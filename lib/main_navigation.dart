@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'home_page.dart'; // HomePage agora é importada do arquivo separado
 import 'expenses_screen.dart'; // Importando a tela de gastos
 import 'lessons_screen.dart'; // Importando a nova LessonsScreen estilizada
+import 'goals_screen.dart'; // Importando a nova tela de metas
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -17,7 +18,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _pages = [
     const HomePage(),
     const ExpensesScreen(),
-    const GoalsPage(),
+    const GoalsScreen(),
     const LessonsScreen(), // Usando a nova LessonsScreen ao invés do placeholder
   ];
 
@@ -158,86 +159,6 @@ class TransactionsPage extends StatelessWidget {
                         child: const Icon(
                           Icons.receipt_long_rounded,
                           color: Color(0xFFEF4444),
-                          size: 50,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Em Desenvolvimento',
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF1E293B),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Esta tela estará disponível em breve!',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF64748B),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class GoalsPage extends StatelessWidget {
-  const GoalsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Minhas Metas',
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Defina e acompanhe seus objetivos',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF64748B),
-                ),
-              ),
-              const SizedBox(height: 40),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF8B5CF6).withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.flag_rounded,
-                          color: Color(0xFF8B5CF6),
                           size: 50,
                         ),
                       ),

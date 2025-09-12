@@ -1,4 +1,3 @@
-// register_children_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -186,9 +185,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     }
   }
 
-  void _finalizarCadastro() {
-    Navigator.pop(context); // ou push para home/dashboard
-  }
+  // void _finalizarCadastro() {
+  //   Navigator.pop(context); // ou push para home/dashboard
+  // }
 
   // Future<void> _handleRegisterChild() async {
   //   if (_formKey.currentState!.validate()) {
