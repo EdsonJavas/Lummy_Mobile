@@ -200,59 +200,32 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                const Color(0xFF8B5CF6).withOpacity(0.05),
-                Colors.white.withOpacity(0.8),
-              ],
-            ),
-          ),
-        ),
-        title: Text(
-          'Minhas Metas',
-          style: GoogleFonts.poppins(
-            fontSize: isSmallScreen ? 18 : 20,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF1E293B),
-          ),
-        ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.add, color: Colors.white),
-              onPressed: _addNewGoal,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
-          ),
-        ],
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header (igual ao padrão da tela de gastos)
+              Text(
+                'Minhas Metas',
+                style: GoogleFonts.poppins(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1E293B),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Defina objetivos e acompanhe seu progresso',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: const Color(0xFF64748B),
+                ),
+              ),
+              const SizedBox(height: 24),
+
               // Enhanced Header
               Container(
                 padding:
@@ -388,6 +361,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
               fontWeight: FontWeight.w700,
               color: const Color(0xFF1E293B),
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(width: 12),
           Container(
@@ -423,12 +398,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   color: headerColor,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  count.toString(),
-                  style: GoogleFonts.poppins(
-                    fontSize: isSmallScreen ? 12 : 14,
-                    fontWeight: FontWeight.w700,
-                    color: headerColor,
+                Flexible(
+                  child: Text(
+                    count.toString(),
+                    style: GoogleFonts.poppins(
+                      fontSize: isSmallScreen ? 12 : 14,
+                      fontWeight: FontWeight.w700,
+                      color: headerColor,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -521,6 +500,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF1E293B),
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
                           ),
                         ),
                         // Status badge
@@ -577,187 +559,73 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
+                        softWrap: true,
                       ),
                     ],
                   ],
                 ),
               ),
-              // Enhanced menu button
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFFE2E8F0),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: PopupMenuButton<String>(
-                  onSelected: (value) {
-                    switch (value) {
-                      case 'add_progress':
-                        _showAddProgressDialog(goal);
-                        break;
-                      case 'mark_completed':
-                        _markGoalAsCompleted(goal);
-                        break;
-                      case 'delete':
-                        _showDeleteConfirmation(goal);
-                        break;
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'add_progress',
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.add,
-                              color: Color(0xFF10B981),
-                              size: 16,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Adicionar Progresso',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF1E293B),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (goal.status == GoalStatus.ongoing)
-                      PopupMenuItem(
-                        value: 'mark_completed',
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF8B5CF6).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.check_circle,
-                                color: Color(0xFF8B5CF6),
-                                size: 16,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'Marcar como Concluída',
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFF1E293B),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEF4444).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.delete,
-                              color: Color(0xFFEF4444),
-                              size: 16,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Excluir Meta',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFFEF4444),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  icon: Icon(
-                    Icons.more_vert,
-                    color: const Color(0xFF64748B),
-                    size: 20,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 8,
-                ),
-              ),
+              const SizedBox.shrink(),
             ],
           ),
           const SizedBox(height: 24),
 
-          // Enhanced Progress Bar with better styling
-          Container(
-            height: 12,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: primaryColor.withOpacity(0.1),
-                width: 1,
-              ),
-            ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: goal.progress,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      primaryColor,
-                      secondaryColor,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(7),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withOpacity(0.3),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+          // Progress Bar - visible track + centered percentage
+          SizedBox(
+            height: 16,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Track
+                Container(
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE2E8F0),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: const Color(0xFFD1D5DB),
+                      width: 1,
                     ),
-                  ],
+                  ),
                 ),
-                child: goal.progress > 0.1
-                    ? Center(
-                        child: Text(
-                          '${(goal.progress * 100).toInt()}%',
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
+                // Fill
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    widthFactor: goal.progress.clamp(0.0, 1.0),
+                    child: Container(
+                      height: 16,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [primaryColor, secondaryColor],
                         ),
-                      )
-                    : null,
-              ),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: primaryColor.withOpacity(0.25),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Centered label over the bar
+                IgnorePointer(
+                  ignoring: true,
+                  child: Text(
+                    '${(goal.progress * 100).toInt()}%',
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: goal.progress > 0.5 ? Colors.white : primaryColor,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -826,6 +694,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF1E293B),
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
                       ),
                       Text(
                         '/ R\$ ${goal.targetAmount.toStringAsFixed(2)}',
@@ -834,6 +705,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF64748B),
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
                       ),
                     ],
                   ),
@@ -857,7 +731,6 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 ),
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(
                     Icons.celebration,
@@ -865,12 +738,17 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     size: 18,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    '🎉 Concluída em ${_formatDate(goal.completedDate!)}',
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 12 : 14,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF10B981),
+                  Flexible(
+                    child: Text(
+                      '🎉 Concluída em ${_formatDate(goal.completedDate!)}',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 12 : 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF10B981),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                     ),
                   ),
                 ],

@@ -32,6 +32,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF1E293B),
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
               Text(
@@ -40,6 +42,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   fontSize: 16,
                   color: const Color(0xFF64748B),
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 24),
 
@@ -119,48 +123,52 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF1E293B),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        // Gráfico - Diminuindo de 180 para 140
+                        // Gráfico estilizado
                         SizedBox(
                           width: 140,
                           height: 140,
                           child: PieChart(
                             PieChartData(
+                              startDegreeOffset: -90,
                               sectionsSpace: 2,
-                              centerSpaceRadius: 35, // Reduzindo de 45 para 35
+                              centerSpaceRadius: 48,
+                              borderData: FlBorderData(show: false),
                               sections: [
                                 PieChartSectionData(
-                                  color: const Color(0xFFEF4444),
+                                  color: const Color(0xFF8B5CF6),
                                   value: 35,
                                   title: '',
-                                  radius: 25, // Reduzindo de 35 para 25
+                                  radius: 32,
                                 ),
                                 PieChartSectionData(
-                                  color: const Color(0xFFFF66B3),
+                                  color: const Color(0xFF3B82F6),
                                   value: 25,
                                   title: '',
-                                  radius: 25,
+                                  radius: 32,
                                 ),
                                 PieChartSectionData(
-                                  color: const Color(0xFFFF8D15),
+                                  color: const Color(0xFFF472B6),
                                   value: 20,
                                   title: '',
-                                  radius: 25,
+                                  radius: 32,
                                 ),
                                 PieChartSectionData(
-                                  color: const Color(0xFFFCA5A5),
+                                  color: const Color(0xFFFB923C),
                                   value: 15,
                                   title: '',
-                                  radius: 25,
+                                  radius: 32,
                                 ),
                                 PieChartSectionData(
-                                  color: const Color(0xFFE5E7EB),
+                                  color: const Color(0xFFCBD5E1),
                                   value: 5,
                                   title: '',
-                                  radius: 25,
+                                  radius: 32,
                                 ),
                               ],
                             ),
@@ -172,11 +180,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLegendItem('Metas', const Color(0xFFEF4444), 'R\$ 436,63'),
-                              _buildLegendItem('Transporte', const Color(0xFFFF66B3), 'R\$ 311,88'),
-                              _buildLegendItem('Jogos e Brinquedos', const Color(0xFFFF8D15), 'R\$ 249,50'),
-                              _buildLegendItem('Alimentação', const Color(0xFFFCA5A5), 'R\$ 187,13'),
-                              _buildLegendItem('Outros', const Color(0xFFE5E7EB), 'R\$ 62,36'),
+                              _buildLegendItem('Metas', const Color(0xFF8B5CF6),
+                                  'R\$ 436,63'),
+                              _buildLegendItem('Transporte',
+                                  const Color(0xFF3B82F6), 'R\$ 311,88'),
+                              _buildLegendItem('Jogos e Brinquedos',
+                                  const Color(0xFFF472B6), 'R\$ 249,50'),
+                              _buildLegendItem('Alimentação',
+                                  const Color(0xFFFB923C), 'R\$ 187,13'),
+                              _buildLegendItem('Outros',
+                                  const Color(0xFFCBD5E1), 'R\$ 62,36'),
                             ],
                           ),
                         ),
@@ -238,10 +251,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildTransactionItem('Lanche na escola', 'Alimentação', 'R\$ 15,50', const Color(0xFFFCA5A5)),
-                    _buildTransactionItem('Ônibus', 'Transporte', 'R\$ 4,50', const Color(0xFFFF66B3)),
-                    _buildTransactionItem('Jogo novo', 'Jogos e Brinquedos', 'R\$ 29,90', const Color(0xFFFF8D15)),
-                    _buildTransactionItem('Mesada guardada', 'Metas', 'R\$ 50,00', const Color(0xFFEF4444)),
+                    _buildTransactionItem('Lanche na escola', 'Alimentação',
+                        'R\$ 15,50', const Color(0xFFFCA5A5)),
+                    _buildTransactionItem('Ônibus', 'Transporte', 'R\$ 4,50',
+                        const Color(0xFFFF66B3)),
+                    _buildTransactionItem('Jogo novo', 'Jogos e Brinquedos',
+                        'R\$ 29,90', const Color(0xFFFF8D15)),
+                    _buildTransactionItem('Mesada guardada', 'Metas',
+                        'R\$ 50,00', const Color(0xFFEF4444)),
                   ],
                 ),
               ),
@@ -273,14 +290,23 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 fontSize: 14,
                 color: const Color(0xFF64748B),
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
             ),
           ),
-          Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF1E293B),
+          Flexible(
+            child: Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF1E293B),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.right,
+              softWrap: false,
             ),
           ),
         ],
@@ -288,7 +314,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
-  Widget _buildFilterButton(String label, String value, List<String> options, Function(String) onChanged) {
+  Widget _buildFilterButton(String label, String value, List<String> options,
+      Function(String) onChanged) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -326,7 +353,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
-  Widget _buildTransactionItem(String title, String category, String amount, Color categoryColor) {
+  Widget _buildTransactionItem(
+      String title, String category, String amount, Color categoryColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -356,6 +384,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     fontWeight: FontWeight.w500,
                     color: const Color(0xFF1E293B),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                 ),
                 Text(
                   category,
@@ -363,16 +394,25 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     fontSize: 12,
                     color: const Color(0xFF64748B),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                 ),
               ],
             ),
           ),
-          Text(
-            amount,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF1E293B),
+          Flexible(
+            child: Text(
+              amount,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF1E293B),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.right,
+              softWrap: false,
             ),
           ),
         ],
