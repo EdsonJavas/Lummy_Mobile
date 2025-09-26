@@ -36,6 +36,14 @@ class BiometricAuthService {
     }
   }
 
+  Future<List<BiometricType>> getAvailableBiometrics() async {
+    try {
+      return await _localAuth.getAvailableBiometrics();
+    } catch (_) {
+      return [];
+    }
+  }
+
   Future<bool> isBiometricEnabled() async {
     final v = await _secureStorage.read(key: _biometricEnabledKey);
     return v == 'true';
@@ -62,6 +70,25 @@ class BiometricAuthService {
 
   Future<bool> authenticate({String reason = 'Confirmar para entrar'}) async {
     try {
+      print('Iniciando autenticação biométrica...');
+
+      // Verificar se o dispositivo suporta biometria
+      final isSupported = await _localAuth.isDeviceSupported();
+      if (!isSupported) {
+        print('Dispositivo não suporta biometria');
+        return false;
+      }
+
+      // Verificar se há biometrias disponíveis
+      final availableBiometrics = await _localAuth.getAvailableBiometrics();
+      print('Biometrias disponíveis: $availableBiometrics');
+
+      if (availableBiometrics.isEmpty) {
+        print('Nenhuma biometria cadastrada');
+        return false;
+      }
+
+      // Tentar autenticação
       final didAuth = await _localAuth.authenticate(
         localizedReason: reason,
         options: const AuthenticationOptions(
@@ -70,8 +97,11 @@ class BiometricAuthService {
           useErrorDialogs: true,
         ),
       );
+
+      print('Resultado da autenticação: $didAuth');
       return didAuth;
-    } catch (_) {
+    } catch (e) {
+      print('Erro na autenticação biométrica: $e');
       return false;
     }
   }
@@ -84,9 +114,11 @@ class AppFacade {
   static final AppFacade instance = AppFacade._();
 
   final LoginUseCase _login = locator<LoginUseCase>();
-  final AddTransactionUseCase _addTransaction = locator<AddTransactionUseCase>();
+  final AddTransactionUseCase _addTransaction =
+      locator<AddTransactionUseCase>();
   final SetGoalUseCase _setGoal = locator<SetGoalUseCase>();
-  final GetFinancialDataUseCase _getFinancial = locator<GetFinancialDataUseCase>();
+  final GetFinancialDataUseCase _getFinancial =
+      locator<GetFinancialDataUseCase>();
 
   Future<Result<String>> login(String email, String password) {
     return _login(email: email, password: password);
@@ -126,5 +158,3 @@ class AppFacade {
     );
   }
 }
-
-
