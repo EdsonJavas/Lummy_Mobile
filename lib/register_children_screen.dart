@@ -30,35 +30,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
   bool _passwordFocused = false;
   bool _ageFocused = false;
 
-  String? _responsavelId; // 🔹 Para guardar o ID do responsável no Firestore
-
-  late AnimationController _animationController;
-  late Animation<double> _bounceAnimation;
-  late AnimationController _starAnimationController;
-  late Animation<double> _starAnimation;
+  String? _responsavelId;
 
   @override
   void initState() {
     super.initState();
-    _criarResponsavelNoFirestore(); // 🔹 cria o responsável assim que entra na tela
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-    _bounceAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
-    );
-
-    _starAnimationController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    )..repeat();
-    _starAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-          parent: _starAnimationController, curve: Curves.easeInOut),
-    );
-
-    _animationController.forward();
+    _criarResponsavelNoFirestore();
   }
 
   @override
@@ -68,8 +45,6 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     _emailController.dispose();
     _passwordController.dispose();
     _ageController.dispose();
-    _animationController.dispose();
-    _starAnimationController.dispose();
     super.dispose();
   }
 
@@ -113,7 +88,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         "nome": widget.responsavel.nome,
         "cpf": widget.responsavel.cpf,
         "email": widget.responsavel.email,
-        "senha": widget.responsavel.senha, // ⚠️ não recomendado texto plano
+        "senha": widget.responsavel.senha,
         "createdAt": FieldValue.serverTimestamp(),
       });
 
@@ -127,19 +102,30 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     }
   }
 
-  // 🔹 Agora o método principal volta a se chamar _handleRegisterChild
   Future<void> _handleRegisterChild() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedGender.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Selecione o sexo da criança")),
+          SnackBar(
+            content: const Text("Selecione o sexo da criança"),
+            backgroundColor: const Color(0xFFEF4444),
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         );
         return;
       }
 
       if (_responsavelId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Responsável ainda não foi criado")),
+          SnackBar(
+            content: const Text("Responsável ainda não foi criado"),
+            backgroundColor: const Color(0xFFEF4444),
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         );
         return;
       }
@@ -155,17 +141,23 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           "nome": _nameController.text.trim(),
           "cpf": _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
           "email": _emailController.text.trim(),
-          "senha": _passwordController.text, // ⚠️ idem
+          "senha": _passwordController.text,
           "idade": int.tryParse(_ageController.text.trim()) ?? 0,
           "sexo": _selectedGender,
           "createdAt": FieldValue.serverTimestamp(),
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("🎉 Criança adicionada com sucesso!")),
+          SnackBar(
+            content: const Text("Criança adicionada com sucesso!"),
+            backgroundColor: const Color(0xFF10B981),
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         );
 
-        // 🔹 limpar formulário
+        // Limpar formulário
         _formKey.currentState?.reset();
         _nameController.clear();
         _cpfController.clear();
@@ -177,127 +169,19 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro ao adicionar criança: $e")),
+          SnackBar(
+            content: Text("Erro ao adicionar criança: $e"),
+            backgroundColor: const Color(0xFFEF4444),
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
         );
       }
 
       setState(() => _isLoading = false);
     }
   }
-
-  // void _finalizarCadastro() {
-  //   Navigator.pop(context); // ou push para home/dashboard
-  // }
-
-  // Future<void> _handleRegisterChild() async {
-  //   if (_formKey.currentState!.validate()) {
-  //     if (_selectedGender.isEmpty) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: const Text('Por favor, selecione o sexo da criança'),
-  //           backgroundColor: Colors.orange,
-  //           behavior: SnackBarBehavior.floating,
-  //           shape:
-  //               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-  //         ),
-  //       );
-  //       return;
-  //     }
-
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-
-  //     try {
-  //       final firestore = FirebaseFirestore.instance;
-
-  //       // 🔹 1. Criar documento do responsável
-  //       final responsavelRef = await firestore.collection("responsaveis").add({
-  //         "nome": widget.responsavel.nome,
-  //         "cpf": widget.responsavel.cpf,
-  //         "email": widget.responsavel.email,
-  //         "senha": widget
-  //             .responsavel.senha, // ⚠️ não recomendado salvar em texto plano
-  //         "createdAt": FieldValue.serverTimestamp(),
-  //       });
-
-  //       // 🔹 2. Criar documento da criança dentro de "children"
-  //       await firestore
-  //           .collection("responsaveis")
-  //           .doc(responsavelRef.id)
-  //           .collection("children")
-  //           .add({
-  //         "nome": _nameController.text.trim(),
-  //         "cpf": _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-  //         "email": _emailController.text.trim(),
-  //         "senha": _passwordController.text, // ⚠️ idem
-  //         "idade": int.tryParse(_ageController.text.trim()) ?? 0,
-  //         "sexo": _selectedGender,
-  //         "createdAt": FieldValue.serverTimestamp(),
-  //       });
-
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content:
-  //               const Text('🎉 Responsável e criança cadastrados com sucesso!'),
-  //           backgroundColor: Colors.green,
-  //           behavior: SnackBarBehavior.floating,
-  //           shape:
-  //               RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-  //         ),
-  //       );
-
-  //       // 🔹 Se quiser limpar os campos da criança
-  //       _nameController.clear();
-  //       _cpfController.clear();
-  //       _emailController.clear();
-  //       _passwordController.clear();
-  //       _ageController.clear();
-  //       setState(() {
-  //         _selectedGender = '';
-  //       });
-
-  //       // 🔹 Pode navegar para próxima tela
-  //       Navigator.pop(context); // ou push para home/dashboard
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(
-  //           content: Text('Erro ao salvar: $e'),
-  //           backgroundColor: Colors.red,
-  //         ),
-  //       );
-  //     }
-
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   }
-
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content: Row(
-  //         children: [
-  //           const Text('🎉 '),
-  //           const Text('Criança cadastrada com sucesso!'),
-  //         ],
-  //       ),
-  //       backgroundColor: Colors.green,
-  //       behavior: SnackBarBehavior.floating,
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-  //     ),
-  //   );
-  //   if (_selectedGender.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: const Text('Por favor, selecione o sexo da criança'),
-  //         backgroundColor: Colors.orange,
-  //         behavior: SnackBarBehavior.floating,
-  //         shape:
-  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-  //       ),
-  //     );
-  //   }
-  // }
 
   Widget _buildGenderSelector() {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -311,7 +195,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           style: GoogleFonts.poppins(
             fontSize: isVerySmallScreen ? 14 : 16,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: const Color(0xFF1E293B),
           ),
         ),
         SizedBox(height: isVerySmallScreen ? 8 : 12),
@@ -326,48 +210,54 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  padding: EdgeInsets.all(isVerySmallScreen ? 12 : 16),
+                  padding: EdgeInsets.all(isVerySmallScreen ? 16 : 20),
                   decoration: BoxDecoration(
-                    gradient: _selectedGender == 'Masculino'
-                        ? const LinearGradient(
-                            colors: [Color(0xFF4FC3F7), Color(0xFF29B6F6)],
-                          )
-                        : null,
                     color: _selectedGender == 'Masculino'
-                        ? null
-                        : const Color(0xFFF8F9FA),
-                    borderRadius: BorderRadius.circular(15),
+                        ? const Color(0xFF1E40AF).withOpacity(0.1)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: _selectedGender == 'Masculino'
-                          ? Colors.transparent
-                          : Colors.grey.shade300,
-                      width: 2,
+                          ? const Color(0xFF1E40AF)
+                          : const Color(0xFFE2E8F0),
+                      width: _selectedGender == 'Masculino' ? 2 : 1,
                     ),
-                    boxShadow: _selectedGender == 'Masculino'
-                        ? [
-                            BoxShadow(
-                              color: const Color(0xFF4FC3F7).withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                        : [],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
-                      Text(
-                        '👦',
-                        style: TextStyle(fontSize: isVerySmallScreen ? 24 : 30),
+                      Container(
+                        width: isVerySmallScreen ? 32 : 40,
+                        height: isVerySmallScreen ? 32 : 40,
+                        decoration: BoxDecoration(
+                          color: _selectedGender == 'Masculino'
+                              ? const Color(0xFF1E40AF)
+                              : const Color(0xFF64748B).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          color: _selectedGender == 'Masculino'
+                              ? Colors.white
+                              : const Color(0xFF64748B),
+                          size: isVerySmallScreen ? 16 : 20,
+                        ),
                       ),
-                      SizedBox(height: isVerySmallScreen ? 4 : 8),
+                      SizedBox(height: isVerySmallScreen ? 8 : 12),
                       Text(
                         'Menino',
                         style: GoogleFonts.poppins(
                           fontSize: isVerySmallScreen ? 12 : 14,
                           fontWeight: FontWeight.w600,
                           color: _selectedGender == 'Masculino'
-                              ? Colors.white
-                              : Colors.black87,
+                              ? const Color(0xFF1E40AF)
+                              : const Color(0xFF64748B),
                         ),
                       ),
                     ],
@@ -385,48 +275,54 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  padding: EdgeInsets.all(isVerySmallScreen ? 12 : 16),
+                  padding: EdgeInsets.all(isVerySmallScreen ? 16 : 20),
                   decoration: BoxDecoration(
-                    gradient: _selectedGender == 'Feminino'
-                        ? const LinearGradient(
-                            colors: [Color(0xFFFF8A95), Color(0xFFFF6B7A)],
-                          )
-                        : null,
                     color: _selectedGender == 'Feminino'
-                        ? null
-                        : const Color(0xFFF8F9FA),
-                    borderRadius: BorderRadius.circular(15),
+                        ? const Color(0xFFEC4899).withOpacity(0.1)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: _selectedGender == 'Feminino'
-                          ? Colors.transparent
-                          : Colors.grey.shade300,
-                      width: 2,
+                          ? const Color(0xFFEC4899)
+                          : const Color(0xFFE2E8F0),
+                      width: _selectedGender == 'Feminino' ? 2 : 1,
                     ),
-                    boxShadow: _selectedGender == 'Feminino'
-                        ? [
-                            BoxShadow(
-                              color: const Color(0xFFFF8A95).withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                        : [],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
-                      Text(
-                        '👧',
-                        style: TextStyle(fontSize: isVerySmallScreen ? 24 : 30),
+                      Container(
+                        width: isVerySmallScreen ? 32 : 40,
+                        height: isVerySmallScreen ? 32 : 40,
+                        decoration: BoxDecoration(
+                          color: _selectedGender == 'Feminino'
+                              ? const Color(0xFFEC4899)
+                              : const Color(0xFF64748B).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          color: _selectedGender == 'Feminino'
+                              ? Colors.white
+                              : const Color(0xFF64748B),
+                          size: isVerySmallScreen ? 16 : 20,
+                        ),
                       ),
-                      SizedBox(height: isVerySmallScreen ? 4 : 8),
+                      SizedBox(height: isVerySmallScreen ? 8 : 12),
                       Text(
                         'Menina',
                         style: GoogleFonts.poppins(
                           fontSize: isVerySmallScreen ? 12 : 14,
                           fontWeight: FontWeight.w600,
                           color: _selectedGender == 'Feminino'
-                              ? Colors.white
-                              : Colors.black87,
+                              ? const Color(0xFFEC4899)
+                              : const Color(0xFF64748B),
                         ),
                       ),
                     ],
@@ -440,7 +336,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     );
   }
 
-  Widget _buildAnimatedInputField({
+  Widget _buildInputField({
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
@@ -457,25 +353,20 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     final isVerySmallScreen = screenHeight < 650;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        gradient: isFocused
-            ? const LinearGradient(
-                colors: [Color(0xFFFFF3E0), Color(0xFFFFE0B2)],
-              )
-            : null,
-        color: isFocused ? null : const Color(0xFFF8F9FA),
-        borderRadius: BorderRadius.circular(15),
+        color: const Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isFocused ? const Color(0xFFFF8C42) : Colors.transparent,
+          color: isFocused ? const Color(0xFF1E40AF) : Colors.transparent,
           width: 2,
         ),
         boxShadow: isFocused
             ? [
                 BoxShadow(
-                  color: const Color(0xFFFF8C42).withOpacity(0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  color: const Color(0xFF1E40AF).withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ]
             : [
@@ -496,19 +387,20 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           textCapitalization: textCapitalization,
           style: GoogleFonts.poppins(
             fontSize: isVerySmallScreen ? 14 : 16,
-            color: Colors.black87,
+            color: const Color(0xFF1E293B),
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: GoogleFonts.poppins(
-              color: Colors.grey[500],
+              color: const Color(0xFF64748B),
               fontSize: isVerySmallScreen ? 14 : 16,
               fontWeight: FontWeight.w400,
             ),
             prefixIcon: Icon(
               icon,
-              color: isFocused ? const Color(0xFFFF8C42) : Colors.grey[500],
+              color:
+                  isFocused ? const Color(0xFF1E40AF) : const Color(0xFF64748B),
               size: isVerySmallScreen ? 20 : 22,
             ),
             suffixIcon: suffixIcon,
@@ -537,6 +429,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -546,54 +439,23 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           ),
           child: Stack(
             children: [
-              // Fundo com gradiente mais colorido e infantil
+              // Header com gradiente azul - similar ao LoginScreen
               Container(
                 width: double.infinity,
-                height: screenHeight,
+                height: isVerySmallScreen
+                    ? screenHeight * 0.35
+                    : screenHeight * 0.4,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                     colors: [
-                      Color(0xFF4FC3F7), // Azul claro
-                      Color(0xFF29B6F6), // Azul médio
-                      Color(0xFFFF8A95), // Rosa claro
-                      Color(0xFFFFB74D), // Laranja claro
+                      Color(0xFF4A90E2),
+                      Color(0xFF357ABD),
                     ],
                   ),
                 ),
               ),
-
-              // Estrelas animadas no fundo
-              ...List.generate(8, (index) {
-                return AnimatedBuilder(
-                  animation: _starAnimation,
-                  builder: (context, child) {
-                    final offset = (_starAnimation.value + index * 0.2) % 1.0;
-                    return Positioned(
-                      top: (screenHeight * 0.1) + (index * 80) + (offset * 50),
-                      left: (index % 2 == 0)
-                          ? screenWidth * 0.1 + (offset * 30)
-                          : screenWidth * 0.8 + (offset * 30),
-                      child: Transform.rotate(
-                        angle: _starAnimation.value * 6.28,
-                        child: Text(
-                          index % 4 == 0
-                              ? '⭐'
-                              : index % 4 == 1
-                                  ? '🌟'
-                                  : index % 4 == 2
-                                      ? '✨'
-                                      : '💫',
-                          style: TextStyle(
-                            fontSize: isVerySmallScreen ? 16 : 20,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              }),
 
               // Logo no topo
               SafeArea(
@@ -610,7 +472,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
                             Icons.arrow_back,
@@ -628,7 +490,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.white,
+                                color: Colors.black,
                               ),
                             ),
                             TextSpan(
@@ -636,7 +498,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFFFFD54F),
+                                color: Colors.orange,
                               ),
                             ),
                             TextSpan(
@@ -644,7 +506,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.white,
+                                color: const Color(0xFF003092),
                               ),
                             ),
                             TextSpan(
@@ -652,7 +514,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFFFFD54F),
+                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -663,55 +525,29 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 ),
               ),
 
-              // Personagem infantil animado
+              // Ilustração simples no header
               Positioned(
                 top: isVerySmallScreen
-                    ? screenHeight * 0.08
-                    : screenHeight * 0.10,
-                left: screenWidth * 0.2,
-                right: screenWidth * 0.2,
-                child: AnimatedBuilder(
-                  animation: _bounceAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _bounceAnimation.value,
-                      child: Center(
-                        child: Container(
-                          height: isVerySmallScreen
-                              ? 200
-                              : (isSmallScreen ? 250 : 300),
-                          width: isVerySmallScreen
-                              ? 200
-                              : (isSmallScreen ? 250 : 300),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(150),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Text(
-                              '👶',
-                              style: TextStyle(
-                                fontSize: isVerySmallScreen
-                                    ? 80
-                                    : (isSmallScreen ? 100 : 120),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                    ? screenHeight * 0.12
+                    : screenHeight * 0.15,
+                left: screenWidth * 0.25,
+                right: screenWidth * 0.25,
+                child: Container(
+                  height: isVerySmallScreen ? 80 : 100,
+                  width: isVerySmallScreen ? 80 : 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Icon(
+                    Icons.child_care,
+                    size: isVerySmallScreen ? 40 : 50,
+                    color: Colors.white,
+                  ),
                 ),
               ),
 
-              // Formulário na parte inferior
+              // Formulário na parte inferior - similar ao LoginScreen
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -752,37 +588,36 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
-                                height: isVerySmallScreen
-                                    ? 15
-                                    : (isSmallScreen ? 25 : 35)),
+                            SizedBox(height: isVerySmallScreen ? 25 : 40),
 
-                            // Título com emoji
-                            Row(
-                              children: [
-                                Text(
-                                  '🎈 ',
-                                  style: TextStyle(
-                                      fontSize: isVerySmallScreen ? 24 : 28),
-                                ),
-                                Text(
-                                  'Cadastrar Criança',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: isVerySmallScreen ? 24 : 28,
-                                    fontWeight: FontWeight.w700,
-                                    color: const Color(0xFF2E3A59),
-                                  ),
-                                ),
-                              ],
+                            // Título
+                            Text(
+                              'Cadastrar Criança',
+                              style: GoogleFonts.poppins(
+                                fontSize: isVerySmallScreen ? 24 : 28,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF1E293B),
+                              ),
                             ),
 
-                            SizedBox(height: isVerySmallScreen ? 15 : 20),
+                            const SizedBox(height: 8),
+
+                            Text(
+                              'Adicione os dados da criança para continuar',
+                              style: GoogleFonts.poppins(
+                                fontSize: isVerySmallScreen ? 14 : 16,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF64748B),
+                              ),
+                            ),
+
+                            SizedBox(height: isVerySmallScreen ? 20 : 30),
 
                             // Campo Nome
-                            _buildAnimatedInputField(
+                            _buildInputField(
                               controller: _nameController,
                               hintText: 'Nome da criança',
-                              icon: Icons.child_care,
+                              icon: Icons.person_outline,
                               isFocused: _nameFocused,
                               onFocusChange: (hasFocus) {
                                 setState(() {
@@ -801,18 +636,18 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               },
                             ),
 
-                            SizedBox(height: isVerySmallScreen ? 10 : 14),
+                            SizedBox(height: isVerySmallScreen ? 12 : 16),
 
                             // Seletor de sexo
                             _buildGenderSelector(),
 
-                            SizedBox(height: isVerySmallScreen ? 10 : 14),
+                            SizedBox(height: isVerySmallScreen ? 12 : 16),
 
                             // Campo Idade
-                            _buildAnimatedInputField(
+                            _buildInputField(
                               controller: _ageController,
                               hintText: 'Idade da criança',
-                              icon: Icons.cake,
+                              icon: Icons.cake_outlined,
                               isFocused: _ageFocused,
                               keyboardType: TextInputType.number,
                               inputFormatters: [
@@ -836,13 +671,13 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               },
                             ),
 
-                            SizedBox(height: isVerySmallScreen ? 10 : 14),
+                            SizedBox(height: isVerySmallScreen ? 12 : 16),
 
                             // Campo CPF
-                            _buildAnimatedInputField(
+                            _buildInputField(
                               controller: _cpfController,
                               hintText: 'CPF da criança',
-                              icon: Icons.badge,
+                              icon: Icons.badge_outlined,
                               isFocused: _cpfFocused,
                               keyboardType: TextInputType.number,
                               inputFormatters: [
@@ -874,13 +709,13 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               },
                             ),
 
-                            SizedBox(height: isVerySmallScreen ? 10 : 14),
+                            SizedBox(height: isVerySmallScreen ? 12 : 16),
 
                             // Campo E-mail
-                            _buildAnimatedInputField(
+                            _buildInputField(
                               controller: _emailController,
                               hintText: 'E-mail da criança',
-                              icon: Icons.email,
+                              icon: Icons.email_outlined,
                               isFocused: _emailFocused,
                               keyboardType: TextInputType.emailAddress,
                               onFocusChange: (hasFocus) {
@@ -900,13 +735,13 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               },
                             ),
 
-                            SizedBox(height: isVerySmallScreen ? 10 : 14),
+                            SizedBox(height: isVerySmallScreen ? 12 : 16),
 
                             // Campo Senha
-                            _buildAnimatedInputField(
+                            _buildInputField(
                               controller: _passwordController,
                               hintText: 'Senha da criança',
-                              icon: Icons.lock,
+                              icon: Icons.lock_outline,
                               isFocused: _passwordFocused,
                               obscureText: !_isPasswordVisible,
                               onFocusChange: (hasFocus) {
@@ -917,11 +752,11 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _isPasswordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
                                   color: _passwordFocused
-                                      ? const Color(0xFFFF8C42)
-                                      : Colors.grey[500],
+                                      ? const Color(0xFF1E40AF)
+                                      : const Color(0xFF64748B),
                                   size: isVerySmallScreen ? 20 : 22,
                                 ),
                                 onPressed: () {
@@ -941,7 +776,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               },
                             ),
 
-                            SizedBox(height: isVerySmallScreen ? 20 : 25),
+                            SizedBox(height: isVerySmallScreen ? 25 : 35),
 
                             // Botão Cadastrar Criança
                             Container(
@@ -951,8 +786,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                                 gradient: const LinearGradient(
                                   colors: [
                                     Color(0xFFFF8C42),
-                                    Color(0xFFFF6B7A),
-                                    Color(0xFF4FC3F7),
+                                    Color(0xFFFF7A28),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(
@@ -960,9 +794,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(0xFFFF8C42)
-                                        .withOpacity(0.4),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 6),
+                                        .withOpacity(0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
@@ -987,30 +821,15 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                                           strokeWidth: 2,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                            Colors.white,
-                                          ),
+                                                  Colors.white),
                                         ),
                                       )
-                                    : Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            '🎉 ',
-                                            style: TextStyle(
-                                                fontSize: isVerySmallScreen
-                                                    ? 16
-                                                    : 18),
-                                          ),
-                                          Text(
-                                            'Cadastrar Criança',
-                                            style: GoogleFonts.poppins(
-                                              fontSize:
-                                                  isVerySmallScreen ? 16 : 18,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ],
+                                    : Text(
+                                        'Cadastrar Criança',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: isVerySmallScreen ? 16 : 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                               ),
                             ),
@@ -1019,39 +838,22 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
 
                             // Botão para adicionar mais crianças
                             Center(
-                              child: TextButton(
+                              child: TextButton.icon(
                                 onPressed: () async {
-                                  await _handleRegisterChild(); // 🔹 salva no Firestore
-
-                                  // 🔹 se quiser limpar manualmente além do que já tem no método
-                                  _formKey.currentState?.reset();
-                                  _nameController.clear();
-                                  _cpfController.clear();
-                                  _emailController.clear();
-                                  _passwordController.clear();
-                                  _ageController.clear();
-                                  setState(() {
-                                    _selectedGender = '';
-                                  });
+                                  await _handleRegisterChild();
                                 },
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      '➕ ',
-                                      style: TextStyle(
-                                          fontSize:
-                                              isVerySmallScreen ? 14 : 16),
-                                    ),
-                                    Text(
-                                      'Adicionar outra criança',
-                                      style: GoogleFonts.poppins(
-                                        color: const Color(0xFF4FC3F7),
-                                        fontSize: isVerySmallScreen ? 14 : 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
+                                icon: const Icon(
+                                  Icons.add_circle_outline,
+                                  color: Color(0xFF1E40AF),
+                                  size: 20,
+                                ),
+                                label: Text(
+                                  'Adicionar outra criança',
+                                  style: GoogleFonts.poppins(
+                                    color: const Color(0xFF1E40AF),
+                                    fontSize: isVerySmallScreen ? 14 : 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
