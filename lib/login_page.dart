@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy_login/main_navigation.dart';
+import 'package:lummy_login/di/locator.dart';
+import 'package:lummy_login/application/app_facade.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,12 +21,30 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _emailFocused = false;
   bool _passwordFocused = false;
+  bool _biometricAvailable = false;
+  bool _biometricEnabled = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricState();
+  }
+
+  Future<void> _loadBiometricState() async {
+    final bio = locator<BiometricAuthService>();
+    final supported = await bio.canCheckBiometrics();
+    final enabled = await bio.isBiometricEnabled();
+    setState(() {
+      _biometricAvailable = supported;
+      _biometricEnabled = enabled;
+    });
   }
 
   Future<void> _handleLogin() async {
@@ -34,6 +54,10 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       await Future.delayed(const Duration(seconds: 2));
+      if (_biometricEnabled) {
+        final bio = locator<BiometricAuthService>();
+        await bio.cacheUserId('mock-user');
+      }
 
       setState(() {
         _isLoading = false;
@@ -391,6 +415,34 @@ class _LoginScreenState extends State<LoginScreen> {
                             
                             SizedBox(height: isVerySmallScreen ? 20 : 30), // Responsivo
                             
+                            // Alternar biometria
+                            if (_biometricAvailable) ...[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Usar biometria',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: isVerySmallScreen ? 12 : 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  Switch(
+                                    value: _biometricEnabled,
+                                    onChanged: (v) async {
+                                      final bio = locator<BiometricAuthService>();
+                                      await bio.setBiometricEnabled(v);
+                                      setState(() {
+                                        _biometricEnabled = v;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: isVerySmallScreen ? 12 : 16),
+                            ],
+
                             // Botão Login com gradiente
                             Container(
                               width: double.infinity,

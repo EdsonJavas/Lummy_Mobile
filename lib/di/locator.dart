@@ -8,6 +8,9 @@ import 'package:lummy_login/domain/usecases/add_transaction_use_case.dart';
 import 'package:lummy_login/domain/usecases/get_financial_data_use_case.dart';
 import 'package:lummy_login/domain/usecases/login_use_case.dart';
 import 'package:lummy_login/domain/usecases/set_goal_use_case.dart';
+import 'package:lummy_login/application/app_facade.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_auth/local_auth.dart';
 
 final GetIt locator = GetIt.instance;
 
@@ -24,6 +27,14 @@ void setupLocator() {
   locator.registerFactory<AddTransactionUseCase>(() => AddTransactionUseCase(locator()));
   locator.registerFactory<SetGoalUseCase>(() => SetGoalUseCase(locator()));
   locator.registerFactory<GetFinancialDataUseCase>(() => GetFinancialDataUseCase(locator()));
+
+  // Biometrics
+  locator.registerLazySingleton<LocalAuthentication>(() => LocalAuthentication());
+  locator.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
+  locator.registerLazySingleton<BiometricAuthService>(() => BiometricAuthService(
+        locator<LocalAuthentication>(),
+        locator<FlutterSecureStorage>(),
+      ));
 }
 
 
