@@ -59,7 +59,61 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = false;
     });
+    
+    // Mostrar diálogo perguntando se deseja salvar a digital
+    final shouldEnable = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Usar biometria?',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          'Deseja salvar sua digital para facilitar os próximos logins?',
+          style: GoogleFonts.poppins(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              'Não',
+              style: GoogleFonts.poppins(
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(
+              'Sim',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
 
+    if (shouldEnable == true) {
+      final bio = locator<BiometricAuthService>();
+      await bio.setBiometricEnabled(true);
+      setState(() {
+        _biometricEnabled = true;
+      });
+    }
   }
 
 
@@ -167,9 +221,10 @@ class _LoginScreenState extends State<LoginScreen> {
           _cachedUserId = _emailController.text;
 
           if (!_biometricEnabled) {
-            _showBiometricSetupDialog();
+            await _showBiometricSetupDialog();
           }
         }
+        // Navegar para a tela principal independentemente da escolha de biometria
         _navigateToMain();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -693,36 +748,58 @@ class _LoginScreenState extends State<LoginScreen> {
                                     isVerySmallScreen ? 16 : 20), // Responsivo
 
                             // Botão de Login
-                            SizedBox(
+                            Container(
                               width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFFF8C42), Color(0xFFFF5722)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                    isVerySmallScreen ? 25 : 28),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFFF8C42)
+                                        .withOpacity(0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
                               child: ElevatedButton(
                                 onPressed: _isLoading ? null : _handleLogin,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF4A90E2),
+                                  backgroundColor: Colors.transparent,
                                   foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shadowColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(
+                                        isVerySmallScreen ? 25 : 28),
                                   ),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16),
-                                  elevation: 3,
                                 ),
-                                child: _isLoading
-                                    ? const SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 2,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  child: _isLoading
+                                      ? SizedBox(
+                                          height: isVerySmallScreen ? 18 : 20,
+                                          width: isVerySmallScreen ? 18 : 20,
+                                          child: const CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          ),
+                                        )
+                                      : Text(
+                                          'Entrar',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: isVerySmallScreen ? 16 : 18,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                      )
-                                    : Text(
-                                        'Entrar',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
+                                ),
                               ),
                             ),
 
@@ -762,13 +839,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ],
                             ),
-
-                            // Botão de teste de biometria (apenas para debug)
-                            if (kDebugMode)
-                              TextButton(
-                                onPressed: _testBiometric,
-                                child: const Text("Testar Biometria"),
-                              ),
 
                             SizedBox(
                                 height:

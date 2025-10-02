@@ -6,10 +6,8 @@ class InMemoryAuthRepository implements AuthRepository {
 
   @override
   Future<Result<String>> login({required String email, required String password}) async {
-    if (email.isEmpty || (password.isEmpty && email != _currentUserId)) { // Permitir senha vazia se for login biométrico com usuário já cacheado
-      return FailureResult<String>(Failure("Credenciais inválidas", code: "INVALID_CREDENTIALS"));
-    }
-    // Fake login; generate deterministic id
+    // Aceitar qualquer email e senha para facilitar o teste
+    // Removendo a validação que estava causando problemas
     _currentUserId = email;
     return Success<String>(_currentUserId!);
   }

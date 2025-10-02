@@ -35,6 +35,15 @@ void setupLocator() {
         locator<LocalAuthentication>(),
         locator<FlutterSecureStorage>(),
       ));
+      
+  // Facade
+  locator.registerLazySingleton<AppFacade>(() => AppFacade(
+        loginUseCase: locator<LoginUseCase>(),
+        getFinancialDataUseCase: locator<GetFinancialDataUseCase>(),
+        addTransactionUseCase: locator<AddTransactionUseCase>(),
+        setGoalUseCase: locator<SetGoalUseCase>(),
+        biometricAuthService: locator<BiometricAuthService>(),
+      ));
 }
 
 
