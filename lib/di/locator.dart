@@ -37,13 +37,7 @@ void setupLocator() {
       ));
       
   // Facade
-  locator.registerLazySingleton<AppFacade>(() => AppFacade(
-        loginUseCase: locator<LoginUseCase>(),
-        getFinancialDataUseCase: locator<GetFinancialDataUseCase>(),
-        addTransactionUseCase: locator<AddTransactionUseCase>(),
-        setGoalUseCase: locator<SetGoalUseCase>(),
-        biometricAuthService: locator<BiometricAuthService>(),
-      ));
+  locator.registerLazySingleton<AppFacade>(() => AppFacade.instance);
 }
 
 
