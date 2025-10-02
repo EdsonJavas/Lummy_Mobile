@@ -11,6 +11,8 @@ abstract class Result<T> {
 
   bool get isSuccess => this is Success<T>;
   bool get isFailure => this is FailureResult<T>;
+
+  get error => null;
 }
 
 class Success<T> extends Result<T> {

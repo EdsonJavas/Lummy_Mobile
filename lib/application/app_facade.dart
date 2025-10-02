@@ -124,6 +124,13 @@ class AppFacade {
     return _login(email: email, password: password);
   }
 
+  Future<Result<String>> loginWithBiometrics(String userId) {
+    // Para login com biometria, o userId (email) é usado para identificar o usuário.
+    // A senha não é necessária, mas o LoginUseCase espera ambos. Pode ser necessário ajustar o LoginUseCase
+    // ou passar uma senha placeholder se o backend exigir.
+    return _login(email: userId, password: ""); // Passando uma string vazia para a senha por enquanto
+  }
+
   Future<Result<FinancialData>> getFinancialData(String userId) {
     return _getFinancial(userId);
   }

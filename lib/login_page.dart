@@ -5,6 +5,7 @@ import 'package:lummy_login/main_navigation.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/application/app_facade.dart';
 import 'register_screen.dart';
+import 'package:flutter/foundation.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,7 +36,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _loadBiometricState();
+    _loadBiometricState().then((_) {
+      if (_biometricAvailable && _biometricEnabled && _cachedUserId != null) {
+        _authenticateWithBiometrics();
+      }
+    });
   }
 
   Future<void> _loadBiometricState() async {
@@ -55,207 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = false;
     });
 
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF4A90E2).withOpacity(0.1),
-              ),
-              child: Center(
-                child: CustomPaint(
-                  size: const Size(24, 24),
-                  painter: FingerprintIconPainter(
-                    color: const Color(0xFF4A90E2),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Configurar Biometria',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Deseja habilitar a autenticação biométrica para facilitar seu próximo acesso?',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.grey[700],
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4A90E2).withOpacity(0.05),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFF4A90E2).withOpacity(0.2),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.security,
-                    color: const Color(0xFF4A90E2),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Mais seguro e prático',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF4A90E2),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-              _navigateToMain();
-            },
-            child: Text(
-              'Agora não',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.of(context).pop(true);
-              await _enableBiometricAndNavigate();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A90E2),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            child: Text(
-              'Habilitar',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (result == false) {
-      _navigateToMain();
-    }
   }
 
-  Future<void> _enableBiometricAndNavigate() async {
-    final bio = locator<BiometricAuthService>();
-
-    try {
-      // Verificar se biometria está realmente disponível
-      final isSupported = await bio.isDeviceSupported();
-      final canCheck = await bio.canCheckBiometrics();
-
-      print('Biometria - Suportada: $isSupported, Pode verificar: $canCheck');
-
-      if (!isSupported || !canCheck) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Biometria não está disponível neste dispositivo.',
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-        _navigateToMain();
-        return;
-      }
-
-      // Testar autenticação biométrica
-      final success = await bio.authenticate(reason: 'Configure sua biometria');
-
-      print('Resultado da autenticação: $success');
-
-      if (success) {
-        await bio.setBiometricEnabled(true);
-        await bio.cacheUserId('mock-user');
-        print('Biometria configurada com sucesso');
-        _navigateToMain();
-      } else {
-        // Se falhou, mostrar erro e navegar mesmo assim
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Autenticação biométrica cancelada ou falhou. Você pode tentar novamente.',
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
-            backgroundColor: Colors.orange,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-        _navigateToMain();
-      }
-    } catch (e) {
-      print('Erro na configuração biométrica: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Erro ao configurar biometria: ${e.toString()}',
-            style: GoogleFonts.poppins(fontSize: 14),
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      );
-      _navigateToMain();
-    }
-  }
 
   void _navigateToMain() {
     Navigator.pushReplacement(
@@ -344,34 +150,42 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Simular login bem-sucedido
-      final bio = locator<BiometricAuthService>();
-
-      // Se biometria está disponível e habilitada, cachear o usuário
-      if (_biometricAvailable && _biometricEnabled) {
-        await bio.cacheUserId('mock-user');
-        _cachedUserId = 'mock-user';
-      }
-
-      // Se biometria está disponível mas não habilitada, oferecer para habilitar
-      if (_biometricAvailable && !_biometricEnabled) {
-        _showBiometricSetupDialog();
-        return;
-      }
+      final appFacade = locator<AppFacade>();
+      final result = await appFacade.login(
+        _emailController.text,
+        _passwordController.text,
+      );
 
       setState(() {
         _isLoading = false;
       });
 
-      // Navegar para a tela de configuração de perfil após login bem-sucedido
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainNavigation(),
-        ),
-      );
+      if (result.isSuccess) {
+        final bio = locator<BiometricAuthService>();
+        if (_biometricAvailable) {
+          await bio.cacheUserId(_emailController.text);
+          _cachedUserId = _emailController.text;
+
+          if (!_biometricEnabled) {
+            _showBiometricSetupDialog();
+          }
+        }
+        _navigateToMain();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result.error ?? 'Erro desconhecido ao fazer login',
+              style: GoogleFonts.poppins(fontSize: 14),
+            ),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -410,10 +224,29 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (ok) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MainNavigation()),
-        );
+        final appFacade = locator<AppFacade>();
+        final loginResult = await appFacade.loginWithBiometrics(_cachedUserId!); // Assumindo que _cachedUserId não é nulo aqui
+
+        if (loginResult.isSuccess) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MainNavigation()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                loginResult.error ?? 'Erro ao fazer login com biometria.',
+                style: GoogleFonts.poppins(fontSize: 14),
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -636,7 +469,41 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             SizedBox(
                                 height:
-                                    isVerySmallScreen ? 20 : 30), // Responsivo
+                                    isVerySmallScreen ? 12 : 16), // Responsivo
+
+                            // Botão de Login com Biometria
+                            if (_biometricAvailable &&
+                                _biometricEnabled &&
+                                _cachedUserId != null)
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    bottom: isVerySmallScreen ? 16 : 20),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton.icon(
+                                    onPressed: _authenticateWithBiometrics,
+                                    icon: const Icon(Icons.fingerprint,
+                                        color: Color(0xFF4A90E2)),
+                                    label: Text(
+                                      'Entrar com Digital',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: const Color(0xFF4A90E2),
+                                      ),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(
+                                          color: Color(0xFF4A90E2), width: 2),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                    ),
+                                  ),
+                                ),
+                              ),
 
                             // Campo Email estilizado
                             AnimatedContainer(
@@ -713,8 +580,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       return 'Por favor, insira seu e-mail';
                                     }
                                     if (!RegExp(
-                                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                        .hasMatch(value)) {
+                                            r'^[\w-\.]+@[\w-]+\.[\w-]{2,4}$').hasMatch(value)) {
                                       return 'Por favor, insira um e-mail válido';
                                     }
                                     return null;
@@ -724,8 +590,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
 
                             SizedBox(
-                                height:
-                                    isVerySmallScreen ? 12 : 16), // Responsivo
+                                height: isVerySmallScreen ? 12 : 16), // Responsivo
 
                             // Campo Senha estilizado
                             AnimatedContainer(
@@ -825,98 +690,36 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             SizedBox(
                                 height:
-                                    isVerySmallScreen ? 20 : 30), // Responsivo
+                                    isVerySmallScreen ? 16 : 20), // Responsivo
 
-                            // Ícone de digital discreto (mostra só após 1º login habilitado)
-                            if (_biometricAvailable &&
-                                _biometricEnabled &&
-                                _cachedUserId != null) ...[
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: IconButton(
-                                  tooltip: 'Entrar com digital',
-                                  onPressed: _authenticateWithBiometrics,
-                                  icon: SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CustomPaint(
-                                      painter: FingerprintIconPainter(
-                                          color: const Color(0xFF4A90E2)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: isVerySmallScreen ? 8 : 12),
-                            ],
-
-                            // Botão de debug temporário (remover depois)
-                            if (_biometricAvailable) ...[
-                              Center(
-                                child: TextButton(
-                                  onPressed: _testBiometric,
-                                  child: Text(
-                                    'Testar Biometria (Debug)',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-
-                            // Sem botão extra de digital – apenas ícone acima
-
-                            // Botão Login com gradiente
-                            Container(
+                            // Botão de Login
+                            SizedBox(
                               width: double.infinity,
-                              height: isVerySmallScreen ? 50 : 56, // Responsivo
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFFF8C42),
-                                    Color(0xFFFF7A28),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                    isVerySmallScreen ? 25 : 28),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFFFF8C42)
-                                        .withOpacity(0.3),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
                               child: ElevatedButton(
                                 onPressed: _isLoading ? null : _handleLogin,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
+                                  backgroundColor: const Color(0xFF4A90E2),
                                   foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shadowColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        isVerySmallScreen ? 25 : 28),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16),
+                                  elevation: 3,
                                 ),
                                 child: _isLoading
-                                    ? SizedBox(
-                                        height: isVerySmallScreen ? 18 : 20,
-                                        width: isVerySmallScreen ? 18 : 20,
-                                        child: const CircularProgressIndicator(
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
                                           strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                            Colors.white,
-                                          ),
                                         ),
                                       )
                                     : Text(
-                                        'Login',
+                                        'Entrar',
                                         style: GoogleFonts.poppins(
-                                          fontSize: isVerySmallScreen ? 16 : 18,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -925,44 +728,47 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             SizedBox(
                                 height:
-                                    isVerySmallScreen ? 20 : 30), // Responsivo
+                                    isVerySmallScreen ? 16 : 20), // Responsivo
 
-                            // Link para criar conta - com navegação
-                            Center(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegisterScreen(),
-                                    ),
-                                  );
-                                },
-                                child: RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'Ainda não tem uma conta? ',
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF9E9E9E),
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'Crie uma conta',
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF003092),
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
+                            // Link para Registrar
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Não tem uma conta?',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 12 : 14,
+                                    color: Colors.grey[700],
                                   ),
                                 ),
-                              ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const RegisterScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Registre-se',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: isVerySmallScreen ? 12 : 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF4A90E2),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
+
+                            // Botão de teste de biometria (apenas para debug)
+                            if (kDebugMode)
+                              TextButton(
+                                onPressed: _testBiometric,
+                                child: const Text("Testar Biometria"),
+                              ),
 
                             SizedBox(
                                 height:
@@ -1082,3 +888,4 @@ class FingerprintIconPainter extends CustomPainter {
     return oldDelegate.color != color;
   }
 }
+

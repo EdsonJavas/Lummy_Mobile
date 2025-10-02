@@ -107,7 +107,6 @@ class _BiometricGateState extends State<_BiometricGate>
       _biometricEnabled = enabled;
     });
 
-    // Se biometria está disponível e habilitada, tentar autenticação automática
     if (_biometricAvailable && _biometricEnabled && cached != null) {
       await _tryBiometricAuth();
     } else {
@@ -176,7 +175,7 @@ class _BiometricGateState extends State<_BiometricGate>
                 child: Row(
                   children: [
                     RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         children: [
                           TextSpan(
                             text: 'Lu',
@@ -201,7 +200,7 @@ class _BiometricGateState extends State<_BiometricGate>
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.w400,
-                              color: const Color(0xFF003092),
+                              color: Color(0xFF003092),
                               fontFamily: 'Poppins',
                             ),
                           ),
