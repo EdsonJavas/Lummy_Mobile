@@ -25,25 +25,30 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              Text(
-                'Meus Gastos',
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Acompanhe onde você gasta seu dinheiro',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  color: const Color(0xFF64748B),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Meus Gastos',
+                    style: GoogleFonts.poppins(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1E293B),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Vamos ver onde você gastou seu dinheirinho!',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      color: const Color(0xFF64748B),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
 
@@ -52,15 +57,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF3695F4), Color(0xFF62C370)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: const Color(0xFF3B82F6),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF3695F4).withOpacity(0.3),
+                      color: const Color(0xFF3B82F6).withOpacity(0.2),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -69,14 +70,23 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Total Gasto',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: Colors.white.withOpacity(0.8),
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          '📊',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Total Gasto',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     Text(
                       'R\$ 1.247,50',
                       style: GoogleFonts.poppins(
@@ -153,19 +163,19 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                   radius: 32,
                                 ),
                                 PieChartSectionData(
-                                  color: const Color(0xFFF472B6),
+                                  color: const Color(0xFF10B981),
                                   value: 20,
                                   title: '',
                                   radius: 32,
                                 ),
                                 PieChartSectionData(
-                                  color: const Color(0xFFFB923C),
+                                  color: const Color(0xFFF59E0B),
                                   value: 15,
                                   title: '',
                                   radius: 32,
                                 ),
                                 PieChartSectionData(
-                                  color: const Color(0xFFCBD5E1),
+                                  color: const Color(0xFFE5E7EB),
                                   value: 5,
                                   title: '',
                                   radius: 32,
@@ -185,11 +195,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                               _buildLegendItem('Transporte',
                                   const Color(0xFF3B82F6), 'R\$ 311,88'),
                               _buildLegendItem('Jogos e Brinquedos',
-                                  const Color(0xFFF472B6), 'R\$ 249,50'),
+                                  const Color(0xFF10B981), 'R\$ 249,50'),
                               _buildLegendItem('Alimentação',
-                                  const Color(0xFFFB923C), 'R\$ 187,13'),
+                                  const Color(0xFFF59E0B), 'R\$ 187,13'),
                               _buildLegendItem('Outros',
-                                  const Color(0xFFCBD5E1), 'R\$ 62,36'),
+                                  const Color(0xFFE5E7EB), 'R\$ 62,36'),
                             ],
                           ),
                         ),
@@ -200,24 +210,67 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Filtros
-              Row(
+              // Filtros com Chips
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: _buildFilterButton(
-                      'Período',
-                      selectedPeriod,
-                      ['Este mês', 'Última semana', 'Últimos 3 meses'],
-                      (value) => setState(() => selectedPeriod = value),
+                  Text(
+                    'Filtros',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1E293B),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildFilterButton(
-                      'Categoria',
-                      selectedCategory,
-                      ['Todas', 'Metas', 'Transporte', 'Alimentação'],
-                      (value) => setState(() => selectedCategory = value),
+                  const SizedBox(height: 16),
+                  
+                  // Filtro de Período
+                  Text(
+                    'Período',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildFilterChip('Este mês', selectedPeriod == 'Este mês', () => setState(() => selectedPeriod = 'Este mês')),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Última semana', selectedPeriod == 'Última semana', () => setState(() => selectedPeriod = 'Última semana')),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Últimos 3 meses', selectedPeriod == 'Últimos 3 meses', () => setState(() => selectedPeriod = 'Últimos 3 meses')),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Filtro de Categoria
+                  Text(
+                    'Categoria',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildFilterChip('Todas', selectedCategory == 'Todas', () => setState(() => selectedCategory = 'Todas')),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Metas', selectedCategory == 'Metas', () => setState(() => selectedCategory = 'Metas')),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Transporte', selectedCategory == 'Transporte', () => setState(() => selectedCategory = 'Transporte')),
+                        const SizedBox(width: 8),
+                        _buildFilterChip('Alimentação', selectedCategory == 'Alimentação', () => setState(() => selectedCategory = 'Alimentação')),
+                      ],
                     ),
                   ),
                 ],
@@ -252,13 +305,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     ),
                     const SizedBox(height: 16),
                     _buildTransactionItem('Lanche na escola', 'Alimentação',
-                        'R\$ 15,50', const Color(0xFFFCA5A5)),
+                        'R\$ 15,50', const Color(0xFFF59E0B)),
                     _buildTransactionItem('Ônibus', 'Transporte', 'R\$ 4,50',
-                        const Color(0xFFFF66B3)),
+                        const Color(0xFF3B82F6)),
                     _buildTransactionItem('Jogo novo', 'Jogos e Brinquedos',
-                        'R\$ 29,90', const Color(0xFFFF8D15)),
+                        'R\$ 29,90', const Color(0xFF10B981)),
                     _buildTransactionItem('Mesada guardada', 'Metas',
-                        'R\$ 50,00', const Color(0xFFEF4444)),
+                        'R\$ 50,00', const Color(0xFF8B5CF6)),
                   ],
                 ),
               ),
@@ -314,40 +367,40 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     );
   }
 
-  Widget _buildFilterButton(String label, String value, List<String> options,
-      Function(String) onChanged) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
+  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF3B82F6) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFFE2E8F0),
+            width: 1.5,
           ),
-        ],
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF64748B)),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: const Color(0xFF3B82F6).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ] : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Text(
+          label,
           style: GoogleFonts.poppins(
             fontSize: 14,
-            color: const Color(0xFF1E293B),
+            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.white : const Color(0xFF64748B),
           ),
-          items: options.map((String option) {
-            return DropdownMenuItem<String>(
-              value: option,
-              child: Text(option),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            if (newValue != null) onChanged(newValue);
-          },
         ),
       ),
     );

@@ -10,10 +10,15 @@ import 'dart:math' as math;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Inicializar Firebase e locator de forma síncrona
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  // Configurar locator imediatamente
   setupLocator();
+  
   runApp(const LummyApp());
 }
 
@@ -27,9 +32,17 @@ class LummyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         fontFamily: 'Poppins',
+        useMaterial3: true, // Usar Material 3 para melhor performance
       ),
       home: const LoginScreen(),
       debugShowCheckedModeBanner: false,
+      // Otimizações de performance
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          child: child!,
+        );
+      },
     );
   }
 }

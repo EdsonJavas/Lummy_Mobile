@@ -127,6 +127,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -198,55 +199,60 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
-              );
-            },
-            child: Container(
-              width: isSmallScreen ? 50 : 56,
-              height: isSmallScreen ? 50 : 56,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFF1E40AF),
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF1E40AF).withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipOval(
+          Row(
+            children: [
+              // Botão do Perfil
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfilePage(),
+                    ),
+                  );
+                },
                 child: Container(
-                  padding: const EdgeInsets.all(4),
-                  child: Image.network(
-                    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E40AF).withOpacity(0.1),
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          color: const Color(0xFF1E40AF),
-                          size: isSmallScreen ? 24 : 28,
-                        ),
-                      );
-                    },
+                  width: isSmallScreen ? 50 : 56,
+                  height: isSmallScreen ? 50 : 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF1E40AF),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF1E40AF).withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Image.network(
+                        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E40AF).withOpacity(0.1),
+                            ),
+                            child: Icon(
+                              Icons.person,
+                              color: const Color(0xFF1E40AF),
+                              size: isSmallScreen ? 24 : 28,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -911,3 +917,5 @@ class EducationalTip {
 
   EducationalTip(this.category, this.content, this.emoji);
 }
+
+
