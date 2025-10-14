@@ -12,23 +12,30 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
-  
+
   String _selectedType = 'expense';
   String _selectedCategory = 'Alimentação';
-  
+
   final List<String> _expenseCategories = [
-    'Alimentação', 'Transporte', 'Diversão', 'Roupas', 'Outros'
+    'Alimentação',
+    'Transporte',
+    'Diversão',
+    'Roupas',
+    'Outros',
   ];
-  
+
   final List<String> _incomeCategories = [
-    'Mesada', 'Presente', 'Trabalho', 'Outros'
+    'Mesada',
+    'Presente',
+    'Trabalho',
+    'Outros',
   ];
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenHeight < 700;
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -54,23 +61,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Seletor de tipo
               _buildTypeSelector(isSmallScreen),
               const SizedBox(height: 24),
-              
-              // Campo de descrição
               _buildDescriptionField(isSmallScreen),
               const SizedBox(height: 20),
-              
-              // Campo de valor
               _buildAmountField(isSmallScreen),
               const SizedBox(height: 20),
-              
-              // Seletor de categoria
               _buildCategorySelector(isSmallScreen),
               const SizedBox(height: 32),
-              
-              // Botão de salvar
               _buildSaveButton(isSmallScreen),
             ],
           ),
@@ -105,8 +103,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 child: Container(
                   padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
                   decoration: BoxDecoration(
-                    color: _selectedType == 'expense' 
-                        ? const Color(0xFFEF4444).withOpacity(0.1)
+                    color: _selectedType == 'expense'
+                        ? const Color(0xFFEF4444).withValues(alpha: 0.1)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
@@ -149,8 +147,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 child: Container(
                   padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
                   decoration: BoxDecoration(
-                    color: _selectedType == 'income' 
-                        ? const Color(0xFF10B981).withOpacity(0.1)
+                    color: _selectedType == 'income'
+                        ? const Color(0xFF10B981).withValues(alpha: 0.1)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
@@ -203,12 +201,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         TextFormField(
           controller: _descriptionController,
           decoration: InputDecoration(
-            hintText: _selectedType == 'expense' 
+            hintText: _selectedType == 'expense'
                 ? 'Ex: Lanche na escola'
                 : 'Ex: Mesada da semana',
-            hintStyle: GoogleFonts.poppins(
-              color: const Color(0xFF64748B),
-            ),
+            hintStyle: GoogleFonts.poppins(color: const Color(0xFF64748B)),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
@@ -253,9 +249,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             hintText: '0,00',
-            hintStyle: GoogleFonts.poppins(
-              color: const Color(0xFF64748B),
-            ),
+            hintStyle: GoogleFonts.poppins(color: const Color(0xFF64748B)),
             prefixText: 'R\$ ',
             prefixStyle: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 16 : 18,
@@ -292,10 +286,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   }
 
   Widget _buildCategorySelector(bool isSmallScreen) {
-    final categories = _selectedType == 'expense' 
-        ? _expenseCategories 
+    final categories = _selectedType == 'expense'
+        ? _expenseCategories
         : _incomeCategories;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -349,7 +343,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       child: ElevatedButton(
         onPressed: _saveTransaction,
         style: ElevatedButton.styleFrom(
-          backgroundColor: _selectedType == 'expense' 
+          backgroundColor: _selectedType == 'expense'
               ? const Color(0xFFEF4444)
               : const Color(0xFF10B981),
           foregroundColor: Colors.white,
@@ -373,7 +367,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   void _saveTransaction() {
     if (_formKey.currentState!.validate()) {
       final amount = double.parse(_amountController.text.replaceAll(',', '.'));
-      
+
       Navigator.pop(context, {
         'description': _descriptionController.text,
         'amount': amount,

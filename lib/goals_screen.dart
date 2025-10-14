@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'models/goal.dart';
-import 'sceens/new_goal_screen.dart';
+import 'screens/new_goal_screen.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
@@ -99,7 +99,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     ];
   }
 
-  void _addNewGoal() async {
+  Future<void> _addNewGoal() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const NewGoalScreen()),
@@ -125,9 +125,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           ),
           backgroundColor: const Color(0xFF8B5CF6),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     }
@@ -181,9 +179,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ),
         backgroundColor: const Color(0xFFEF4444),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -193,10 +189,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenHeight < 700;
 
-    final ongoingGoals =
-        goals.where((g) => g.status == GoalStatus.ongoing).toList();
-    final completedGoals =
-        goals.where((g) => g.status == GoalStatus.completed).toList();
+    final ongoingGoals = goals
+        .where((g) => g.status == GoalStatus.ongoing)
+        .toList();
+    final completedGoals = goals
+        .where((g) => g.status == GoalStatus.completed)
+        .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -228,8 +226,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
               // Enhanced Header
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF8B5CF6),
                   borderRadius: BorderRadius.circular(20),
@@ -249,10 +249,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Text(
-                        '📊',
-                        style: TextStyle(fontSize: 24),
-                      ),
+                      child: const Text('📊', style: TextStyle(fontSize: 24)),
                     ),
                     const SizedBox(width: 20),
                     Expanded(
@@ -287,7 +284,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
               // Ongoing Goals Section
               if (ongoingGoals.isNotEmpty) ...[
                 _buildSectionHeader(
-                    'Em Andamento', ongoingGoals.length, isSmallScreen),
+                  'Em Andamento',
+                  ongoingGoals.length,
+                  isSmallScreen,
+                ),
                 const SizedBox(height: 20),
                 ...ongoingGoals
                     .map((goal) => _buildGoalCard(goal, isSmallScreen))
@@ -298,7 +298,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
               // Completed Goals Section
               if (completedGoals.isNotEmpty) ...[
                 _buildSectionHeader(
-                    'Concluídas', completedGoals.length, isSmallScreen),
+                  'Concluídas',
+                  completedGoals.length,
+                  isSmallScreen,
+                ),
                 const SizedBox(height: 20),
                 ...completedGoals
                     .map((goal) => _buildGoalCard(goal, isSmallScreen))
@@ -318,8 +321,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
   Widget _buildSectionHeader(String title, int count, bool isSmallScreen) {
     final bool isCompleted = title == 'Concluídas';
-    final Color headerColor =
-        isCompleted ? const Color(0xFF10B981) : const Color(0xFF8B5CF6);
+    final Color headerColor = isCompleted
+        ? const Color(0xFF10B981)
+        : const Color(0xFF8B5CF6);
     final IconData headerIcon = isCompleted ? Icons.check_circle : Icons.flag;
 
     return Container(
@@ -334,10 +338,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: headerColor.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: headerColor.withOpacity(0.1), width: 1),
       ),
       child: Row(
         children: [
@@ -377,10 +378,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: headerColor.withOpacity(0.3),
-                width: 1,
-              ),
+              border: Border.all(color: headerColor.withOpacity(0.3), width: 1),
               boxShadow: [
                 BoxShadow(
                   color: headerColor.withOpacity(0.1),
@@ -392,11 +390,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.tag,
-                  size: 14,
-                  color: headerColor,
-                ),
+                Icon(Icons.tag, size: 14, color: headerColor),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
@@ -508,7 +502,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         // Status badge
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: goal.status == GoalStatus.completed
                                 ? const Color(0xFF10B981).withOpacity(0.1)
@@ -775,10 +771,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF8B5CF6),
-                    Color(0xFF7C3AED),
-                  ],
+                  colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
@@ -801,10 +794,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: const Color(0xFFE2E8F0),
-                  width: 1,
-                ),
+                border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -852,10 +842,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF8B5CF6),
-                    Color(0xFF7C3AED),
-                  ],
+                  colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
@@ -872,8 +859,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   backgroundColor: Colors.transparent,
                   foregroundColor: Colors.white,
                   shadowColor: Colors.transparent,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -881,10 +870,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.add,
-                      size: 20,
-                    ),
+                    const Icon(Icons.add, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       'Criar Primeira Meta',
@@ -908,25 +894,17 @@ class _GoalsScreenState extends State<GoalsScreen> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                Color(0xFFF8FAFC),
-              ],
+              colors: [Colors.white, Color(0xFFF8FAFC)],
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: const Color(0xFFE2E8F0),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -938,26 +916,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF10B981),
-                      Color(0xFF059669),
-                    ],
+                    colors: [Color(0xFF10B981), Color(0xFF059669)],
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.add_circle,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                    Icon(Icons.add_circle, color: Colors.white, size: 24),
                     SizedBox(width: 8),
-                    Text(
-                      '💰',
-                      style: TextStyle(fontSize: 20),
-                    ),
+                    Text('💰', style: TextStyle(fontSize: 20)),
                   ],
                 ),
               ),
@@ -985,10 +953,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFFE2E8F0),
-                    width: 1,
-                  ),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
@@ -1019,7 +984,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                   ),
                 ),
               ),
@@ -1052,10 +1019,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFF10B981),
-                            Color(0xFF059669),
-                          ],
+                          colors: [Color(0xFF10B981), Color(0xFF059669)],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
@@ -1068,8 +1032,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          final amount = double.tryParse(
-                                  controller.text.replaceAll(',', '.')) ??
+                          final amount =
+                              double.tryParse(
+                                controller.text.replaceAll(',', '.'),
+                              ) ??
                               0;
                           if (amount > 0) {
                             _updateGoalProgress(goal, amount);
@@ -1087,7 +1053,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                     Text(
                                       'Progresso adicionado! 💰',
                                       style: GoogleFonts.poppins(
-                                          fontWeight: FontWeight.w600),
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -1133,25 +1100,17 @@ class _GoalsScreenState extends State<GoalsScreen> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.white,
-                Color(0xFFF8FAFC),
-              ],
+              colors: [Colors.white, Color(0xFFF8FAFC)],
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: const Color(0xFFE2E8F0),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1163,10 +1122,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFFEF4444),
-                      Color(0xFFDC2626),
-                    ],
+                    colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -1179,10 +1135,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       size: 24,
                     ),
                     SizedBox(width: 8),
-                    Text(
-                      '⚠️',
-                      style: TextStyle(fontSize: 20),
-                    ),
+                    Text('⚠️', style: TextStyle(fontSize: 20)),
                   ],
                 ),
               ),
@@ -1269,10 +1222,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFFEF4444),
-                            Color(0xFFDC2626),
-                          ],
+                          colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [

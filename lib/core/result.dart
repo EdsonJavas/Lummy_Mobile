@@ -2,7 +2,10 @@
 abstract class Result<T> {
   const Result();
 
-  R when<R>({required R Function(T) success, required R Function(Failure) failure}) {
+  R when<R>({
+    required R Function(T) success,
+    required R Function(Failure) failure,
+  }) {
     final self = this;
     if (self is Success<T>) return success(self.value);
     if (self is FailureResult<T>) return failure(self.error);
@@ -12,7 +15,7 @@ abstract class Result<T> {
   bool get isSuccess => this is Success<T>;
   bool get isFailure => this is FailureResult<T>;
 
-  get error => null;
+  Failure? get error => null;
 }
 
 class Success<T> extends Result<T> {
@@ -21,6 +24,7 @@ class Success<T> extends Result<T> {
 }
 
 class FailureResult<T> extends Result<T> {
+  @override
   final Failure error;
   const FailureResult(this.error);
 }
@@ -35,7 +39,5 @@ class Failure {
   const Failure(this.message, {this.code, this.cause, this.stackTrace});
 
   @override
-  String toString() => 'Failure(code: ' + (code ?? '-') + ', message: ' + message + ')';
+  String toString() => 'Failure(code: ${code ?? '-'}, message: $message)';
 }
-
-

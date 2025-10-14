@@ -25,10 +25,7 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -46,17 +43,37 @@ class _MainNavigationState extends State<MainNavigation> {
             child: Row(
               children: [
                 Expanded(
-                    child: _buildNavItem(0, Icons.home_rounded, 'Início',
-                        const Color(0xFF1E40AF))),
+                  child: _buildNavItem(
+                    0,
+                    Icons.home_rounded,
+                    'Início',
+                    const Color(0xFF1E40AF),
+                  ),
+                ),
                 Expanded(
-                    child: _buildNavItem(1, Icons.receipt_long_rounded,
-                        'Gastos', const Color(0xFFEF4444))),
+                  child: _buildNavItem(
+                    1,
+                    Icons.receipt_long_rounded,
+                    'Gastos',
+                    const Color(0xFFEF4444),
+                  ),
+                ),
                 Expanded(
-                    child: _buildNavItem(2, Icons.flag_rounded, 'Metas',
-                        const Color(0xFF8B5CF6))),
+                  child: _buildNavItem(
+                    2,
+                    Icons.flag_rounded,
+                    'Metas',
+                    const Color(0xFF8B5CF6),
+                  ),
+                ),
                 Expanded(
-                    child: _buildNavItem(3, Icons.school_rounded, 'Aprender',
-                        const Color(0xFF10B981))),
+                  child: _buildNavItem(
+                    3,
+                    Icons.school_rounded,
+                    'Aprender',
+                    const Color(0xFF10B981),
+                  ),
+                ),
               ],
             ),
           ),
@@ -78,7 +95,7 @@ class _MainNavigationState extends State<MainNavigation> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(

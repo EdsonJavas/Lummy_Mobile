@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy_login/sceens/new_goal_screen.dart';
+import 'package:lummy_login/screens/new_goal_screen.dart';
 import 'profile_page.dart';
 import 'add_expense_screen.dart';
 
@@ -13,16 +13,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // Dados do usuário
-  final String userName = "Edson Jr";
-  final String userRole = "Pequeno Empreendedor";
+  final String userName = 'Edson Jr';
+  final String userRole = 'Pequeno Empreendedor';
   double currentBalance = 127.50;
   double savingsGoal = 200.00;
-  String goalName = "Bicicleta Nova";
-  String goalEmoji = "🚲";
-  
+  String goalName = 'Bicicleta Nova';
+  String goalEmoji = '🚲';
+
   // Lista de transações
   List<Map<String, dynamic>> transactions = [];
-  
+
   // Lista de conquistas
   List<Map<String, dynamic>> achievements = [
     {
@@ -47,34 +47,34 @@ class _HomePageState extends State<HomePage> {
       'isCompleted': false,
     },
   ];
-  
+
   // Lista de dicas educativas
   int currentTipIndex = 0;
   final List<EducationalTip> educationalTips = [
     EducationalTip(
-      "Dica do Dia",
-      "Que tal anotar todos os seus gastos por uma semana?",
-      "📝",
+      'Dica do Dia',
+      'Que tal anotar todos os seus gastos por uma semana?',
+      '📝',
     ),
     EducationalTip(
-      "Você Sabia?",
-      "Guardar 10% do que você ganha é um ótimo começo para suas metas!",
-      "💡",
+      'Você Sabia?',
+      'Guardar 10% do que você ganha é um ótimo começo para suas metas!',
+      '💡',
     ),
     EducationalTip(
-      "Desafio",
-      "Tente economizar R\$ 5,00 esta semana comprando menos doces!",
-      "🎯",
+      'Desafio',
+      'Tente economizar R\$ 5,00 esta semana comprando menos doces!',
+      '🎯',
     ),
     EducationalTip(
-      "Aprenda",
+      'Aprenda',
       "Antes de comprar algo, pergunte: 'Eu realmente preciso disso?'",
-      "🤔",
+      '🤔',
     ),
     EducationalTip(
-      "Meta Inteligente",
-      "Divida sua meta grande em metas menores. Fica mais fácil!",
-      "🧠",
+      'Meta Inteligente',
+      'Divida sua meta grande em metas menores. Fica mais fácil!',
+      '🧠',
     ),
   ];
 
@@ -84,7 +84,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _addTransaction(String description, double amount, String type, String category) {
+  void _addTransaction(
+    String description,
+    double amount,
+    String type,
+    String category,
+  ) {
     setState(() {
       transactions.add({
         'id': DateTime.now().millisecondsSinceEpoch.toString(),
@@ -94,13 +99,13 @@ class _HomePageState extends State<HomePage> {
         'category': category,
         'date': DateTime.now(),
       });
-      
+
       if (type == 'expense') {
         currentBalance -= amount;
       } else {
         currentBalance += amount;
       }
-      
+
       _checkAchievements();
     });
   }
@@ -127,7 +132,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -143,22 +147,22 @@ class _HomePageState extends State<HomePage> {
             children: [
               // Header simples estilo Inter
               _buildSimpleHeader(screenWidth, isSmallScreen),
-              
+
               // Saldo atual
               _buildBalanceCard(screenWidth, isSmallScreen),
-              
+
               // Meta de economia
               _buildSavingsGoal(screenWidth, isSmallScreen),
-              
+
               // Ações rápidas (estilo Inter)
               _buildQuickActionsInter(screenWidth, isSmallScreen),
-              
+
               // Educação financeira
               _buildEducationSection(screenWidth, isSmallScreen),
-              
+
               // Conquistas melhoradas
               _buildAchievementsImproved(screenWidth, isSmallScreen),
-              
+
               const SizedBox(height: 20),
             ],
           ),
@@ -267,10 +271,7 @@ class _HomePageState extends State<HomePage> {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1E40AF),
-            Color(0xFF1E3A8A),
-          ],
+          colors: [Color(0xFF1E40AF), Color(0xFF1E3A8A)],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
@@ -364,7 +365,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildSavingsGoal(double screenWidth, bool isSmallScreen) {
     final progress = currentBalance / savingsGoal;
-    
+
     return Container(
       margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
@@ -529,7 +530,7 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => const AddExpenseScreen(),
                       ),
                     );
-                    
+
                     if (result != null) {
                       _addTransaction(
                         result['description'],
@@ -537,14 +538,16 @@ class _HomePageState extends State<HomePage> {
                         result['type'],
                         result['category'],
                       );
-                      
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            result['type'] == 'expense' 
+                            result['type'] == 'expense'
                                 ? 'Gasto registrado! 📝'
                                 : 'Dinheiro adicionado! 💰',
-                            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           backgroundColor: const Color(0xFF10B981),
                           behavior: SnackBarBehavior.floating,
@@ -574,19 +577,21 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => const NewGoalScreen(),
                       ),
                     );
-                    
+
                     if (result != null) {
                       _setNewGoal(
                         result['name'],
                         result['emoji'],
                         result['amount'],
                       );
-                      
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
                             'Nova meta criada! 🎯',
-                            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           backgroundColor: const Color(0xFF8B5CF6),
                           behavior: SnackBarBehavior.floating,
@@ -613,7 +618,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildActionCardInter(String title, String subtitle, IconData icon, Color color, bool isSmallScreen) {
+  Widget _buildActionCardInter(
+    String title,
+    String subtitle,
+    IconData icon,
+    Color color,
+    bool isSmallScreen,
+  ) {
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       decoration: BoxDecoration(
@@ -638,11 +649,7 @@ class _HomePageState extends State<HomePage> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: isSmallScreen ? 20 : 24,
-            ),
+            child: Icon(icon, color: color, size: isSmallScreen ? 20 : 24),
           ),
           const SizedBox(height: 16),
           Text(
@@ -669,7 +676,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildEducationSection(double screenWidth, bool isSmallScreen) {
     final currentTip = educationalTips[currentTipIndex];
-    
+
     return Container(
       margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       child: Column(
@@ -691,10 +698,7 @@ class _HomePageState extends State<HomePage> {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF8B5CF6),
-                  Color(0xFF7C3AED),
-                ],
+                colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
@@ -751,7 +755,10 @@ class _HomePageState extends State<HomePage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                     elevation: 0,
                   ),
                   child: Text(
@@ -771,8 +778,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildAchievementsImproved(double screenWidth, bool isSmallScreen) {
-    final completedAchievements = achievements.where((a) => a['isCompleted'] == true).length;
-    
+    final completedAchievements = achievements
+        .where((a) => a['isCompleted'] == true)
+        .length;
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
       child: Column(
@@ -838,7 +847,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildAchievementItem(String emoji, String title, String description, bool isCompleted, bool isSmallScreen) {
+  Widget _buildAchievementItem(
+    String emoji,
+    String title,
+    String description,
+    bool isCompleted,
+    bool isSmallScreen,
+  ) {
     return Row(
       children: [
         Container(
@@ -859,9 +874,7 @@ class _HomePageState extends State<HomePage> {
           child: Center(
             child: Text(
               emoji,
-              style: TextStyle(
-                fontSize: isSmallScreen ? 20 : 24,
-              ),
+              style: TextStyle(fontSize: isSmallScreen ? 20 : 24),
             ),
           ),
         ),
@@ -899,11 +912,7 @@ class _HomePageState extends State<HomePage> {
               color: Color(0xFF10B981),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.check,
-              color: Colors.white,
-              size: 16,
-            ),
+            child: const Icon(Icons.check, color: Colors.white, size: 16),
           ),
       ],
     );
@@ -917,5 +926,3 @@ class EducationalTip {
 
   EducationalTip(this.category, this.content, this.emoji);
 }
-
-

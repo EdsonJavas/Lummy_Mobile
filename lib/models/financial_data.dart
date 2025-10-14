@@ -9,8 +9,8 @@ class FinancialData {
   FinancialData({
     this.currentBalance = 127.50,
     this.savingsGoal = 200.00,
-    this.goalName = "Bicicleta Nova",
-    this.goalEmoji = "🚲",
+    this.goalName = 'Bicicleta Nova',
+    this.goalEmoji = '🚲',
     this.transactions = const [],
     this.achievements = const [],
   });

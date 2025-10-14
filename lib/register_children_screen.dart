@@ -85,12 +85,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
   Future<void> _criarResponsavelNoFirestore() async {
     final firestore = FirebaseFirestore.instance;
     try {
-      final docRef = await firestore.collection("responsaveis").add({
-        "nome": widget.responsavel.nome,
-        "cpf": widget.responsavel.cpf,
-        "email": widget.responsavel.email,
-        "senha": widget.responsavel.senha,
-        "createdAt": FieldValue.serverTimestamp(),
+      final docRef = await firestore.collection('responsaveis').add({
+        'nome': widget.responsavel.nome,
+        'cpf': widget.responsavel.cpf,
+        'email': widget.responsavel.email,
+        'senha': widget.responsavel.senha,
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
       setState(() {
@@ -98,7 +98,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro ao criar responsável: $e")),
+        SnackBar(content: Text('Erro ao criar responsável: $e')),
       );
     }
   }
@@ -108,7 +108,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       if (_selectedGender.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("Selecione o sexo da criança"),
+            content: const Text('Selecione o sexo da criança'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
             shape:
@@ -121,7 +121,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       if (_responsavelId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("Responsável ainda não foi criado"),
+            content: const Text('Responsável ainda não foi criado'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
             shape:
@@ -135,22 +135,22 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
 
       try {
         await FirebaseFirestore.instance
-            .collection("responsaveis")
+            .collection('responsaveis')
             .doc(_responsavelId)
-            .collection("children")
+            .collection('children')
             .add({
-          "nome": _nameController.text.trim(),
-          "cpf": _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-          "email": _emailController.text.trim(),
-          "senha": _passwordController.text,
-          "idade": int.tryParse(_ageController.text.trim()) ?? 0,
-          "sexo": _selectedGender,
-          "createdAt": FieldValue.serverTimestamp(),
+          'nome': _nameController.text.trim(),
+          'cpf': _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          'email': _emailController.text.trim(),
+          'senha': _passwordController.text,
+          'idade': int.tryParse(_ageController.text.trim()) ?? 0,
+          'sexo': _selectedGender,
+          'createdAt': FieldValue.serverTimestamp(),
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("Criança adicionada com sucesso!"),
+            content: const Text('Criança adicionada com sucesso!'),
             backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
             shape:
@@ -171,7 +171,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Erro ao adicionar criança: $e"),
+            content: Text('Erro ao adicionar criança: $e'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
             shape:

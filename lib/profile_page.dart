@@ -10,8 +10,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final String userName = "Edson Jr";
-  final String userRole = "Pequeno Empreendedor";
+  final String userName = 'Edson Jr';
+  final String userRole = 'Pequeno Empreendedor';
   final int userLevel = 5;
   final int totalPoints = 2190;
   final int completedGoals = 8;

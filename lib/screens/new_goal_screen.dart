@@ -12,19 +12,33 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _amountController = TextEditingController();
-  
+
   String _selectedEmoji = '🚲';
-  
+
   final List<String> _goalEmojis = [
-    '🚲', '🎮', '📱', '👟', '🎸', '📚', '🏀', '🎨', 
-    '🧸', '🎯', '💻', '🎧', '⚽', '🛴', '🎪', '🎭'
+    '🚲',
+    '🎮',
+    '📱',
+    '👟',
+    '🎸',
+    '📚',
+    '🏀',
+    '🎨',
+    '🧸',
+    '🎯',
+    '💻',
+    '🎧',
+    '⚽',
+    '🛴',
+    '🎪',
+    '🎭',
   ];
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenHeight < 700;
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -54,22 +68,22 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
               // Preview da meta
               _buildGoalPreview(isSmallScreen),
               const SizedBox(height: 32),
-              
+
               // Seletor de emoji
               _buildEmojiSelector(isSmallScreen),
               const SizedBox(height: 24),
-              
+
               // Campo de nome
               _buildNameField(isSmallScreen),
               const SizedBox(height: 20),
-              
+
               // Campo de valor
               _buildAmountField(isSmallScreen),
               const SizedBox(height: 32),
-              
+
               // Botão de salvar
               _buildSaveButton(isSmallScreen),
-              
+
               // Espaço extra para o scroll
               const SizedBox(height: 40),
             ],
@@ -87,15 +101,12 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF8B5CF6),
-            Color(0xFF7C3AED),
-          ],
+          colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF8B5CF6).withOpacity(0.3),
+            color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -108,7 +119,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w500,
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 16),
@@ -116,7 +127,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
             width: isSmallScreen ? 60 : 80,
             height: isSmallScreen ? 60 : 80,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
@@ -128,7 +139,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            _nameController.text.isEmpty ? 'Nome da Meta' : _nameController.text,
+            _nameController.text.isEmpty
+                ? 'Nome da Meta'
+                : _nameController.text,
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 18 : 22,
               fontWeight: FontWeight.w700,
@@ -138,8 +151,8 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            _amountController.text.isEmpty 
-                ? 'R\$ 0,00' 
+            _amountController.text.isEmpty
+                ? 'R\$ 0,00'
                 : 'R\$ ${_amountController.text}',
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 24 : 28,
@@ -184,7 +197,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
             itemBuilder: (context, index) {
               final emoji = _goalEmojis[index];
               final isSelected = emoji == _selectedEmoji;
-              
+
               return GestureDetector(
                 onTap: () {
                   setState(() {
@@ -193,12 +206,12 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSelected 
-                        ? const Color(0xFF8B5CF6).withOpacity(0.1)
+                    color: isSelected
+                        ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isSelected 
+                      color: isSelected
                           ? const Color(0xFF8B5CF6)
                           : Colors.transparent,
                       width: 2,
@@ -237,9 +250,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
           onChanged: (value) => setState(() {}),
           decoration: InputDecoration(
             hintText: 'Ex: Bicicleta Nova',
-            hintStyle: GoogleFonts.poppins(
-              color: const Color(0xFF64748B),
-            ),
+            hintStyle: GoogleFonts.poppins(color: const Color(0xFF64748B)),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
@@ -285,9 +296,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             hintText: '200,00',
-            hintStyle: GoogleFonts.poppins(
-              color: const Color(0xFF64748B),
-            ),
+            hintStyle: GoogleFonts.poppins(color: const Color(0xFF64748B)),
             prefixText: 'R\$ ',
             prefixStyle: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 16 : 18,
@@ -351,7 +360,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   void _saveGoal() {
     if (_formKey.currentState!.validate()) {
       final amount = double.parse(_amountController.text.replaceAll(',', '.'));
-      
+
       Navigator.pop(context, {
         'name': _nameController.text,
         'emoji': _selectedEmoji,
