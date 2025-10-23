@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'shared/widgets/money_text_field.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -12,6 +13,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
+  double? _currentAmount;
   
   String _selectedType = 'expense';
   String _selectedCategory = 'Alimentação';
@@ -240,58 +242,18 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   }
 
   Widget _buildAmountField(bool isSmallScreen) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Valor',
-          style: GoogleFonts.poppins(
-            fontSize: isSmallScreen ? 14 : 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF1E293B),
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _amountController,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            hintText: '0,00',
-            hintStyle: GoogleFonts.poppins(
-              color: const Color(0xFF64748B),
-            ),
-            prefixText: 'R\$ ',
-            prefixStyle: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 16 : 18,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF1E293B),
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF1E40AF), width: 2),
-            ),
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor, digite um valor';
-            }
-            if (double.tryParse(value.replaceAll(',', '.')) == null) {
-              return 'Por favor, digite um valor válido';
-            }
-            return null;
-          },
-        ),
-      ],
+    return MoneyTextField(
+      label: 'Valor',
+      controller: _amountController,
+      onChanged: (value) {
+        setState(() {
+          _currentAmount = value;
+        });
+      },
+      isSmallScreen: isSmallScreen,
+      fontSize: isSmallScreen ? 16 : 18,
+      fontWeight: FontWeight.w600,
+      textAlign: TextAlign.start,
     );
   }
 

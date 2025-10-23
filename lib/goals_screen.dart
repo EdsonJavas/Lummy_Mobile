@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'models/goal.dart';
 import 'screens/new_goal_screen.dart';
+import 'shared/widgets/money_text_field.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
@@ -903,105 +904,79 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
   void _showAddProgressDialog(Goal goal) {
     final controller = TextEditingController();
+    double? currentAmount;
+    
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.white, Color(0xFFF8FAFC)],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.white, Color(0xFFF8FAFC)],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
             ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header with icon
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF10B981), Color(0xFF059669)],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add_circle, color: Colors.white, size: 24),
-                    SizedBox(width: 8),
-                    Text('💰', style: TextStyle(fontSize: 20)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Adicionar Progresso',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Quanto você economizou para "${goal.name}"?',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF64748B),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header with icon
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF10B981), Color(0xFF059669)],
                     ),
-                  ],
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_circle, color: Colors.white, size: 24),
+                      SizedBox(width: 8),
+                      Text('💰', style: TextStyle(fontSize: 20)),
+                    ],
+                  ),
                 ),
-                child: TextField(
-                  controller: controller,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
+                const SizedBox(height: 20),
+                Text(
+                  'Adicionar Progresso',
                   style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                     color: const Color(0xFF1E293B),
                   ),
-                  decoration: InputDecoration(
-                    hintText: '0,00',
-                    hintStyle: GoogleFonts.poppins(
-                      color: const Color(0xFF64748B),
-                    ),
-                    prefixText: 'R\$ ',
-                    prefixStyle: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF10B981),
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Quanto você economizou para "${goal.name}"?',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF64748B),
                   ),
                 ),
-              ),
+                const SizedBox(height: 24),
+                MoneyTextField(
+                  controller: controller,
+                  onChanged: (value) {
+                    setState(() {
+                      currentAmount = value;
+                    });
+                  },
+                  isSmallScreen: false,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  textAlign: TextAlign.center,
+                ),
               const SizedBox(height: 24),
               Row(
                 children: [
@@ -1044,13 +1019,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          final amount =
-                              double.tryParse(
-                                controller.text.replaceAll(',', '.'),
-                              ) ??
-                              0;
-                          if (amount > 0) {
-                            _updateGoalProgress(goal, amount);
+                          if (currentAmount != null && currentAmount! > 0) {
+                            _updateGoalProgress(goal, currentAmount!);
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -1104,6 +1074,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

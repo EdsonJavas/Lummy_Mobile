@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy_login/screens/new_goal_screen.dart';
+import 'package:lummy_login/screens/request_money_screen.dart';
 import 'package:lummy_login/shared/widgets/cached_avatar.dart';
 import 'profile_page.dart';
 import 'daily_missions_screen.dart';
@@ -847,70 +848,157 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
+          Column(
             children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DailyMissionsScreen(),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DailyMissionsScreen(),
+                          ),
+                        );
+                      },
+                      child: _buildActionCardInter(
+                        'Missões Diárias',
+                        'Complete desafios e ganhe pontos',
+                        Icons.emoji_events_outlined,
+                        const Color(0xFFF59E0B),
+                        isSmallScreen,
                       ),
-                    );
-                  },
-                  child: _buildActionCardInter(
-                    'Missões Diárias',
-                    'Complete desafios e ganhe pontos',
-                    Icons.emoji_events_outlined,
-                    const Color(0xFFF59E0B),
-                    isSmallScreen,
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NewGoalScreen(),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NewGoalScreen(),
+                          ),
+                        );
+
+                        if (result != null) {
+                          _setNewGoal(
+                            result['name'],
+                            result['emoji'],
+                            result['amount'],
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Nova meta criada! 🎯',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              backgroundColor: const Color(0xFF8B5CF6),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: _buildActionCardInter(
+                        'Nova Meta',
+                        'Defina um novo objetivo',
+                        Icons.flag_outlined,
+                        const Color(0xFF8B5CF6),
+                        isSmallScreen,
                       ),
-                    );
-
-                    if (result != null) {
-                      _setNewGoal(
-                        result['name'],
-                        result['emoji'],
-                        result['amount'],
-                      );
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Nova meta criada! 🎯',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RequestMoneyScreen(),
+                          ),
+                        );
+                      },
+                      child: _buildActionCardInter(
+                        'Pedir Dinheiro',
+                        'Peça dinheiro ao responsável',
+                        Icons.request_quote_rounded,
+                        const Color(0xFF10B981),
+                        isSmallScreen,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardTheme.color,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Theme.of(context).dividerColor
+                              : const Color(0xFFE2E8F0),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: isSmallScreen ? 40 : 48,
+                            height: isSmallScreen ? 40 : 48,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF64748B).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.more_horiz_rounded,
+                              color: Color(0xFF64748B),
+                              size: 20,
                             ),
                           ),
-                          backgroundColor: const Color(0xFF8B5CF6),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Em Breve',
+                            style: GoogleFonts.poppins(
+                              fontSize: isSmallScreen ? 14 : 16,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).textTheme.titleMedium?.color,
+                            ),
                           ),
-                        ),
-                      );
-                    }
-                  },
-                  child: _buildActionCardInter(
-                    'Nova Meta',
-                    'Defina um novo objetivo',
-                    Icons.flag_outlined,
-                    const Color(0xFF8B5CF6),
-                    isSmallScreen,
+                          const SizedBox(height: 4),
+                          Text(
+                            'Mais funcionalidades',
+                            style: GoogleFonts.poppins(
+                              fontSize: isSmallScreen ? 12 : 14,
+                              fontWeight: FontWeight.w400,
+                              color: Theme.of(context).textTheme.bodyMedium?.color,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),

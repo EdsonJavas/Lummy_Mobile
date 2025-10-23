@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../shared/widgets/money_text_field.dart';
 
 class NewGoalScreen extends StatefulWidget {
   const NewGoalScreen({super.key});
@@ -12,6 +13,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _amountController = TextEditingController();
+  double? _currentAmount;
 
   String _selectedEmoji = '🚲';
 
@@ -334,57 +336,18 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   }
 
   Widget _buildAmountField(bool isSmallScreen) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Valor da meta',
-          style: GoogleFonts.poppins(
-            fontSize: isSmallScreen ? 14 : 16,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).textTheme.titleMedium?.color,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _amountController,
-          onChanged: (value) => setState(() {}),
-          keyboardType: TextInputType.number,
-          style: GoogleFonts.poppins(
-            fontSize: isSmallScreen ? 14 : 16,
-            color: Theme.of(context).textTheme.bodyLarge?.color,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            hintText: '200,00',
-            hintStyle: GoogleFonts.poppins(
-              color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
-              fontSize: isSmallScreen ? 14 : 16,
-            ),
-            prefixText: 'R\$ ',
-            prefixStyle: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 16 : 18,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-            ),
-            filled: true,
-            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-            prefixIcon: Icon(
-              Icons.attach_money,
-              color: Theme.of(context).iconTheme.color,
-            ),
-          ),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Por favor, digite o valor da meta';
-            }
-            if (double.tryParse(value.replaceAll(',', '.')) == null) {
-              return 'Por favor, digite um valor válido';
-            }
-            return null;
-          },
-        ),
-      ],
+    return MoneyTextField(
+      label: 'Valor da meta',
+      controller: _amountController,
+      onChanged: (value) {
+        setState(() {
+          _currentAmount = value;
+        });
+      },
+      isSmallScreen: isSmallScreen,
+      fontSize: isSmallScreen ? 16 : 18,
+      fontWeight: FontWeight.w500,
+      textAlign: TextAlign.start,
     );
   }
 
@@ -432,13 +395,13 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
 
   void _saveGoal() {
     if (_formKey.currentState!.validate()) {
-      final amount = double.parse(_amountController.text.replaceAll(',', '.'));
-
-      Navigator.pop(context, {
-        'name': _nameController.text,
-        'emoji': _selectedEmoji,
-        'amount': amount,
-      });
+      if (_currentAmount != null && _currentAmount! > 0) {
+        Navigator.pop(context, {
+          'name': _nameController.text,
+          'emoji': _selectedEmoji,
+          'amount': _currentAmount!,
+        });
+      }
     }
   }
 
