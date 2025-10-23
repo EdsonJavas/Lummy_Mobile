@@ -44,8 +44,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
     if (cpf.length <= 3) return cpf;
     if (cpf.length <= 6) return '${cpf.substring(0, 3)}.${cpf.substring(3)}';
-    if (cpf.length <= 9)
+    if (cpf.length <= 9) {
       return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6)}';
+    }
     return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9, 11)}';
   }
 
@@ -114,28 +115,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: screenHeight,
-          ),
+          constraints: BoxConstraints(minHeight: screenHeight),
           child: Stack(
             children: [
-              // Fundo azul ocupando toda a tela
+              // Fundo adaptativo ao tema
               Container(
                 width: double.infinity,
                 height: screenHeight,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF4A90E2),
-                      Color(0xFF357ABD),
-                    ],
-                  ),
+                decoration: BoxDecoration(
+                  gradient: Theme.of(context).brightness == Brightness.dark
+                      ? const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF0A0A1A), Color(0xFF1A1A2E)],
+                        )
+                      : const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+                        ),
                 ),
               ),
 
@@ -156,7 +159,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.black,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                             TextSpan(
@@ -180,7 +187,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.black,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                           ],
@@ -201,19 +212,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Center(
                   child: SvgPicture.network(
                     'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
-                    height:
-                        isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                    height: isVerySmallScreen
+                        ? 250
+                        : (isSmallScreen ? 300 : 380),
                     fit: BoxFit.contain,
                     placeholderBuilder: (context) => Container(
-                      height:
-                          isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
-                      width:
-                          isVerySmallScreen ? 250 : (isSmallScreen ? 300 : 380),
+                      height: isVerySmallScreen
+                          ? 250
+                          : (isSmallScreen ? 300 : 380),
+                      width: isVerySmallScreen
+                          ? 250
+                          : (isSmallScreen ? 300 : 380),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(isVerySmallScreen
-                            ? 125
-                            : (isSmallScreen ? 150 : 190)),
+                        borderRadius: BorderRadius.circular(
+                          isVerySmallScreen ? 125 : (isSmallScreen ? 150 : 190),
+                        ),
                       ),
                       child: Icon(
                         Icons.person,
@@ -245,7 +259,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardTheme.color,
+                      border: Theme.of(context).brightness == Brightness.dark
+                          ? Border.all(color: Theme.of(context).dividerColor)
+                          : null,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
@@ -269,473 +286,386 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                                height: isVerySmallScreen
-                                    ? 15
-                                    : (isSmallScreen ? 25 : 35)),
+                              height: isVerySmallScreen
+                                  ? 15
+                                  : (isSmallScreen ? 25 : 35),
+                            ),
 
                             // Título "Crie sua conta" - responsivo
-                            Text(
-                              'Crie sua conta de Responsável',
-                              style: GoogleFonts.inter(
-                                fontSize: isVerySmallScreen ? 24 : 28,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
+                            ShaderMask(
+                              shaderCallback: (bounds) => LinearGradient(
+                                colors:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? [
+                                        const Color(0xFF3B82F6),
+                                        const Color(0xFF8B5CF6),
+                                      ] // Azul → Roxo como no site
+                                    : [
+                                        const Color(0xFF1E293B),
+                                        const Color(0xFF1E293B),
+                                      ],
+                              ).createShader(bounds),
+                              child: Text(
+                                'Crie sua conta de Responsável',
+                                style: GoogleFonts.inter(
+                                  fontSize: isVerySmallScreen ? 24 : 28,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors
+                                      .white, // This color is masked by the shader
+                                ),
                               ),
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
 
                             // Campo Nome do responsável
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _nameFocused
-                                      ? const Color(0xFF4A90E2)
-                                      : Colors.transparent,
-                                  width: 2,
+                            Focus(
+                              onFocusChange: (hasFocus) {
+                                setState(() {
+                                  _nameFocused = hasFocus;
+                                });
+                              },
+                              child: TextFormField(
+                                controller: _nameController,
+                                keyboardType: TextInputType.name,
+                                textCapitalization: TextCapitalization.words,
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen ? 14 : 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                boxShadow: _nameFocused
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(0xFF4A90E2)
-                                              .withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                    : [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _nameFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _nameController,
-                                  keyboardType: TextInputType.name,
-                                  textCapitalization: TextCapitalization.words,
-                                  style: GoogleFonts.poppins(
+                                decoration: InputDecoration(
+                                  hintText: 'Nome do responsável',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Theme.of(
+                                      context,
+                                    ).inputDecorationTheme.hintStyle?.color,
                                     fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Nome do responsável',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.person_outline,
-                                      color: _nameFocused
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
-                                      size: isVerySmallScreen ? 20 : 22,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
+                                  prefixIcon: Icon(
+                                    Icons.person_outline,
+                                    color: _nameFocused
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).iconTheme.color,
+                                    size: isVerySmallScreen ? 20 : 22,
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira o nome do responsável';
-                                    }
-                                    if (value.trim().length < 2) {
-                                      return 'Nome deve ter pelo menos 2 caracteres';
-                                    }
-                                    return null;
-                                  },
+                                  filled: true,
+                                  fillColor: Theme.of(
+                                    context,
+                                  ).inputDecorationTheme.fillColor,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isVerySmallScreen ? 16 : 20,
+                                    vertical: isVerySmallScreen ? 14 : 18,
+                                  ),
+                                  errorStyle: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 10 : 12,
+                                  ),
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira o nome do responsável';
+                                  }
+                                  if (value.trim().length < 2) {
+                                    return 'Nome deve ter pelo menos 2 caracteres';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
 
                             // Campo CPF
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _cpfFocused
-                                      ? const Color(0xFF4A90E2)
-                                      : Colors.transparent,
-                                  width: 2,
+                            Focus(
+                              onFocusChange: (hasFocus) {
+                                setState(() {
+                                  _cpfFocused = hasFocus;
+                                });
+                              },
+                              child: TextFormField(
+                                controller: _cpfController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(11),
+                                  TextInputFormatter.withFunction((
+                                    oldValue,
+                                    newValue,
+                                  ) {
+                                    final formatted = _formatCPF(newValue.text);
+                                    return TextEditingValue(
+                                      text: formatted,
+                                      selection: TextSelection.collapsed(
+                                        offset: formatted.length,
+                                      ),
+                                    );
+                                  }),
+                                ],
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen ? 14 : 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                boxShadow: _cpfFocused
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(0xFF4A90E2)
-                                              .withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                    : [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _cpfFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _cpfController,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                    LengthLimitingTextInputFormatter(11),
-                                    TextInputFormatter.withFunction(
-                                        (oldValue, newValue) {
-                                      final formatted =
-                                          _formatCPF(newValue.text);
-                                      return TextEditingValue(
-                                        text: formatted,
-                                        selection: TextSelection.collapsed(
-                                            offset: formatted.length),
-                                      );
-                                    }),
-                                  ],
-                                  style: GoogleFonts.poppins(
+                                decoration: InputDecoration(
+                                  hintText: 'CPF do responsável',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Theme.of(
+                                      context,
+                                    ).inputDecorationTheme.hintStyle?.color,
                                     fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: 'CPF do responsável',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.badge_outlined,
-                                      color: _cpfFocused
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
-                                      size: isVerySmallScreen ? 20 : 22,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
+                                  prefixIcon: Icon(
+                                    Icons.badge_outlined,
+                                    color: _cpfFocused
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).iconTheme.color,
+                                    size: isVerySmallScreen ? 20 : 22,
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira o CPF do responsável';
-                                    }
-                                    if (!_isValidCPF(value)) {
-                                      return 'Por favor, insira um CPF válido';
-                                    }
-                                    return null;
-                                  },
+                                  filled: true,
+                                  fillColor: Theme.of(
+                                    context,
+                                  ).inputDecorationTheme.fillColor,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isVerySmallScreen ? 16 : 20,
+                                    vertical: isVerySmallScreen ? 14 : 18,
+                                  ),
+                                  errorStyle: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 10 : 12,
+                                  ),
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira o CPF do responsável';
+                                  }
+                                  if (!_isValidCPF(value)) {
+                                    return 'Por favor, insira um CPF válido';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
 
                             // Campo E-mail do responsável
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _emailFocused
-                                      ? const Color(0xFF4A90E2)
-                                      : Colors.transparent,
-                                  width: 2,
+                            Focus(
+                              onFocusChange: (hasFocus) {
+                                setState(() {
+                                  _emailFocused = hasFocus;
+                                });
+                              },
+                              child: TextFormField(
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen ? 14 : 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                boxShadow: _emailFocused
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(0xFF4A90E2)
-                                              .withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                    : [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _emailFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _emailController,
-                                  keyboardType: TextInputType.emailAddress,
-                                  style: GoogleFonts.poppins(
+                                decoration: InputDecoration(
+                                  hintText: 'E-mail do responsável',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Theme.of(
+                                      context,
+                                    ).inputDecorationTheme.hintStyle?.color,
                                     fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: 'E-mail do responsável',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.email_outlined,
-                                      color: _emailFocused
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
-                                      size: isVerySmallScreen ? 20 : 22,
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
+                                  prefixIcon: Icon(
+                                    Icons.email_outlined,
+                                    color: _emailFocused
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).iconTheme.color,
+                                    size: isVerySmallScreen ? 20 : 22,
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira o e-mail do responsável';
-                                    }
-                                    if (!RegExp(
-                                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                        .hasMatch(value)) {
-                                      return 'Por favor, insira um e-mail válido';
-                                    }
-                                    return null;
-                                  },
+                                  filled: true,
+                                  fillColor: Theme.of(
+                                    context,
+                                  ).inputDecorationTheme.fillColor,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isVerySmallScreen ? 16 : 20,
+                                    vertical: isVerySmallScreen ? 14 : 18,
+                                  ),
+                                  errorStyle: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 10 : 12,
+                                  ),
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira o e-mail do responsável';
+                                  }
+                                  if (!RegExp(
+                                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                  ).hasMatch(value)) {
+                                    return 'Por favor, insira um e-mail válido';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
 
                             // Campo Senha
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _passwordFocused
-                                      ? const Color(0xFF4A90E2)
-                                      : Colors.transparent,
-                                  width: 2,
+                            Focus(
+                              onFocusChange: (hasFocus) {
+                                setState(() {
+                                  _passwordFocused = hasFocus;
+                                });
+                              },
+                              child: TextFormField(
+                                controller: _passwordController,
+                                obscureText: !_isPasswordVisible,
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen ? 14 : 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                boxShadow: _passwordFocused
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(0xFF4A90E2)
-                                              .withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                    : [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _passwordFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: !_isPasswordVisible,
-                                  style: GoogleFonts.poppins(
+                                decoration: InputDecoration(
+                                  hintText: 'Sua Senha',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Theme.of(
+                                      context,
+                                    ).inputDecorationTheme.hintStyle?.color,
                                     fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Sua Senha',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.lock_outline,
+                                  prefixIcon: Icon(
+                                    Icons.lock_outline,
+                                    color: _passwordFocused
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).iconTheme.color,
+                                    size: isVerySmallScreen ? 20 : 22,
+                                  ),
+                                  filled: true,
+                                  fillColor: Theme.of(
+                                    context,
+                                  ).inputDecorationTheme.fillColor,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isVerySmallScreen ? 16 : 20,
+                                    vertical: isVerySmallScreen ? 14 : 18,
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isPasswordVisible
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
                                       color: _passwordFocused
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                          : Theme.of(context).iconTheme.color,
                                       size: isVerySmallScreen ? 20 : 22,
                                     ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isPasswordVisible
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined,
-                                        color: _passwordFocused
-                                            ? const Color(0xFF4A90E2)
-                                            : Colors.grey[500],
-                                        size: isVerySmallScreen ? 20 : 22,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isPasswordVisible =
-                                              !_isPasswordVisible;
-                                        });
-                                      },
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isPasswordVisible =
+                                            !_isPasswordVisible;
+                                      });
+                                    },
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira sua senha';
-                                    }
-                                    if (value.length < 6) {
-                                      return 'A senha deve ter pelo menos 6 caracteres';
-                                    }
-                                    return null;
-                                  },
+                                  errorStyle: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 10 : 12,
+                                  ),
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira sua senha';
+                                  }
+                                  if (value.length < 6) {
+                                    return 'A senha deve ter pelo menos 6 caracteres';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 10 : 14),
 
                             // Campo Confirmar Senha
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _confirmPasswordFocused
-                                      ? const Color(0xFF4A90E2)
-                                      : Colors.transparent,
-                                  width: 2,
+                            Focus(
+                              onFocusChange: (hasFocus) {
+                                setState(() {
+                                  _confirmPasswordFocused = hasFocus;
+                                });
+                              },
+                              child: TextFormField(
+                                controller: _confirmPasswordController,
+                                obscureText: !_isConfirmPasswordVisible,
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen ? 14 : 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                boxShadow: _confirmPasswordFocused
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(0xFF4A90E2)
-                                              .withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                    : [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _confirmPasswordFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _confirmPasswordController,
-                                  obscureText: !_isConfirmPasswordVisible,
-                                  style: GoogleFonts.poppins(
+                                decoration: InputDecoration(
+                                  hintText: 'Confirme sua Senha',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Theme.of(
+                                      context,
+                                    ).inputDecorationTheme.hintStyle?.color,
                                     fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Confirme sua Senha',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.lock_outline,
+                                  prefixIcon: Icon(
+                                    Icons.lock_outline,
+                                    color: _confirmPasswordFocused
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).iconTheme.color,
+                                    size: isVerySmallScreen ? 20 : 22,
+                                  ),
+                                  filled: true,
+                                  fillColor: Theme.of(
+                                    context,
+                                  ).inputDecorationTheme.fillColor,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isVerySmallScreen ? 16 : 20,
+                                    vertical: isVerySmallScreen ? 14 : 18,
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isConfirmPasswordVisible
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
                                       color: _confirmPasswordFocused
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                          : Theme.of(context).iconTheme.color,
                                       size: isVerySmallScreen ? 20 : 22,
                                     ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isConfirmPasswordVisible
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined,
-                                        color: _confirmPasswordFocused
-                                            ? const Color(0xFF4A90E2)
-                                            : Colors.grey[500],
-                                        size: isVerySmallScreen ? 20 : 22,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isConfirmPasswordVisible =
-                                              !_isConfirmPasswordVisible;
-                                        });
-                                      },
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isConfirmPasswordVisible =
+                                            !_isConfirmPasswordVisible;
+                                      });
+                                    },
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, confirme sua senha';
-                                    }
-                                    if (value != _passwordController.text) {
-                                      return 'As senhas não coincidem';
-                                    }
-                                    return null;
-                                  },
+                                  errorStyle: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 10 : 12,
+                                  ),
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, confirme sua senha';
+                                  }
+                                  if (value != _passwordController.text) {
+                                    return 'As senhas não coincidem';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
 
@@ -753,11 +683,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(
-                                    isVerySmallScreen ? 25 : 28),
+                                  isVerySmallScreen ? 25 : 28,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF8C42)
-                                        .withOpacity(0.3),
+                                    color: const Color(
+                                      0xFFFF8C42,
+                                    ).withOpacity(0.3),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),
@@ -772,7 +704,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   shadowColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(
-                                        isVerySmallScreen ? 25 : 28),
+                                      isVerySmallScreen ? 25 : 28,
+                                    ),
                                   ),
                                 ),
                                 child: _isLoading
@@ -783,8 +716,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           strokeWidth: 2,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                            Colors.white,
-                                          ),
+                                                Colors.white,
+                                              ),
                                         ),
                                       )
                                     : Text(
@@ -856,19 +789,9 @@ class FormTopClipper extends CustomClipper<Path> {
     path.lineTo(size.width, size.height);
     path.lineTo(size.width, 60);
 
-    path.quadraticBezierTo(
-      size.width * 0.75,
-      20,
-      size.width * 0.5,
-      20,
-    );
+    path.quadraticBezierTo(size.width * 0.75, 20, size.width * 0.5, 20);
 
-    path.quadraticBezierTo(
-      size.width * 0.25,
-      20,
-      0,
-      60,
-    );
+    path.quadraticBezierTo(size.width * 0.25, 20, 0, 60);
 
     path.close();
 

@@ -16,7 +16,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -28,22 +28,32 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Meus Gastos',
-                    style: GoogleFonts.poppins(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1E293B),
+                  ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: Theme.of(context).brightness == Brightness.dark
+                          ? [
+                              const Color(0xFFEF4444),
+                              const Color(0xFFFF8C42),
+                            ] // Vermelho → Laranja como no site
+                          : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                    ).createShader(bounds),
+                    child: Text(
+                      'Meus Gastos',
+                      style: GoogleFonts.poppins(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Vamos ver onde você gastou seu dinheirinho!',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      color: const Color(0xFF64748B),
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -72,10 +82,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          '📊',
-                          style: const TextStyle(fontSize: 20),
-                        ),
+                        const Text('📊', style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 8),
                         Text(
                           'Total Gasto',
@@ -113,8 +120,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(16),
+                  border: Theme.of(context).brightness == Brightness.dark
+                      ? Border.all(color: Theme.of(context).dividerColor)
+                      : null,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
@@ -131,7 +141,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1E293B),
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -190,16 +200,31 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLegendItem('Metas', const Color(0xFF8B5CF6),
-                                  'R\$ 436,63'),
-                              _buildLegendItem('Transporte',
-                                  const Color(0xFF3B82F6), 'R\$ 311,88'),
-                              _buildLegendItem('Jogos e Brinquedos',
-                                  const Color(0xFF10B981), 'R\$ 249,50'),
-                              _buildLegendItem('Alimentação',
-                                  const Color(0xFFF59E0B), 'R\$ 187,13'),
-                              _buildLegendItem('Outros',
-                                  const Color(0xFFE5E7EB), 'R\$ 62,36'),
+                              _buildLegendItem(
+                                'Metas',
+                                const Color(0xFF8B5CF6),
+                                'R\$ 436,63',
+                              ),
+                              _buildLegendItem(
+                                'Transporte',
+                                const Color(0xFF3B82F6),
+                                'R\$ 311,88',
+                              ),
+                              _buildLegendItem(
+                                'Jogos e Brinquedos',
+                                const Color(0xFF10B981),
+                                'R\$ 249,50',
+                              ),
+                              _buildLegendItem(
+                                'Alimentação',
+                                const Color(0xFFF59E0B),
+                                'R\$ 187,13',
+                              ),
+                              _buildLegendItem(
+                                'Outros',
+                                const Color(0xFFE5E7EB),
+                                'R\$ 62,36',
+                              ),
                             ],
                           ),
                         ),
@@ -219,18 +244,18 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1E293B),
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Filtro de Período
                   Text(
                     'Período',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF64748B),
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -238,24 +263,39 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildFilterChip('Este mês', selectedPeriod == 'Este mês', () => setState(() => selectedPeriod = 'Este mês')),
+                        _buildFilterChip(
+                          'Este mês',
+                          selectedPeriod == 'Este mês',
+                          () => setState(() => selectedPeriod = 'Este mês'),
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Última semana', selectedPeriod == 'Última semana', () => setState(() => selectedPeriod = 'Última semana')),
+                        _buildFilterChip(
+                          'Última semana',
+                          selectedPeriod == 'Última semana',
+                          () =>
+                              setState(() => selectedPeriod = 'Última semana'),
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Últimos 3 meses', selectedPeriod == 'Últimos 3 meses', () => setState(() => selectedPeriod = 'Últimos 3 meses')),
+                        _buildFilterChip(
+                          'Últimos 3 meses',
+                          selectedPeriod == 'Últimos 3 meses',
+                          () => setState(
+                            () => selectedPeriod = 'Últimos 3 meses',
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Filtro de Categoria
                   Text(
                     'Categoria',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF64748B),
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -263,13 +303,30 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildFilterChip('Todas', selectedCategory == 'Todas', () => setState(() => selectedCategory = 'Todas')),
+                        _buildFilterChip(
+                          'Todas',
+                          selectedCategory == 'Todas',
+                          () => setState(() => selectedCategory = 'Todas'),
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Metas', selectedCategory == 'Metas', () => setState(() => selectedCategory = 'Metas')),
+                        _buildFilterChip(
+                          'Metas',
+                          selectedCategory == 'Metas',
+                          () => setState(() => selectedCategory = 'Metas'),
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Transporte', selectedCategory == 'Transporte', () => setState(() => selectedCategory = 'Transporte')),
+                        _buildFilterChip(
+                          'Transporte',
+                          selectedCategory == 'Transporte',
+                          () => setState(() => selectedCategory = 'Transporte'),
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Alimentação', selectedCategory == 'Alimentação', () => setState(() => selectedCategory = 'Alimentação')),
+                        _buildFilterChip(
+                          'Alimentação',
+                          selectedCategory == 'Alimentação',
+                          () =>
+                              setState(() => selectedCategory = 'Alimentação'),
+                        ),
                       ],
                     ),
                   ),
@@ -282,8 +339,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(16),
+                  border: Theme.of(context).brightness == Brightness.dark
+                      ? Border.all(color: Theme.of(context).dividerColor)
+                      : null,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
@@ -300,18 +360,34 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1E293B),
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildTransactionItem('Lanche na escola', 'Alimentação',
-                        'R\$ 15,50', const Color(0xFFF59E0B)),
-                    _buildTransactionItem('Ônibus', 'Transporte', 'R\$ 4,50',
-                        const Color(0xFF3B82F6)),
-                    _buildTransactionItem('Jogo novo', 'Jogos e Brinquedos',
-                        'R\$ 29,90', const Color(0xFF10B981)),
-                    _buildTransactionItem('Mesada guardada', 'Metas',
-                        'R\$ 50,00', const Color(0xFF8B5CF6)),
+                    _buildTransactionItem(
+                      'Lanche na escola',
+                      'Alimentação',
+                      'R\$ 15,50',
+                      const Color(0xFFF59E0B),
+                    ),
+                    _buildTransactionItem(
+                      'Ônibus',
+                      'Transporte',
+                      'R\$ 4,50',
+                      const Color(0xFF3B82F6),
+                    ),
+                    _buildTransactionItem(
+                      'Jogo novo',
+                      'Jogos e Brinquedos',
+                      'R\$ 29,90',
+                      const Color(0xFF10B981),
+                    ),
+                    _buildTransactionItem(
+                      'Mesada guardada',
+                      'Metas',
+                      'R\$ 50,00',
+                      const Color(0xFF8B5CF6),
+                    ),
                   ],
                 ),
               ),
@@ -330,10 +406,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Container(
             width: 12,
             height: 12,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -341,7 +414,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               label,
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: const Color(0xFF64748B),
+                color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -354,7 +427,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF1E293B),
+                color: Theme.of(context).textTheme.titleMedium?.color,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -374,32 +447,42 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3B82F6) : Colors.white,
+          color: isSelected
+              ? const Color(0xFF3B82F6)
+              : Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFFE2E8F0),
+            color: isSelected
+                ? const Color(0xFF3B82F6)
+                : Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).dividerColor
+                : const Color(0xFFE2E8F0),
             width: 1.5,
           ),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: const Color(0xFF3B82F6).withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ] : [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 1),
-            ),
-          ],
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF3B82F6).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
         ),
         child: Text(
           label,
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : const Color(0xFF64748B),
+            color: isSelected
+                ? Colors.white
+                : Theme.of(context).textTheme.bodyMedium?.color,
           ),
         ),
       ),
@@ -407,7 +490,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 
   Widget _buildTransactionItem(
-      String title, String category, String amount, Color categoryColor) {
+    String title,
+    String category,
+    String amount,
+    Color categoryColor,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -435,7 +522,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF1E293B),
+                    color: Theme.of(context).textTheme.titleMedium?.color,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -445,7 +532,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   category,
                   style: GoogleFonts.poppins(
                     fontSize: 12,
-                    color: const Color(0xFF64748B),
+                    color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -460,7 +547,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF1E293B),
+                color: Theme.of(context).textTheme.titleMedium?.color,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

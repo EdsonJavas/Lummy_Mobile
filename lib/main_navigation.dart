@@ -28,7 +28,7 @@ class _MainNavigationState extends State<MainNavigation> {
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.08),
@@ -109,7 +109,9 @@ class _MainNavigationState extends State<MainNavigation> {
               ),
               child: Icon(
                 icon,
-                color: isSelected ? Colors.white : const Color(0xFF64748B),
+                color: isSelected
+                    ? Colors.white
+                    : Theme.of(context).textTheme.bodyMedium?.color,
                 size: 24,
               ),
             ),
@@ -119,7 +121,9 @@ class _MainNavigationState extends State<MainNavigation> {
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? color : const Color(0xFF64748B),
+                color: isSelected
+                    ? color
+                    : Theme.of(context).textTheme.bodyMedium?.color,
               ),
             ),
           ],

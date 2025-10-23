@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy_login/screens/new_goal_screen.dart';
+import 'package:lummy_login/shared/widgets/cached_avatar.dart';
 import 'profile_page.dart';
-import 'add_expense_screen.dart';
+import 'daily_missions_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -48,65 +49,239 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  // Lista de dicas educativas
+  // Lista de dicas educativas - MUITAS dicas!
   int currentTipIndex = 0;
   final List<EducationalTip> educationalTips = [
     EducationalTip(
       'Dica do Dia',
-      'Que tal anotar todos os seus gastos por uma semana?',
+      'Que tal anotar todos os seus gastos por uma semana? Isso ajuda a entender para onde vai seu dinheiro!',
       '📝',
     ),
     EducationalTip(
       'Você Sabia?',
-      'Guardar 10% do que você ganha é um ótimo começo para suas metas!',
+      'Guardar 10% do que você ganha é um ótimo começo para realizar seus sonhos!',
       '💡',
     ),
     EducationalTip(
       'Desafio',
-      'Tente economizar R\$ 5,00 esta semana comprando menos doces!',
+      'Tente economizar R\$ 5,00 esta semana comprando menos doces e lanches!',
       '🎯',
     ),
     EducationalTip(
       'Aprenda',
-      "Antes de comprar algo, pergunte: 'Eu realmente preciso disso?'",
+      'Antes de comprar algo, pergunte: "Eu realmente preciso disso agora?"',
       '🤔',
     ),
     EducationalTip(
       'Meta Inteligente',
-      'Divida sua meta grande em metas menores. Fica mais fácil!',
+      'Divida sua meta grande em metas menores. Assim fica mais fácil de conquistar!',
       '🧠',
+    ),
+    EducationalTip(
+      'Super Dica',
+      'Antes de pedir algo aos pais, pense se pode economizar sua mesada para comprar!',
+      '⭐',
+    ),
+    EducationalTip(
+      'Sabedoria',
+      'Dinheiro guardado hoje é um sonho realizado amanhã!',
+      '🌟',
+    ),
+    EducationalTip(
+      'Aprenda Mais',
+      'Compare preços antes de comprar. Às vezes o mesmo produto está mais barato em outro lugar!',
+      '🔍',
+    ),
+    EducationalTip(
+      'Você Sabia?',
+      'Fazer uma lista antes de comprar ajuda a não gastar com coisas que não precisa!',
+      '📋',
+    ),
+    EducationalTip(
+      'Desafio Diário',
+      'Conte quantas vezes você resistiu comprar algo desnecessário hoje!',
+      '💪',
+    ),
+    EducationalTip(
+      'Dica Especial',
+      'Guarde as moedas que sobram no troco. No fim do mês você se surpreende!',
+      '🪙',
+    ),
+    EducationalTip(
+      'Educação Financeira',
+      'Aprenda a diferença entre QUERER e PRECISAR. Isso muda tudo!',
+      '🎓',
+    ),
+    EducationalTip(
+      'Pensamento do Dia',
+      'Pequenas economias se transformam em grandes conquistas!',
+      '💭',
+    ),
+    EducationalTip(
+      'Truque Ninja',
+      'Espere 24 horas antes de comprar algo que você viu. Se ainda quiser, talvez valha a pena!',
+      '🥷',
+    ),
+    EducationalTip(
+      'Você Sabia?',
+      'Ter um cofrinho em casa ajuda você a ver seu dinheiro crescendo todos os dias!',
+      '🐷',
+    ),
+    EducationalTip(
+      'Desafio da Semana',
+      'Tente economizar o dinheiro do lanche de 3 dias e veja quanto juntou!',
+      '🏆',
+    ),
+    EducationalTip(
+      'Aprenda Jogando',
+      'Transforme economia em jogo: a cada R\$ 10 economizados, ganhe 1 ponto!',
+      '🎮',
+    ),
+    EducationalTip(
+      'Dica de Ouro',
+      'Quando ganhar dinheiro, separe uma parte para economizar ANTES de gastar!',
+      '🥇',
+    ),
+    EducationalTip(
+      'Sabedoria Popular',
+      'Dinheiro não dá em árvore, mas você pode fazer ele crescer com paciência!',
+      '🌱',
+    ),
+    EducationalTip(
+      'Aprenda Cedo',
+      'Quanto mais cedo você aprende a economizar, mais sonhos você vai realizar!',
+      '🚀',
+    ),
+    EducationalTip(
+      'Você Sabia?',
+      'Anotar seus gastos é como ter um mapa do tesouro do seu dinheiro!',
+      '🗺️',
+    ),
+    EducationalTip(
+      'Desafio Master',
+      'Passe um dia inteiro sem gastar nada. Você consegue?',
+      '🎖️',
+    ),
+    EducationalTip(
+      'Dica Incrível',
+      'Troque guloseimas por frutas 2x na semana e economize!',
+      '🍎',
+    ),
+    EducationalTip(
+      'Aprenda Sempre',
+      'Pergunte aos seus pais como eles economizam. Você vai aprender muito!',
+      '👨‍👩‍👧',
+    ),
+    EducationalTip(
+      'Pensamento',
+      'Economizar não é deixar de comprar, é comprar o que realmente importa!',
+      '✨',
+    ),
+    EducationalTip(
+      'Planejamento Inteligente',
+      'Faça uma lista com tudo que você quer comprar e coloque números de 1 a 10 do mais importante para o menos. Assim você economiza para o que realmente importa primeiro!',
+      '📊',
+    ),
+    EducationalTip(
+      'Cuide do que é Seu',
+      'Quando você cuida bem dos seus brinquedos, roupas e materiais escolares, eles duram muito mais tempo e você não precisa pedir para comprar novos!',
+      '🛡️',
+    ),
+    EducationalTip(
+      'Economia Compartilhada',
+      'Que tal combinar com seus amigos de trocar brinquedos ou jogos por um tempo? Assim todos experimentam coisas novas sem precisar gastar dinheiro!',
+      '🤝',
+    ),
+    EducationalTip(
+      'Seja Criativo',
+      'Presentes feitos por você são especiais e únicos! Desenhos, cartões, pulseiras... Use sua criatividade e economize dinheiro fazendo presentes com amor!',
+      '🎨',
+    ),
+    EducationalTip(
+      'Controle Semanal',
+      'No final de cada semana, anote quanto dinheiro você conseguiu guardar. Você vai se surpreender como pequenas economias viram grandes conquistas!',
+      '📈',
+    ),
+    EducationalTip(
+      'O Poder da Espera',
+      'Quando você espera alguns dias antes de comprar algo, descobre se realmente quer ou se era só vontade do momento. Isso te ajuda a economizar muito!',
+      '⏰',
+    ),
+    EducationalTip(
+      'Organize Seu Dinheiro',
+      'Use três potes ou cofrinhos: um para gastar no que você quiser, um para economizar para seus sonhos e um para ajudar quem precisa. É uma forma perfeita de aprender!',
+      '🏺',
+    ),
+    EducationalTip(
+      'Preciso ou Quero?',
+      'Sempre que quiser comprar algo, pergunte: é algo que eu PRECISO agora ou só QUERO? Essa pergunta mágica ajuda você a economizar para o que é realmente importante!',
+      '🎯',
+    ),
+    EducationalTip(
+      'Crescendo com Responsabilidade',
+      'Cada vez que você guarda dinheiro ao invés de gastar tudo, está mostrando que está crescendo e aprendendo a ser responsável com suas escolhas!',
+      '🌟',
+    ),
+    EducationalTip(
+      'Agradeça Sempre',
+      'Antes de pedir algo novo, olhe tudo que você já tem e agradeça. Você vai perceber que já tem muitas coisas legais e talvez não precise comprar mais agora!',
+      '🙏',
+    ),
+    EducationalTip(
+      'Construa Seu Futuro',
+      'Cada moedinha que você guarda hoje é como colocar um tijolinho na construção da sua casa dos sonhos. Com paciência e dedicação, você realiza tudo!',
+      '🏗️',
+    ),
+    EducationalTip(
+      'Sabedoria dos Avós',
+      'Seus avós viveram em tempos diferentes e aprenderam muito sobre economizar. Peça para eles contarem histórias de quando eram jovens, você vai aprender demais!',
+      '👴',
+    ),
+    EducationalTip(
+      'Ajude o Planeta',
+      'Sabia que quando você compra menos coisas, também está ajudando o meio ambiente? Menos lixo, menos poluição e um planeta mais feliz para todos!',
+      '🌍',
+    ),
+    EducationalTip(
+      'Visualize Seus Sonhos',
+      'Tire uma foto ou recorte uma imagem do que você está economizando para comprar e cole no seu cofrinho. Assim você lembra todos os dias do seu objetivo!',
+      '🖼️',
+    ),
+    EducationalTip(
+      'Celebre Suas Conquistas',
+      'Quando você alcançar uma meta de economia, comemore! Você pode fazer um desenho, dançar, ou contar para sua família. Você merece por todo esforço que fez!',
+      '🎉',
+    ),
+    EducationalTip(
+      'Errar Faz Parte',
+      'Se você gastou mais do que planejava, não tem problema! O importante é entender o que aconteceu e tentar fazer diferente da próxima vez. Todo mundo erra e aprende!',
+      '💪',
+    ),
+    EducationalTip(
+      'Família Unida',
+      'Converse com seus pais e irmãos sobre economia. Vocês podem criar desafios juntos, como ver quem economiza mais água ou energia. Juntos é mais divertido!',
+      '👨‍👩‍👧‍👦',
+    ),
+    EducationalTip(
+      'Faça Seu Dinheiro Crescer',
+      'Dinheiro parado no cofrinho não aumenta sozinho. Pergunte aos seus pais sobre poupança e como o dinheiro pode crescer um pouquinho todo mês. É mágico!',
+      '💰',
+    ),
+    EducationalTip(
+      'Economizar é Divertido',
+      'Transforme economia em um jogo! A cada R\$ 5 economizados você ganha pontos. Quando chegar a 100 pontos, faça algo especial que não custa dinheiro, como um piquenique!',
+      '🎪',
+    ),
+    EducationalTip(
+      'Prepare-se para Emergências',
+      'Sempre guarde um dinheirinho extra para imprevistos, como quando você quebra algo sem querer ou precisa comprar algo urgente. Ter essa reserva te deixa mais tranquilo!',
+      '🚨',
     ),
   ];
 
   void _nextTip() {
     setState(() {
       currentTipIndex = (currentTipIndex + 1) % educationalTips.length;
-    });
-  }
-
-  void _addTransaction(
-    String description,
-    double amount,
-    String type,
-    String category,
-  ) {
-    setState(() {
-      transactions.add({
-        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-        'description': description,
-        'amount': amount,
-        'type': type,
-        'category': category,
-        'date': DateTime.now(),
-      });
-
-      if (type == 'expense') {
-        currentBalance -= amount;
-      } else {
-        currentBalance += amount;
-      }
-
-      _checkAchievements();
     });
   }
 
@@ -118,20 +293,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _checkAchievements() {
-    setState(() {
-      // Verificar meta alcançada
-      if (currentBalance >= savingsGoal) {
-        achievements = achievements.map((achievement) {
-          if (achievement['id'] == 'goal_reached') {
-            achievement['isCompleted'] = true;
-          }
-          return achievement;
-        }).toList();
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -139,7 +300,7 @@ class _HomePageState extends State<HomePage> {
     final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -174,7 +335,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildSimpleHeader(double screenWidth, bool isSmallScreen) {
     return Container(
       width: double.infinity,
-      color: const Color(0xFFF8FAFC),
+      color: Theme.of(context).scaffoldBackgroundColor,
       padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,13 +344,33 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Olá, $userName',
-                  style: GoogleFonts.poppins(
-                    fontSize: isSmallScreen ? 24 : 28,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF1E293B),
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Olá, ',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 24 : 28,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
+                      ),
+                    ),
+                    Flexible(
+                      child: ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [Color(0xFF1E40AF), Color(0xFF8B5CF6)],
+                        ).createShader(bounds),
+                        child: Text(
+                          userName,
+                          style: GoogleFonts.poppins(
+                            fontSize: isSmallScreen ? 24 : 28,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -197,7 +378,7 @@ class _HomePageState extends State<HomePage> {
                   style: GoogleFonts.poppins(
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF64748B),
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
               ],
@@ -215,45 +396,14 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 },
-                child: Container(
-                  width: isSmallScreen ? 50 : 56,
-                  height: isSmallScreen ? 50 : 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0xFF1E40AF),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF1E40AF).withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      child: Image.network(
-                        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1E40AF).withOpacity(0.1),
-                            ),
-                            child: Icon(
-                              Icons.person,
-                              color: const Color(0xFF1E40AF),
-                              size: isSmallScreen ? 24 : 28,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                child: CachedAvatar(
+                  imageUrl:
+                      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
+                  size: isSmallScreen ? 50 : 56,
+                  borderColor: const Color(0xFF1E40AF),
+                  borderWidth: 2,
+                  fallbackIcon: Icons.person,
+                  fallbackIconColor: const Color(0xFF1E40AF),
                 ),
               ),
             ],
@@ -365,18 +515,26 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildSavingsGoal(double screenWidth, bool isSmallScreen) {
     final progress = currentBalance / savingsGoal;
+    final remaining = savingsGoal - currentBalance;
+    final progressPercent = (progress * 100).clamp(0, 100).toInt();
+    final isCompleted = progress >= 1.0;
 
     return Container(
       margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF334155)
+              : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
+            blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
@@ -384,20 +542,31 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header with badge
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E40AF).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(
+                    colors: isCompleted
+                        ? [
+                            const Color(0xFF10B981).withOpacity(0.15),
+                            const Color(0xFF10B981).withOpacity(0.05),
+                          ]
+                        : [
+                            const Color(0xFF1E40AF).withOpacity(0.15),
+                            const Color(0xFF1E40AF).withOpacity(0.05),
+                          ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   goalEmoji,
-                  style: TextStyle(fontSize: isSmallScreen ? 16 : 20),
+                  style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,97 +574,246 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       goalName,
                       style: GoogleFonts.poppins(
-                        fontSize: isSmallScreen ? 16 : 18,
+                        fontSize: isSmallScreen ? 17 : 19,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1E293B),
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                        height: 1.2,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      'Meta de economia',
-                      style: GoogleFonts.poppins(
-                        fontSize: isSmallScreen ? 12 : 14,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xFF64748B),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isCompleted
+                            ? const Color(0xFF10B981).withOpacity(0.1)
+                            : const Color(0xFF3B82F6).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        isCompleted ? 'Meta concluída' : 'Em progresso',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: isCompleted
+                              ? const Color(0xFF10B981)
+                              : const Color(0xFF3B82F6),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              Text(
-                '${(progress * 100).toInt()}%',
-                style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 16 : 18,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1E40AF),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: isCompleted
+                      ? const Color(0xFF10B981).withOpacity(0.1)
+                      : const Color(0xFF1E40AF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$progressPercent%',
+                  style: GoogleFonts.poppins(
+                    fontSize: isSmallScreen ? 16 : 18,
+                    fontWeight: FontWeight.w700,
+                    color: isCompleted
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFF1E40AF),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Container(
-            height: 8,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE2E8F0),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: progress > 1.0 ? 1.0 : progress,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
-                  ),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 24),
+          // Progress bar with labels
+          Column(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Economizado',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF64748B),
-                    ),
-                  ),
                   Text(
                     'R\$ ${currentBalance.toStringAsFixed(2)}',
                     style: GoogleFonts.poppins(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1E293B),
+                      color: const Color(0xFF10B981),
+                    ),
+                  ),
+                  Text(
+                    'R\$ ${savingsGoal.toStringAsFixed(2)}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
                     ),
                   ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              const SizedBox(height: 8),
+              Stack(
                 children: [
-                  Text(
-                    'Falta',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF64748B),
+                  Container(
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF334155)
+                          : const Color(0xFFE2E8F0),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  Text(
-                    'R\$ ${(savingsGoal - currentBalance).toStringAsFixed(2)}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1E40AF),
+                  FractionallySizedBox(
+                    widthFactor: progress.clamp(0.0, 1.0),
+                    child: Container(
+                      height: 10,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isCompleted
+                              ? [
+                                  const Color(0xFF10B981),
+                                  const Color(0xFF059669),
+                                ]
+                              : [
+                                  const Color(0xFF3B82F6),
+                                  const Color(0xFF1E40AF),
+                                ],
+                        ),
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                (isCompleted
+                                        ? const Color(0xFF10B981)
+                                        : const Color(0xFF3B82F6))
+                                    .withOpacity(0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Info cards
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF1E293B).withOpacity(0.5)
+                        : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF334155)
+                          : const Color(0xFFE2E8F0),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.savings_outlined,
+                            size: 16,
+                            color: Color(0xFF10B981),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Economizado',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.color?.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'R\$ ${currentBalance.toStringAsFixed(2)}',
+                        style: GoogleFonts.poppins(
+                          fontSize: isSmallScreen ? 16 : 18,
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).textTheme.titleLarge?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF1E293B).withOpacity(0.5)
+                        : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF334155)
+                          : const Color(0xFFE2E8F0),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            remaining > 0
+                                ? Icons.trending_up
+                                : Icons.check_circle_outline,
+                            size: 16,
+                            color: remaining > 0
+                                ? const Color(0xFFF59E0B)
+                                : const Color(0xFF10B981),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            remaining > 0 ? 'Falta' : 'Excedente',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.color?.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'R\$ ${remaining.abs().toStringAsFixed(2)}',
+                        style: GoogleFonts.poppins(
+                          fontSize: isSmallScreen ? 16 : 18,
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).textTheme.titleLarge?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -510,12 +828,22 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'O que você quer fazer?',
-            style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 18 : 20,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF1E293B),
+          ShaderMask(
+            shaderCallback: (bounds) => LinearGradient(
+              colors: Theme.of(context).brightness == Brightness.dark
+                  ? [
+                      const Color(0xFF3B82F6),
+                      const Color(0xFF8B5CF6),
+                    ] // Azul → Roxo como no site
+                  : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+            ).createShader(bounds),
+            child: Text(
+              'O que você quer fazer?',
+              style: GoogleFonts.poppins(
+                fontSize: isSmallScreen ? 18 : 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -523,46 +851,19 @@ class _HomePageState extends State<HomePage> {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () async {
-                    final result = await Navigator.push(
+                  onTap: () {
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const AddExpenseScreen(),
+                        builder: (context) => const DailyMissionsScreen(),
                       ),
                     );
-
-                    if (result != null) {
-                      _addTransaction(
-                        result['description'],
-                        result['amount'],
-                        result['type'],
-                        result['category'],
-                      );
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            result['type'] == 'expense'
-                                ? 'Gasto registrado! 📝'
-                                : 'Dinheiro adicionado! 💰',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          backgroundColor: const Color(0xFF10B981),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      );
-                    }
                   },
                   child: _buildActionCardInter(
-                    'Registrar Gasto',
-                    'Anote o que você gastou',
-                    Icons.receipt_long_outlined,
-                    const Color(0xFFEF4444),
+                    'Missões Diárias',
+                    'Complete desafios e ganhe pontos',
+                    Icons.emoji_events_outlined,
+                    const Color(0xFFF59E0B),
                     isSmallScreen,
                   ),
                 ),
@@ -628,9 +929,14 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Theme.of(context).dividerColor
+              : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -657,7 +963,7 @@ class _HomePageState extends State<HomePage> {
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF1E293B),
+              color: Theme.of(context).textTheme.titleMedium?.color,
             ),
           ),
           const SizedBox(height: 4),
@@ -666,7 +972,7 @@ class _HomePageState extends State<HomePage> {
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 12 : 14,
               fontWeight: FontWeight.w400,
-              color: const Color(0xFF64748B),
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
           ),
         ],
@@ -682,94 +988,170 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Aprenda Brincando',
-            style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 18 : 20,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF1E293B),
+          ShaderMask(
+            shaderCallback: (bounds) => LinearGradient(
+              colors: Theme.of(context).brightness == Brightness.dark
+                  ? [
+                      const Color(0xFFFF8C42),
+                      const Color(0xFF10B981),
+                    ] // Laranja → Verde como no site
+                  : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+            ).createShader(bounds),
+            child: Text(
+              'Aprenda Brincando',
+              style: GoogleFonts.poppins(
+                fontSize: isSmallScreen ? 18 : 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 400),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0.3, 0),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: child,
                 ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        currentTip.emoji,
-                        style: TextStyle(fontSize: isSmallScreen ? 20 : 24),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      currentTip.category,
-                      style: GoogleFonts.poppins(
-                        fontSize: isSmallScreen ? 14 : 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
+              );
+            },
+            child: Container(
+              key: ValueKey<int>(currentTipIndex),
+              width: double.infinity,
+              constraints: BoxConstraints(minHeight: isSmallScreen ? 200 : 220),
+              padding: EdgeInsets.all(isSmallScreen ? 24.0 : 28.0),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF8B5CF6),
+                    Color(0xFF7C3AED),
+                    Color(0xFF6D28D9),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  currentTip.content,
-                  style: GoogleFonts.poppins(
-                    fontSize: isSmallScreen ? 16 : 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    height: 1.4,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF8B5CF6).withOpacity(0.4),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                    spreadRadius: -4,
                   ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _nextTip,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF8B5CF6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    elevation: 0,
+                  BoxShadow(
+                    color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                    blurRadius: 40,
+                    offset: const Offset(0, 20),
                   ),
-                  child: Text(
-                    'Mais dicas',
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.25),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 2,
+                          ),
+                        ),
+                        child: Text(
+                          currentTip.emoji,
+                          style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              currentTip.category,
+                              style: GoogleFonts.poppins(
+                                fontSize: isSmallScreen ? 15 : 17,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            Text(
+                              'Dica ${currentTipIndex + 1} de ${educationalTips.length}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    currentTip.content,
                     style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 14 : 16,
+                      fontSize: isSmallScreen ? 16 : 18,
                       fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      height: 1.5,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.1),
+                          offset: const Offset(0, 2),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _nextTip,
+                      icon: const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Color(0xFF8B5CF6),
+                        size: 22,
+                      ),
+                      label: Text(
+                        'Próxima Dica',
+                        style: GoogleFonts.poppins(
+                          fontSize: isSmallScreen ? 15 : 16,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF8B5CF6),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF8B5CF6),
+                        padding: EdgeInsets.symmetric(
+                          vertical: isSmallScreen ? 14 : 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -790,12 +1172,22 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Suas Conquistas',
-                style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 18 : 20,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1E293B),
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? [
+                          const Color(0xFF10B981),
+                          const Color(0xFF3B82F6),
+                        ] // Verde → Azul como no site
+                      : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                ).createShader(bounds),
+                child: Text(
+                  'Suas Conquistas',
+                  style: GoogleFonts.poppins(
+                    fontSize: isSmallScreen ? 18 : 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Text(
@@ -803,7 +1195,7 @@ class _HomePageState extends State<HomePage> {
                 style: GoogleFonts.poppins(
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF64748B),
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),
               ),
             ],
@@ -812,9 +1204,14 @@ class _HomePageState extends State<HomePage> {
           Container(
             padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardTheme.color,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Theme.of(context).dividerColor
+                    : const Color(0xFFE2E8F0),
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.04),
@@ -862,12 +1259,14 @@ class _HomePageState extends State<HomePage> {
           decoration: BoxDecoration(
             color: isCompleted
                 ? const Color(0xFF10B981).withOpacity(0.1)
+                : Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).colorScheme.surfaceContainerHighest
                 : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isCompleted
                   ? const Color(0xFF10B981).withOpacity(0.3)
-                  : const Color(0xFFE2E8F0),
+                  : Theme.of(context).dividerColor,
               width: 1,
             ),
           ),
@@ -889,8 +1288,8 @@ class _HomePageState extends State<HomePage> {
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w600,
                   color: isCompleted
-                      ? const Color(0xFF1E293B)
-                      : const Color(0xFF64748B),
+                      ? Theme.of(context).textTheme.titleMedium?.color
+                      : Theme.of(context).textTheme.bodyMedium?.color,
                 ),
               ),
               const SizedBox(height: 2),
@@ -899,12 +1298,13 @@ class _HomePageState extends State<HomePage> {
                 style: GoogleFonts.poppins(
                   fontSize: isSmallScreen ? 12 : 14,
                   fontWeight: FontWeight.w400,
-                  color: const Color(0xFF64748B),
+                  color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
               ),
             ],
           ),
         ),
+        const SizedBox(width: 12),
         if (isCompleted)
           Container(
             padding: const EdgeInsets.all(4),

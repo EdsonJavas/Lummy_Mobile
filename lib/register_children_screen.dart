@@ -97,9 +97,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         _responsavelId = docRef.id;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao criar responsável: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao criar responsável: $e')));
     }
   }
 
@@ -111,8 +111,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             content: const Text('Selecione o sexo da criança'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
         return;
@@ -124,8 +125,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             content: const Text('Responsável ainda não foi criado'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
         return;
@@ -139,22 +141,23 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             .doc(_responsavelId)
             .collection('children')
             .add({
-          'nome': _nameController.text.trim(),
-          'cpf': _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-          'email': _emailController.text.trim(),
-          'senha': _passwordController.text,
-          'idade': int.tryParse(_ageController.text.trim()) ?? 0,
-          'sexo': _selectedGender,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+              'nome': _nameController.text.trim(),
+              'cpf': _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+              'email': _emailController.text.trim(),
+              'senha': _passwordController.text,
+              'idade': int.tryParse(_ageController.text.trim()) ?? 0,
+              'sexo': _selectedGender,
+              'createdAt': FieldValue.serverTimestamp(),
+            });
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Criança adicionada com sucesso!'),
             backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
 
@@ -174,8 +177,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             content: Text('Erro ao adicionar criança: $e'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
       }
@@ -400,8 +404,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             ),
             prefixIcon: Icon(
               icon,
-              color:
-                  isFocused ? const Color(0xFF1E40AF) : const Color(0xFF64748B),
+              color: isFocused
+                  ? const Color(0xFF1E40AF)
+                  : const Color(0xFF64748B),
               size: isVerySmallScreen ? 20 : 22,
             ),
             suffixIcon: suffixIcon,
@@ -427,34 +432,34 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     final isVerySmallScreen = screenHeight < 650;
-    final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: screenHeight,
-          ),
+          constraints: BoxConstraints(minHeight: screenHeight),
           child: Stack(
             children: [
-              // Header com gradiente azul - similar ao LoginScreen
+              // Header com gradiente adaptativo ao tema
               Container(
                 width: double.infinity,
                 height: isVerySmallScreen
                     ? screenHeight * 0.35
                     : screenHeight * 0.4,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF4A90E2),
-                      Color(0xFF357ABD),
-                    ],
-                  ),
+                decoration: BoxDecoration(
+                  gradient: Theme.of(context).brightness == Brightness.dark
+                      ? const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF0A0A1A), Color(0xFF1A1A2E)],
+                        )
+                      : const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+                        ),
                 ),
               ),
 
@@ -491,7 +496,11 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.black,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                             TextSpan(
@@ -515,7 +524,11 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.black,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                           ],
@@ -566,7 +579,10 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardTheme.color,
+                      border: Theme.of(context).brightness == Brightness.dark
+                          ? Border.all(color: Theme.of(context).dividerColor)
+                          : null,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
@@ -592,12 +608,28 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                             SizedBox(height: isVerySmallScreen ? 25 : 40),
 
                             // Título
-                            Text(
-                              'Cadastrar Criança',
-                              style: GoogleFonts.poppins(
-                                fontSize: isVerySmallScreen ? 24 : 28,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF1E293B),
+                            ShaderMask(
+                              shaderCallback: (bounds) => LinearGradient(
+                                colors:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? [
+                                        const Color(0xFF3B82F6),
+                                        const Color(0xFF8B5CF6),
+                                      ] // Azul → Roxo como no site
+                                    : [
+                                        const Color(0xFF1E293B),
+                                        const Color(0xFF1E293B),
+                                      ],
+                              ).createShader(bounds),
+                              child: Text(
+                                'Cadastrar Criança',
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen ? 24 : 28,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors
+                                      .white, // This color is masked by the shader
+                                ),
                               ),
                             ),
 
@@ -684,13 +716,16 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 LengthLimitingTextInputFormatter(11),
-                                TextInputFormatter.withFunction(
-                                    (oldValue, newValue) {
+                                TextInputFormatter.withFunction((
+                                  oldValue,
+                                  newValue,
+                                ) {
                                   final formatted = _formatCPF(newValue.text);
                                   return TextEditingValue(
                                     text: formatted,
                                     selection: TextSelection.collapsed(
-                                        offset: formatted.length),
+                                      offset: formatted.length,
+                                    ),
                                   );
                                 }),
                               ],
@@ -728,8 +763,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                                 if (value == null || value.isEmpty) {
                                   return 'Por favor, insira o e-mail da criança';
                                 }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                    .hasMatch(value)) {
+                                if (!RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                ).hasMatch(value)) {
                                   return 'Por favor, insira um e-mail válido';
                                 }
                                 return null;
@@ -791,19 +827,22 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(
-                                    isVerySmallScreen ? 25 : 28),
+                                  isVerySmallScreen ? 25 : 28,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF8C42)
-                                        .withOpacity(0.3),
+                                    color: const Color(
+                                      0xFFFF8C42,
+                                    ).withOpacity(0.3),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
                               ),
                               child: ElevatedButton(
-                                onPressed:
-                                    _isLoading ? null : _handleRegisterChild,
+                                onPressed: _isLoading
+                                    ? null
+                                    : _handleRegisterChild,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   foregroundColor: Colors.white,
@@ -811,7 +850,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                                   shadowColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(
-                                        isVerySmallScreen ? 25 : 28),
+                                      isVerySmallScreen ? 25 : 28,
+                                    ),
                                   ),
                                 ),
                                 child: _isLoading
@@ -822,7 +862,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                                           strokeWidth: 2,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                                  Colors.white),
+                                                Colors.white,
+                                              ),
                                         ),
                                       )
                                     : Text(
@@ -884,19 +925,9 @@ class FormTopClipper extends CustomClipper<Path> {
     path.lineTo(size.width, size.height);
     path.lineTo(size.width, 60);
 
-    path.quadraticBezierTo(
-      size.width * 0.75,
-      20,
-      size.width * 0.5,
-      20,
-    );
+    path.quadraticBezierTo(size.width * 0.75, 20, size.width * 0.5, 20);
 
-    path.quadraticBezierTo(
-      size.width * 0.25,
-      20,
-      0,
-      60,
-    );
+    path.quadraticBezierTo(size.width * 0.25, 20, 0, 60);
 
     path.close();
 

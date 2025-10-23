@@ -197,7 +197,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         .toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -206,12 +206,22 @@ class _GoalsScreenState extends State<GoalsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header (igual ao padrão da tela de gastos)
-              Text(
-                'Minhas Metas',
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? [
+                          const Color(0xFF8B5CF6),
+                          const Color(0xFF3B82F6),
+                        ] // Roxo → Azul como no site
+                      : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                ).createShader(bounds),
+                child: Text(
+                  'Minhas Metas',
+                  style: GoogleFonts.poppins(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -219,7 +229,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 'Defina objetivos e acompanhe seu progresso',
                 style: GoogleFonts.poppins(
                   fontSize: 16,
-                  color: const Color(0xFF64748B),
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),
               ),
               const SizedBox(height: 24),
@@ -289,9 +299,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   isSmallScreen,
                 ),
                 const SizedBox(height: 20),
-                ...ongoingGoals
-                    .map((goal) => _buildGoalCard(goal, isSmallScreen))
-                    .toList(),
+                ...ongoingGoals.map(
+                  (goal) => _buildGoalCard(goal, isSmallScreen),
+                ),
                 const SizedBox(height: 40),
               ],
 
@@ -303,9 +313,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   isSmallScreen,
                 ),
                 const SizedBox(height: 20),
-                ...completedGoals
-                    .map((goal) => _buildGoalCard(goal, isSmallScreen))
-                    .toList(),
+                ...completedGoals.map(
+                  (goal) => _buildGoalCard(goal, isSmallScreen),
+                ),
               ],
 
               // Empty State
@@ -360,7 +370,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
             style: GoogleFonts.poppins(
               fontSize: isSmallScreen ? 18 : 20,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF1E293B),
+              color: Theme.of(context).textTheme.titleLarge?.color,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -426,7 +436,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: goal.status == GoalStatus.completed
@@ -492,7 +502,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                             style: GoogleFonts.poppins(
                               fontSize: isSmallScreen ? 16 : 18,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF1E293B),
+                              color: Theme.of(
+                                context,
+                              ).textTheme.titleLarge?.color,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:lummy_login/login_page.dart';
+import 'package:lummy_login/core/providers/theme_provider.dart';
+import 'package:lummy_login/screens/edit_profile_screen.dart';
+import 'package:lummy_login/screens/notifications_screen.dart';
+import 'package:lummy_login/shared/widgets/cached_avatar.dart';
+import 'package:lummy_login/shared/widgets/cached_image.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,44 +30,50 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileHeader(screenWidth, screenHeight),
-            Transform(
-              transform: Matrix4.translationValues(0, -40, 0),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 25,
-                      offset: Offset(0, -15),
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.only(
+            bottom: 16.0,
+          ), // Reduzir padding inferior
+          child: Column(
+            children: [
+              _buildProfileHeader(screenWidth, screenHeight),
+              Transform(
+                transform: Matrix4.translationValues(0, -40, 0),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
                     ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildStatsSection(),
-                      const SizedBox(height: 20),
-                      _buildAchievementsSection(),
-                      const SizedBox(height: 20),
-                      _buildSettingsSection(),
-                      const SizedBox(height: 100),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 25,
+                        offset: const Offset(0, -15),
+                      ),
                     ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildStatsSection(),
+                        const SizedBox(height: 20),
+                        _buildAchievementsSection(),
+                        const SizedBox(height: 20),
+                        _buildSettingsSection(),
+                        const SizedBox(height: 20), // Reduzido de 100 para 20
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -76,21 +88,49 @@ class _ProfilePageState extends State<ProfilePage> {
           SizedBox(
             height: screenHeight * 0.60,
             width: double.infinity,
-            child: Image.network(
-              'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/fotocriancafodase%201-MFp8K8GLj7deZeGCFVqMJVDVgEtfsc.png',
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
+            child: Consumer<ThemeProvider>(
+              builder: (context, themeProvider, _) {
                 return Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFF87CEEB),
-                        Color(0xFF4CAF50),
-                      ],
-                    ),
+                    image: themeProvider.isDarkMode
+                        ? const DecorationImage(
+                            image: AssetImage('dark.png'),
+                            fit: BoxFit.cover,
+                            opacity: 0.8,
+                          )
+                        : null,
                   ),
+                  child: themeProvider.isDarkMode
+                      ? Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.6),
+                                Colors.black.withOpacity(0.8),
+                              ],
+                              stops: const [0.0, 0.7, 1.0],
+                            ),
+                          ),
+                        )
+                      : CachedImage(
+                          imageUrl:
+                              'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/fotocriancafodase%201-MFp8K8GLj7deZeGCFVqMJVDVgEtfsc.png',
+                          width: double.infinity,
+                          height: screenHeight * 0.60,
+                          fit: BoxFit.cover,
+                          errorWidget: Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.topCenter,
+                                colors: [Color(0xFF87CEEB), Color(0xFF4CAF50)],
+                              ),
+                            ),
+                          ),
+                        ),
                 );
               },
             ),
@@ -107,7 +147,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.arrow_back_ios,
                   color: Colors.white,
                   size: 20,
@@ -138,37 +178,23 @@ class _ProfilePageState extends State<ProfilePage> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Color(0xFF1E40AF), width: 4),
+                border: Border.all(color: const Color(0xFF1E40AF), width: 4),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2),
                     blurRadius: 20,
-                    offset: Offset(0, 10),
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
-              child: ClipOval(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFF87CEEB).withOpacity(0.3),
-                  ),
-                  child: Image.network(
+              child: const CachedAvatar(
+                imageUrl:
                     'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFF1E40AF).withOpacity(0.1),
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          size: 60,
-                          color: Color(0xFF1E40AF),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                size: 120,
+                borderColor: Colors.white,
+                borderWidth: 4,
+                fallbackIcon: Icons.person,
+                fallbackIconColor: Color(0xFF1E40AF),
               ),
             ),
           ),
@@ -182,14 +208,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Color(0xFFFF8C42),
+                    color: const Color(0xFFFF8C42),
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 3),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
                         blurRadius: 10,
-                        offset: Offset(0, 5),
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
@@ -210,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.star,
                           color: Color(0xFFFF8C42),
                           size: 16,
@@ -255,14 +281,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       Shadow(
                         color: Colors.black.withOpacity(0.3),
                         blurRadius: 10,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(25),
@@ -274,7 +303,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 10,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
@@ -299,12 +328,22 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Minhas Conquistas',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1E293B),
+        ShaderMask(
+          shaderCallback: (bounds) => LinearGradient(
+            colors: Theme.of(context).brightness == Brightness.dark
+                ? [
+                    const Color(0xFF10B981),
+                    const Color(0xFF8B5CF6),
+                  ] // Verde → Roxo como no site
+                : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+          ).createShader(bounds),
+          child: Text(
+            'Minhas Conquistas',
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -315,7 +354,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 'Metas Concluídas',
                 completedGoals.toString(),
                 Icons.flag_rounded,
-                Color(0xFF8B5CF6),
+                const Color(0xFF8B5CF6),
               ),
             ),
             const SizedBox(width: 16),
@@ -324,7 +363,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 'Total Economizado',
                 'R\$ ${totalSaved.toStringAsFixed(0)}',
                 Icons.savings_rounded,
-                Color(0xFF10B981),
+                const Color(0xFF10B981),
               ),
             ),
           ],
@@ -334,18 +373,22 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildStatCard(
-      String label, String value, IconData icon, Color color) {
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.2), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
             blurRadius: 12,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -358,11 +401,7 @@ class _ProfilePageState extends State<ProfilePage> {
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 28,
-            ),
+            child: Icon(icon, color: color, size: 28),
           ),
           const SizedBox(height: 12),
           Text(
@@ -380,7 +419,7 @@ class _ProfilePageState extends State<ProfilePage> {
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Color(0xFF64748B),
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
           ),
         ],
@@ -392,13 +431,16 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
+        border: Theme.of(context).brightness == Brightness.dark
+            ? Border.all(color: Theme.of(context).dividerColor)
+            : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
             blurRadius: 12,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -411,32 +453,42 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               Expanded(
                 // Adicionado Expanded aqui
-                child: Text(
-                  'Medalhas Conquistadas',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1E293B),
+                child: ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: Theme.of(context).brightness == Brightness.dark
+                        ? [
+                            const Color(0xFFFF8C42),
+                            const Color(0xFFEF4444),
+                          ] // Laranja → Vermelho como no site
+                        : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                  ).createShader(bounds),
+                  child: Text(
+                    'Medalhas Conquistadas',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                    overflow: TextOverflow
+                        .ellipsis, // Adicionado para evitar overflow de texto
                   ),
-                  overflow: TextOverflow
-                      .ellipsis, // Adicionado para evitar overflow de texto
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xFFFF8C42),
-                      Color(0xFFFF7A28),
-                    ],
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF8C42), Color(0xFFFF7A28)],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xFFFF8C42).withOpacity(0.3),
+                      color: const Color(0xFFFF8C42).withOpacity(0.3),
                       blurRadius: 8,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -445,25 +497,26 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     // Medalhas conquistadas (2)
                     ...List.generate(
-                        2,
-                        (index) => Container(
-                              width: 8,
-                              height: 8,
-                              margin: EdgeInsets.only(right: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.5),
-                                    blurRadius: 4,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                            )),
+                      2,
+                      (index) => Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.only(right: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.5),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
 
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
 
                     // Separador
                     Container(
@@ -472,22 +525,23 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.white.withOpacity(0.5),
                     ),
 
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
 
                     // Medalhas não conquistadas (3)
                     ...List.generate(
-                        3,
-                        (index) => Container(
-                              width: 6,
-                              height: 6,
-                              margin: EdgeInsets.only(right: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
-                                shape: BoxShape.circle,
-                              ),
-                            )),
+                      3,
+                      (index) => Container(
+                        width: 6,
+                        height: 6,
+                        margin: const EdgeInsets.only(right: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
 
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
 
                     Text(
                       '2/5',
@@ -534,20 +588,22 @@ class _ProfilePageState extends State<ProfilePage> {
           height: 60,
           decoration: BoxDecoration(
             color: isUnlocked
-                ? Color(0xFFFF8C42).withOpacity(0.1)
-                : Color(0xFFF1F5F9),
+                ? const Color(0xFFFF8C42).withOpacity(0.1)
+                : Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).colorScheme.surfaceContainerHighest
+                : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isUnlocked
-                  ? Color(0xFFFF8C42).withOpacity(0.3)
-                  : Color(0xFFE2E8F0),
+                  ? const Color(0xFFFF8C42).withOpacity(0.3)
+                  : Theme.of(context).dividerColor,
               width: 2,
             ),
           ),
           child: Center(
             child: Text(
               emoji,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 // opacity: isUnlocked ? 1.0 : 0.5,
               ),
@@ -561,7 +617,9 @@ class _ProfilePageState extends State<ProfilePage> {
           style: GoogleFonts.poppins(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: isUnlocked ? Color(0xFF1E293B) : Color(0xFF64748B),
+            color: isUnlocked
+                ? Theme.of(context).textTheme.titleMedium?.color
+                : Theme.of(context).textTheme.bodyMedium?.color,
           ),
         ),
       ],
@@ -572,25 +630,38 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
+        border: Theme.of(context).brightness == Brightness.dark
+            ? Border.all(color: Theme.of(context).dividerColor)
+            : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
             blurRadius: 12,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Configurações',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1E293B),
+          ShaderMask(
+            shaderCallback: (bounds) => LinearGradient(
+              colors: Theme.of(context).brightness == Brightness.dark
+                  ? [
+                      const Color(0xFF3B82F6),
+                      const Color(0xFF10B981),
+                    ] // Azul → Verde como no site
+                  : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+            ).createShader(bounds),
+            child: Text(
+              'Configurações',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -598,25 +669,64 @@ class _ProfilePageState extends State<ProfilePage> {
             Icons.edit_rounded,
             'Editar Perfil',
             'Altere suas informações pessoais',
-            Color(0xFF1E40AF),
+            const Color(0xFF1E40AF),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EditProfileScreen(),
+                ),
+              );
+            },
           ),
           _buildSettingItem(
             Icons.notifications_rounded,
             'Notificações',
             'Gerencie suas notificações',
-            Color(0xFF8B5CF6),
+            const Color(0xFF8B5CF6),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsScreen(),
+                ),
+              );
+            },
           ),
+          _buildPremiumThemeSettingItem(),
           _buildSettingItem(
             Icons.help_rounded,
             'Ajuda',
             'Tire suas dúvidas',
-            Color(0xFF10B981),
+            const Color(0xFF10B981),
+            onTap: () {
+              // TODO: Implementar tela de ajuda
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Tela de ajuda em desenvolvimento 🚧',
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                  ),
+                  backgroundColor: const Color(0xFF10B981),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            },
           ),
           _buildSettingItem(
             Icons.logout_rounded,
             'Sair',
             'Desconectar da conta',
-            Color(0xFFEF4444),
+            const Color(0xFFEF4444),
+            onTap: () async {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false,
+              );
+            },
           ),
         ],
       ),
@@ -624,29 +734,23 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildSettingItem(
-      IconData icon, String title, String subtitle, Color color) {
+    IconData icon,
+    String title,
+    String subtitle,
+    Color color, {
+    VoidCallback? onTap,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () async {
-          if (title == 'Sair') {
-            // Voltar para a tela de login limpando a pilha
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (route) => false,
-            );
-          }
-        },
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: color.withOpacity(0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: color.withOpacity(0.1),
-              width: 1,
-            ),
+            border: Border.all(color: color.withOpacity(0.1), width: 1),
           ),
           child: Row(
             children: [
@@ -656,11 +760,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 20,
-                ),
+                child: Icon(icon, color: color, size: 20),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -672,7 +772,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1E293B),
+                        color: Theme.of(context).textTheme.titleMedium?.color,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -681,7 +781,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
-                        color: Color(0xFF64748B),
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     ),
                   ],
@@ -689,13 +789,164 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Color(0xFF64748B),
+                color: Theme.of(context).textTheme.bodyMedium?.color,
                 size: 20,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPremiumThemeSettingItem() {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        final isDark = themeProvider.isDarkMode;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: Theme.of(context).brightness == Brightness.dark
+                  ? [
+                      const Color(0xFFF59E0B), // Dourado vibrante
+                      const Color(0xFFF97316), // Laranja vibrante
+                      const Color(0xFFEF4444), // Vermelho vibrante
+                    ]
+                  : [
+                      const Color(0xFF3B82F6), // Azul vibrante
+                      const Color(0xFF8B5CF6), // Roxo vibrante
+                      const Color(0xFFEC4899), // Rosa vibrante
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFFF59E0B).withOpacity(0.4)
+                    : const Color(0xFF3B82F6).withOpacity(0.3),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
+                spreadRadius: -4,
+              ),
+              BoxShadow(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFFF59E0B).withOpacity(0.2)
+                    : const Color(0xFF3B82F6).withOpacity(0.2),
+                blurRadius: 40,
+                offset: const Offset(0, 20),
+              ),
+            ],
+            border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.25),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.4),
+                    width: 2,
+                  ),
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: Icon(
+                    isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                    color: Colors.white,
+                    size: 22,
+                    key: ValueKey(isDark),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Tema Premium',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 0.3,
+                            ),
+                            overflow: TextOverflow.visible,
+                            maxLines: 1,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.25),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.4),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            'PRO',
+                            style: GoogleFonts.poppins(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      isDark ? 'Modo escuro ativado' : 'Modo claro ativado',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.25),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.4),
+                    width: 1.5,
+                  ),
+                ),
+                child: Switch(
+                  value: isDark,
+                  onChanged: (_) => themeProvider.toggleTheme(),
+                  activeColor: Colors.white,
+                  activeTrackColor: Colors.white.withOpacity(0.4),
+                  inactiveThumbColor: Colors.white.withOpacity(0.9),
+                  inactiveTrackColor: Colors.white.withOpacity(0.3),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

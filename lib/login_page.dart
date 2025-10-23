@@ -63,39 +63,155 @@ class _LoginScreenState extends State<LoginScreen> {
     final shouldEnable = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Usar biometria?',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        content: Text(
-          'Deseja salvar sua digital para facilitar os próximos logins?',
-          style: GoogleFonts.poppins(fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Não',
-              style: GoogleFonts.poppins(
-                color: Colors.grey[700],
-                fontWeight: FontWeight.w500,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardTheme.color,
+            borderRadius: BorderRadius.circular(28),
+            border: Theme.of(context).brightness == Brightness.dark
+                ? Border.all(color: Theme.of(context).dividerColor, width: 1)
+                : null,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 30,
+                offset: const Offset(0, 15),
               ),
-            ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(
-              'Sim',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Ícone de biometria
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: Theme.of(context).brightness == Brightness.dark
+                        ? [
+                            const Color(0xFF3B82F6).withOpacity(0.2),
+                            const Color(0xFF8B5CF6).withOpacity(0.1),
+                          ]
+                        : [
+                            const Color(0xFF1E40AF).withOpacity(0.1),
+                            const Color(0xFF8B5CF6).withOpacity(0.05),
+                          ],
+                  ),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF3B82F6).withOpacity(0.3)
+                        : const Color(0xFF1E40AF).withOpacity(0.2),
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  Icons.fingerprint,
+                  size: 64,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF3B82F6)
+                      : const Color(0xFF1E40AF),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Título
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? [const Color(0xFF3B82F6), const Color(0xFF8B5CF6)]
+                      : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                ).createShader(bounds),
+                child: Text(
+                  'Ativar Biometria?',
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Descrição
+              Text(
+                'Salve sua digital para fazer login de forma rápida e segura nos próximos acessos!',
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              // Botões
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).cardTheme.color
+                            : const Color(0xFFF1F5F9),
+                        foregroundColor: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: BorderSide(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).dividerColor
+                                : const Color(0xFFE2E8F0),
+                            width: 1,
+                          ),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Agora Não',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B82F6),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Ativar',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       ),
     );
 
@@ -267,6 +383,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final isSmallScreen = screenHeight < 700;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
@@ -274,16 +391,22 @@ class _LoginScreenState extends State<LoginScreen> {
           constraints: BoxConstraints(minHeight: screenHeight),
           child: Stack(
             children: [
-              // Fundo azul ocupando toda a tela
+              // Fundo adaptativo ao tema
               Container(
                 width: double.infinity,
                 height: screenHeight,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-                  ),
+                decoration: BoxDecoration(
+                  gradient: Theme.of(context).brightness == Brightness.dark
+                      ? const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF0A0A1A), Color(0xFF1A1A2E)],
+                        )
+                      : const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+                        ),
                 ),
               ),
 
@@ -304,7 +427,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.black,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                             TextSpan(
@@ -328,7 +455,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.black,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                           ],
@@ -396,7 +527,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardTheme.color,
+                      border: Theme.of(context).brightness == Brightness.dark
+                          ? Border.all(color: Theme.of(context).dividerColor)
+                          : null,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
@@ -426,15 +560,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ? 20
                                   : (isSmallScreen ? 30 : 50),
                             ), // Responsivo
-                            // Título "Faça Login" - responsivo
-                            Text(
-                              'Faça Login',
-                              style: GoogleFonts.inter(
-                                fontSize: isVerySmallScreen
-                                    ? 24
-                                    : 28, // Menor em telas pequenas
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
+                            // Título "Faça Login" - responsivo com gradiente
+                            ShaderMask(
+                              shaderCallback: (bounds) => LinearGradient(
+                                colors:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? [
+                                        const Color(0xFF3B82F6),
+                                        const Color(0xFF8B5CF6),
+                                      ]
+                                    : [
+                                        const Color(0xFF1E293B),
+                                        const Color(0xFF1E293B),
+                                      ],
+                              ).createShader(bounds),
+                              child: Text(
+                                'Faça Login',
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen
+                                      ? 24
+                                      : 28, // Menor em telas pequenas
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
 
@@ -482,88 +631,65 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
 
                             // Campo Email estilizado
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _emailFocused
-                                      ? const Color(0xFF4A90E2)
-                                      : Colors.transparent,
-                                  width: 2,
+                            Focus(
+                              onFocusChange: (hasFocus) {
+                                setState(() {
+                                  _emailFocused = hasFocus;
+                                });
+                              },
+                              child: TextFormField(
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen
+                                      ? 14
+                                      : 16, // Responsivo
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                boxShadow: _emailFocused
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(
-                                            0xFF4A90E2,
-                                          ).withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                    : [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _emailFocused = hasFocus;
-                                  });
+                                decoration: InputDecoration(
+                                  hintText: 'Seu E-mail',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Theme.of(
+                                      context,
+                                    ).inputDecorationTheme.hintStyle?.color,
+                                    fontSize: isVerySmallScreen ? 14 : 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.email_outlined,
+                                    color: _emailFocused
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).iconTheme.color,
+                                    size: isVerySmallScreen
+                                        ? 20
+                                        : 22, // Responsivo
+                                  ),
+                                  filled: true,
+                                  fillColor: Theme.of(
+                                    context,
+                                  ).inputDecorationTheme.fillColor,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isVerySmallScreen ? 16 : 20,
+                                    vertical: isVerySmallScreen ? 14 : 18,
+                                  ),
+                                  errorStyle: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 10 : 12,
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira seu e-mail';
+                                  }
+                                  if (!RegExp(
+                                    r'^[\w-\.]+@[\w-]+\.[\w-]{2,4}$',
+                                  ).hasMatch(value)) {
+                                    return 'Por favor, insira um e-mail válido';
+                                  }
+                                  return null;
                                 },
-                                child: TextFormField(
-                                  controller: _emailController,
-                                  keyboardType: TextInputType.emailAddress,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: isVerySmallScreen
-                                        ? 14
-                                        : 16, // Responsivo
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Seu E-mail',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.email_outlined,
-                                      color: _emailFocused
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
-                                      size: isVerySmallScreen
-                                          ? 20
-                                          : 22, // Responsivo
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira seu e-mail';
-                                    }
-                                    if (!RegExp(
-                                      r'^[\w-\.]+@[\w-]+\.[\w-]{2,4}$',
-                                    ).hasMatch(value)) {
-                                      return 'Por favor, insira um e-mail válido';
-                                    }
-                                    return null;
-                                  },
-                                ),
                               ),
                             ),
 
@@ -571,99 +697,78 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: isVerySmallScreen ? 12 : 16,
                             ), // Responsivo
                             // Campo Senha estilizado
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF8F9FA),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: _passwordFocused
-                                      ? const Color(0xFF4A90E2)
-                                      : Colors.transparent,
-                                  width: 2,
+                            Focus(
+                              onFocusChange: (hasFocus) {
+                                setState(() {
+                                  _passwordFocused = hasFocus;
+                                });
+                              },
+                              child: TextFormField(
+                                controller: _passwordController,
+                                obscureText: !_isPasswordVisible,
+                                style: GoogleFonts.poppins(
+                                  fontSize: isVerySmallScreen ? 14 : 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                boxShadow: _passwordFocused
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(
-                                            0xFF4A90E2,
-                                          ).withOpacity(0.1),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                    : [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                              ),
-                              child: Focus(
-                                onFocusChange: (hasFocus) {
-                                  setState(() {
-                                    _passwordFocused = hasFocus;
-                                  });
-                                },
-                                child: TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: !_isPasswordVisible,
-                                  style: GoogleFonts.poppins(
+                                decoration: InputDecoration(
+                                  hintText: 'Sua Senha',
+                                  hintStyle: GoogleFonts.poppins(
+                                    color: Theme.of(
+                                      context,
+                                    ).inputDecorationTheme.hintStyle?.color,
                                     fontSize: isVerySmallScreen ? 14 : 16,
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w400,
                                   ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Sua Senha',
-                                    hintStyle: GoogleFonts.poppins(
-                                      color: Colors.grey[500],
-                                      fontSize: isVerySmallScreen ? 14 : 16,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    prefixIcon: Icon(
-                                      Icons.lock_outline,
+                                  prefixIcon: Icon(
+                                    Icons.lock_outline,
+                                    color: _passwordFocused
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).iconTheme.color,
+                                    size: isVerySmallScreen ? 20 : 22,
+                                  ),
+                                  filled: true,
+                                  fillColor: Theme.of(
+                                    context,
+                                  ).inputDecorationTheme.fillColor,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: isVerySmallScreen ? 16 : 20,
+                                    vertical: isVerySmallScreen ? 14 : 18,
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isPasswordVisible
+                                          ? Icons.visibility_outlined
+                                          : Icons.visibility_off_outlined,
                                       color: _passwordFocused
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.grey[500],
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                          : Theme.of(context).iconTheme.color,
                                       size: isVerySmallScreen ? 20 : 22,
                                     ),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: isVerySmallScreen ? 16 : 20,
-                                      vertical: isVerySmallScreen ? 14 : 18,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isPasswordVisible
-                                            ? Icons.visibility_outlined
-                                            : Icons.visibility_off_outlined,
-                                        color: _passwordFocused
-                                            ? const Color(0xFF4A90E2)
-                                            : Colors.grey[500],
-                                        size: isVerySmallScreen ? 20 : 22,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isPasswordVisible =
-                                              !_isPasswordVisible;
-                                        });
-                                      },
-                                    ),
-                                    errorStyle: GoogleFonts.poppins(
-                                      fontSize: isVerySmallScreen ? 10 : 12,
-                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isPasswordVisible =
+                                            !_isPasswordVisible;
+                                      });
+                                    },
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Por favor, insira sua senha';
-                                    }
-                                    if (value.length < 6) {
-                                      return 'A senha deve ter pelo menos 6 caracteres';
-                                    }
-                                    return null;
-                                  },
+                                  errorStyle: GoogleFonts.poppins(
+                                    fontSize: isVerySmallScreen ? 10 : 12,
+                                  ),
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, insira sua senha';
+                                  }
+                                  if (value.length < 6) {
+                                    return 'A senha deve ter pelo menos 6 caracteres';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
 
@@ -709,7 +814,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
                                   child: _isLoading
                                       ? SizedBox(
                                           height: isVerySmallScreen ? 18 : 20,
@@ -747,7 +854,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'Não tem uma conta?',
                                   style: GoogleFonts.poppins(
                                     fontSize: isVerySmallScreen ? 12 : 14,
-                                    color: Colors.grey[700],
+                                    color: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.color,
                                   ),
                                 ),
                                 TextButton(
@@ -765,7 +874,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     style: GoogleFonts.poppins(
                                       fontSize: isVerySmallScreen ? 12 : 14,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF4A90E2),
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                     ),
                                   ),
                                 ),

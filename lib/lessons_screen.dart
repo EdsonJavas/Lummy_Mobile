@@ -21,7 +21,8 @@ class _LessonsScreenState extends State<LessonsScreen> {
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: NetworkImage(
-                    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4DB5FF%20FFA42E%2077D88F%20FF8FC2%20BBA8F9%20FEE440%20%281%29%201-6GbuJScbV9th96qhg9CZLt9VZ4YLhW.png'),
+                  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4DB5FF%20FFA42E%2077D88F%20FF8FC2%20BBA8F9%20FEE440%20%281%29%201-6GbuJScbV9th96qhg9CZLt9VZ4YLhW.png',
+                ),
                 fit: BoxFit.cover,
               ),
             ),
@@ -43,15 +44,23 @@ class _LessonsScreenState extends State<LessonsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 8),
-                      const Text(
-                        'Aulas',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [
+                            Color(0xFFFF8C42),
+                            Color(0xFF10B981),
+                          ], // Laranja → Verde como no site
+                        ).createShader(bounds),
+                        child: const Text(
+                          'Aulas',
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -78,8 +87,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                     ? Colors.white.withOpacity(0.28)
                                     : const Color(0xFF62C370),
                                 foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
@@ -106,8 +116,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                     ? const Color(0xFF62C370)
                                     : Colors.white.withOpacity(0.28),
                                 foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
@@ -135,9 +146,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
             maxChildSize: 0.95,
             builder: (context, scrollController) {
               return Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFAFAFA),
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
@@ -149,7 +160,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                       height: 4,
                       width: 40,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: Theme.of(context).dividerColor,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -168,14 +179,15 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                   end: Alignment.bottomRight,
                                   colors: [
                                     Color(0xFF3695F4),
-                                    Color(0xFF62C370)
+                                    Color(0xFF62C370),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF3695F4)
-                                        .withOpacity(0.25),
+                                    color: const Color(
+                                      0xFF3695F4,
+                                    ).withOpacity(0.25),
                                     blurRadius: 16,
                                     offset: const Offset(0, 8),
                                   ),
@@ -193,7 +205,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                         gradient: LinearGradient(
                                           colors: [
                                             Color(0xFF2D1B69),
-                                            Color(0xFF8B5CF6)
+                                            Color(0xFF8B5CF6),
                                           ],
                                         ),
                                       ),
@@ -229,25 +241,28 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                             Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4),
+                                                    horizontal: 8,
+                                                    vertical: 4,
+                                                  ),
                                               decoration: BoxDecoration(
-                                                color: Colors.white
-                                                    .withOpacity(0.18),
+                                                color: Colors.white.withOpacity(
+                                                  0.18,
+                                                ),
                                                 borderRadius:
                                                     BorderRadius.circular(999),
                                                 border: Border.all(
-                                                    color: Colors.white
-                                                        .withOpacity(0.25),
-                                                    width: 1),
+                                                  color: Colors.white
+                                                      .withOpacity(0.25),
+                                                  width: 1,
+                                                ),
                                               ),
                                               child: const Text(
                                                 '60% concluído',
                                                 style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 10,
-                                                    fontWeight:
-                                                        FontWeight.w600),
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -283,14 +298,15 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                                   decoration: BoxDecoration(
                                                     gradient:
                                                         const LinearGradient(
-                                                      colors: [
-                                                        Color(0xFFFF8C42),
-                                                        Color(0xFFFF66B3)
-                                                      ],
-                                                    ),
+                                                          colors: [
+                                                            Color(0xFFFF8C42),
+                                                            Color(0xFFFF66B3),
+                                                          ],
+                                                        ),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            6),
+                                                          6,
+                                                        ),
                                                   ),
                                                 ),
                                               ),
@@ -300,47 +316,60 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                         const SizedBox(height: 10),
                                         Row(
                                           children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                            Flexible(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
                                                       horizontal: 10,
-                                                      vertical: 6),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              child: const Text(
-                                                'Continuar',
-                                                style: TextStyle(
-                                                  color: Color(0xFF1E293B),
-                                                  fontWeight: FontWeight.w700,
+                                                      vertical: 6,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: const Text(
+                                                  'Continuar',
+                                                  style: TextStyle(
+                                                    color: Color(0xFF1E293B),
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ),
-                                            const SizedBox(width: 10),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                            const SizedBox(width: 8),
+                                            Flexible(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
                                                       horizontal: 8,
-                                                      vertical: 4),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white
-                                                    .withOpacity(0.18),
-                                                borderRadius:
-                                                    BorderRadius.circular(999),
-                                                border: Border.all(
+                                                      vertical: 4,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white
+                                                      .withOpacity(0.18),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        999,
+                                                      ),
+                                                  border: Border.all(
                                                     color: Colors.white
                                                         .withOpacity(0.25),
-                                                    width: 1),
-                                              ),
-                                              child: const Text(
-                                                'Vídeo • 6 min',
-                                                style: TextStyle(
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  'Vídeo • 6 min',
+                                                  style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 10,
-                                                    fontWeight:
-                                                        FontWeight.w600),
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -368,18 +397,21 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                             : const LinearGradient(
                                                 colors: [
                                                   Color(0xFF60A5FA),
-                                                  Color(0xFF7C3AED)
+                                                  Color(0xFF7C3AED),
                                                 ],
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                               ),
                                         color: showWatchedLessons
-                                            ? Colors.white
+                                            ? Theme.of(context).cardTheme.color
                                             : null,
                                         borderRadius: BorderRadius.circular(16),
                                         border: showWatchedLessons
                                             ? Border.all(
-                                                color: const Color(0xFFE2E8F0))
+                                                color: Theme.of(
+                                                  context,
+                                                ).dividerColor,
+                                              )
                                             : null,
                                         boxShadow: showWatchedLessons
                                             ? [
@@ -403,8 +435,10 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                                   'Juntando Dinheiro com Leo - #$lessonNumber',
                                                   style: TextStyle(
                                                     color: showWatchedLessons
-                                                        ? const Color(
-                                                            0xFF1E293B)
+                                                        ? Theme.of(context)
+                                                              .textTheme
+                                                              .titleLarge
+                                                              ?.color
                                                         : Colors.white,
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w600,
@@ -416,39 +450,48 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                               ),
                                               if (showWatchedLessons)
                                                 Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4,
+                                                      ),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        const Color(0xFF10B981)
-                                                            .withOpacity(0.1),
+                                                    color: const Color(
+                                                      0xFF10B981,
+                                                    ).withOpacity(0.1),
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            999),
+                                                          999,
+                                                        ),
                                                     border: Border.all(
-                                                        color: const Color(
-                                                                0xFF10B981)
-                                                            .withOpacity(0.2)),
+                                                      color: const Color(
+                                                        0xFF10B981,
+                                                      ).withOpacity(0.2),
+                                                    ),
                                                   ),
                                                   child: const Row(
                                                     mainAxisSize:
                                                         MainAxisSize.min,
                                                     children: [
-                                                      Icon(Icons.check_circle,
-                                                          size: 12,
-                                                          color: Color(
-                                                              0xFF10B981)),
+                                                      Icon(
+                                                        Icons.check_circle,
+                                                        size: 12,
+                                                        color: Color(
+                                                          0xFF10B981,
+                                                        ),
+                                                      ),
                                                       SizedBox(width: 4),
-                                                      Text('Assistida',
-                                                          style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF10B981),
-                                                              fontSize: 10,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600)),
+                                                      Text(
+                                                        'Assistida',
+                                                        style: TextStyle(
+                                                          color: Color(
+                                                            0xFF10B981,
+                                                          ),
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -461,7 +504,10 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                                 : 'Que tal assistir agora?',
                                             style: TextStyle(
                                               color: showWatchedLessons
-                                                  ? const Color(0xFF64748B)
+                                                  ? Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.color
                                                   : Colors.white70,
                                               fontSize: 13,
                                             ),
@@ -494,8 +540,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                             child: Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2),
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
                                               decoration: BoxDecoration(
                                                 color: showWatchedLessons
                                                     ? const Color(0xFF10B981)
@@ -508,10 +555,10 @@ class _LessonsScreenState extends State<LessonsScreen> {
                                                     ? 'Assistida'
                                                     : 'Novo',
                                                 style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 10,
-                                                    fontWeight:
-                                                        FontWeight.w600),
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
                                             ),
                                           ),
