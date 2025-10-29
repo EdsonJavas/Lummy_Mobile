@@ -128,23 +128,28 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
   }
 
   void _onTextChanged(String value) {
-    if (value.isEmpty) {
+    // Comportamento de digitação por centavos: "1" -> "0,01", "12" -> "0,12", "123" -> "1,23"
+    // Mantemos apenas dígitos e convertemos para double dividindo por 100
+    final digitsOnly = value.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (digitsOnly.isEmpty) {
       _controller.clear();
       widget.onChanged?.call(null);
       return;
     }
 
-    final numericValue = _parseCurrency(value);
-    if (numericValue != null) {
-      final formattedValue = _formatCurrency(numericValue);
-      if (formattedValue != value) {
-        _controller.value = TextEditingValue(
-          text: formattedValue,
-          selection: TextSelection.collapsed(offset: formattedValue.length),
-        );
-      }
-      widget.onChanged?.call(numericValue);
+    final cents = double.parse(digitsOnly);
+    final numericValue = cents / 100.0;
+    final formattedValue = _formatCurrency(numericValue);
+
+    if (_controller.text != formattedValue) {
+      _controller.value = TextEditingValue(
+        text: formattedValue,
+        selection: TextSelection.collapsed(offset: formattedValue.length),
+      );
     }
+
+    widget.onChanged?.call(numericValue);
   }
 
   @override
@@ -193,9 +198,9 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
             enabled: widget.enabled,
             autofocus: widget.autofocus,
             textAlign: widget.textAlign,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: false),
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[\d,.]')),
+              FilteringTextInputFormatter.digitsOnly,
             ],
             style: GoogleFonts.poppins(
               fontSize: widget.fontSize ?? (widget.isSmallScreen ? 18 : 20),

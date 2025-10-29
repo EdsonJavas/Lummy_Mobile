@@ -330,7 +330,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   void _saveTransaction() {
     if (_formKey.currentState!.validate()) {
-      final amount = double.parse(_amountController.text.replaceAll(',', '.'));
+      final amount = _currentAmount ?? 0.0;
 
       Navigator.pop(context, {
         'description': _descriptionController.text,
