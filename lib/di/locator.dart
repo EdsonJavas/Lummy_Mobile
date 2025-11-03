@@ -11,6 +11,7 @@ import 'package:lummy_login/domain/usecases/set_goal_use_case.dart';
 import 'package:lummy_login/application/app_facade.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:lummy_login/services/family_service.dart';
 
 final GetIt locator = GetIt.instance;
 
@@ -35,6 +36,8 @@ void setupLocator() {
         locator<LocalAuthentication>(),
         locator<FlutterSecureStorage>(),
       ));
+  // Services
+  locator.registerLazySingleton<FamilyService>(() => FamilyService());
       
   // Facade
   locator.registerLazySingleton<AppFacade>(() => AppFacade.instance);

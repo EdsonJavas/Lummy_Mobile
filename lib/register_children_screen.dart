@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'responsavel_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lummy_login/di/locator.dart';
+import 'package:lummy_login/services/family_service.dart';
 
 class RegisterChildrenScreen extends StatefulWidget {
   final Responsavel responsavel;
@@ -31,11 +32,13 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
   bool _ageFocused = false;
 
   String? _responsavelId;
+  late final FamilyService _familyService;
 
   @override
   void initState() {
     super.initState();
-    _criarResponsavelNoFirestore();
+    _familyService = locator<FamilyService>();
+    _criarResponsavel();
   }
 
   @override
@@ -82,24 +85,28 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     return digit1 == int.parse(cpf[9]) && digit2 == int.parse(cpf[10]);
   }
 
-  Future<void> _criarResponsavelNoFirestore() async {
-    final firestore = FirebaseFirestore.instance;
+  Future<void> _criarResponsavel() async {
     try {
-      final docRef = await firestore.collection('responsaveis').add({
-        'nome': widget.responsavel.nome,
-        'cpf': widget.responsavel.cpf,
-        'email': widget.responsavel.email,
-        'senha': widget.responsavel.senha,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
+      final id = await _familyService.createResponsavel(
+        nome: widget.responsavel.nome,
+        cpf: widget.responsavel.cpf,
+        email: widget.responsavel.email,
+        senha: widget.responsavel.senha,
+      );
       setState(() {
-        _responsavelId = docRef.id;
+        _responsavelId = id;
       });
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao criar responsável: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao criar responsável: $e'),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
     }
   }
 
@@ -136,19 +143,15 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       setState(() => _isLoading = true);
 
       try {
-        await FirebaseFirestore.instance
-            .collection('responsaveis')
-            .doc(_responsavelId)
-            .collection('children')
-            .add({
-              'nome': _nameController.text.trim(),
-              'cpf': _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-              'email': _emailController.text.trim(),
-              'senha': _passwordController.text,
-              'idade': int.tryParse(_ageController.text.trim()) ?? 0,
-              'sexo': _selectedGender,
-              'createdAt': FieldValue.serverTimestamp(),
-            });
+        await _familyService.addChild(
+          responsavelId: _responsavelId!,
+          nome: _nameController.text.trim(),
+          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          email: _emailController.text.trim(),
+          senha: _passwordController.text,
+          idade: int.tryParse(_ageController.text.trim()) ?? 0,
+          sexo: _selectedGender,
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -192,6 +195,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     final screenHeight = MediaQuery.of(context).size.height;
     final isVerySmallScreen = screenHeight < 650;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -200,7 +205,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           style: GoogleFonts.poppins(
             fontSize: isVerySmallScreen ? 14 : 16,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1E293B),
+            color: theme.textTheme.titleMedium?.color,
           ),
         ),
         SizedBox(height: isVerySmallScreen ? 8 : 12),
@@ -218,18 +223,18 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                   padding: EdgeInsets.all(isVerySmallScreen ? 16 : 20),
                   decoration: BoxDecoration(
                     color: _selectedGender == 'Masculino'
-                        ? const Color(0xFF1E40AF).withOpacity(0.1)
-                        : Colors.white,
+                        ? theme.colorScheme.primary.withOpacity(0.08)
+                        : theme.cardTheme.color,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: _selectedGender == 'Masculino'
-                          ? const Color(0xFF1E40AF)
-                          : const Color(0xFFE2E8F0),
+                          ? theme.colorScheme.primary
+                          : theme.dividerColor,
                       width: _selectedGender == 'Masculino' ? 2 : 1,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -242,15 +247,15 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                         height: isVerySmallScreen ? 32 : 40,
                         decoration: BoxDecoration(
                           color: _selectedGender == 'Masculino'
-                              ? const Color(0xFF1E40AF)
-                              : const Color(0xFF64748B).withOpacity(0.1),
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.primary.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           Icons.person,
                           color: _selectedGender == 'Masculino'
                               ? Colors.white
-                              : const Color(0xFF64748B),
+                              : theme.iconTheme.color,
                           size: isVerySmallScreen ? 16 : 20,
                         ),
                       ),
@@ -261,8 +266,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                           fontSize: isVerySmallScreen ? 12 : 14,
                           fontWeight: FontWeight.w600,
                           color: _selectedGender == 'Masculino'
-                              ? const Color(0xFF1E40AF)
-                              : const Color(0xFF64748B),
+                              ? theme.colorScheme.primary
+                              : theme.textTheme.bodyMedium?.color,
                         ),
                       ),
                     ],
@@ -283,18 +288,18 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                   padding: EdgeInsets.all(isVerySmallScreen ? 16 : 20),
                   decoration: BoxDecoration(
                     color: _selectedGender == 'Feminino'
-                        ? const Color(0xFFEC4899).withOpacity(0.1)
-                        : Colors.white,
+                        ? theme.colorScheme.secondary.withOpacity(0.08)
+                        : theme.cardTheme.color,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: _selectedGender == 'Feminino'
-                          ? const Color(0xFFEC4899)
-                          : const Color(0xFFE2E8F0),
+                          ? theme.colorScheme.secondary
+                          : theme.dividerColor,
                       width: _selectedGender == 'Feminino' ? 2 : 1,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -307,15 +312,15 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                         height: isVerySmallScreen ? 32 : 40,
                         decoration: BoxDecoration(
                           color: _selectedGender == 'Feminino'
-                              ? const Color(0xFFEC4899)
-                              : const Color(0xFF64748B).withOpacity(0.1),
+                              ? theme.colorScheme.secondary
+                              : theme.colorScheme.secondary.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           Icons.person,
                           color: _selectedGender == 'Feminino'
                               ? Colors.white
-                              : const Color(0xFF64748B),
+                              : theme.iconTheme.color,
                           size: isVerySmallScreen ? 16 : 20,
                         ),
                       ),
@@ -326,8 +331,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                           fontSize: isVerySmallScreen ? 12 : 14,
                           fontWeight: FontWeight.w600,
                           color: _selectedGender == 'Feminino'
-                              ? const Color(0xFFEC4899)
-                              : const Color(0xFF64748B),
+                              ? theme.colorScheme.secondary
+                              : theme.textTheme.bodyMedium?.color,
                         ),
                       ),
                     ],
@@ -433,6 +438,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
 
     final isVerySmallScreen = screenHeight < 650;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       resizeToAvoidBottomInset: true,
@@ -579,13 +586,11 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                     ),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardTheme.color,
-                      border: Theme.of(context).brightness == Brightness.dark
-                          ? Border.all(color: Theme.of(context).dividerColor)
-                          : null,
+                      color: theme.cardTheme.color,
+                      border: isDark ? Border.all(color: theme.dividerColor) : null,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
                           blurRadius: 20,
                           offset: const Offset(0, -5),
                         ),
@@ -610,25 +615,17 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                             // Título
                             ShaderMask(
                               shaderCallback: (bounds) => LinearGradient(
-                                colors:
-                                    Theme.of(context).brightness ==
+                                colors: Theme.of(context).brightness ==
                                         Brightness.dark
-                                    ? [
-                                        const Color(0xFF3B82F6),
-                                        const Color(0xFF8B5CF6),
-                                      ] // Azul → Roxo como no site
-                                    : [
-                                        const Color(0xFF1E293B),
-                                        const Color(0xFF1E293B),
-                                      ],
+                                    ? [theme.colorScheme.primary, theme.colorScheme.secondary]
+                                    : [theme.textTheme.titleLarge?.color ?? const Color(0xFF1E293B), theme.textTheme.titleLarge?.color ?? const Color(0xFF1E293B)],
                               ).createShader(bounds),
                               child: Text(
                                 'Cadastrar Criança',
                                 style: GoogleFonts.poppins(
                                   fontSize: isVerySmallScreen ? 24 : 28,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors
-                                      .white, // This color is masked by the shader
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -640,7 +637,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               style: GoogleFonts.poppins(
                                 fontSize: isVerySmallScreen ? 14 : 16,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFF64748B),
+                                color: theme.textTheme.bodyMedium?.color,
                               ),
                             ),
 

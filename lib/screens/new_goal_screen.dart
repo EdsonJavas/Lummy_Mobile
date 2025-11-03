@@ -9,13 +9,53 @@ class NewGoalScreen extends StatefulWidget {
   State<NewGoalScreen> createState() => _NewGoalScreenState();
 }
 
-class _NewGoalScreenState extends State<NewGoalScreen> {
+class _NewGoalScreenState extends State<NewGoalScreen>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _amountController = TextEditingController();
   double? _currentAmount;
 
   String _selectedEmoji = '🚲';
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _fadeController.forward();
+    _slideController.forward();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    _nameController.dispose();
+    _amountController.dispose();
+    super.dispose();
+  }
 
   final List<String> _goalEmojis = [
     '🚲',
@@ -43,7 +83,11 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
@@ -140,6 +184,8 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
               ),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );
@@ -405,10 +451,5 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _amountController.dispose();
-    super.dispose();
-  }
+  
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DailyMissionsScreen extends StatefulWidget {
   const DailyMissionsScreen({super.key});
@@ -8,7 +9,8 @@ class DailyMissionsScreen extends StatefulWidget {
   State<DailyMissionsScreen> createState() => _DailyMissionsScreenState();
 }
 
-class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
+class _DailyMissionsScreenState extends State<DailyMissionsScreen>
+    with TickerProviderStateMixin {
   // Missões diárias
   List<Map<String, dynamic>> missions = [
     {
@@ -18,7 +20,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
       'emoji': '📚',
       'progress': 2,
       'total': 3,
-      'points': 50,
+      'points': 10,
       'isCompleted': false,
       'color': const Color(0xFF3B82F6),
     },
@@ -29,7 +31,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
       'emoji': '💰',
       'progress': 0,
       'total': 5,
-      'points': 100,
+      'points': 20,
       'isCompleted': false,
       'color': const Color(0xFF10B981),
     },
@@ -40,7 +42,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
       'emoji': '🎯',
       'progress': 0,
       'total': 1,
-      'points': 75,
+      'points': 15,
       'isCompleted': false,
       'color': const Color(0xFF8B5CF6),
     },
@@ -51,7 +53,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
       'emoji': '🎓',
       'progress': 0,
       'total': 1,
-      'points': 150,
+      'points': 25,
       'isCompleted': false,
       'color': const Color(0xFFF59E0B),
     },
@@ -62,7 +64,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
       'emoji': '🛡️',
       'progress': 0,
       'total': 1,
-      'points': 200,
+      'points': 30,
       'isCompleted': false,
       'color': const Color(0xFFEF4444),
     },
@@ -71,13 +73,103 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
   int totalPoints = 425;
   int earnedPoints = 150;
 
+  static const _kCompletedKey = 'missions_completed_ids';
+  static const _kNextResetAtKey = 'missions_next_reset_at';
+  static const _kEarnedPointsKey = 'missions_earned_points';
+
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMissionsState();
+    _fadeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _slideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeInOut,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _fadeController.forward();
+    _slideController.forward();
+  }
+
+  Future<void> _loadMissionsState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final nextResetAt = prefs.getInt(_kNextResetAtKey) ?? 0;
+    if (now >= nextResetAt && nextResetAt != 0) {
+      await _resetMissions(prefs);
+      return;
+    }
+    final completed = prefs.getStringList(_kCompletedKey) ?? <String>[];
+    setState(() {
+      for (final m in missions) {
+        if (completed.contains(m['id'])) {
+          m['isCompleted'] = true;
+          m['progress'] = m['total'];
+        }
+      }
+      earnedPoints = prefs.getInt(_kEarnedPointsKey) ?? missions
+          .where((m) => m['isCompleted'] == true)
+          .fold<int>(0, (sum, m) => sum + (m['points'] as int));
+      totalPoints = 0; // opcional: pode representar total acumulável no dia
+    });
+    if (nextResetAt == 0) {
+      final resetAt = DateTime.now().add(const Duration(hours: 24)).millisecondsSinceEpoch;
+      await prefs.setInt(_kNextResetAtKey, resetAt);
+    }
+  }
+
+  Future<void> _resetMissions(SharedPreferences prefs) async {
+    setState(() {
+      for (final m in missions) {
+        m['isCompleted'] = false;
+        m['progress'] = 0;
+      }
+      earnedPoints = 0;
+    });
+    await prefs.remove(_kCompletedKey);
+    await prefs.setInt(_kEarnedPointsKey, 0);
+    final resetAt = DateTime.now().add(const Duration(hours: 24)).millisecondsSinceEpoch;
+    await prefs.setInt(_kNextResetAtKey, resetAt);
+  }
+
+  
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    super.dispose();
+  }
+
   void _completeMission(String missionId) {
     setState(() {
       final mission = missions.firstWhere((m) => m['id'] == missionId);
+      if (mission['isCompleted'] == true) return;
       mission['isCompleted'] = true;
       mission['progress'] = mission['total'];
       earnedPoints += mission['points'] as int;
     });
+
+    _persistMissionCompleted(missionId);
+    _persistPoints();
 
     // Mostrar animação de conclusão
     final mission = missions.firstWhere((m) => m['id'] == missionId);
@@ -220,6 +312,20 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
     );
   }
 
+  Future<void> _persistMissionCompleted(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(_kCompletedKey) ?? <String>[];
+    if (!list.contains(id)) {
+      list.add(id);
+      await prefs.setStringList(_kCompletedKey, list);
+    }
+  }
+
+  Future<void> _persistPoints() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kEarnedPointsKey, earnedPoints);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isSmallScreen = MediaQuery.of(context).size.height < 700;
@@ -229,7 +335,11 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
@@ -472,6 +582,8 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen> {
             ),
             const SizedBox(height: 20),
           ],
+        ),
+          ),
         ),
       ),
     );

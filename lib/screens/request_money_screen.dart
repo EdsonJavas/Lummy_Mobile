@@ -179,6 +179,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: isSmallScreen ? 8 : 12),
                     // Header
                     _buildHeader(isSmallScreen),
                     

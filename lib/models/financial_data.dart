@@ -7,7 +7,7 @@ class FinancialData {
   List<Achievement> achievements;
 
   FinancialData({
-    this.currentBalance = 127.50,
+    this.currentBalance = 0.0,
     this.savingsGoal = 200.00,
     this.goalName = 'Bicicleta Nova',
     this.goalEmoji = '🚲',

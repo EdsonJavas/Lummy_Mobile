@@ -302,13 +302,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         const Color(0xFF8B5CF6),
                                       ] // Azul → Roxo como no site
                                     : [
-                                        const Color(0xFF1E293B),
-                                        const Color(0xFF1E293B),
+                                        Theme.of(context).textTheme.titleLarge?.color ?? const Color(0xFF1E293B),
+                                        Theme.of(context).textTheme.titleLarge?.color ?? const Color(0xFF1E293B),
                                       ],
                               ).createShader(bounds),
                               child: Text(
                                 'Crie sua conta de Responsável',
-                                style: GoogleFonts.inter(
+                                style: GoogleFonts.poppins(
                                   fontSize: isVerySmallScreen ? 24 : 28,
                                   fontWeight: FontWeight.w600,
                                   color: Colors

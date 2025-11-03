@@ -12,9 +12,7 @@ android {
     namespace = "com.example.lummy"
     compileSdk = flutter.compileSdkVersion
 
-    // Pin to a stable NDK version so AGP can auto-install it if missing
-    ndkVersion = "26.3.11579264"
-
+    // NDK not required for this project; omit explicit ndkVersion to avoid enforcing install
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

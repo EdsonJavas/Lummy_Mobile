@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy_login/screens/new_goal_screen.dart';
 import 'package:lummy_login/screens/request_money_screen.dart';
+import 'package:lummy_login/screens/claim_share_screen.dart';
 import 'package:lummy_login/shared/widgets/cached_avatar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'profile_page.dart';
 import 'daily_missions_screen.dart';
 
@@ -17,10 +19,11 @@ class _HomePageState extends State<HomePage> {
   // Dados do usuário
   final String userName = 'Edson Jr';
   final String userRole = 'Pequeno Empreendedor';
-  double currentBalance = 127.50;
+  double currentBalance = 0.0;
   double savingsGoal = 200.00;
   String goalName = 'Bicicleta Nova';
   String goalEmoji = '🚲';
+  int _earnedMissionPoints = 0;
 
   // Lista de transações
   List<Map<String, dynamic>> transactions = [];
@@ -279,6 +282,19 @@ class _HomePageState extends State<HomePage> {
       '🚨',
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEarnedPoints();
+  }
+
+  Future<void> _loadEarnedPoints() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _earnedMissionPoints = prefs.getInt('missions_earned_points') ?? 0;
+    });
+  }
 
   void _nextTip() {
     setState(() {
@@ -941,60 +957,74 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: Container(
-                      padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardTheme.color,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Theme.of(context).dividerColor
-                              : const Color(0xFFE2E8F0),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: isSmallScreen ? 40 : 48,
-                            height: isSmallScreen ? 40 : 48,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF64748B).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
+                    child: GestureDetector(
+                      onTap: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final alreadyClaimed = prefs.getBool('share_claimed') ?? false;
+                        if (alreadyClaimed) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Você já resgatou sua parte',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              backgroundColor: const Color(0xFF64748B),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.more_horiz_rounded,
-                              color: Color(0xFF64748B),
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Em Breve',
-                            style: GoogleFonts.poppins(
-                              fontSize: isSmallScreen ? 14 : 16,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).textTheme.titleMedium?.color,
+                          );
+                          return;
+                        }
+                        // Score ponderado: pontos de missões + bônus por conquistas
+                        final completedAchievements = achievements
+                            .where((a) => a['isCompleted'] == true)
+                            .length
+                            .toDouble();
+                        final weightedScore = _earnedMissionPoints.toDouble() + (completedAchievements * 5.0);
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ClaimShareScreen(
+                              totalAmount: 50.0,
+                              currentChildScore: weightedScore,
+                              otherChildrenScores: const [2.0, 3.0],
+                              otherChildrenNames: const ['Guilherme', 'Adriel'],
+                              currentChildName: 'Você',
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Mais funcionalidades',
-                            style: GoogleFonts.poppins(
-                              fontSize: isSmallScreen ? 12 : 14,
-                              fontWeight: FontWeight.w400,
-                              color: Theme.of(context).textTheme.bodyMedium?.color,
+                        );
+                        if (result is Map && result['claimed'] == true) {
+                          final claimedAmount = ((result['amount'] ?? 0.0) as double);
+                          setState(() {
+                            currentBalance += claimedAmount;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Você retirou R\$ ${claimedAmount.toStringAsFixed(2)}',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              backgroundColor: const Color(0xFF10B981),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                             ),
-                          ),
-                        ],
+                          );
+                        }
+                      },
+                      child: _buildActionCardInter(
+                        'Retirar Minha Parte',
+                        'Resgate sua parte do valor do responsável',
+                        Icons.payments_rounded,
+                        const Color(0xFF10B981),
+                        isSmallScreen,
                       ),
                     ),
                   ),
