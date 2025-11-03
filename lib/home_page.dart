@@ -287,6 +287,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadEarnedPoints();
+    _loadBalance();
   }
 
   Future<void> _loadEarnedPoints() async {
@@ -294,6 +295,18 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _earnedMissionPoints = prefs.getInt('missions_earned_points') ?? 0;
     });
+  }
+
+  Future<void> _loadBalance() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      currentBalance = prefs.getDouble('current_balance') ?? 0.0;
+    });
+  }
+
+  Future<void> _persistBalance() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('current_balance', currentBalance);
   }
 
   void _nextTip() {
@@ -959,26 +972,6 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
-                        final prefs = await SharedPreferences.getInstance();
-                        final alreadyClaimed = prefs.getBool('share_claimed') ?? false;
-                        if (alreadyClaimed) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Você já resgatou sua parte',
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              backgroundColor: const Color(0xFF64748B),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
-                          return;
-                        }
                         // Score ponderado: pontos de missões + bônus por conquistas
                         final completedAchievements = achievements
                             .where((a) => a['isCompleted'] == true)
@@ -1002,6 +995,7 @@ class _HomePageState extends State<HomePage> {
                           setState(() {
                             currentBalance += claimedAmount;
                           });
+                          await _persistBalance();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
