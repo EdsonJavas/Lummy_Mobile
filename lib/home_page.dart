@@ -288,6 +288,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _loadEarnedPoints();
     _loadBalance();
+    _loadGoal();
   }
 
   Future<void> _loadEarnedPoints() async {
@@ -309,6 +310,22 @@ class _HomePageState extends State<HomePage> {
     await prefs.setDouble('current_balance', currentBalance);
   }
 
+  Future<void> _loadGoal() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      goalName = prefs.getString('goal_name') ?? goalName;
+      goalEmoji = prefs.getString('goal_emoji') ?? goalEmoji;
+      savingsGoal = prefs.getDouble('goal_target') ?? savingsGoal;
+    });
+  }
+
+  Future<void> _persistGoal() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('goal_name', goalName);
+    await prefs.setString('goal_emoji', goalEmoji);
+    await prefs.setDouble('goal_target', savingsGoal);
+  }
+
   void _nextTip() {
     setState(() {
       currentTipIndex = (currentTipIndex + 1) % educationalTips.length;
@@ -321,6 +338,7 @@ class _HomePageState extends State<HomePage> {
       goalEmoji = emoji;
       savingsGoal = amount;
     });
+    _persistGoal();
   }
 
   @override

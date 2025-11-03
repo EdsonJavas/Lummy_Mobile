@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'models/goal.dart';
 import 'screens/new_goal_screen.dart';
 import 'shared/widgets/money_text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
@@ -12,92 +13,76 @@ class GoalsScreen extends StatefulWidget {
 }
 
 class _GoalsScreenState extends State<GoalsScreen> {
-  List<Goal> goals = [];
+  Goal? currentGoal;
+  List<Goal> completedGoals = [];
 
   @override
   void initState() {
     super.initState();
-    _loadSampleGoals();
+    _loadCurrentGoal();
+    _loadCompletedGoals();
   }
 
-  void _loadSampleGoals() {
+  Future<void> _loadCurrentGoal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString('goal_name') ?? 'Bicicleta Nova';
+    final emoji = prefs.getString('goal_emoji') ?? '🚲';
+    final target = prefs.getDouble('goal_target') ?? 200.0;
+    final balance = prefs.getDouble('current_balance') ?? 0.0;
+
+    setState(() {
+      currentGoal = Goal(
+        id: 'current',
+        name: name,
+        emoji: emoji,
+        targetAmount: target,
+        currentAmount: balance,
+        status: balance >= target ? GoalStatus.completed : GoalStatus.ongoing,
+        createdDate: DateTime.now().subtract(const Duration(days: 1)),
+        description: 'Sua meta atual em andamento',
+      );
+    });
+  }
+
+  void _loadCompletedGoals() {
     final now = DateTime.now();
-    goals = [
-      Goal(
-        id: '1',
-        name: 'Bicicleta Nova',
-        emoji: '🚲',
-        targetAmount: 500.0,
-        currentAmount: 127.50,
-        status: GoalStatus.ongoing,
-        createdDate: now.subtract(const Duration(days: 30)),
-        description:
-            'Economizando para comprar uma bicicleta nova para passear no parque',
-      ),
-      Goal(
-        id: '2',
-        name: 'Video Game',
-        emoji: '🎮',
-        targetAmount: 800.0,
-        currentAmount: 320.0,
-        status: GoalStatus.ongoing,
-        createdDate: now.subtract(const Duration(days: 45)),
-        description: 'Novo console de videogame para jogar com os amigos',
-      ),
-      Goal(
-        id: '3',
-        name: 'Livros de Aventura',
-        emoji: '📚',
-        targetAmount: 150.0,
-        currentAmount: 150.0,
-        status: GoalStatus.completed,
-        createdDate: now.subtract(const Duration(days: 60)),
-        completedDate: now.subtract(const Duration(days: 15)),
-        description: 'Coleção completa de livros de aventura',
-      ),
-      Goal(
-        id: '4',
-        name: 'Fones de Ouvido',
-        emoji: '🎧',
-        targetAmount: 300.0,
-        currentAmount: 180.0,
-        status: GoalStatus.ongoing,
-        createdDate: now.subtract(const Duration(days: 20)),
-        description: 'Fones sem fio para ouvir música',
-      ),
-      Goal(
-        id: '5',
-        name: 'Viagem para Praia',
-        emoji: '🏖️',
-        targetAmount: 400.0,
-        currentAmount: 400.0,
-        status: GoalStatus.completed,
-        createdDate: now.subtract(const Duration(days: 90)),
-        completedDate: now.subtract(const Duration(days: 10)),
-        description: 'Viagem de férias para a praia com a família',
-      ),
-      Goal(
-        id: '6',
-        name: 'Novo Celular',
-        emoji: '📱',
-        targetAmount: 1200.0,
-        currentAmount: 650.0,
-        status: GoalStatus.ongoing,
-        createdDate: now.subtract(const Duration(days: 25)),
-        description: 'Atualizar meu celular para um modelo melhor',
-      ),
-      Goal(
-        id: '7',
-        name: 'Curso de Inglês',
-        emoji: '🎓',
-        targetAmount: 600.0,
-        currentAmount: 600.0,
-        status: GoalStatus.completed,
-        createdDate: now.subtract(const Duration(days: 120)),
-        completedDate: now.subtract(const Duration(days: 5)),
-        description: 'Curso intensivo de inglês para conversação',
-      ),
-    ];
+    setState(() {
+      completedGoals = [
+        Goal(
+          id: 'c1',
+          name: 'Livros de Aventura',
+          emoji: '📚',
+          targetAmount: 150.0,
+          currentAmount: 150.0,
+          status: GoalStatus.completed,
+          createdDate: now.subtract(const Duration(days: 60)),
+          completedDate: now.subtract(const Duration(days: 15)),
+          description: 'Coleção completa de livros de aventura',
+        ),
+        Goal(
+          id: 'c2',
+          name: 'Viagem para Praia',
+          emoji: '🏖️',
+          targetAmount: 400.0,
+          currentAmount: 400.0,
+          status: GoalStatus.completed,
+          createdDate: now.subtract(const Duration(days: 90)),
+          completedDate: now.subtract(const Duration(days: 10)),
+          description: 'Viagem de férias para a praia com a família',
+        ),
+        Goal(
+          id: 'c3',
+          name: 'Curso de Inglês',
+          emoji: '🎓',
+          targetAmount: 600.0,
+          currentAmount: 600.0,
+          status: GoalStatus.completed,
+          createdDate: now.subtract(const Duration(days: 120)),
+          completedDate: now.subtract(const Duration(days: 5)),
+          description: 'Curso intensivo de inglês para conversação',
+        ),
+      ];
+    });
   }
 
   Future<void> _addNewGoal() async {
@@ -107,16 +92,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
     );
 
     if (result != null) {
-      setState(() {
-        final newGoal = Goal(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          name: result['name'],
-          emoji: result['emoji'],
-          targetAmount: result['amount'],
-          createdDate: DateTime.now(),
-        );
-        goals.add(newGoal);
-      });
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('goal_name', result['name']);
+      await prefs.setString('goal_emoji', result['emoji']);
+      await prefs.setDouble('goal_target', result['amount']);
+
+      await _loadCurrentGoal();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -132,44 +113,27 @@ class _GoalsScreenState extends State<GoalsScreen> {
     }
   }
 
-  void _updateGoalProgress(Goal goal, double amount) {
-    setState(() {
-      final updatedGoal = goal.copyWith(
-        currentAmount: goal.currentAmount + amount,
-      );
-
-      final index = goals.indexWhere((g) => g.id == goal.id);
-      if (index != -1) {
-        goals[index] = updatedGoal;
-
-        // Check if goal is completed
-        if (updatedGoal.progress >= 1.0 &&
-            updatedGoal.status == GoalStatus.ongoing) {
-          goals[index] = updatedGoal.copyWith(
-            status: GoalStatus.completed,
-            completedDate: DateTime.now(),
-          );
-        }
-      }
-    });
+  Future<void> _updateGoalProgress(Goal goal, double amount) async {
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getDouble('current_balance') ?? 0.0;
+    final updated = current + amount;
+    await prefs.setDouble('current_balance', updated);
+    await _loadCurrentGoal();
   }
 
-  void _markGoalAsCompleted(Goal goal) {
-    setState(() {
-      final index = goals.indexWhere((g) => g.id == goal.id);
-      if (index != -1) {
-        goals[index] = goal.copyWith(
-          status: GoalStatus.completed,
-          completedDate: DateTime.now(),
-          currentAmount: goal.targetAmount,
-        );
-      }
-    });
+  Future<void> _markGoalAsCompleted(Goal goal) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('current_balance', goal.targetAmount);
+    await _loadCurrentGoal();
   }
 
-  void _deleteGoal(Goal goal) {
+  Future<void> _deleteGoal(Goal goal) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('goal_name');
+    await prefs.remove('goal_emoji');
+    await prefs.remove('goal_target');
     setState(() {
-      goals.removeWhere((g) => g.id == goal.id);
+      currentGoal = null;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -190,12 +154,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = screenHeight < 700;
 
-    final ongoingGoals = goals
-        .where((g) => g.status == GoalStatus.ongoing)
-        .toList();
-    final completedGoals = goals
-        .where((g) => g.status == GoalStatus.completed)
-        .toList();
+    final goal = currentGoal;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -292,21 +251,19 @@ class _GoalsScreenState extends State<GoalsScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Ongoing Goals Section
-              if (ongoingGoals.isNotEmpty) ...[
+              if (goal != null) ...[
                 _buildSectionHeader(
-                  'Em Andamento',
-                  ongoingGoals.length,
+                  goal.status == GoalStatus.completed ? 'Concluída' : 'Em Andamento',
+                  1,
                   isSmallScreen,
                 ),
                 const SizedBox(height: 20),
-                ...ongoingGoals.map(
-                  (goal) => _buildGoalCard(goal, isSmallScreen),
-                ),
+                _buildGoalCard(goal, isSmallScreen),
                 const SizedBox(height: 40),
+              ] else ...[
+                _buildEmptyState(isSmallScreen),
               ],
 
-              // Completed Goals Section
               if (completedGoals.isNotEmpty) ...[
                 _buildSectionHeader(
                   'Concluídas',
@@ -314,13 +271,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   isSmallScreen,
                 ),
                 const SizedBox(height: 20),
-                ...completedGoals.map(
-                  (goal) => _buildGoalCard(goal, isSmallScreen),
-                ),
+                ...completedGoals.map((g) => _buildGoalCard(g, isSmallScreen)),
               ],
-
-              // Empty State
-              if (goals.isEmpty) _buildEmptyState(isSmallScreen),
 
               const SizedBox(height: 40),
             ],

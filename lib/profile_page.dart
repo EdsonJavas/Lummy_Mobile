@@ -33,8 +33,8 @@ class _ProfilePageState extends State<ProfilePage> {
         physics: const BouncingScrollPhysics(),
         child: Padding(
           padding: const EdgeInsets.only(
-            bottom: 16.0,
-          ), // Reduzir padding inferior
+            bottom: 0.0,
+          ),
           child: Column(
             children: [
               _buildProfileHeader(screenWidth, screenHeight),
@@ -57,7 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 20.0),
+                    padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 0.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -66,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         _buildAchievementsSection(),
                         const SizedBox(height: 20),
                         _buildSettingsSection(),
-                        const SizedBox(height: 20), // Reduzido de 100 para 20
+                        const SizedBox(height: 8),
                       ],
                     ),
                   ),

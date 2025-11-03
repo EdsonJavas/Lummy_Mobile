@@ -32,8 +32,8 @@ class _LessonsScreenState extends State<LessonsScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
+                    Colors.black.withOpacity(0.20),
                     Colors.black.withOpacity(0.35),
-                    Colors.black.withOpacity(0.55),
                   ],
                 ),
               ),
@@ -44,23 +44,15 @@ class _LessonsScreenState extends State<LessonsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 8),
-                      ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [
-                            Color(0xFFFF8C42),
-                            Color(0xFF10B981),
-                          ], // Laranja → Verde como no site
-                        ).createShader(bounds),
-                        child: const Text(
-                          'Aulas',
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      const Text(
+                        'Aulas',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 6),
                       Text(
