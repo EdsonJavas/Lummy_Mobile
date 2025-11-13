@@ -19,6 +19,17 @@ class InMemoryAuthRepository implements AuthRepository {
 
   @override
   String? get currentUserId => _currentUserId;
+  
+  @override
+  Future<Result<String>> register({
+    required String email,
+    required String password,
+    required String name,
+    Map<String, dynamic>? metadata,
+  }) async {
+    _currentUserId = email;
+    return Success<String>(_currentUserId!);
+  }
 }
 
 

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'core/config/supabase_config.dart';
 import 'di/locator.dart';
 import 'login_page.dart';
 
@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen>
     _bootstrap();
   }
 
-  void _startAnimations() async {
+  Future<void> _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 300));
     _fadeController.forward();
 
@@ -87,17 +87,26 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _bootstrap() async {
     try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
+      // Inicializar Supabase PRIMEIRO
+      debugPrint('Inicializando Supabase...');
+      await Supabase.initialize(
+        url: SupabaseConfig.url,
+        anonKey: SupabaseConfig.anonKey,
       );
+      debugPrint('Supabase inicializado com sucesso!');
+      
+      // Só depois inicializar o locator (que depende do Supabase)
+      debugPrint('Configurando dependências...');
       setupLocator();
+      debugPrint('Dependências configuradas com sucesso!');
 
       // Aguarda as animações terminarem + delay para visualização
-      await Future.delayed(const Duration(milliseconds: 4000));
+      await Future.delayed(const Duration(milliseconds: 2000));
 
       if (!mounted) return;
 
-      // Fade-out antes de navegar
+      // SEMPRE navegar para tela de login
+      debugPrint('ℹ️ Navegando para tela de login...');
       await _fadeOut();
 
       if (!mounted) return;
@@ -115,12 +124,28 @@ class _SplashScreenState extends State<SplashScreen>
           },
         ),
       );
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Log do erro para debug
+      debugPrint('Erro ao inicializar aplicação: $e');
+      debugPrint('Stack trace: $stackTrace');
+      
       // Em caso de erro, ainda assim navega para o login
       if (!mounted) return;
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+      
+      // Tentar inicializar o locator mesmo com erro (pode funcionar em alguns casos)
+      try {
+        debugPrint('Tentando inicializar dependências mesmo com erro...');
+        setupLocator();
+      } catch (locatorError) {
+        debugPrint('Erro ao inicializar dependências: $locatorError');
+        // Ignorar erro do locator se já tiver dado erro antes
+      }
+      
+      // Sempre ir para login, mesmo com erro
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
     }
   }
 

@@ -117,7 +117,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             }
                           });
                         },
-                        activeColor: const Color(0xFF8B5CF6),
+                        activeThumbColor: const Color(0xFF8B5CF6),
                       ),
                     ],
                   ),
@@ -279,7 +279,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ],
             ),
           ),
-          Switch(value: value, onChanged: onChanged, activeColor: color),
+          Switch(value: value, onChanged: onChanged, activeThumbColor: color),
         ],
       ),
     );

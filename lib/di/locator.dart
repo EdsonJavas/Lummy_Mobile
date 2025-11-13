@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:lummy_login/data/datasources/in_memory_data_source.dart';
-import 'package:lummy_login/data/repositories/auth_repository_impl.dart';
+import 'package:lummy_login/data/repositories/supabase_auth_repository.dart';
 import 'package:lummy_login/data/repositories/finance_repository_impl.dart';
 import 'package:lummy_login/domain/repositories/auth_repository.dart';
 import 'package:lummy_login/domain/repositories/finance_repository.dart';
@@ -16,11 +16,17 @@ import 'package:lummy_login/services/family_service.dart';
 final GetIt locator = GetIt.instance;
 
 void setupLocator() {
+  // Limpar registros anteriores se existirem (para hot reload)
+  if (locator.isRegistered<AuthRepository>()) {
+    locator.reset();
+  }
+
   // Data sources
   locator.registerLazySingleton<InMemoryDataSource>(() => InMemoryDataSource());
 
-  // Repositories
-  locator.registerLazySingleton<AuthRepository>(() => InMemoryAuthRepository());
+  // Repositories - Usando Supabase Auth agora
+  // Supabase.instance.client deve estar disponível pois Supabase.initialize() já foi chamado
+  locator.registerLazySingleton<AuthRepository>(() => SupabaseAuthRepository());
   locator.registerLazySingleton<FinanceRepository>(() => InMemoryFinanceRepository(locator()));
 
   // Use cases
@@ -29,6 +35,9 @@ void setupLocator() {
   locator.registerFactory<SetGoalUseCase>(() => SetGoalUseCase(locator()));
   locator.registerFactory<GetFinancialDataUseCase>(() => GetFinancialDataUseCase(locator()));
 
+  // Services
+  locator.registerLazySingleton<FamilyService>(() => FamilyService());
+
   // Biometrics
   locator.registerLazySingleton<LocalAuthentication>(() => LocalAuthentication());
   locator.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
@@ -36,8 +45,6 @@ void setupLocator() {
         locator<LocalAuthentication>(),
         locator<FlutterSecureStorage>(),
       ));
-  // Services
-  locator.registerLazySingleton<FamilyService>(() => FamilyService());
       
   // Facade
   locator.registerLazySingleton<AppFacade>(() => AppFacade.instance);

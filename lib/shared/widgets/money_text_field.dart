@@ -266,10 +266,10 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.error_outline_rounded,
                 size: 16,
-                color: const Color(0xFFEF4444),
+                color: Color(0xFFEF4444),
               ),
               const SizedBox(width: 8),
               Expanded(

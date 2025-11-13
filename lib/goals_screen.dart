@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'models/goal.dart';
 import 'screens/new_goal_screen.dart';
 import 'shared/widgets/money_text_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/ensure_child_record.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
@@ -15,97 +16,347 @@ class GoalsScreen extends StatefulWidget {
 class _GoalsScreenState extends State<GoalsScreen> {
   Goal? currentGoal;
   List<Goal> completedGoals = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadCurrentGoal();
-    _loadCompletedGoals();
+    _loadGoals();
+  }
+
+  Future<void> _loadGoals() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+
+      if (user == null) {
+        debugPrint('❌ Usuário não autenticado');
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Carregar meta em andamento
+      await _loadCurrentGoal();
+
+      // Sincronizar progresso da meta com o cofrinho (children.balance)
+      await _syncGoalWithBalance();
+
+      // Carregar metas concluídas
+      await _loadCompletedGoals();
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('❌ Erro ao carregar metas: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _syncGoalWithBalance() async {
+    try {
+      if (currentGoal == null || currentGoal!.status == GoalStatus.completed) {
+        return;
+      }
+
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+
+      // Buscar saldo do cofrinho
+      final childRow = await supabase
+          .from('children')
+          .select('balance')
+          .eq('id', user.id)
+          .maybeSingle();
+      final balance = (childRow?['balance'] as num?)?.toDouble() ?? 0.0;
+
+      final goal = currentGoal!;
+      final target = goal.targetAmount;
+      final newAmount = balance.clamp(0.0, target);
+
+      // Atualizar current_amount para refletir o cofrinho
+      await supabase
+          .from('goals')
+          .update({'current_amount': newAmount})
+          .eq('id', goal.id)
+          .eq('child_id', user.id);
+
+      // Se atingiu ou superou o alvo, marcar como concluída
+      if (balance >= target) {
+        await supabase
+            .from('goals')
+            .update({
+              'status': 'completed',
+              'current_amount': target,
+              'completed_at': DateTime.now().toIso8601String(),
+            })
+            .eq('id', goal.id)
+            .eq('child_id', user.id);
+      }
+
+      // Recarregar metas para refletir mudanças
+      await _loadCurrentGoal();
+    } catch (e) {
+      debugPrint('⚠️ Erro ao sincronizar meta com balance: $e');
+    }
   }
 
   Future<void> _loadCurrentGoal() async {
-    final prefs = await SharedPreferences.getInstance();
-    final name = prefs.getString('goal_name') ?? 'Bicicleta Nova';
-    final emoji = prefs.getString('goal_emoji') ?? '🚲';
-    final target = prefs.getDouble('goal_target') ?? 200.0;
-    final balance = prefs.getDouble('current_balance') ?? 0.0;
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
 
-    setState(() {
-      currentGoal = Goal(
-        id: 'current',
-        name: name,
-        emoji: emoji,
-        targetAmount: target,
-        currentAmount: balance,
-        status: balance >= target ? GoalStatus.completed : GoalStatus.ongoing,
-        createdDate: DateTime.now().subtract(const Duration(days: 1)),
-        description: 'Sua meta atual em andamento',
-      );
-    });
+      if (user == null) return;
+
+      final goalData = await supabase
+          .from('goals')
+          .select('*')
+          .eq('child_id', user.id)
+          .eq('status', 'ongoing')
+          .maybeSingle();
+
+      if (goalData != null) {
+        setState(() {
+          currentGoal = Goal(
+            id: goalData['id'] as String,
+            name: goalData['name'] as String,
+            emoji: goalData['emoji'] as String? ?? '🎯',
+            targetAmount: (goalData['target_amount'] as num).toDouble(),
+            currentAmount: (goalData['current_amount'] as num).toDouble(),
+            status: (goalData['status'] as String) == 'completed'
+                ? GoalStatus.completed
+                : GoalStatus.ongoing,
+            createdDate: DateTime.parse(goalData['created_at'] as String),
+            completedDate: goalData['completed_at'] != null
+                ? DateTime.parse(goalData['completed_at'] as String)
+                : null,
+            description: goalData['description'] as String? ?? '',
+          );
+        });
+        debugPrint('✅ Meta atual carregada: ${currentGoal?.name}');
+      } else {
+        setState(() {
+          currentGoal = null;
+        });
+        debugPrint('ℹ️ Nenhuma meta em andamento encontrada');
+      }
+    } catch (e) {
+      debugPrint('❌ Erro ao carregar meta atual: $e');
+      setState(() {
+        currentGoal = null;
+      });
+    }
   }
 
-  void _loadCompletedGoals() {
-    final now = DateTime.now();
-    setState(() {
-      completedGoals = [
-        Goal(
-          id: 'c1',
-          name: 'Livros de Aventura',
-          emoji: '📚',
-          targetAmount: 150.0,
-          currentAmount: 150.0,
-          status: GoalStatus.completed,
-          createdDate: now.subtract(const Duration(days: 60)),
-          completedDate: now.subtract(const Duration(days: 15)),
-          description: 'Coleção completa de livros de aventura',
-        ),
-        Goal(
-          id: 'c2',
-          name: 'Viagem para Praia',
-          emoji: '🏖️',
-          targetAmount: 400.0,
-          currentAmount: 400.0,
-          status: GoalStatus.completed,
-          createdDate: now.subtract(const Duration(days: 90)),
-          completedDate: now.subtract(const Duration(days: 10)),
-          description: 'Viagem de férias para a praia com a família',
-        ),
-        Goal(
-          id: 'c3',
-          name: 'Curso de Inglês',
-          emoji: '🎓',
-          targetAmount: 600.0,
-          currentAmount: 600.0,
-          status: GoalStatus.completed,
-          createdDate: now.subtract(const Duration(days: 120)),
-          completedDate: now.subtract(const Duration(days: 5)),
-          description: 'Curso intensivo de inglês para conversação',
-        ),
-      ];
-    });
+  Future<void> _loadCompletedGoals() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+
+      if (user == null) return;
+
+      final completedGoalsData = await supabase
+          .from('goals')
+          .select('*')
+          .eq('child_id', user.id)
+          .eq('status', 'completed')
+          .order('completed_at', ascending: false);
+
+      if (completedGoalsData.isNotEmpty) {
+        setState(() {
+          completedGoals = completedGoalsData.map((data) {
+            return Goal(
+              id: data['id'] as String,
+              name: data['name'] as String,
+              emoji: data['emoji'] as String? ?? '🎯',
+              targetAmount: (data['target_amount'] as num).toDouble(),
+              currentAmount: (data['current_amount'] as num).toDouble(),
+              status: GoalStatus.completed,
+              createdDate: DateTime.parse(data['created_at'] as String),
+              completedDate: data['completed_at'] != null
+                  ? DateTime.parse(data['completed_at'] as String)
+                  : null,
+              description: data['description'] as String? ?? '',
+            );
+          }).toList();
+        });
+        debugPrint('✅ ${completedGoals.length} metas concluídas carregadas');
+      } else {
+        setState(() {
+          completedGoals = [];
+        });
+        debugPrint('ℹ️ Nenhuma meta concluída encontrada');
+      }
+    } catch (e) {
+      debugPrint('❌ Erro ao carregar metas concluídas: $e');
+      setState(() {
+        completedGoals = [];
+      });
+    }
   }
 
   Future<void> _addNewGoal() async {
+    // Verificar se já existe uma meta em andamento
+    if (currentGoal != null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Você já tem uma meta em andamento! Complete ou remova a meta atual antes de criar uma nova.',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const NewGoalScreen()),
     );
 
-    if (result != null) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('goal_name', result['name']);
-      await prefs.setString('goal_emoji', result['emoji']);
-      await prefs.setDouble('goal_target', result['amount']);
+    if (result != null && mounted) {
+      try {
+        final supabase = Supabase.instance.client;
+        final user = supabase.auth.currentUser;
 
-      await _loadCurrentGoal();
+        if (user == null) {
+          throw Exception('Usuário não autenticado');
+        }
 
+        // Garantir que o registro existe na tabela children
+        final childExists = await EnsureChildRecord.ensureChildExists();
+        if (!childExists) {
+          throw Exception('Não foi possível criar o registro do usuário. Verifique se você foi registrado por um responsável.');
+        }
+
+        // Verificar novamente se não há meta em andamento (race condition)
+        final existingGoal = await supabase
+            .from('goals')
+            .select('id')
+            .eq('child_id', user.id)
+            .eq('status', 'ongoing')
+            .maybeSingle();
+
+        if (existingGoal != null) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Você já tem uma meta em andamento!',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              ),
+              backgroundColor: const Color(0xFFEF4444),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          );
+          return;
+        }
+
+        // Criar nova meta no banco
+        await supabase.from('goals').insert({
+          'child_id': user.id,
+          'name': result['name'].toString().trim(),
+          'emoji': (result['emoji'] as String? ?? '🎯').trim(),
+          'target_amount': (result['amount'] as num).toDouble(),
+          'current_amount': 0.0,
+          'status': 'ongoing', // Garantir que seja exatamente 'ongoing'
+          'description': '',
+        });
+
+        // Recarregar metas
+        await _loadGoals();
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Nova meta criada! 🎯',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            ),
+            backgroundColor: const Color(0xFF8B5CF6),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        );
+      } catch (e) {
+        debugPrint('❌ Erro ao criar meta: $e');
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro ao criar meta: $e',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            ),
+            backgroundColor: const Color(0xFFEF4444),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _updateGoalProgress(Goal goal, double amount) async {
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+
+      if (user == null) {
+        throw Exception('Usuário não autenticado');
+      }
+
+      final newAmount = goal.currentAmount + amount;
+      final targetAmount = goal.targetAmount;
+
+      // Atualizar no banco
+      await supabase
+          .from('goals')
+          .update({
+            'current_amount': newAmount.clamp(0.0, targetAmount),
+          })
+          .eq('id', goal.id)
+          .eq('child_id', user.id);
+
+      // Recarregar metas (para pegar atualização automática de status se completou)
+      await _loadGoals();
+
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Nova meta criada! 🎯',
+            'Progresso adicionado! 💰',
             style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFF8B5CF6),
+          backgroundColor: const Color(0xFF10B981),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    } catch (e) {
+      debugPrint('❌ Erro ao atualizar progresso: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Erro ao atualizar progresso: $e',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -113,40 +364,104 @@ class _GoalsScreenState extends State<GoalsScreen> {
     }
   }
 
-  Future<void> _updateGoalProgress(Goal goal, double amount) async {
-    final prefs = await SharedPreferences.getInstance();
-    final current = prefs.getDouble('current_balance') ?? 0.0;
-    final updated = current + amount;
-    await prefs.setDouble('current_balance', updated);
-    await _loadCurrentGoal();
-  }
-
   Future<void> _markGoalAsCompleted(Goal goal) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('current_balance', goal.targetAmount);
-    await _loadCurrentGoal();
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+
+      if (user == null) {
+        throw Exception('Usuário não autenticado');
+      }
+
+      // Atualizar meta para concluída
+      await supabase
+          .from('goals')
+          .update({
+            'status': 'completed',
+            'current_amount': goal.targetAmount,
+            'completed_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', goal.id)
+          .eq('child_id', user.id);
+
+      // Recarregar metas
+      await _loadGoals();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Meta concluída! 🎉',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: const Color(0xFF10B981),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    } catch (e) {
+      debugPrint('❌ Erro ao completar meta: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Erro ao completar meta: $e',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
   }
 
   Future<void> _deleteGoal(Goal goal) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('goal_name');
-    await prefs.remove('goal_emoji');
-    await prefs.remove('goal_target');
-    setState(() {
-      currentGoal = null;
-    });
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Meta removida',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+      if (user == null) {
+        throw Exception('Usuário não autenticado');
+      }
+
+      // Deletar do banco
+      await supabase
+          .from('goals')
+          .delete()
+          .eq('id', goal.id)
+          .eq('child_id', user.id);
+
+      // Recarregar metas
+      await _loadGoals();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Meta removida',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        backgroundColor: const Color(0xFFEF4444),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
+      );
+    } catch (e) {
+      debugPrint('❌ Erro ao deletar meta: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Erro ao remover meta: $e',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
   }
 
   @override
@@ -158,13 +473,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      // Removido FAB de "+ Nova meta" conforme solicitado
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: _isLoading
+            ? _buildSkeletonLoader()
+            : SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
               // Header (igual ao padrão da tela de gastos)
               ShaderMask(
                 shaderCallback: (bounds) => LinearGradient(
@@ -838,7 +1156,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     const Icon(Icons.add, size: 20),
                     const SizedBox(width: 8),
                     Text(
-                      'Criar Primeira Meta',
+                      completedGoals.isNotEmpty ? 'criar nova meta' : 'Criar Primeira Meta',
                       style: GoogleFonts.poppins(
                         fontSize: isSmallScreen ? 16 : 18,
                         fontWeight: FontWeight.w700,
@@ -1197,6 +1515,63 @@ class _GoalsScreenState extends State<GoalsScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header skeleton
+          Container(
+            height: 32,
+            width: 150,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Current goal skeleton
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Completed goals title skeleton
+          Container(
+            height: 24,
+            width: 120,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Completed goals list skeleton
+          ...List.generate(
+            3,
+            (index) => Padding(
+              padding: EdgeInsets.only(bottom: index == 2 ? 0 : 16),
+              child: Container(
+                height: 100,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

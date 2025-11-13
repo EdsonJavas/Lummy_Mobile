@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ClaimShareScreen extends StatefulWidget {
   final double totalAmount;
@@ -30,7 +29,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
   late Animation<Offset> _slideAnimation;
 
   bool _claimed = false;
-  bool _alreadyClaimed = false;
+  bool _alreadyClaimed = false; // temporariamente ignorado para testes
 
   @override
   void initState() {
@@ -59,9 +58,9 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
   }
 
   Future<void> _loadClaimed() async {
-    final prefs = await SharedPreferences.getInstance();
+    // Temporariamente permitir múltiplos resgates para testes
     setState(() {
-      _alreadyClaimed = prefs.getBool('share_claimed') ?? false;
+      _alreadyClaimed = false;
     });
   }
 
@@ -121,8 +120,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
   }
 
   Future<void> _persistClaimed() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('share_claimed', true);
+    // Temporariamente não persistir flag de resgate
   }
 
   @override
@@ -427,10 +425,10 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: (_claimed || _alreadyClaimed) ? null : _claim,
+                      onPressed: _claim,
                       icon: const Icon(Icons.payments_rounded, size: 22),
                       label: Text(
-                        (_claimed || _alreadyClaimed) ? 'Resgatado' : 'Retirar minha parte',
+                        'Retirar minha parte',
                         style: GoogleFonts.poppins(
                           fontSize: isSmall ? 16 : 18,
                           fontWeight: FontWeight.w700,

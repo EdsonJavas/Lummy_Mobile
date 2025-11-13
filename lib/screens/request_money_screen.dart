@@ -94,7 +94,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
     }
   }
 
-  void _generateRequest() async {
+  Future<void> _generateRequest() async {
     if (_currentAmount == null || _currentAmount! <= 0) {
       _showSnackBar('Digite um valor válido para pedir dinheiro', isError: true);
       return;
@@ -121,7 +121,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
     _showSnackBar('Link gerado com sucesso! 🎉');
   }
 
-  void _copyToClipboard() async {
+  Future<void> _copyToClipboard() async {
     if (_generatedLink.isEmpty) return;
     
     await Clipboard.setData(ClipboardData(text: _generatedLink));

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy_login/login_page.dart';
 import 'package:lummy_login/core/providers/theme_provider.dart';
 import 'package:lummy_login/screens/edit_profile_screen.dart';
 import 'package:lummy_login/screens/notifications_screen.dart';
 import 'package:lummy_login/shared/widgets/cached_avatar.dart';
 import 'package:lummy_login/shared/widgets/cached_image.dart';
+import 'package:lummy_login/di/locator.dart';
+import 'package:lummy_login/domain/repositories/auth_repository.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,12 +19,208 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final String userName = 'Edson Jr';
+  String userName = 'Carregando...';
   final String userRole = 'Pequeno Empreendedor';
-  final int userLevel = 5;
-  final int totalPoints = 2190;
-  final int completedGoals = 8;
-  final double totalSaved = 347.50;
+  int userLevel = 1;
+  int totalPoints = 0;
+  int completedGoals = 0;
+  double totalSaved = 0.0;
+  List<Map<String, dynamic>> achievements = [];
+  bool _isLoadingStats = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+    _loadUserStats();
+  }
+
+  Future<void> _loadUserName() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      
+      if (user != null) {
+        debugPrint('🔍 Buscando nome do usuário no perfil: ${user.id}');
+        
+        // Buscar na tabela children
+        try {
+          final childRow = await supabase
+              .from('children')
+              .select('nome')
+              .eq('id', user.id)
+              .maybeSingle();
+
+          if (childRow != null && childRow['nome'] != null) {
+            setState(() {
+              userName = childRow['nome'] as String;
+            });
+            debugPrint('✅ Nome encontrado na tabela children: $userName');
+            return;
+          }
+        } catch (e) {
+          debugPrint('❌ Erro ao buscar na tabela children: $e');
+        }
+
+        // Fallback: metadata do usuário
+        final meta = user.userMetadata ?? {};
+        final name = (meta['name'] ?? meta['full_name'] ?? meta['username']) as String?;
+        if (name != null && name.trim().isNotEmpty) {
+          setState(() {
+            userName = name.trim();
+          });
+          return;
+        }
+
+        // Fallback: prefixo do email
+        final emailName = user.email?.split('@').first;
+        if (emailName != null && emailName.trim().isNotEmpty) {
+          setState(() {
+            userName = emailName.trim();
+          });
+          return;
+        }
+      }
+
+      setState(() {
+        userName = 'Usuário';
+      });
+    } catch (e) {
+      debugPrint('❌ Erro ao carregar nome do usuário: $e');
+      setState(() {
+        userName = 'Usuário';
+      });
+    }
+  }
+
+  Future<void> _loadUserStats() async {
+    try {
+      setState(() {
+        _isLoadingStats = true;
+      });
+
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+
+      if (user == null) {
+        debugPrint('❌ Usuário não autenticado ao carregar stats');
+        setState(() {
+          _isLoadingStats = false;
+        });
+        return;
+      }
+
+      debugPrint('📊 Carregando estatísticas do usuário: ${user.id}');
+
+      // 1. Buscar pontos e nível da tabela children
+      try {
+        // Primeiro tentar buscar com as novas colunas
+        final childData = await supabase
+            .from('children')
+            .select('total_points, level, balance')
+            .eq('id', user.id)
+            .maybeSingle();
+
+        if (childData != null) {
+          setState(() {
+            // Se as colunas não existirem ainda, usar valores padrão
+            totalPoints = (childData['total_points'] as int?) ?? 0;
+            userLevel = (childData['level'] as int?) ?? 1;
+            totalSaved = (childData['balance'] as num?)?.toDouble() ?? 0.0;
+          });
+          debugPrint('✅ Pontos: $totalPoints, Nível: $userLevel, Saldo: $totalSaved');
+        } else {
+          // Se não encontrar dados, buscar apenas balance e inicializar resto
+          final balanceData = await supabase
+              .from('children')
+              .select('balance')
+              .eq('id', user.id)
+              .maybeSingle();
+          
+          setState(() {
+            totalPoints = 0;
+            userLevel = 1;
+            totalSaved = (balanceData?['balance'] as num?)?.toDouble() ?? 0.0;
+          });
+          debugPrint('⚠️ Dados não encontrados, inicializando com valores padrão');
+        }
+      } catch (e) {
+        // Se der erro (provavelmente colunas não existem), buscar apenas balance
+        debugPrint('⚠️ Erro ao buscar pontos/nível (colunas podem não existir): $e');
+        try {
+          final balanceData = await supabase
+              .from('children')
+              .select('balance')
+              .eq('id', user.id)
+              .maybeSingle();
+          
+          setState(() {
+            totalPoints = 0;
+            userLevel = 1;
+            totalSaved = (balanceData?['balance'] as num?)?.toDouble() ?? 0.0;
+          });
+        } catch (e2) {
+          debugPrint('❌ Erro ao buscar balance: $e2');
+          setState(() {
+            totalPoints = 0;
+            userLevel = 1;
+            totalSaved = 0.0;
+          });
+        }
+      }
+
+      // 2. Buscar conquistas da tabela achievements
+      try {
+        final achievementsData = await supabase
+            .from('achievements')
+            .select('*')
+            .eq('child_id', user.id)
+            .order('completed_date', ascending: false);
+
+        if (achievementsData.isNotEmpty) {
+          setState(() {
+            achievements = List<Map<String, dynamic>>.from(achievementsData);
+          });
+          debugPrint('✅ ${achievements.length} conquistas encontradas');
+        } else {
+          setState(() {
+            achievements = [];
+          });
+          debugPrint('ℹ️ Nenhuma conquista encontrada');
+        }
+      } catch (e) {
+        debugPrint('⚠️ Erro ao buscar conquistas: $e');
+        setState(() {
+          achievements = [];
+        });
+      }
+
+      // 3. Buscar metas completadas da tabela goals
+      try {
+        final completedGoalsData = await supabase
+            .from('goals')
+            .select('id')
+            .eq('child_id', user.id)
+            .eq('status', 'completed');
+
+        setState(() {
+          completedGoals = completedGoalsData.length;
+        });
+        debugPrint('✅ $completedGoals metas completadas encontradas');
+            } catch (e) {
+        debugPrint('⚠️ Erro ao buscar metas completadas: $e');
+        setState(() {
+          completedGoals = 0;
+        });
+      }
+    } catch (e) {
+      debugPrint('❌ Erro ao carregar estatísticas: $e');
+    } finally {
+      setState(() {
+        _isLoadingStats = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -220,14 +419,23 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                   child: Center(
-                    child: Text(
-                      userLevel.toString(),
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: _isLoadingStats
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : Text(
+                            userLevel.toString(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(width: 20),
@@ -242,14 +450,23 @@ class _ProfilePageState extends State<ProfilePage> {
                           size: 16,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          totalPoints.toString(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
+                        _isLoadingStats
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : Text(
+                                totalPoints.toString(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ],
                     ),
                     Text(
@@ -492,89 +709,150 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ],
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Medalhas conquistadas (2)
-                    ...List.generate(
-                      2,
-                      (index) => Container(
-                        width: 8,
-                        height: 8,
-                        margin: const EdgeInsets.only(right: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.white.withOpacity(0.5),
-                              blurRadius: 4,
-                              offset: const Offset(0, 1),
+                child: Builder(
+                  builder: (context) {
+                    final completedCount = achievements.where((a) => a['is_completed'] == true).length;
+                    final totalCount = achievements.isNotEmpty ? achievements.length : 5; // Default 5 se não houver conquistas
+                    final uncompletedCount = totalCount - completedCount;
+                    
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Medalhas conquistadas
+                        ...List.generate(
+                          completedCount > 5 ? 5 : completedCount,
+                          (index) => Container(
+                            width: 8,
+                            height: 8,
+                            margin: const EdgeInsets.only(right: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.white.withOpacity(0.5),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
 
-                    const SizedBox(width: 6),
+                        if (completedCount > 0 && uncompletedCount > 0) ...[
+                          const SizedBox(width: 6),
+                          // Separador
+                          Container(
+                            width: 1,
+                            height: 12,
+                            color: Colors.white.withOpacity(0.5),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
 
-                    // Separador
-                    Container(
-                      width: 1,
-                      height: 12,
-                      color: Colors.white.withOpacity(0.5),
-                    ),
-
-                    const SizedBox(width: 6),
-
-                    // Medalhas não conquistadas (3)
-                    ...List.generate(
-                      3,
-                      (index) => Container(
-                        width: 6,
-                        height: 6,
-                        margin: const EdgeInsets.only(right: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
-                          shape: BoxShape.circle,
+                        // Medalhas não conquistadas
+                        ...List.generate(
+                          uncompletedCount > 5 ? 5 : uncompletedCount,
+                          (index) => Container(
+                            width: 6,
+                            height: 6,
+                            margin: const EdgeInsets.only(right: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
 
-                    const SizedBox(width: 8),
+                        const SizedBox(width: 8),
 
-                    Text(
-                      '2/5',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                        Text(
+                          '$completedCount/$totalCount',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _buildBadge('🥇', 'Primeira\nEconomia', true),
-                const SizedBox(width: 16),
-                _buildBadge('📊', 'Controle\nde Gastos', true),
-                const SizedBox(width: 16),
-                _buildBadge('🎯', 'Meta\nAlcançada', false),
-                const SizedBox(width: 16),
-                _buildBadge('🔥', 'Sequência\n7 dias', false),
-                const SizedBox(width: 16),
-                _buildBadge('💎', 'Poupador\nEstrela', false),
-              ],
-            ),
-          ),
+          _isLoadingStats
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : achievements.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.emoji_events_outlined,
+                              size: 48,
+                              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Nenhuma conquista ainda',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).textTheme.bodyMedium?.color,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Complete missões para desbloquear conquistas!',
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: achievements.map((achievement) {
+                          final title = achievement['title'] ?? 'Conquista';
+                          final emoji = achievement['emoji'] ?? '🏆';
+                          final isCompleted = achievement['is_completed'] == true;
+                          
+                          // Quebrar título em 2 linhas se necessário
+                          final titleParts = title.split(' ');
+                          String displayTitle;
+                          if (titleParts.length > 1) {
+                            final mid = (titleParts.length / 2).ceil();
+                            displayTitle = '${titleParts.sublist(0, mid).join(' ')}\n${titleParts.sublist(mid).join(' ')}';
+                          } else {
+                            displayTitle = title;
+                          }
+                          
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 16),
+                            child: _buildBadge(
+                              emoji,
+                              displayTitle,
+                              isCompleted,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
         ],
       ),
     );
@@ -670,13 +948,17 @@ class _ProfilePageState extends State<ProfilePage> {
             'Editar Perfil',
             'Altere suas informações pessoais',
             const Color(0xFF1E40AF),
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const EditProfileScreen(),
                 ),
               );
+              // Se houve atualização, recarregar o nome
+              if (result == true) {
+                _loadUserName();
+              }
             },
           ),
           _buildSettingItem(
@@ -722,10 +1004,76 @@ class _ProfilePageState extends State<ProfilePage> {
             'Desconectar da conta',
             const Color(0xFFEF4444),
             onTap: () async {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (route) => false,
+              // Mostrar diálogo de confirmação
+              final shouldLogout = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(
+                    'Sair da conta?',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  content: Text(
+                    'Tem certeza que deseja sair? Você precisará fazer login novamente.',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: Text(
+                        'Cancelar',
+                        style: GoogleFonts.poppins(
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text(
+                        'Sair',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFFEF4444),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               );
+
+              if (shouldLogout == true) {
+                try {
+                  // Fazer logout no Supabase
+                  final authRepo = locator<AuthRepository>();
+                  await authRepo.logout();
+                  
+                  debugPrint('✅ Logout realizado com sucesso');
+                  
+                  // Navegar para tela de login
+                  if (!mounted) return;
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                } catch (e) {
+                  debugPrint('❌ Erro ao fazer logout: $e');
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Erro ao fazer logout: $e',
+                        style: GoogleFonts.poppins(),
+                      ),
+                      backgroundColor: const Color(0xFFEF4444),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  );
+                }
+              }
             },
           ),
         ],
@@ -912,7 +1260,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Switch(
                   value: isDark,
                   onChanged: (_) => themeProvider.toggleTheme(),
-                  activeColor: Colors.white,
+                  activeThumbColor: Colors.white,
                   activeTrackColor: Colors.white.withOpacity(0.4),
                   inactiveThumbColor: Colors.white.withOpacity(0.9),
                   inactiveTrackColor: Colors.white.withOpacity(0.3),

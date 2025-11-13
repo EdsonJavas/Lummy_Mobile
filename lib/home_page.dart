@@ -1,10 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy_login/screens/new_goal_screen.dart';
 import 'package:lummy_login/screens/request_money_screen.dart';
 import 'package:lummy_login/screens/claim_share_screen.dart';
 import 'package:lummy_login/shared/widgets/cached_avatar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lummy_login/utils/supabase_test.dart';
 import 'profile_page.dart';
 import 'daily_missions_screen.dart';
 
@@ -17,13 +20,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // Dados do usuário
-  final String userName = 'Edson Jr';
+  String userName = '';
   final String userRole = 'Pequeno Empreendedor';
   double currentBalance = 0.0;
-  double savingsGoal = 200.00;
-  String goalName = 'Bicicleta Nova';
-  String goalEmoji = '🚲';
+  double savingsGoal = 0.0;
+  String goalName = '';
+  String goalEmoji = '🎯';
+  double goalCurrentAmount = 0.0;
+  bool hasActiveGoal = false;
   int _earnedMissionPoints = 0;
+  RealtimeChannel? _goalsChannel;
 
   // Lista de transações
   List<Map<String, dynamic>> transactions = [];
@@ -286,9 +292,148 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _loadUserName();
     _loadEarnedPoints();
     _loadBalance();
     _loadGoal();
+    _subscribeGoalsRealtime();
+    // Testar conexão na inicialização (apenas em debug)
+    if (kDebugMode) {
+      _testConnection();
+    }
+  }
+
+  void _subscribeGoalsRealtime() {
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+
+      _goalsChannel = supabase
+          .channel('public:goals:child_${user.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'goals',
+            filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'child_id', value: user.id),
+            callback: (payload) => _loadGoal(),
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'goals',
+            filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'child_id', value: user.id),
+            callback: (payload) => _loadGoal(),
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.delete,
+            schema: 'public',
+            table: 'goals',
+            filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'child_id', value: user.id),
+            callback: (payload) => _loadGoal(),
+          )
+          .subscribe();
+    } catch (e) {
+      debugPrint('⚠️ Erro ao assinar realtime de goals: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    try {
+      if (_goalsChannel != null) {
+        Supabase.instance.client.removeChannel(_goalsChannel!);
+      }
+    } catch (_) {}
+    super.dispose();
+  }
+
+  Future<void> _testConnection() async {
+    try {
+      debugPrint('🧪 Iniciando teste de conexão com Supabase...');
+      final results = await SupabaseTest.testConnection();
+      debugPrint('📊 Resultados do teste:');
+      results.forEach((key, value) {
+        debugPrint('   $key: $value');
+      });
+    } catch (e) {
+      debugPrint('❌ Erro ao testar conexão: $e');
+    }
+  }
+
+  Future<void> _loadUserName() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      String? name;
+
+      if (user != null) {
+        debugPrint('🔍 Buscando nome para usuário: ${user.id}');
+        
+        // 1) Buscar na tabela children pelo id do usuário autenticado
+        try {
+          final childRow = await supabase
+              .from('children')
+              .select('nome')
+              .eq('id', user.id)
+              .maybeSingle();
+
+          debugPrint('📊 Resultado da busca em children: ${childRow != null ? "encontrado" : "não encontrado"}');
+          
+          if (childRow != null && childRow['nome'] != null) {
+            name = childRow['nome'] as String?;
+            debugPrint('✅ Nome encontrado na tabela children: $name');
+          } else {
+            debugPrint('⚠️ Nome não encontrado na tabela children, tentando fallbacks...');
+          }
+        } catch (e) {
+          debugPrint('❌ Erro ao buscar na tabela children: $e');
+          if (e is PostgrestException) {
+            debugPrint('   Código: ${e.code}');
+            debugPrint('   Mensagem: ${e.message}');
+            debugPrint('   Detalhes: ${e.details}');
+          }
+        }
+
+        // 2) Fallback: metadata do usuário (caso exista)
+        if (name == null || name.trim().isEmpty) {
+          final meta = user.userMetadata ?? {};
+          name = (meta['name'] ?? meta['full_name'] ?? meta['username']) as String?;
+          if (name != null) {
+            debugPrint('✅ Nome encontrado no metadata: $name');
+          }
+        }
+
+        // 3) Fallback: prefixo do email
+        if (name == null || name.trim().isEmpty) {
+          name = user.email?.split('@').first;
+          if (name != null) {
+            debugPrint('✅ Usando prefixo do email: $name');
+          }
+        }
+      } else {
+        debugPrint('⚠️ Nenhum usuário autenticado');
+      }
+
+      // 4) Fallback: valor salvo localmente (se existir)
+      if (name == null || name.trim().isEmpty) {
+        name = (await SharedPreferences.getInstance()).getString('user_name');
+        if (name != null) {
+          debugPrint('✅ Nome encontrado no SharedPreferences: $name');
+        }
+      }
+      
+      setState(() {
+        userName = (name?.trim().isNotEmpty == true) ? name!.trim() : 'Usuário';
+        debugPrint('👤 Nome final definido: $userName');
+      });
+    } catch (e, stackTrace) {
+      debugPrint('❌ Erro ao carregar nome do usuário: $e');
+      debugPrint('Stack trace: $stackTrace');
+      setState(() {
+        userName = 'Usuário';
+      });
+    }
   }
 
   Future<void> _loadEarnedPoints() async {
@@ -299,46 +444,211 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadBalance() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      currentBalance = prefs.getDouble('current_balance') ?? 0.0;
-    });
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        setState(() => currentBalance = 0.0);
+        return;
+      }
+      final row = await supabase
+          .from('children')
+          .select('balance')
+          .eq('id', user.id)
+          .maybeSingle();
+      final bal = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+      setState(() {
+        currentBalance = bal;
+      });
+      
+      // Sincronizar meta com o novo balance
+      if (hasActiveGoal) {
+        final goalRow = await supabase
+            .from('goals')
+            .select('id')
+            .eq('child_id', user.id)
+            .eq('status', 'ongoing')
+            .maybeSingle();
+        if (goalRow != null) {
+          await _syncGoalWithBalance(goalRow['id'] as String);
+          // Recarregar meta para atualizar a UI
+          await _loadGoal();
+        }
+      }
+    } catch (e) {
+      debugPrint('⚠️ Erro ao carregar balance: $e');
+      setState(() => currentBalance = 0.0);
+    }
   }
 
   Future<void> _persistBalance() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('current_balance', currentBalance);
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+      await supabase
+          .from('children')
+          .update({
+            'balance': currentBalance,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', user.id);
+    } catch (e) {
+      debugPrint('⚠️ Erro ao persistir balance: $e');
+    }
+  }
+
+  Future<void> _syncGoalWithBalance(String goalId) async {
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+
+      // Buscar saldo do cofrinho
+      final childRow = await supabase
+          .from('children')
+          .select('balance')
+          .eq('id', user.id)
+          .maybeSingle();
+      final balance = (childRow?['balance'] as num?)?.toDouble() ?? 0.0;
+
+      // Buscar meta atual
+      final goalRow = await supabase
+          .from('goals')
+          .select('target_amount, status')
+          .eq('id', goalId)
+          .maybeSingle();
+
+      if (goalRow == null) return;
+
+      final target = (goalRow['target_amount'] as num).toDouble();
+      final status = goalRow['status'] as String;
+      
+      // Se já está concluída, não atualizar
+      if (status == 'completed') return;
+
+      final newAmount = balance.clamp(0.0, target);
+
+      // Atualizar current_amount para refletir o cofrinho
+      await supabase
+          .from('goals')
+          .update({'current_amount': newAmount})
+          .eq('id', goalId)
+          .eq('child_id', user.id);
+
+      // Se atingiu ou superou o alvo, marcar como concluída
+      if (balance >= target) {
+        await supabase
+            .from('goals')
+            .update({
+              'status': 'completed',
+              'current_amount': target,
+              'completed_at': DateTime.now().toIso8601String(),
+            })
+            .eq('id', goalId)
+            .eq('child_id', user.id);
+      }
+    } catch (e) {
+      debugPrint('⚠️ Erro ao sincronizar meta com balance na homepage: $e');
+    }
   }
 
   Future<void> _loadGoal() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      goalName = prefs.getString('goal_name') ?? goalName;
-      goalEmoji = prefs.getString('goal_emoji') ?? goalEmoji;
-      savingsGoal = prefs.getDouble('goal_target') ?? savingsGoal;
-    });
-  }
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
 
-  Future<void> _persistGoal() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('goal_name', goalName);
-    await prefs.setString('goal_emoji', goalEmoji);
-    await prefs.setDouble('goal_target', savingsGoal);
+      if (user == null) {
+        debugPrint('❌ Usuário não autenticado ao carregar meta');
+        setState(() {
+          hasActiveGoal = false;
+        });
+        return;
+      }
+
+      final goalData = await supabase
+          .from('goals')
+          .select('*')
+          .eq('child_id', user.id)
+          .eq('status', 'ongoing')
+          .maybeSingle();
+
+      if (goalData != null) {
+        // Sincronizar meta com cofrinho antes de exibir
+        await _syncGoalWithBalance(goalData['id'] as String);
+        
+        // Recarregar meta atualizada
+        final updatedGoal = await supabase
+            .from('goals')
+            .select('*')
+            .eq('id', goalData['id'] as String)
+            .maybeSingle();
+        
+        if (updatedGoal != null) {
+          setState(() {
+            goalName = updatedGoal['name'] as String;
+            goalEmoji = updatedGoal['emoji'] as String? ?? '🎯';
+            savingsGoal = (updatedGoal['target_amount'] as num).toDouble();
+            final current = (updatedGoal['current_amount'] as num).toDouble();
+            goalCurrentAmount = current > savingsGoal ? savingsGoal : current;
+            hasActiveGoal = true;
+          });
+          debugPrint('✅ Meta carregada e sincronizada na homepage: $goalName');
+        } else {
+          setState(() {
+            goalName = goalData['name'] as String;
+            goalEmoji = goalData['emoji'] as String? ?? '🎯';
+            savingsGoal = (goalData['target_amount'] as num).toDouble();
+            final current = (goalData['current_amount'] as num).toDouble();
+            goalCurrentAmount = current > savingsGoal ? savingsGoal : current;
+            hasActiveGoal = true;
+          });
+          debugPrint('✅ Meta carregada na homepage: $goalName');
+        }
+      } else {
+        // Se não há meta em andamento, mostrar a última meta concluída
+        final lastCompleted = await supabase
+            .from('goals')
+            .select('*')
+            .eq('child_id', user.id)
+            .eq('status', 'completed')
+            .order('completed_at', ascending: false)
+            .limit(1)
+            .maybeSingle();
+
+        if (lastCompleted != null) {
+          final target = (lastCompleted['target_amount'] as num).toDouble();
+          setState(() {
+            goalName = lastCompleted['name'] as String;
+            goalEmoji = lastCompleted['emoji'] as String? ?? '🎯';
+            savingsGoal = target;
+            goalCurrentAmount = target; // meta concluída nunca excede o alvo
+            hasActiveGoal = true; // Exibir cartão com status de concluída
+          });
+          debugPrint('ℹ️ Exibindo última meta concluída na homepage: $goalName');
+        } else {
+          setState(() {
+            hasActiveGoal = false;
+            goalName = '';
+            goalEmoji = '🎯';
+            savingsGoal = 0.0;
+            goalCurrentAmount = 0.0;
+          });
+          debugPrint('ℹ️ Nenhuma meta encontrada para exibir na homepage');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Erro ao carregar meta na homepage: $e');
+      setState(() {
+        hasActiveGoal = false;
+      });
+    }
   }
 
   void _nextTip() {
     setState(() {
       currentTipIndex = (currentTipIndex + 1) % educationalTips.length;
     });
-  }
-
-  void _setNewGoal(String name, String emoji, double amount) {
-    setState(() {
-      goalName = name;
-      goalEmoji = emoji;
-      savingsGoal = amount;
-    });
-    _persistGoal();
   }
 
   @override
@@ -360,8 +670,10 @@ class _HomePageState extends State<HomePage> {
               // Saldo atual
               _buildBalanceCard(screenWidth, isSmallScreen),
 
-              // Meta de economia
-              _buildSavingsGoal(screenWidth, isSmallScreen),
+              // Meta de economia (sempre mostra: ativa ou preview vazio)
+              hasActiveGoal 
+                  ? _buildSavingsGoal(screenWidth, isSmallScreen)
+                  : _buildEmptyGoalCard(screenWidth, isSmallScreen),
 
               // Ações rápidas (estilo Inter)
               _buildQuickActionsInter(screenWidth, isSmallScreen),
@@ -562,8 +874,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildSavingsGoal(double screenWidth, bool isSmallScreen) {
-    final progress = currentBalance / savingsGoal;
-    final remaining = savingsGoal - currentBalance;
+    // Usar valor reservado da meta (goalCurrentAmount) e nunca exceder o alvo
+    final cappedTarget = savingsGoal < 0 ? 0.0 : savingsGoal;
+    final contributed = goalCurrentAmount.clamp(0.0, cappedTarget);
+    final progress = cappedTarget > 0 ? contributed / cappedTarget : 0.0;
+    final remaining = cappedTarget - contributed;
     final progressPercent = (progress * 100).clamp(0, 100).toInt();
     final isCompleted = progress >= 1.0;
 
@@ -687,8 +1002,8 @@ class _HomePageState extends State<HomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'R\$ ${currentBalance.toStringAsFixed(2)}',
+                   Text(
+                     'R\$ ${contributed.toStringAsFixed(2)}',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -870,6 +1185,314 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildEmptyGoalCard(double screenWidth, bool isSmallScreen) {
+    const progress = 0.0;
+    const progressPercent = 0;
+    const isCompleted = false;
+
+    return GestureDetector(
+      onTap: () async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const NewGoalScreen(),
+          ),
+        );
+
+        if (result != null) {
+          // Recarregar meta do banco após criar nova meta
+          await _loadGoal();
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Nova meta criada! 🎯',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                backgroundColor: const Color(0xFF8B5CF6),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+        padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF334155)
+                : const Color(0xFFE2E8F0),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with badge
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF8B5CF6).withOpacity(0.15),
+                        const Color(0xFF8B5CF6).withOpacity(0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '🎯',
+                    style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Sem metas ainda',
+                        style: GoogleFonts.poppins(
+                          fontSize: isSmallScreen ? 17 : 19,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.titleLarge?.color?.withOpacity(0.6),
+                          height: 1.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          'Crie sua primeira meta',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF8B5CF6),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '0%',
+                    style: GoogleFonts.poppins(
+                      fontSize: isSmallScreen ? 16 : 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF8B5CF6).withOpacity(0.6),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            // Progress bar with labels
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'R\$ 0,00',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                      ),
+                    ),
+                    Text(
+                      'R\$ 0,00',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Stack(
+                  children: [
+                    Container(
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFE2E8F0),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    FractionallySizedBox(
+                      widthFactor: 0.0,
+                      child: Container(
+                        height: 10,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF8B5CF6),
+                              Color(0xFF7C3AED),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            // Info cards
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E293B).withOpacity(0.5)
+                          : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFE2E8F0),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.savings_outlined,
+                              size: 16,
+                              color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Economizado',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.color?.withOpacity(0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'R\$ 0,00',
+                          style: GoogleFonts.poppins(
+                            fontSize: isSmallScreen ? 16 : 18,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).textTheme.titleLarge?.color?.withOpacity(0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E293B).withOpacity(0.5)
+                          : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFE2E8F0),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.trending_up,
+                              size: 16,
+                              color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Falta',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.color?.withOpacity(0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'R\$ 0,00',
+                          style: GoogleFonts.poppins(
+                            fontSize: isSmallScreen ? 16 : 18,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).textTheme.titleLarge?.color?.withOpacity(0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildQuickActionsInter(double screenWidth, bool isSmallScreen) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
@@ -930,27 +1553,26 @@ class _HomePageState extends State<HomePage> {
                         );
 
                         if (result != null) {
-                          _setNewGoal(
-                            result['name'],
-                            result['emoji'],
-                            result['amount'],
-                          );
+                          // Recarregar meta do banco após criar nova meta
+                          await _loadGoal();
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Nova meta criada! 🎯',
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w500,
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Nova meta criada! 🎯',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                backgroundColor: const Color(0xFF8B5CF6),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              backgroundColor: const Color(0xFF8B5CF6),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
+                            );
+                          }
                         }
                       },
                       child: _buildActionCardInter(
@@ -1014,6 +1636,19 @@ class _HomePageState extends State<HomePage> {
                             currentBalance += claimedAmount;
                           });
                           await _persistBalance();
+                          // Sincronizar meta com o novo balance
+                          if (hasActiveGoal) {
+                            final goalRow = await Supabase.instance.client
+                                .from('goals')
+                                .select('id')
+                                .eq('child_id', Supabase.instance.client.auth.currentUser!.id)
+                                .eq('status', 'ongoing')
+                                .maybeSingle();
+                            if (goalRow != null) {
+                              await _syncGoalWithBalance(goalRow['id'] as String);
+                              await _loadGoal();
+                            }
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(

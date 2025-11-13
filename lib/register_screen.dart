@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy_login/di/locator.dart';
+import 'package:lummy_login/domain/repositories/auth_repository.dart';
+import 'package:lummy_login/services/family_service.dart';
 import 'register_children_screen.dart';
-import 'responsavel_model.dart'; // <-- ADICIONADO
+import 'responsavel_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -79,28 +82,98 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _isLoading = true;
       });
 
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        // Verificar se o locator está inicializado
+        if (!locator.isRegistered<AuthRepository>()) {
+          throw Exception('Sistema ainda não foi inicializado. Aguarde alguns instantes.');
+        }
+        
+        final authRepo = locator<AuthRepository>();
+        final familyService = locator<FamilyService>();
 
-      setState(() {
-        _isLoading = false;
-      });
+        // Criar conta no Supabase Auth
+        final registerResult = await authRepo.register(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          name: _nameController.text.trim(),
+          metadata: {
+            'cpf': _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+            'role': 'parent',
+          },
+        );
 
-      // Criar objeto Responsavel
-      final responsavel = Responsavel(
-        nome: _nameController.text.trim(),
-        cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-        email: _emailController.text.trim(),
-        senha: _passwordController.text,
-      );
+        if (!registerResult.isSuccess) {
+          setState(() {
+            _isLoading = false;
+          });
+          
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                registerResult.error?.message ?? 'Erro ao criar conta',
+              ),
+              backgroundColor: const Color(0xFFEF4444),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+          return;
+        }
 
-      // Passar para próxima tela
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              RegisterChildrenScreen(responsavel: responsavel),
-        ),
-      );
+        // Salvar dados adicionais na tabela responsaveis
+        final userId = registerResult.when(
+          success: (id) => id,
+          failure: (_) => throw Exception('Erro ao registrar'),
+        );
+        await familyService.createResponsavelData(
+          userId: userId,
+          nome: _nameController.text.trim(),
+          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          email: _emailController.text.trim(),
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (!mounted) return;
+
+        // Criar objeto Responsavel com o ID do Supabase
+        final responsavel = Responsavel(
+          nome: _nameController.text.trim(),
+          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          email: _emailController.text.trim(),
+          senha: _passwordController.text,
+        );
+
+        // Passar para próxima tela
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                RegisterChildrenScreen(responsavel: responsavel, parentUserId: userId),
+          ),
+        );
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao criar conta: $e'),
+            backgroundColor: const Color(0xFFEF4444),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
     }
   }
 

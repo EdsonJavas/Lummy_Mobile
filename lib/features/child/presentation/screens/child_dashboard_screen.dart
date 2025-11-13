@@ -6,6 +6,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/widgets.dart';
 import '../bloc/child_dashboard_cubit.dart';
 import '../bloc/child_dashboard_state.dart';
+import '../widgets/child_dashboard_skeleton.dart';
 
 class ChildDashboardScreen extends StatelessWidget {
   final String userId;
@@ -34,7 +35,7 @@ class _ChildDashboardView extends StatelessWidget {
       body: BlocBuilder<ChildDashboardCubit, ChildDashboardState>(
         builder: (context, state) {
           if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const ChildDashboardSkeleton();
           }
 
           if (state.error != null) {

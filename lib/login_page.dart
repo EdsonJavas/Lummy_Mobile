@@ -4,6 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy_login/main_navigation.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/application/app_facade.dart';
+import 'package:lummy_login/core/result.dart';
+import 'package:lummy_login/domain/entities/user_entity.dart';
+import 'package:lummy_login/features/parent/presentation/screens/parent_dashboard_screen.dart';
+import 'package:lummy_login/services/family_service.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -35,11 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _loadBiometricState().then((_) {
-      if (_biometricAvailable && _biometricEnabled && _cachedUserId != null) {
-        _authenticateWithBiometrics();
-      }
-    });
+    _loadBiometricState();
   }
 
   Future<void> _loadBiometricState() async {
@@ -224,10 +224,52 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _navigateToMain() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MainNavigation()),
+  Future<void> _navigateAccordingToProfile(String userId) async {
+    final familyService = locator<FamilyService>();
+
+    try {
+      final profile = await familyService.fetchUserProfile(userId);
+
+      if (!mounted) return;
+
+      if (profile is ParentEntity) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ParentDashboardScreen(parentId: profile.id),
+          ),
+        );
+      } else if (profile is ChildEntity) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainNavigation()),
+        );
+      } else {
+        _showLoginError(
+          'Não encontramos o perfil associado a esta conta. Complete o cadastro e tente novamente.',
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showLoginError(
+        'Não foi possível carregar as informações do usuário. Tente novamente.',
+      );
+    }
+  }
+
+  void _showLoginError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.poppins(fontSize: 14),
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
     );
   }
 
@@ -247,7 +289,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = false;
       });
 
-      if (result.isSuccess) {
+      if (result is Success<String>) {
+        final userId = result.value;
         final bio = locator<BiometricAuthService>();
         if (_biometricAvailable) {
           await bio.cacheUserId(_emailController.text);
@@ -257,27 +300,33 @@ class _LoginScreenState extends State<LoginScreen> {
             await _showBiometricSetupDialog();
           }
         }
-        // Navegar para a tela principal independentemente da escolha de biometria
-        _navigateToMain();
+        await _navigateAccordingToProfile(userId);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result.error?.message ?? 'Erro desconhecido ao fazer login',
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
+        _showLoginError(
+          result.error?.message ?? 'Erro desconhecido ao fazer login',
         );
       }
     }
   }
 
   Future<void> _authenticateWithBiometrics() async {
+    if (_cachedUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Nenhum usuário salvo para autenticação biométrica.',
+            style: GoogleFonts.poppins(fontSize: 14),
+          ),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+      return;
+    }
+
     try {
       final bio = locator<BiometricAuthService>();
 
@@ -286,52 +335,23 @@ class _LoginScreenState extends State<LoginScreen> {
       final canCheck = await bio.canCheckBiometrics();
       final enabled = await bio.isBiometricEnabled();
 
-      print(
-        'Biometria - Suportada: $isSupported, Pode verificar: $canCheck, Habilitada: $enabled',
-      );
-
       if (!isSupported || !canCheck || !enabled) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Biometria não está disponível ou foi desabilitada.',
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-        return;
-      }
-
-      final ok = await bio.authenticate(reason: 'Confirmar com biometria');
-      print('Resultado da autenticação biométrica: $ok');
-
-      if (!mounted) return;
-
-      if (ok) {
-        final appFacade = locator<AppFacade>();
-        final loginResult = await appFacade.loginWithBiometrics(
-          _cachedUserId!,
-        ); // Assumindo que _cachedUserId não é nulo aqui
-
-        if (loginResult.isSuccess) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const MainNavigation()),
-          );
-        } else {
+        // Se biometria não está mais disponível, desabilitar e limpar cache
+        await bio.setBiometricEnabled(false);
+        await bio.clearCachedUser();
+        setState(() {
+          _biometricEnabled = false;
+          _cachedUserId = null;
+        });
+        
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                loginResult.error?.message ??
-                    'Erro ao fazer login com biometria.',
+                'Biometria não está mais disponível. Use email e senha para fazer login.',
                 style: GoogleFonts.poppins(fontSize: 14),
               ),
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.orange,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -339,34 +359,89 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           );
         }
+        return;
+      }
+
+      final ok = await bio.authenticate(reason: 'Confirmar com biometria');
+
+      if (!mounted) return;
+
+      if (ok) {
+        setState(() => _isLoading = true);
+        
+        try {
+          final appFacade = locator<AppFacade>();
+          final loginResult = await appFacade.loginWithBiometrics(
+            _cachedUserId!,
+          );
+
+          if (!mounted) return;
+          
+          setState(() => _isLoading = false);
+
+          if (loginResult is Success<String>) {
+            await _navigateAccordingToProfile(loginResult.value);
+          } else {
+            _showLoginError(
+              loginResult.error?.message ??
+                  'Erro ao fazer login com biometria. Tente fazer login com email e senha.',
+            );
+          }
+        } catch (e) {
+          if (!mounted) return;
+          setState(() => _isLoading = false);
+          _showLoginError(
+            'Erro ao processar login biométrico: ${e.toString()}',
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Autenticação biométrica cancelada ou falhou.',
-              style: GoogleFonts.poppins(fontSize: 14),
+        // Usuário cancelou ou falhou - apenas informar, não bloquear
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Autenticação biométrica cancelada. Use email e senha para fazer login.',
+                style: GoogleFonts.poppins(fontSize: 14),
+              ),
+              backgroundColor: Colors.blue,
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            backgroundColor: Colors.orange,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+          );
+        }
       }
     } catch (e) {
       print('Erro na autenticação biométrica: $e');
       if (!mounted) return;
 
+      // Em caso de erro, desabilitar biometria para evitar loops
+      try {
+        final bio = locator<BiometricAuthService>();
+        await bio.setBiometricEnabled(false);
+        await bio.clearCachedUser();
+        setState(() {
+          _biometricEnabled = false;
+          _cachedUserId = null;
+        });
+      } catch (_) {
+        // Ignorar erro ao limpar
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Erro na autenticação biométrica: ${e.toString()}',
+            'Erro na autenticação biométrica. Use email e senha para fazer login.',
             style: GoogleFonts.poppins(fontSize: 14),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: Colors.orange,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          duration: const Duration(seconds: 3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
       );
     }

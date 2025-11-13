@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy_login/domain/entities/user_entity.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/widgets.dart';
+import '../../../../domain/entities/user_entity.dart';
 import '../bloc/parent_dashboard_cubit.dart';
 import '../bloc/parent_dashboard_state.dart';
+import '../widgets/allowance_distribution_card.dart';
+import '../widgets/analytics_panels.dart';
+import '../widgets/parent_dashboard_skeleton.dart';
+import 'parent_profile_screen.dart';
 
 class ParentDashboardScreen extends StatelessWidget {
   final String parentId;
@@ -17,193 +21,482 @@ class ParentDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ParentDashboardCubit()..loadDashboard(parentId),
-      child: const _ParentDashboardView(),
+      child: _ParentDashboardView(parentId: parentId),
     );
   }
 }
 
-class _ParentDashboardView extends StatelessWidget {
-  const _ParentDashboardView();
+class _ParentDashboardView extends StatefulWidget {
+  final String parentId;
+
+  const _ParentDashboardView({required this.parentId});
+
+  @override
+  State<_ParentDashboardView> createState() => _ParentDashboardViewState();
+}
+
+class _ParentDashboardViewState extends State<_ParentDashboardView> {
+  Future<void> _refresh(BuildContext context) async {
+    await context.read<ParentDashboardCubit>().loadDashboard(widget.parentId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(AppConstants.backgroundLight),
-      appBar: AppBar(
-        title: Text(
-          'Painel do Responsável',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-        actions: [
-          BlocBuilder<ParentDashboardCubit, ParentDashboardState>(
-            builder: (context, state) {
-              return IconButton(
-                icon: Badge(
-                  label: Text('${state.unreadNotificationsCount}'),
-                  isLabelVisible: state.unreadNotificationsCount > 0,
-                  child: const Icon(Icons.notifications_outlined),
-                ),
-                onPressed: () {
-                  // Navegar para notificações
-                },
-              );
-            },
-          ),
-        ],
-      ),
-      body: BlocBuilder<ParentDashboardCubit, ParentDashboardState>(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    final colorScheme = Theme.of(context).colorScheme;
 
-          if (state.error != null) {
-            return Center(
-              child: EmptyState(
-                emoji: '😔',
-                title: 'Ops!',
-                message: state.error!,
-                buttonText: 'Tentar Novamente',
-                onButtonPressed: () {
-                  // Reload
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: BlocBuilder<ParentDashboardCubit, ParentDashboardState>(
+                builder: (context, state) {
+                  if (state.isLoading && state.children.isEmpty) {
+                    return const ParentDashboardSkeleton();
+                  }
+
+                  if (state.error != null) {
+                    return Center(
+                      child: EmptyState(
+                        emoji: '⚠️',
+                        title: 'Não foi possível carregar os dados',
+                        message: 'Tente atualizar a tela para sincronizar novamente.',
+                        buttonText: 'Tentar novamente',
+                        onButtonPressed: () => _refresh(context),
+                      ),
+                    );
+                  }
+
+                  return Stack(
+                    children: [
+                      RefreshIndicator(
+                        color: colorScheme.primary,
+                        onRefresh: () => _refresh(context),
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics(),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppConstants.spacingLarge,
+                              vertical: AppConstants.spacingLarge,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildFinancialHeader(context, state),
+                                const SizedBox(height: AppConstants.spacingLarge),
+                                _buildSummaryCards(context, state),
+                                const SizedBox(height: AppConstants.spacingLarge),
+                                AllowanceDistributionCard(
+                                  availableBalance: state.walletBalance,
+                                  children: state.children,
+                                  onDistributeEqually: (amount) => context
+                                      .read<ParentDashboardCubit>()
+                                      .distributeAmount(amount),
+                                  onDepositToChild: (childId, amount) => context
+                                      .read<ParentDashboardCubit>()
+                                      .transferToChild(childId, amount),
+                                ),
+                                const SizedBox(height: AppConstants.spacingLarge),
+                                ParentAnalyticsPanels(
+                                  monthlyTrend: state.monthlyTrend,
+                                  monthExpenseTotal: state.monthExpenseTotal,
+                                  monthIncomeTotal: state.monthIncomeTotal,
+                                  categoryBreakdown: state.categoryBreakdown,
+                                  goalSummaries: state.goalSummaries,
+                                ),
+                                const SizedBox(height: AppConstants.spacingLarge),
+                                _buildChildrenList(context, state),
+                                const SizedBox(height: AppConstants.spacingLarge),
+                                if (state.pendingApprovals.isNotEmpty)
+                                  _buildPendingApprovals(context, state),
+                                const SizedBox(height: AppConstants.spacingXLarge),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (state.isLoading)
+                        Positioned.fill(
+                          child: Container(
+                            color: Theme.of(context)
+                                .scaffoldBackgroundColor
+                                .withOpacity(0.7),
+                            child: const Center(
+                              child: BrandedLoader(
+                                label: 'Atualizando informações...',
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
                 },
               ),
-            );
-          }
-
-          return SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                const SizedBox(height: AppConstants.spacingLarge),
-                _buildSummaryCards(context, state),
-                const SizedBox(height: AppConstants.spacingLarge),
-                _buildChildrenList(context, state),
-                const SizedBox(height: AppConstants.spacingLarge),
-                if (state.pendingApprovals.isNotEmpty)
-                  _buildPendingApprovals(context, state),
-                const SizedBox(height: AppConstants.spacingXLarge),
-              ],
             ),
-          );
-        },
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           // Adicionar nova criança
         },
-        backgroundColor: const Color(AppConstants.primaryBlue),
+        backgroundColor: colorScheme.primary,
         icon: const Icon(Icons.person_add),
         label: Text(
-          'Adicionar Criança',
+          'Adicionar criança',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < AppConstants.smallScreenHeight;
+
+    return BlocBuilder<ParentDashboardCubit, ParentDashboardState>(
+      builder: (context, state) {
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.spacingLarge,
+            vertical: AppConstants.spacingMedium,
+          ),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color(AppConstants.primaryBlue),
+                Color(AppConstants.secondaryBlue),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(AppConstants.primaryBlue).withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Olá, Responsável',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 24 : 28,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Gerencie as finanças da família',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  if (state.unreadNotificationsCount > 0)
+                    Stack(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.notifications_outlined),
+                          color: Colors.white,
+                          onPressed: () {
+                            // Navegar para notificações
+                          },
+                        ),
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFEF4444),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '${state.unreadNotificationsCount}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ParentProfileScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: isSmallScreen ? 50 : 56,
+                      height: isSmallScreen ? 50 : 56,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        color: Color(AppConstants.primaryBlue),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFinancialHeader(
+    BuildContext context,
+    ParentDashboardState state,
+  ) {
+    final isSmallScreen =
+        MediaQuery.of(context).size.height < AppConstants.smallScreenHeight;
+
+    return CustomCard(
+      gradient: const LinearGradient(
+        colors: [
+          Color(AppConstants.primaryBlue),
+          Color(AppConstants.secondaryBlue),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      padding: EdgeInsets.all(isSmallScreen ? 20 : 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.18),
+              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            ),
+            child: const Icon(
+              Icons.account_balance_wallet_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: AppConstants.spacingMedium),
+          Text(
+            'Saldo disponível',
+            style: GoogleFonts.poppins(
+              fontSize: isSmallScreen ? 16 : 18,
+              fontWeight: FontWeight.w500,
+              color: Colors.white.withOpacity(0.85),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            AppFormatters.formatCurrency(state.walletBalance),
+            style: GoogleFonts.poppins(
+              fontSize: isSmallScreen ? 32 : 36,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: AppConstants.spacingLarge),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: _buildHeaderMetric(
+                  label: 'Receitas do mês',
+                  value: AppFormatters.formatCurrency(state.monthIncomeTotal),
+                  icon: Icons.trending_up_rounded,
+                  color: const Color(AppConstants.successGreen),
+                ),
+              ),
+              const SizedBox(width: AppConstants.spacingMedium),
+              Expanded(
+                child: _buildHeaderMetric(
+                  label: 'Despesas do mês',
+                  value: AppFormatters.formatCurrency(state.monthExpenseTotal),
+                  icon: Icons.trending_down_rounded,
+                  color: const Color(AppConstants.accentOrange),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderMetric({
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.18),
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: AppConstants.spacingSmall),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: Colors.white.withOpacity(0.7),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                value,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildSummaryCards(BuildContext context, ParentDashboardState state) {
     final isSmallScreen =
         MediaQuery.of(context).size.height < AppConstants.smallScreenHeight;
+    final rawWidth =
+        MediaQuery.of(context).size.width - (AppConstants.spacingLarge * 2);
+    final availableWidth = rawWidth > 0 ? rawWidth : MediaQuery.of(context).size.width;
+    final twoColumnBase =
+        (availableWidth - AppConstants.spacingMedium).clamp(200, availableWidth);
+    final twoColumnWidth = (twoColumnBase.toDouble()) / 2;
+
+    final cards = [
+      _SummaryCardData(
+        title: 'Crianças cadastradas',
+        value: '${state.children.length}',
+        icon: Icons.people_outline,
+        gradient: const LinearGradient(
+          colors: [
+            Color(AppConstants.primaryBlue),
+            Color(AppConstants.purple),
+          ],
+        ),
+      ),
+      _SummaryCardData(
+        title: 'Solicitações pendentes',
+        value: '${state.pendingApprovalsCount}',
+        icon: Icons.pending_actions_outlined,
+        gradient: const LinearGradient(
+          colors: [
+            Color(AppConstants.warningOrange),
+            Color(AppConstants.accentOrange),
+          ],
+        ),
+      ),
+    ];
 
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppConstants.spacingLarge,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: CustomCard(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(AppConstants.primaryBlue),
-                  Color(AppConstants.secondaryBlue),
-                ],
+      child: Wrap(
+        spacing: AppConstants.spacingMedium,
+        runSpacing: AppConstants.spacingMedium,
+        children: cards
+            .map(
+              (card) => SizedBox(
+                width: availableWidth >= 720 ? twoColumnWidth : availableWidth,
+                child: CustomCard(
+                  gradient: card.gradient,
+                  padding: EdgeInsets.all(isSmallScreen ? 18 : 22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius:
+                              BorderRadius.circular(AppConstants.radiusSmall),
+                        ),
+                        child: Icon(
+                          card.icon,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        card.value,
+                        style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        card.title,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.people,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    '${state.children.length}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    'Crianças',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: AppConstants.spacingMedium),
-          Expanded(
-            child: CustomCard(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(AppConstants.warningOrange),
-                  Color(AppConstants.accentOrange),
-                ],
-              ),
-              padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.pending_actions,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    '${state.pendingApprovalsCount}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    'Pendentes',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+            )
+            .toList(),
       ),
     );
   }
@@ -215,20 +508,15 @@ class _ParentDashboardView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Suas Crianças',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: const Color(AppConstants.textPrimary),
-            ),
+            'Dependentes',
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: AppConstants.spacingMedium),
           if (state.children.isEmpty)
             const EmptyState(
-              emoji: '👶',
-              title: 'Nenhuma criança cadastrada',
-              message:
-                  'Adicione uma criança para começar a acompanhar as finanças!',
+              emoji: '👥',
+              title: 'Nenhum dependente cadastrado',
+              message: 'Inclua uma criança para começar a acompanhar os dados.',
             )
           else
             ListView.separated(
@@ -242,6 +530,7 @@ class _ParentDashboardView extends StatelessWidget {
                 final spending = state.totalSpendingByChild[child.id] ?? 0.0;
 
                 return CustomCard(
+                  color: Theme.of(context).colorScheme.surface,
                   onTap: () {
                     context.read<ParentDashboardCubit>().selectChild(child);
                     // Navegar para detalhes da criança
@@ -253,9 +542,8 @@ class _ParentDashboardView extends StatelessWidget {
                         height: 56,
                         decoration: BoxDecoration(
                           color: child.gender == Gender.male
-                              ? const Color(
-                                  AppConstants.primaryBlue,
-                                ).withOpacity(0.1)
+                              ? const Color(AppConstants.primaryBlue)
+                                  .withOpacity(0.1)
                               : const Color(AppConstants.pink).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(
                             AppConstants.radiusMedium,
@@ -279,7 +567,7 @@ class _ParentDashboardView extends StatelessWidget {
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(AppConstants.textPrimary),
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -290,29 +578,34 @@ class _ParentDashboardView extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
-                                    color: const Color(
-                                      AppConstants.textSecondary,
-                                    ),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.65),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Container(
                                   width: 3,
                                   height: 3,
-                                  decoration: const BoxDecoration(
-                                    color: Color(AppConstants.textLight),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.25),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  'Saldo: ${AppFormatters.formatCurrency(child.balance)}',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: const Color(
-                                      AppConstants.successGreen,
+                                Flexible(
+                                  child: Text(
+                                    'Saldo: ${AppFormatters.formatCurrency(child.balance)}',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(AppConstants.successGreen),
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -328,7 +621,10 @@ class _ParentDashboardView extends StatelessWidget {
                             style: GoogleFonts.poppins(
                               fontSize: 11,
                               fontWeight: FontWeight.w400,
-                              color: const Color(AppConstants.textSecondary),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.6),
                             ),
                           ),
                           Text(
@@ -336,15 +632,18 @@ class _ParentDashboardView extends StatelessWidget {
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: const Color(AppConstants.textPrimary),
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(width: AppConstants.spacingSmall),
-                      const Icon(
+                      Icon(
                         Icons.chevron_right,
-                        color: Color(AppConstants.textLight),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.4),
                       ),
                     ],
                   ),
@@ -368,12 +667,11 @@ class _ParentDashboardView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Aguardando Aprovação',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(AppConstants.textPrimary),
+              Flexible(
+                child: Text(
+                  'Aguardando aprovação',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               TextButton(
@@ -385,7 +683,7 @@ class _ParentDashboardView extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: const Color(AppConstants.primaryBlue),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
               ),
@@ -429,4 +727,18 @@ class _ParentDashboardView extends StatelessWidget {
       ),
     );
   }
+}
+
+class _SummaryCardData {
+  final String title;
+  final String value;
+  final IconData icon;
+  final LinearGradient gradient;
+
+  const _SummaryCardData({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.gradient,
+  });
 }

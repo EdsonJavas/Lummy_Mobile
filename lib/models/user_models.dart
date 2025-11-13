@@ -63,27 +63,20 @@ class ChildAccount {
 }
 
 /*
-Firestore schema (proposta):
+Supabase schema (proposta):
 
-collections:
-- users/{userId}
-  role: 'parent' | 'child'
-  email, name, createdAt
+tables:
+- users (id, role: 'parent' | 'child', email, name, created_at)
 
-- users/{parentId}/children/{childId}
-  displayName, age, createdAt
+- children (id, parent_id, display_name, age, created_at)
 
-- users/{parentId}/children/{childId}/progress/{autoId}
-  type: 'lesson' | 'mission'
-  refId: string (lessonId ou missionId)
-  status: 'not_started' | 'in_progress' | 'completed'
-  updatedAt: timestamp
+- progress (id, child_id, type: 'lesson' | 'mission', ref_id, status, updated_at)
 
-- users/{parentId}/children/{childId}/finance/{autoId}
-  kind: 'transaction' | 'goal'
-  amount, category, createdAt, meta...
+- transactions (id, child_id, kind: 'transaction' | 'goal', amount, category, created_at, meta...)
 
-security rules (alto nível):
+- goals (id, child_id, name, emoji, target_amount, current_amount, status, created_at, ...)
+
+RLS (Row Level Security) policies:
 - Parent pode ler/gravar seus filhos e progresso.
-- Child pode ler/gravar somente seus próprios documentos sob parentId vinculado.
+- Child pode ler/gravar somente seus próprios registros vinculados ao parent_id.
 */

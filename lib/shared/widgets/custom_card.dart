@@ -25,7 +25,7 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget cardChild = Container(
+    final Widget cardChild = Container(
       padding: padding ?? const EdgeInsets.all(AppConstants.spacingLarge),
       decoration: BoxDecoration(
         color: gradient == null

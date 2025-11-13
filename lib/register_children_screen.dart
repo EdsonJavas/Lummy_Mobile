@@ -4,11 +4,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'responsavel_model.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/services/family_service.dart';
+import 'package:lummy_login/domain/repositories/auth_repository.dart';
 
 class RegisterChildrenScreen extends StatefulWidget {
   final Responsavel responsavel;
+  final String parentUserId; // ID do responsável no Supabase
 
-  const RegisterChildrenScreen({super.key, required this.responsavel});
+  const RegisterChildrenScreen({
+    super.key,
+    required this.responsavel,
+    required this.parentUserId,
+  });
   @override
   State<RegisterChildrenScreen> createState() => _RegisterChildrenScreenState();
 }
@@ -31,15 +37,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
   bool _passwordFocused = false;
   bool _ageFocused = false;
 
-  String? _responsavelId;
-  late final FamilyService _familyService;
-
-  @override
-  void initState() {
-    super.initState();
-    _familyService = locator<FamilyService>();
-    _criarResponsavel();
-  }
+  FamilyService get _familyService => locator<FamilyService>();
+  AuthRepository get _authRepo => locator<AuthRepository>();
 
   @override
   void dispose() {
@@ -85,34 +84,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     return digit1 == int.parse(cpf[9]) && digit2 == int.parse(cpf[10]);
   }
 
-  Future<void> _criarResponsavel() async {
-    try {
-      final id = await _familyService.createResponsavel(
-        nome: widget.responsavel.nome,
-        cpf: widget.responsavel.cpf,
-        email: widget.responsavel.email,
-        senha: widget.responsavel.senha,
-      );
-      setState(() {
-        _responsavelId = id;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao criar responsável: $e'),
-          backgroundColor: const Color(0xFFEF4444),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-      );
-    }
-  }
+
 
   Future<void> _handleRegisterChild() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedGender.isEmpty) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Selecione o sexo da criança'),
@@ -126,43 +103,109 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         return;
       }
 
-      if (_responsavelId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Responsável ainda não foi criado'),
-            backgroundColor: const Color(0xFFEF4444),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-        return;
-      }
-
       setState(() => _isLoading = true);
 
       try {
-        await _familyService.addChild(
-          responsavelId: _responsavelId!,
-          nome: _nameController.text.trim(),
-          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+        // Verificar se o locator está inicializado
+        if (!locator.isRegistered<AuthRepository>()) {
+          throw Exception('Sistema ainda não foi inicializado. Aguarde alguns instantes.');
+        }
+        
+        // Criar conta da criança no Supabase Auth
+        final registerResult = await _authRepo.register(
           email: _emailController.text.trim(),
-          senha: _passwordController.text,
-          idade: int.tryParse(_ageController.text.trim()) ?? 0,
-          sexo: _selectedGender,
+          password: _passwordController.text,
+          name: _nameController.text.trim(),
+          metadata: {
+            'cpf': _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+            'role': 'child',
+            'parent_id': widget.parentUserId,
+            'idade': int.tryParse(_ageController.text.trim()) ?? 0,
+            'sexo': _selectedGender,
+          },
         );
 
+        if (!registerResult.isSuccess) {
+          setState(() => _isLoading = false);
+          
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                registerResult.error?.message ?? 'Erro ao criar conta da criança',
+              ),
+              backgroundColor: const Color(0xFFEF4444),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+          return;
+        }
+
+        // Obter o ID da criança
+        final childUserId = registerResult.when(
+          success: (id) => id,
+          failure: (_) => throw Exception('Erro ao registrar criança'),
+        );
+
+        // Mostrar sucesso imediatamente (usuário criado no Auth)
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Criança adicionada com sucesso!'),
+            content: const Text('Conta da criança criada! Salvando dados adicionais...'),
             backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
+            duration: const Duration(seconds: 2),
           ),
         );
+
+        // Processar inserção na tabela children de forma assíncrona
+        // Isso evita que o usuário espere muito tempo
+        _familyService.addChildData(
+          childUserId: childUserId,
+          responsavelId: widget.parentUserId,
+          nome: _nameController.text.trim(),
+          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          email: _emailController.text.trim(),
+          idade: int.tryParse(_ageController.text.trim()) ?? 0,
+          sexo: _selectedGender,
+        ).then((_) {
+          // Sucesso na inserção dos dados adicionais
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Criança adicionada com sucesso!'),
+              backgroundColor: const Color(0xFF10B981),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        }).catchError((error) {
+          // Erro ao inserir dados adicionais (mas o usuário já foi criado)
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Conta criada, mas houve um erro ao salvar dados adicionais: $error'),
+              backgroundColor: const Color(0xFFFFA500),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        });
 
         // Limpar formulário
         _formKey.currentState?.reset();
@@ -175,6 +218,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           _selectedGender = '';
         });
       } catch (e) {
+        setState(() => _isLoading = false);
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao adicionar criança: $e'),
@@ -186,8 +231,6 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           ),
         );
       }
-
-      setState(() => _isLoading = false);
     }
   }
 

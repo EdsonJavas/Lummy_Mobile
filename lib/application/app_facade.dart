@@ -113,12 +113,11 @@ class AppFacade {
 
   static final AppFacade instance = AppFacade._();
 
-  final LoginUseCase _login = locator<LoginUseCase>();
-  final AddTransactionUseCase _addTransaction =
-      locator<AddTransactionUseCase>();
-  final SetGoalUseCase _setGoal = locator<SetGoalUseCase>();
-  final GetFinancialDataUseCase _getFinancial =
-      locator<GetFinancialDataUseCase>();
+  // Usar lazy getters para evitar acesso ao locator antes da inicialização
+  LoginUseCase get _login => locator<LoginUseCase>();
+  AddTransactionUseCase get _addTransaction => locator<AddTransactionUseCase>();
+  SetGoalUseCase get _setGoal => locator<SetGoalUseCase>();
+  GetFinancialDataUseCase get _getFinancial => locator<GetFinancialDataUseCase>();
 
   Future<Result<String>> login(String email, String password) {
     return _login(email: email, password: password);

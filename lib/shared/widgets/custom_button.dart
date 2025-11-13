@@ -151,13 +151,17 @@ class CustomButton extends StatelessWidget {
                 children: [
                   if (icon != null) ...[
                     Icon(icon, size: fontSize + 2),
-                    SizedBox(width: AppConstants.spacingSmall),
+                    const SizedBox(width: AppConstants.spacingSmall),
                   ],
-                  Text(
-                    text,
-                    style: GoogleFonts.poppins(
-                      fontSize: fontSize,
-                      fontWeight: FontWeight.w600,
+                  Flexible(
+                    child: Text(
+                      text,
+                      style: GoogleFonts.poppins(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
