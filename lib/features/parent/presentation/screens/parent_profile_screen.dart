@@ -248,13 +248,13 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                   ),
                 ],
               ),
-              child: CachedAvatar(
+              child: const CachedAvatar(
                 imageUrl: '',
                 size: 120,
                 borderColor: Colors.white,
                 borderWidth: 4,
                 fallbackIcon: Icons.person,
-                fallbackIconColor: const Color(0xFF1E40AF),
+                fallbackIconColor: Color(0xFF1E40AF),
               ),
             ),
           ),

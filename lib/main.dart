@@ -12,7 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Inicializar formatação de data em português
-  await initializeDateFormatting('pt_BR', null);
+  await initializeDateFormatting('pt_BR', null); 
 
   // NÃO inicializar locator aqui - será feito no SplashScreen após inicializar Supabase
   // setupLocator() precisa que o Supabase já esteja inicializado

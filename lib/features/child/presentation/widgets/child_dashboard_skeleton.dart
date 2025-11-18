@@ -22,18 +22,18 @@ class ChildDashboardSkeleton extends StatelessWidget {
                 horizontal: AppConstants.spacingLarge,
                 vertical: AppConstants.spacingMedium,
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SkeletonText(width: 150, height: 28),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       SkeletonText(width: 200, height: 16),
                     ],
                   ),
-                  const SkeletonAvatar(size: 56),
+                  SkeletonAvatar(size: 56),
                 ],
               ),
             ),
@@ -79,7 +79,7 @@ class ChildDashboardSkeleton extends StatelessWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       const SizedBox(height: 8),
-                      SkeletonText(width: 60, height: 12),
+                      const SkeletonText(width: 60, height: 12),
                     ],
                   ),
                 ),
@@ -94,7 +94,7 @@ class ChildDashboardSkeleton extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SkeletonText(width: 150, height: 20),
+                  const SkeletonText(width: 150, height: 20),
                   const SizedBox(height: AppConstants.spacingMedium),
                   ...List.generate(
                     3,
@@ -110,17 +110,17 @@ class ChildDashboardSkeleton extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           const SizedBox(width: AppConstants.spacingMedium),
-                          Expanded(
+                          const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SkeletonText(width: 120, height: 16),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 SkeletonText(width: 80, height: 12),
                               ],
                             ),
                           ),
-                          SkeletonText(width: 60, height: 16),
+                          const SkeletonText(width: 60, height: 16),
                         ],
                       ),
                     ),
@@ -137,7 +137,7 @@ class ChildDashboardSkeleton extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SkeletonText(width: 150, height: 20),
+                  const SkeletonText(width: 150, height: 20),
                   const SizedBox(height: AppConstants.spacingMedium),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -156,7 +156,7 @@ class ChildDashboardSkeleton extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               const SizedBox(height: 8),
-                              SkeletonText(width: 60, height: 12),
+                              const SkeletonText(width: 60, height: 12),
                             ],
                           ),
                         ),

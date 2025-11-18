@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'shared/widgets/widgets.dart';
 import 'utils/ensure_child_record.dart';
 
 class DailyMissionsScreen extends StatefulWidget {
@@ -585,7 +586,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
         child: SlideTransition(
           position: _slideAnimation,
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? _buildSkeletonLoader()
               : _errorMessage != null
                   ? Center(
                       child: Padding(
@@ -613,10 +614,14 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                         ),
                       ),
                     )
-                  : SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        children: [
+                  : BrandedRefreshIndicator(
+                      onRefresh: _loadDailyMissions,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        child: Column(
+                          children: [
                           // Header com progresso arredondado
                           Container(
                             width: double.infinity,
@@ -905,9 +910,10 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                         ],
                       ),
                     ),
-        ),
-      ),
-    );
+                  ),
+                ),
+              ),
+            );
   }
 
   Widget _buildMissionCard(Map<String, dynamic> mission, bool isSmallScreen) {
@@ -1091,6 +1097,44 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          // Header skeleton
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(32),
+                bottomRight: Radius.circular(32),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Missions skeleton
+          ...List.generate(
+            5,
+            (index) => Padding(
+              padding: EdgeInsets.only(bottom: index == 4 ? 0 : 16),
+              child: Container(
+                height: 120,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

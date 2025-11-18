@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'shared/widgets/widgets.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -12,16 +13,53 @@ class ExpensesScreen extends StatefulWidget {
 class _ExpensesScreenState extends State<ExpensesScreen> {
   String selectedPeriod = 'Este mês';
   String selectedCategory = 'Todas';
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simular carregamento de dados do banco
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _refreshData() async {
+    await _loadData();
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
+          child: _buildSkeletonLoader(),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.all(16),
-          child: Column(
+        child: BrandedRefreshIndicator(
+          onRefresh: _refreshData,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
@@ -393,7 +431,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ),
             ],
           ),
-        ),
+            ),
+          ),
       ),
     );
   }
@@ -573,5 +612,65 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       default:
         return Icons.category;
     }
+  }
+
+  Widget _buildSkeletonLoader() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header skeleton
+          const SkeletonText(width: 150, height: 32),
+          const SizedBox(height: 8),
+          const SkeletonText(width: 200, height: 16),
+          const SizedBox(height: 24),
+          // Total card skeleton
+          SkeletonLoader(
+            width: double.infinity,
+            height: 120,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          const SizedBox(height: 24),
+          // Chart skeleton
+          SkeletonLoader(
+            width: double.infinity,
+            height: 250,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          const SizedBox(height: 24),
+          // Categories skeleton
+          const SkeletonText(width: 120, height: 20),
+          const SizedBox(height: 16),
+          ...List.generate(
+            5,
+            (index) => Padding(
+              padding: EdgeInsets.only(bottom: index == 4 ? 0 : 12),
+              child: Row(
+                children: [
+                  SkeletonLoader(
+                    width: 48,
+                    height: 48,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SkeletonText(width: 120, height: 16),
+                        SizedBox(height: 4),
+                        SkeletonText(width: 80, height: 12),
+                      ],
+                    ),
+                  ),
+                  const SkeletonText(width: 60, height: 16),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

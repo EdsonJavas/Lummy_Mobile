@@ -24,36 +24,50 @@ class ParentAnalyticsPanels extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSmallScreen =
-        MediaQuery.of(context).size.height < AppConstants.smallScreenHeight;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 900;
+        final spacing = AppConstants.spacingLarge;
+        final trendCard = _buildTrendCard(
+          context,
+          compact: !isWide,
+        );
+        final categoryCard = _buildCategoryCard(context);
 
-    return Column(
-      children: [
-        Row(
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              flex: 3,
-              child: _buildTrendCard(context, isSmallScreen),
-            ),
-            const SizedBox(width: AppConstants.spacingMedium),
-            Expanded(
-              flex: 2,
-              child: _buildCategoryCard(context),
-            ),
+            if (isWide)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: trendCard),
+                  const SizedBox(width: AppConstants.spacingMedium),
+                  Expanded(child: categoryCard),
+                ],
+              )
+            else ...[
+              trendCard,
+              SizedBox(height: spacing),
+              categoryCard,
+            ],
+            SizedBox(height: spacing),
+            _buildGoalsCard(context),
           ],
-        ),
-        const SizedBox(height: AppConstants.spacingLarge),
-        _buildGoalsCard(context),
-      ],
+        );
+      },
     );
   }
 
-  Widget _buildTrendCard(BuildContext context, bool isSmallScreen) {
+  Widget _buildTrendCard(
+    BuildContext context, {
+    required bool compact,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final chartHeight = compact ? 260.0 : 320.0;
 
     return CustomCard(
-      padding: EdgeInsets.all(isSmallScreen ? 16 : 24),
+      padding: EdgeInsets.all(compact ? 16 : 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -69,7 +83,7 @@ class ParentAnalyticsPanels extends StatelessWidget {
                     Text(
                       'Fluxo mensal',
                       style: GoogleFonts.poppins(
-                        fontSize: isSmallScreen ? 18 : 20,
+                        fontSize: compact ? 18 : 20,
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
                       ),
@@ -112,7 +126,7 @@ class ParentAnalyticsPanels extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingLarge),
           SizedBox(
-            height: 220,
+            height: chartHeight,
             child: LineChart(
               LineChartData(
                 gridData: FlGridData(

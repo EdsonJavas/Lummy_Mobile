@@ -6,6 +6,7 @@ import 'package:lummy_login/screens/new_goal_screen.dart';
 import 'package:lummy_login/screens/request_money_screen.dart';
 import 'package:lummy_login/screens/claim_share_screen.dart';
 import 'package:lummy_login/shared/widgets/cached_avatar.dart';
+import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lummy_login/utils/supabase_test.dart';
 import 'profile_page.dart';
@@ -443,6 +444,20 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _refreshData() async {
+    try {
+      // Recarregar todos os dados
+      await Future.wait([
+        _loadUserName(),
+        _loadEarnedPoints(),
+        _loadBalance(),
+        _loadGoal(),
+      ]);
+    } catch (e) {
+      debugPrint('❌ Erro ao atualizar dados: $e');
+    }
+  }
+
   Future<void> _loadBalance() async {
     try {
       final supabase = Supabase.instance.client;
@@ -660,32 +675,37 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            children: [
-              // Header simples estilo Inter
-              _buildSimpleHeader(screenWidth, isSmallScreen),
+        child: BrandedRefreshIndicator(
+          onRefresh: _refreshData,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            child: Column(
+              children: [
+                // Header simples estilo Inter
+                _buildSimpleHeader(screenWidth, isSmallScreen),
 
-              // Saldo atual
-              _buildBalanceCard(screenWidth, isSmallScreen),
+                // Saldo atual
+                _buildBalanceCard(screenWidth, isSmallScreen),
 
-              // Meta de economia (sempre mostra: ativa ou preview vazio)
-              hasActiveGoal 
-                  ? _buildSavingsGoal(screenWidth, isSmallScreen)
-                  : _buildEmptyGoalCard(screenWidth, isSmallScreen),
+                // Meta de economia (sempre mostra: ativa ou preview vazio)
+                hasActiveGoal 
+                    ? _buildSavingsGoal(screenWidth, isSmallScreen)
+                    : _buildEmptyGoalCard(screenWidth, isSmallScreen),
 
-              // Ações rápidas (estilo Inter)
-              _buildQuickActionsInter(screenWidth, isSmallScreen),
+                // Ações rápidas (estilo Inter)
+                _buildQuickActionsInter(screenWidth, isSmallScreen),
 
-              // Educação financeira
-              _buildEducationSection(screenWidth, isSmallScreen),
+                // Educação financeira
+                _buildEducationSection(screenWidth, isSmallScreen),
 
-              // Conquistas melhoradas
-              _buildAchievementsImproved(screenWidth, isSmallScreen),
+                // Conquistas melhoradas
+                _buildAchievementsImproved(screenWidth, isSmallScreen),
 
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

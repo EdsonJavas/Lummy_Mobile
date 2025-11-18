@@ -8,6 +8,7 @@ import 'package:lummy_login/screens/edit_profile_screen.dart';
 import 'package:lummy_login/screens/notifications_screen.dart';
 import 'package:lummy_login/shared/widgets/cached_avatar.dart';
 import 'package:lummy_login/shared/widgets/cached_image.dart';
+import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/domain/repositories/auth_repository.dart';
 
@@ -222,58 +223,160 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _refreshData() async {
+    await Future.wait([
+      _loadUserName(),
+      _loadUserStats(),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    if (_isLoadingStats) {
+      return Scaffold(
+        body: _buildSkeletonLoader(screenWidth, screenHeight),
+      );
+    }
+
     return Scaffold(
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.only(
-            bottom: 0.0,
+      body: BrandedRefreshIndicator(
+        onRefresh: _refreshData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
           ),
-          child: Column(
-            children: [
-              _buildProfileHeader(screenWidth, screenHeight),
-              Transform(
-                transform: Matrix4.translationValues(0, -40, 0),
-                child: Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      topRight: Radius.circular(40),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 25,
-                        offset: const Offset(0, -15),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              bottom: 0.0,
+            ),
+            child: Column(
+              children: [
+                _buildProfileHeader(screenWidth, screenHeight),
+                Transform(
+                  transform: Matrix4.translationValues(0, -40, 0),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(40),
                       ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 0.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildStatsSection(),
-                        const SizedBox(height: 20),
-                        _buildAchievementsSection(),
-                        const SizedBox(height: 20),
-                        _buildSettingsSection(),
-                        const SizedBox(height: 8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 25,
+                          offset: const Offset(0, -15),
+                        ),
                       ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 0.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildStatsSection(),
+                          const SizedBox(height: 20),
+                          _buildAchievementsSection(),
+                          const SizedBox(height: 20),
+                          _buildSettingsSection(),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoader(double screenWidth, double screenHeight) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Header skeleton
+          Container(
+            height: screenHeight * 0.60,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+            ),
+          ),
+          Transform(
+            transform: Matrix4.translationValues(0, -40, 0),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(40),
+                  topRight: Radius.circular(40),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 0.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Stats skeleton
+                    const SkeletonText(width: 150, height: 24),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SkeletonLoader(
+                            width: double.infinity,
+                            height: 140,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: SkeletonLoader(
+                            width: double.infinity,
+                            height: 140,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    // Achievements skeleton
+                    const SkeletonText(width: 150, height: 24),
+                    const SizedBox(height: 16),
+                    SkeletonLoader(
+                      width: double.infinity,
+                      height: 200,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    const SizedBox(height: 20),
+                    // Settings skeleton
+                    const SkeletonText(width: 120, height: 24),
+                    const SizedBox(height: 16),
+                    ...List.generate(
+                      4,
+                      (index) => Padding(
+                        padding: EdgeInsets.only(bottom: index == 3 ? 0 : 12),
+                        child: SkeletonLoader(
+                          width: double.infinity,
+                          height: 70,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
