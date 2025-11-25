@@ -11,7 +11,7 @@ import '../widgets/parent_dashboard_skeleton.dart';
 import 'parent_profile_screen.dart';
 import 'parent_insights_screen.dart';
 
-class ParentDashboardScreen extends StatelessWidget {
+class ParentDashboardScreen extends StatefulWidget {
   final String parentId;
   final ValueChanged<int>? onNavigateToTab;
 
@@ -22,31 +22,10 @@ class ParentDashboardScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ParentDashboardCubit()..loadDashboard(parentId),
-      child: _ParentDashboardView(
-        parentId: parentId,
-        onNavigateToTab: onNavigateToTab,
-      ),
-    );
-  }
+  State<ParentDashboardScreen> createState() => _ParentDashboardScreenState();
 }
 
-class _ParentDashboardView extends StatefulWidget {
-  final String parentId;
-  final ValueChanged<int>? onNavigateToTab;
-
-  const _ParentDashboardView({
-    required this.parentId,
-    this.onNavigateToTab,
-  });
-
-  @override
-  State<_ParentDashboardView> createState() => _ParentDashboardViewState();
-}
-
-class _ParentDashboardViewState extends State<_ParentDashboardView> {
+class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   Future<void> _refresh(BuildContext context) async {
     await context.read<ParentDashboardCubit>().refresh();
   }

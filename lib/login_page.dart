@@ -6,7 +6,7 @@ import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/application/app_facade.dart';
 import 'package:lummy_login/core/result.dart';
 import 'package:lummy_login/domain/entities/user_entity.dart';
-import 'package:lummy_login/features/parent/presentation/screens/parent_dashboard_screen.dart';
+import 'package:lummy_login/features/parent/presentation/screens/parent_main_navigation.dart';
 import 'package:lummy_login/services/family_service.dart';
 import 'register_screen.dart';
 
@@ -236,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ParentDashboardScreen(parentId: profile.id),
+            builder: (context) => ParentMainNavigation(parentId: profile.id),
           ),
         );
       } else if (profile is ChildEntity) {
