@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../di/locator.dart';
 import '../../../../domain/repositories/auth_repository.dart';
 import '../../../../login_page.dart';
 import '../../../../shared/widgets/cached_avatar.dart';
-import '../../../../shared/widgets/cached_image.dart';
 
 class ParentProfileScreen extends StatefulWidget {
   const ParentProfileScreen({super.key});
@@ -17,6 +17,7 @@ class ParentProfileScreen extends StatefulWidget {
 }
 
 class _ParentProfileScreenState extends State<ParentProfileScreen> {
+  final GlobalKey _settingsSectionKey = GlobalKey();
   String userName = 'Carregando...';
   String userEmail = '';
   int childrenCount = 0;
@@ -141,260 +142,314 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
   }
 
   Widget _buildProfileHeader(double screenWidth, double screenHeight) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return SizedBox(
-      height: screenHeight * 0.60,
+      height: screenHeight * 0.55,
       width: double.infinity,
       child: Stack(
         children: [
-          SizedBox(
-            height: screenHeight * 0.60,
-            width: double.infinity,
+          Positioned.fill(
             child: Consumer<ThemeProvider>(
               builder: (context, themeProvider, _) {
-                return Container(
+                final isDark = themeProvider.isDarkMode;
+                final gradientColors = isDark
+                    ? [
+                        const Color(0xFF0F172A),
+                        const Color(0xFF1E293B),
+                        const Color(0xFF0C4A6E),
+                      ]
+                    : [
+                        const Color(AppConstants.primaryBlue),
+                        const Color(AppConstants.secondaryBlue),
+                        const Color(AppConstants.purple),
+                      ];
+
+                return DecoratedBox(
                   decoration: BoxDecoration(
-                    image: themeProvider.isDarkMode
-                        ? const DecorationImage(
-                            image: AssetImage('dark.png'),
-                            fit: BoxFit.cover,
-                            opacity: 0.8,
-                          )
-                        : null,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: gradientColors,
+                    ),
                   ),
-                  child: themeProvider.isDarkMode
-                      ? Container(
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: -60,
+                        right: -40,
+                        child: _buildDecorativeCircle(180, Colors.white.withOpacity(0.05)),
+                      ),
+                      Positioned(
+                        bottom: -50,
+                        left: -30,
+                        child: _buildDecorativeCircle(140, Colors.white.withOpacity(0.08)),
+                      ),
+                      Positioned(
+                        bottom: 20,
+                        right: 20,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.6),
-                                Colors.black.withOpacity(0.8),
-                              ],
-                              stops: const [0.0, 0.7, 1.0],
+                            color: Colors.white.withOpacity(isDark ? 0.08 : 0.15),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
                             ),
                           ),
-                        )
-                      : CachedImage(
-                          imageUrl:
-                              'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/fotocriancafodase%201-MFp8K8GLj7deZeGCFVqMJVDVgEtfsc.png',
-                          width: double.infinity,
-                          height: screenHeight * 0.60,
-                          fit: BoxFit.cover,
-                          errorWidget: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.topCenter,
-                                colors: [Color(0xFF1E40AF), Color(0xFF3B82F6)],
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.family_restroom_rounded,
+                                color: Colors.white.withOpacity(0.9),
+                                size: 18,
                               ),
-                            ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '$childrenCount crianças',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
           ),
           Positioned(
-            top: 50,
-            left: 20,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 55,
+            top: 0,
             left: 0,
             right: 0,
-            child: Center(
-              child: Text(
-                'Seu Perfil',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.12,
-            left: screenWidth / 2 - 60,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF1E40AF), width: 4),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: const CachedAvatar(
-                imageUrl: '',
-                size: 120,
-                borderColor: Colors.white,
-                borderWidth: 4,
-                fallbackIcon: Icons.person,
-                fallbackIconColor: Color(0xFF1E40AF),
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.27,
-            left: screenWidth / 2 - 80,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E40AF),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: _isLoadingStats
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Text(
-                            childrenCount.toString(),
-                            style: GoogleFonts.poppins(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.family_restroom,
-                          color: Color(0xFF1E40AF),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        _isLoadingStats
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            : Text(
-                                childrenCount.toString(),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ],
+                    _HeaderIconButton(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => Navigator.pop(context),
                     ),
+                    const Spacer(),
                     Text(
-                      'CRIANÇAS',
+                      'Seu Perfil',
                       style: GoogleFonts.poppins(
-                        fontSize: 12,
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white,
                       ),
+                    ),
+                    const Spacer(),
+                    _HeaderIconButton(
+                      icon: Icons.settings_outlined,
+                      onTap: () {
+                        final settingsContext = _settingsSectionKey.currentContext;
+                        if (settingsContext != null) {
+                          Scrollable.ensureVisible(
+                            settingsContext,
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeOutCubic,
+                          );
+                        }
+                      },
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+          Align(
+            alignment: const Alignment(0, -0.15),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 132,
+                  height: 132,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.85),
+                        Colors.white.withOpacity(0.65),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.18),
+                        blurRadius: 30,
+                        offset: const Offset(0, 16),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(6),
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: CachedAvatar(
+                      imageUrl: '',
+                      size: 120,
+                      borderColor: Colors.transparent,
+                      borderWidth: 0,
+                      fallbackIcon: Icons.person,
+                      fallbackIconColor: Color(AppConstants.secondaryBlue),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  userName,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.25)),
+                  ),
+                  child: Text(
+                    'Conta de responsável',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
           Positioned(
-            top: screenHeight * 0.36,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                Text(
-                  userName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+            bottom: 24,
+            left: 24,
+            right: 24,
+            child: _buildHighlightCard(colorScheme),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDecorativeCircle(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+      ),
+    );
+  }
+
+  Widget _buildHighlightCard(ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 30,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      child: DefaultTextStyle(
+        style: GoogleFonts.poppins(color: Colors.white),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildHighlightPill(
+                icon: Icons.email_outlined,
+                label: 'Email',
+                value: userEmail.isEmpty ? '-' : userEmail,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildHighlightPill(
+                icon: Icons.check_circle_rounded,
+                label: 'Status',
+                value: 'Conta verificada',
+                gradient: LinearGradient(
+                  colors: [
+                    colorScheme.secondary,
+                    colorScheme.primary,
+                  ],
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    'Responsável',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHighlightPill({
+    required IconData icon,
+    required String label,
+    required String value,
+    LinearGradient? gradient,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: gradient ??
+            LinearGradient(
+              colors: [
+                Colors.white.withOpacity(0.2),
+                Colors.white.withOpacity(0.1),
               ],
+            ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: Colors.white, size: 18),
+              const SizedBox(width: 6),
+              Text(
+                label.toUpperCase(),
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -406,47 +461,48 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ShaderMask(
-          shaderCallback: (bounds) => LinearGradient(
-            colors: Theme.of(context).brightness == Brightness.dark
-                ? [
-                    const Color(0xFF10B981),
-                    const Color(0xFF8B5CF6),
-                  ]
-                : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
-          ).createShader(bounds),
-          child: Text(
-            'Informações',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-        ),
+        _buildSectionTitle('Informações'),
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: const Color(0xFF1E40AF).withOpacity(0.2),
-              width: 1,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white.withOpacity(0.08)
+                  : const Color(AppConstants.borderLight),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.25 : 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 16),
               ),
             ],
           ),
           child: Column(
             children: [
-              _buildInfoRow(Icons.email_rounded, 'Email', userEmail),
-              const SizedBox(height: 16),
-              _buildInfoRow(Icons.family_restroom_rounded, 'Crianças cadastradas', childrenCount.toString()),
+              _buildInfoRow(
+                Icons.email_rounded,
+                'Email',
+                userEmail,
+              ),
+              const SizedBox(height: 18),
+              const Divider(height: 1),
+              const SizedBox(height: 18),
+              _buildInfoRow(
+                Icons.family_restroom_rounded,
+                'Crianças cadastradas',
+                childrenCount.toString(),
+                trailing: _isLoadingStats
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : null,
+              ),
             ],
           ),
         ),
@@ -454,19 +510,23 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(IconData icon, String label, String value, {Widget? trailing}) {
     return Row(
       children: [
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: const Color(0xFF1E40AF).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: const Color(AppConstants.primaryBlue).withOpacity(0.08),
+            borderRadius: BorderRadius.circular(14),
           ),
-          child: Icon(icon, color: const Color(0xFF1E40AF), size: 20),
+          child: Icon(
+            icon,
+            color: const Color(AppConstants.primaryBlueDark),
+            size: 20,
+          ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,10 +536,10 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 value,
                 style: GoogleFonts.poppins(
@@ -491,12 +551,44 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             ],
           ),
         ),
+        if (trailing != null) ...[
+          const SizedBox(width: 12),
+          trailing,
+        ],
       ],
+    );
+  }
+
+  Widget _buildSectionTitle(String text) {
+    final theme = Theme.of(context);
+    final gradientColors = theme.brightness == Brightness.dark
+        ? [
+            theme.colorScheme.secondary,
+            theme.colorScheme.primary,
+          ]
+        : [
+            const Color(AppConstants.textPrimary),
+            const Color(AppConstants.primaryBlueDark),
+          ];
+
+    return ShaderMask(
+      shaderCallback: (bounds) => LinearGradient(
+        colors: gradientColors,
+      ).createShader(bounds),
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 
   Widget _buildSettingsSection() {
     return Container(
+      key: _settingsSectionKey,
       padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
@@ -515,25 +607,8 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ShaderMask(
-            shaderCallback: (bounds) => LinearGradient(
-              colors: Theme.of(context).brightness == Brightness.dark
-                  ? [
-                      const Color(0xFF3B82F6),
-                      const Color(0xFF10B981),
-                    ]
-                  : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
-            ).createShader(bounds),
-            child: Text(
-              'Configurações',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
+          _buildSectionTitle('Configurações'),
+          const SizedBox(height: 18),
           _buildPremiumThemeSettingItem(),
           _buildSettingItem(
             Icons.help_rounded,
@@ -809,6 +884,40 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _HeaderIconButton extends StatelessWidget {
+  const _HeaderIconButton({
+    required this.icon,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withOpacity(0.25)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.white),
+      ),
     );
   }
 }
