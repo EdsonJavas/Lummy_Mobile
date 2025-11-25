@@ -9,8 +9,13 @@ import 'parent_dashboard_state.dart';
 class ParentDashboardCubit extends Cubit<ParentDashboardState> {
   ParentDashboardCubit() : super(const ParentDashboardState());
 
+  String? _parentId;
+
+  String? get parentId => _parentId;
+
   // Carregar dashboard do responsável
   Future<void> loadDashboard(String parentId) async {
+    _parentId = parentId;
     emit(state.copyWith(isLoading: true));
 
     try {
@@ -47,6 +52,12 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     } catch (e) {
       emit(state.copyWith(isLoading: false, error: e.toString()));
     }
+  }
+
+  Future<void> refresh() async {
+    final id = _parentId;
+    if (id == null) return;
+    await loadDashboard(id);
   }
 
   // Aprovar transação

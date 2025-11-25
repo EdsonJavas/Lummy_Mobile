@@ -7,29 +7,40 @@ import '../../../../shared/widgets/widgets.dart';
 import '../../../../domain/entities/user_entity.dart';
 import '../bloc/parent_dashboard_cubit.dart';
 import '../bloc/parent_dashboard_state.dart';
-import '../widgets/allowance_distribution_card.dart';
 import '../widgets/parent_dashboard_skeleton.dart';
 import 'parent_profile_screen.dart';
 import 'parent_insights_screen.dart';
 
 class ParentDashboardScreen extends StatelessWidget {
   final String parentId;
+  final ValueChanged<int>? onNavigateToTab;
 
-  const ParentDashboardScreen({super.key, required this.parentId});
+  const ParentDashboardScreen({
+    super.key,
+    required this.parentId,
+    this.onNavigateToTab,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ParentDashboardCubit()..loadDashboard(parentId),
-      child: _ParentDashboardView(parentId: parentId),
+      child: _ParentDashboardView(
+        parentId: parentId,
+        onNavigateToTab: onNavigateToTab,
+      ),
     );
   }
 }
 
 class _ParentDashboardView extends StatefulWidget {
   final String parentId;
+  final ValueChanged<int>? onNavigateToTab;
 
-  const _ParentDashboardView({required this.parentId});
+  const _ParentDashboardView({
+    required this.parentId,
+    this.onNavigateToTab,
+  });
 
   @override
   State<_ParentDashboardView> createState() => _ParentDashboardViewState();
@@ -37,7 +48,7 @@ class _ParentDashboardView extends StatefulWidget {
 
 class _ParentDashboardViewState extends State<_ParentDashboardView> {
   Future<void> _refresh(BuildContext context) async {
-    await context.read<ParentDashboardCubit>().loadDashboard(widget.parentId);
+    await context.read<ParentDashboardCubit>().refresh();
   }
 
   @override
@@ -112,59 +123,13 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
                                   const SizedBox(height: 20),
                                   _buildOverviewGrid(context, state),
                                   const SizedBox(height: 32),
-                                  _buildSectionTitle(
-                                    context,
-                                    title: 'Distribuição de recursos',
-                                    subtitle:
-                                        'Envie valores rapidamente para seus filhos',
-                                  ),
-                                  const SizedBox(height: 16),
-                                  AllowanceDistributionCard(
-                                    availableBalance: state.walletBalance,
-                                    children: state.children,
-                                    onDistributeEqually: (amount) => context
-                                        .read<ParentDashboardCubit>()
-                                        .distributeAmount(amount),
-                                    onDepositToChild: (childId, amount) =>
-                                        context
-                                            .read<ParentDashboardCubit>()
-                                            .transferToChild(childId, amount),
-                                  ),
+                                  _buildQuickActions(context, state),
                                   const SizedBox(height: 32),
                                   _buildInsightsPreview(
                                     context,
                                     state,
                                     widget.parentId,
                                   ),
-                                  const SizedBox(height: 32),
-                                  _buildSectionTitle(
-                                    context,
-                                    title: 'Dependentes',
-                                    subtitle:
-                                        'Veja o status e o comportamento financeiro',
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _buildChildrenList(
-                                    context,
-                                    state,
-                                    margin: EdgeInsets.zero,
-                                  ),
-                                  const SizedBox(height: 32),
-                                  if (state.pendingApprovals.isNotEmpty) ...[
-                                    _buildSectionTitle(
-                                      context,
-                                      title: 'Aguardando aprovação',
-                                      subtitle:
-                                          'Autorize ou recuse solicitações em aberto',
-                                    ),
-                                    const SizedBox(height: 16),
-                                    _buildPendingApprovals(
-                                      context,
-                                      state,
-                                      margin: EdgeInsets.zero,
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
                                 ],
                               ),
                             ),
@@ -213,8 +178,16 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final gradientColors = isDark
-        ? const [Color(0xFF1F1840), Color(0xFF6D28D9)]
-        : const [Color(0xFF7C3AED), Color(0xFFEC4899)];
+        ? const [
+            Color(0xFF1E293B),
+            Color(0xFF0F172A),
+            Color(0xFF1E40AF),
+          ]
+        : const [
+            Color(AppConstants.primaryBlue),
+            Color(AppConstants.secondaryBlue),
+            Color(AppConstants.purple),
+          ];
     final topInset = MediaQuery.of(context).padding.top;
 
     return Container(
@@ -223,8 +196,8 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: gradientColors,
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
       child: Column(
@@ -285,13 +258,16 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
             width: double.infinity,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(isDark ? 0.14 : 0.25),
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: Colors.white.withOpacity(0.25)),
+              color: Colors.white.withOpacity(isDark ? 0.15 : 0.22),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: Colors.white.withOpacity(isDark ? 0.2 : 0.3),
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
-                  blurRadius: 16,
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
               ],
@@ -299,22 +275,39 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Saldo familiar disponível',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: isDark
-                        ? Colors.white.withOpacity(0.85)
-                        : const Color(0xFF312E81),
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.account_balance_wallet_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Saldo familiar disponível',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
                   AppFormatters.formatCurrency(state.walletBalance),
                   style: GoogleFonts.poppins(
                     fontSize: 38,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF111827),
+                    color: Colors.white,
+                    letterSpacing: -0.5,
                   ),
                 ),
               ],
@@ -330,26 +323,40 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
     required String title,
     String? subtitle,
   }) {
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: textTheme.titleLarge?.color,
+        ShaderMask(
+          shaderCallback: (bounds) => LinearGradient(
+            colors: isDark
+                ? [
+                    const Color(0xFF3B82F6),
+                    const Color(0xFF8B5CF6),
+                  ]
+                : [
+                    const Color(AppConstants.primaryBlue),
+                    const Color(AppConstants.secondaryBlue),
+                  ],
+          ).createShader(bounds),
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
           ),
         ),
         if (subtitle != null) ...[
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             subtitle,
             style: GoogleFonts.poppins(
               fontSize: 13,
-              color: textTheme.bodyMedium?.color?.withOpacity(0.75),
+              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
             ),
           ),
         ],
@@ -363,22 +370,38 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
     String parentId,
   ) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withOpacity(0.1),
-            theme.colorScheme.secondaryContainer.withOpacity(0.12),
-          ],
+          colors: isDark
+              ? [
+                  const Color(0xFF1E40AF).withOpacity(0.15),
+                  const Color(0xFF8B5CF6).withOpacity(0.12),
+                ]
+              : [
+                  const Color(AppConstants.primaryBlue).withOpacity(0.08),
+                  const Color(AppConstants.purple).withOpacity(0.06),
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.08),
+          color: isDark
+              ? const Color(0xFF3B82F6).withOpacity(0.2)
+              : const Color(AppConstants.primaryBlue).withOpacity(0.15),
+          width: 1.5,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,12 +411,13 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.12),
+                  color: const Color(AppConstants.primaryBlue).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.stacked_line_chart_rounded,
-                  color: theme.colorScheme.primary,
+                  color: Color(AppConstants.primaryBlue),
+                  size: 24,
                 ),
               ),
               const SizedBox(width: 12),
@@ -430,7 +454,7 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
                   value:
                       '${state.monthIncomeTotal > 0 ? ((state.monthExpenseTotal / state.monthIncomeTotal) * 100).clamp(0, 999).toStringAsFixed(0) : '0'}%',
                   icon: Icons.pie_chart_outline_rounded,
-                  color: theme.colorScheme.primary,
+                  color: const Color(AppConstants.successGreen),
                 ),
               ),
               const SizedBox(width: 12),
@@ -439,7 +463,7 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
                   label: 'Metas ativas',
                   value: '${state.goalSummaries.length}',
                   icon: Icons.flag_outlined,
-                  color: theme.colorScheme.secondary,
+                  color: const Color(AppConstants.purple),
                 ),
               ),
             ],
@@ -449,11 +473,14 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
             alignment: Alignment.centerRight,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(AppConstants.primaryBlue),
+                foregroundColor: Colors.white,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
+                elevation: 0,
               ),
               onPressed: () {
                 Navigator.of(context).push(
@@ -465,11 +492,12 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
                   ),
                 );
               },
-              icon: const Icon(Icons.chevron_right_rounded),
+              icon: const Icon(Icons.chevron_right_rounded, size: 20),
               label: Text(
                 'Ver insights completos',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w600,
+                  fontSize: 14,
                 ),
               ),
             ),
@@ -484,12 +512,12 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
     ParentDashboardState state,
   ) {
     final theme = Theme.of(context);
-    final secondaryText = theme.textTheme.bodyMedium?.color?.withOpacity(0.65);
+    final secondaryText = theme.textTheme.bodyMedium?.color?.withOpacity(0.7);
     final childrenCount = state.children.isEmpty ? 1 : state.children.length;
     final averagePerChild = state.walletBalance / childrenCount;
 
     return CustomCard(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       color: theme.colorScheme.surface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,19 +529,40 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Saldo disponível para transferências',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: secondaryText,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(AppConstants.primaryBlue)
+                                .withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.account_balance_wallet_rounded,
+                            color: Color(AppConstants.primaryBlue),
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Saldo disponível',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: secondaryText,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 12),
                     Text(
                       AppFormatters.formatCurrency(state.walletBalance),
                       style: GoogleFonts.poppins(
-                        fontSize: 32,
+                        fontSize: 36,
                         fontWeight: FontWeight.w700,
+                        color: theme.textTheme.titleLarge?.color,
+                        letterSpacing: -0.5,
                       ),
                     ),
                   ],
@@ -523,32 +572,42 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
                 onPressed: () {
                   // Ação futura de adicionar recursos
                 },
-                icon: const Icon(Icons.savings_outlined),
-                label: const Text('Adicionar recursos'),
+                icon: const Icon(Icons.add_rounded, size: 20),
+                label: Text(
+                  'Adicionar',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(AppConstants.accentOrange),
+                  foregroundColor: Colors.white,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
+                  elevation: 0,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Wrap(
             spacing: 12,
             runSpacing: 12,
             children: [
               _BalanceInfoChip(
-                icon: Icons.child_care,
+                icon: Icons.child_care_rounded,
                 label: 'Média por criança',
                 value: AppFormatters.formatCurrency(averagePerChild),
+                color: const Color(AppConstants.successGreen),
               ),
               _BalanceInfoChip(
-                icon: Icons.pending,
+                icon: Icons.pending_actions_rounded,
                 label: 'Solicitações pendentes',
                 value: state.pendingApprovalsCount.toString(),
+                color: const Color(AppConstants.accentOrange),
               ),
             ],
           ),
@@ -618,6 +677,86 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
     );
   }
 
+  Widget _buildQuickActions(
+    BuildContext context,
+    ParentDashboardState state,
+  ) {
+    final quickActions = [
+      _QuickActionData(
+        title: 'Dependentes',
+        subtitle: state.children.isEmpty
+            ? 'Cadastre sua primeira criança'
+            : '${state.children.length} cadastrados',
+        icon: Icons.family_restroom_rounded,
+        color: const Color(AppConstants.primaryBlue),
+        onTap: () => widget.onNavigateToTab?.call(1),
+      ),
+      _QuickActionData(
+        title: 'Distribuir recursos',
+        subtitle: AppFormatters.formatCurrency(state.walletBalance),
+        icon: Icons.payments_rounded,
+        color: const Color(AppConstants.accentOrange),
+        onTap: () => widget.onNavigateToTab?.call(2),
+      ),
+      _QuickActionData(
+        title: 'Aprovações',
+        subtitle: state.pendingApprovalsCount > 0
+            ? '${state.pendingApprovalsCount} pendentes'
+            : 'Nenhuma pendente',
+        icon: Icons.verified_user_rounded,
+        color: const Color(AppConstants.successGreen),
+        onTap: () => widget.onNavigateToTab?.call(3),
+        badgeCount: state.pendingApprovalsCount,
+      ),
+      _QuickActionData(
+        title: 'Insights',
+        subtitle: 'Veja tendências completas',
+        icon: Icons.stacked_line_chart_rounded,
+        color: const Color(AppConstants.purple),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => BlocProvider.value(
+                value: context.read<ParentDashboardCubit>(),
+                child: ParentInsightsScreen(parentId: widget.parentId),
+              ),
+            ),
+          );
+        },
+      ),
+    ];
+
+    final crossAxisCount = MediaQuery.of(context).size.width > 700 ? 4 : 2;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(
+          context,
+          title: 'Ações rápidas',
+          subtitle: 'Separe o que precisa de mais atenção agora',
+        ),
+        const SizedBox(height: 16),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: quickActions.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: crossAxisCount > 2 ? 1.4 : 1.25,
+          ),
+          itemBuilder: (context, index) {
+            final action = quickActions[index];
+            return _QuickActionCard(data: action);
+          },
+        ),
+      ],
+    );
+  }
+
+  // ignore: unused_element
   Widget _buildChildrenList(
     BuildContext context,
     ParentDashboardState state, {
@@ -777,6 +916,7 @@ class _ParentDashboardViewState extends State<_ParentDashboardView> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildPendingApprovals(
     BuildContext context,
     ParentDashboardState state, {
@@ -857,48 +997,171 @@ class _BalanceInfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final Color color;
 
   const _BalanceInfoChip({
     required this.icon,
     required this.label,
     required this.value,
+    this.color = const Color(AppConstants.primaryBlue),
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withOpacity(0.05),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: theme.colorScheme.primary),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
           const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: theme.textTheme.bodySmall?.color,
-                    ),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: theme.textTheme.bodySmall?.color,
                   ),
-                  Text(
-                    value,
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickActionData {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback? onTap;
+  final int badgeCount;
+
+  const _QuickActionData({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    this.onTap,
+    this.badgeCount = 0,
+  });
+}
+
+class _QuickActionCard extends StatelessWidget {
+  final _QuickActionData data;
+
+  const _QuickActionCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: data.onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: theme.cardTheme.color,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: data.color.withOpacity(0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: data.color.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    data.icon,
+                    color: data.color,
+                  ),
+                ),
+                if (data.badgeCount > 0) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: data.color,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      data.badgeCount.toString(),
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
+              ],
+            ),
+            const Spacer(),
+            Text(
+              data.title,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: theme.textTheme.titleMedium?.color,
               ),
             ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              data.subtitle,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: theme.textTheme.bodyMedium?.color,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
