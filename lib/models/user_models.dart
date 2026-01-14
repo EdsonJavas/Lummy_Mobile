@@ -14,11 +14,11 @@ class ParentAccount {
   });
 
   Map<String, dynamic> toMap() => {
-        'role': 'parent',
-        'email': email,
-        'name': name,
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'role': 'parent',
+    'email': email,
+    'name': name,
+    'createdAt': createdAt.toIso8601String(),
+  };
 
   static ParentAccount fromMap(String id, Map<String, dynamic> map) =>
       ParentAccount(
@@ -45,12 +45,12 @@ class ChildAccount {
   });
 
   Map<String, dynamic> toMap() => {
-        'role': 'child',
-        'parentId': parentId,
-        'displayName': displayName,
-        'age': age,
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'role': 'child',
+    'parentId': parentId,
+    'displayName': displayName,
+    'age': age,
+    'createdAt': createdAt.toIso8601String(),
+  };
 
   static ChildAccount fromMap(String id, Map<String, dynamic> map) =>
       ChildAccount(

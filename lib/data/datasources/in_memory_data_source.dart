@@ -5,32 +5,35 @@ class InMemoryDataSource {
   final Map<String, FinancialData> _userFinancialData = {};
 
   FinancialData getOrCreateFinancial(String userId) {
-    return _userFinancialData.putIfAbsent(userId, () => FinancialData(
-          transactions: [],
-          achievements: [
-            Achievement(
-              id: 'first_saving',
-              title: 'Primeira Economia',
-              description: 'Você guardou seu primeiro dinheiro!',
-              emoji: '🥇',
-              isCompleted: true,
-            ),
-            Achievement(
-              id: 'expense_control',
-              title: 'Controle de Gastos',
-              description: 'Anotou gastos por 7 dias seguidos',
-              emoji: '📊',
-              isCompleted: true,
-            ),
-            Achievement(
-              id: 'goal_reached',
-              title: 'Meta Alcançada',
-              description: 'Complete sua primeira meta de economia',
-              emoji: '🎯',
-              isCompleted: false,
-            ),
-          ],
-        ));
+    return _userFinancialData.putIfAbsent(
+      userId,
+      () => FinancialData(
+        transactions: [],
+        achievements: [
+          Achievement(
+            id: 'first_saving',
+            title: 'Primeira Economia',
+            description: 'Você guardou seu primeiro dinheiro!',
+            emoji: '🥇',
+            isCompleted: true,
+          ),
+          Achievement(
+            id: 'expense_control',
+            title: 'Controle de Gastos',
+            description: 'Anotou gastos por 7 dias seguidos',
+            emoji: '📊',
+            isCompleted: true,
+          ),
+          Achievement(
+            id: 'goal_reached',
+            title: 'Meta Alcançada',
+            description: 'Complete sua primeira meta de economia',
+            emoji: '🎯',
+            isCompleted: false,
+          ),
+        ],
+      ),
+    );
   }
 
   FinancialData addTransaction({
@@ -46,10 +49,13 @@ class InMemoryDataSource {
       description: description,
       amount: amount,
       date: DateTime.now(),
-      type: type == 'expense' ? TransactionType.expense : TransactionType.income,
+      type: type == 'expense'
+          ? TransactionType.expense
+          : TransactionType.income,
       category: category,
     );
-    data.transactions = List<Transaction>.from(data.transactions)..add(newTransaction);
+    data.transactions = List<Transaction>.from(data.transactions)
+      ..add(newTransaction);
     if (newTransaction.type == TransactionType.expense) {
       data.currentBalance -= amount;
     } else {
@@ -96,5 +102,3 @@ class InMemoryDataSource {
     );
   }
 }
-
-

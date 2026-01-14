@@ -91,11 +91,7 @@ class BiometricAuthService {
       // Tentar autenticação
       final didAuth = await _localAuth.authenticate(
         localizedReason: reason,
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-          useErrorDialogs: true,
-        ),
+        biometricOnly: true,
       );
 
       print('Resultado da autenticação: $didAuth');
@@ -117,7 +113,8 @@ class AppFacade {
   LoginUseCase get _login => locator<LoginUseCase>();
   AddTransactionUseCase get _addTransaction => locator<AddTransactionUseCase>();
   SetGoalUseCase get _setGoal => locator<SetGoalUseCase>();
-  GetFinancialDataUseCase get _getFinancial => locator<GetFinancialDataUseCase>();
+  GetFinancialDataUseCase get _getFinancial =>
+      locator<GetFinancialDataUseCase>();
 
   Future<Result<String>> login(String email, String password) {
     return _login(email: email, password: password);
@@ -127,7 +124,10 @@ class AppFacade {
     // Para login com biometria, o userId (email) é usado para identificar o usuário.
     // A senha não é necessária, mas o LoginUseCase espera ambos. Pode ser necessário ajustar o LoginUseCase
     // ou passar uma senha placeholder se o backend exigir.
-    return _login(email: userId, password: ''); // Passando uma string vazia para a senha por enquanto
+    return _login(
+      email: userId,
+      password: '',
+    ); // Passando uma string vazia para a senha por enquanto
   }
 
   Future<Result<FinancialData>> getFinancialData(String userId) {
@@ -156,11 +156,6 @@ class AppFacade {
     required String emoji,
     required double amount,
   }) {
-    return _setGoal(
-      userId: userId,
-      name: name,
-      emoji: emoji,
-      amount: amount,
-    );
+    return _setGoal(userId: userId, name: name, emoji: emoji, amount: amount);
   }
 }

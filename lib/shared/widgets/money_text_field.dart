@@ -57,7 +57,7 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
     super.initState();
     _controller = widget.controller ?? TextEditingController();
     _focusNode = widget.focusNode ?? FocusNode();
-    
+
     if (widget.initialValue != null) {
       _controller.text = _formatCurrency(widget.initialValue!);
     }
@@ -94,12 +94,12 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
 
   double? _parseCurrency(String text) {
     if (text.isEmpty) return null;
-    
+
     // Remove tudo exceto números, vírgula e ponto
     final cleanText = text.replaceAll(RegExp(r'[^\d,.]'), '');
-    
+
     if (cleanText.isEmpty) return null;
-    
+
     // Se tem vírgula, trata como decimal brasileiro
     if (cleanText.contains(',')) {
       final parts = cleanText.split(',');
@@ -109,7 +109,7 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
         return double.tryParse('$integerPart.$decimalPart');
       }
     }
-    
+
     // Se tem ponto, pode ser decimal americano ou separador de milhares
     if (cleanText.contains('.')) {
       final parts = cleanText.split('.');
@@ -122,7 +122,7 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
         return double.tryParse(number);
       }
     }
-    
+
     // Apenas números
     return double.tryParse(cleanText);
   }
@@ -156,7 +156,7 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,8 +178,8 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
               color: _isFocused
                   ? const Color(0xFF3B82F6)
                   : isDark
-                      ? const Color(0xFF2D3748)
-                      : const Color(0xFFE2E8F0),
+                  ? const Color(0xFF2D3748)
+                  : const Color(0xFFE2E8F0),
               width: _isFocused ? 2 : 1,
             ),
             boxShadow: _isFocused
@@ -199,9 +199,7 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
             autofocus: widget.autofocus,
             textAlign: widget.textAlign,
             keyboardType: const TextInputType.numberWithOptions(decimal: false),
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-            ],
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             style: GoogleFonts.poppins(
               fontSize: widget.fontSize ?? (widget.isSmallScreen ? 18 : 20),
               fontWeight: widget.fontWeight ?? FontWeight.w600,
@@ -235,11 +233,11 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
                               : const Color(0xFFF3F4F6),
                           borderRadius: BorderRadius.circular(8),
                         ),
-            child: const Icon(
-              Icons.clear_rounded,
-              size: 16,
-              color: Color(0xFF9CA3AF),
-            ),
+                        child: const Icon(
+                          Icons.clear_rounded,
+                          size: 16,
+                          color: Color(0xFF9CA3AF),
+                        ),
                       ),
                     )
                   : null,
@@ -252,7 +250,8 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
               fillColor: isDark
                   ? const Color(0xFF1E293B).withOpacity(0.5)
                   : const Color(0xFFF8FAFC),
-              contentPadding: widget.contentPadding ??
+              contentPadding:
+                  widget.contentPadding ??
                   EdgeInsets.symmetric(
                     horizontal: widget.isSmallScreen ? 16 : 20,
                     vertical: widget.isSmallScreen ? 16 : 20,
@@ -289,4 +288,3 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
     );
   }
 }
-

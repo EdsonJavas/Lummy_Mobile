@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../domain/entities/user_entity.dart';
-import '../../../../shared/widgets/widgets.dart';
 
 class AllowanceDistributionCard extends StatefulWidget {
   final double availableBalance;
@@ -25,10 +24,16 @@ class AllowanceDistributionCard extends StatefulWidget {
       _AllowanceDistributionCardState();
 }
 
-class _AllowanceDistributionCardState
-    extends State<AllowanceDistributionCard> {
+class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
   final TextEditingController _amountController = TextEditingController();
   bool _isProcessing = false;
+
+  // Cores consistentes com o app
+  static const _orange = Color(0xFFF59E0B);
+  static const _amber = Color(0xFFD97706);
+  static const _green = Color(0xFF10B981);
+  static const _blue = Color(0xFF3B82F6);
+  static const _purple = Color(0xFF8B5CF6);
 
   @override
   void dispose() {
@@ -38,79 +43,174 @@ class _AllowanceDistributionCardState
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isSmallScreen =
         MediaQuery.of(context).size.height < AppConstants.smallScreenHeight;
 
-    return CustomCard(
-      padding: EdgeInsets.all(isSmallScreen ? 16 : 24),
+    return Container(
+      padding: EdgeInsets.all(isSmallScreen ? 18 : 24),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  'Distribuir recursos',
-                  style: GoogleFonts.poppins(
-                    fontSize: isSmallScreen ? 18 : 20,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: AppConstants.spacingSmall),
-              Flexible(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
-                  ),
-                  child: Text(
-                    'Disponível: ${AppFormatters.formatCurrency(widget.availableBalance)}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.primary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppConstants.spacingMedium),
-          Text(
-            'Defina um valor para distribuir igualmente entre os filhos cadastrados ou faça depósitos individuais conforme necessário.',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-              color: colorScheme.onSurface.withOpacity(0.7),
-            ),
-          ),
-          const SizedBox(height: AppConstants.spacingLarge),
-          CustomTextField(
-            controller: _amountController,
-            hintText: 'Ex.: 150,00',
-            prefixIcon: Icons.attach_money_rounded,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-            ),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9,\.]')),
-            ],
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: AppConstants.spacingMedium),
+          // Header
           Row(
             children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [_orange, _amber]),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.account_tree_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
               Expanded(
-                child: CustomButton(
-                  text: 'Distribuir igualmente',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Distribuir Recursos',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 16 : 18,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      ),
+                    ),
+                    Text(
+                      'Envie para todos ou individualmente',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Saldo badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: _orange.withOpacity(isDark ? 0.15 : 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _orange.withOpacity(0.2)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: _orange,
+                  size: 16,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Disponível: ',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
+                  ),
+                ),
+                Text(
+                  AppFormatters.formatCurrency(widget.availableBalance),
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: _orange,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Campo de valor
+          Container(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark
+                    ? const Color(0xFF334155)
+                    : const Color(0xFFE2E8F0),
+              ),
+            ),
+            child: TextField(
+              controller: _amountController,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[0-9,\.]')),
+              ],
+              onChanged: (_) => setState(() {}),
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              ),
+              decoration: InputDecoration(
+                hintText: 'Digite o valor (Ex: 150,00)',
+                hintStyle: GoogleFonts.poppins(
+                  fontSize: 15,
+                  color: isDark
+                      ? const Color(0xFF64748B)
+                      : const Color(0xFF94A3B8),
+                ),
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: _orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.attach_money_rounded,
+                    color: _orange,
+                    size: 20,
+                  ),
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Botões de ação
+          Row(
+            children: [
+              // Botão Distribuir Igualmente
+              Expanded(
+                child: _buildActionButton(
+                  label: 'Distribuir Igualmente',
+                  icon: Icons.group_rounded,
+                  gradient: const [_orange, _amber],
                   onPressed: _canSubmit
                       ? () async {
                           final amount = _parseAmount();
@@ -120,55 +220,127 @@ class _AllowanceDistributionCardState
                             return;
                           }
                           setState(() => _isProcessing = true);
-                          await Future<void>.delayed(const Duration(milliseconds: 250));
+                          await Future<void>.delayed(
+                            const Duration(milliseconds: 250),
+                          );
                           widget.onDistributeEqually(amount);
                           setState(() {
                             _isProcessing = false;
                             _amountController.clear();
                           });
                           if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text(
-                                  'Distribuição realizada com sucesso.',
-                                ),
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.primary,
-                              ),
+                            _showSuccessSnackBar(
+                              context,
+                              'Distribuição realizada com sucesso!',
                             );
                           }
                         }
                       : null,
                   isLoading: _isProcessing,
+                  isDark: isDark,
                 ),
               ),
-              const SizedBox(width: AppConstants.spacingMedium),
-              OutlinedButton.icon(
-                onPressed: widget.children.isEmpty
-                    ? null
-                    : () async {
-                        await _openIndividualDepositModal(context);
-                      },
-                icon: const Icon(Icons.payments_outlined),
-                label: Text(
-                  'Depósito individual',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isSmallScreen ? 12 : 20,
-                    vertical: isSmallScreen ? 14 : 16,
-                  ),
-                  side: BorderSide(color: colorScheme.primary.withOpacity(0.4)),
-                  foregroundColor: colorScheme.primary,
+              const SizedBox(width: 12),
+              // Botão Depósito Individual
+              Expanded(
+                child: _buildActionButton(
+                  label: 'Individual',
+                  icon: Icons.person_rounded,
+                  gradient: const [_blue, _purple],
+                  onPressed: widget.children.isEmpty
+                      ? null
+                      : () async {
+                          await _openIndividualDepositModal(context, isDark);
+                        },
+                  isDark: isDark,
                 ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required List<Color> gradient,
+    required VoidCallback? onPressed,
+    bool isLoading = false,
+    required bool isDark,
+  }) {
+    final isEnabled = onPressed != null && !isLoading;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            gradient: isEnabled
+                ? LinearGradient(colors: gradient)
+                : LinearGradient(
+                    colors: [
+                      Colors.grey.withOpacity(0.3),
+                      Colors.grey.withOpacity(0.2),
+                    ],
+                  ),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: isEnabled
+                ? [
+                    BoxShadow(
+                      color: gradient[0].withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: isLoading
+              ? const Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      color: isEnabled
+                          ? Colors.white
+                          : (isDark
+                                ? const Color(0xFF64748B)
+                                : const Color(0xFF94A3B8)),
+                      size: 18,
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        label,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isEnabled
+                              ? Colors.white
+                              : (isDark
+                                    ? const Color(0xFF64748B)
+                                    : const Color(0xFF94A3B8)),
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }
@@ -191,29 +363,31 @@ class _AllowanceDistributionCardState
     return double.parse(value.toStringAsFixed(2));
   }
 
-  Future<void> _openIndividualDepositModal(BuildContext context) async {
+  Future<void> _openIndividualDepositModal(
+    BuildContext context,
+    bool isDark,
+  ) async {
     final formKey = GlobalKey<FormState>();
-    String? selectedChildId =
-        widget.children.isNotEmpty ? widget.children.first.id : null;
+    String? selectedChildId = widget.children.isNotEmpty
+        ? widget.children.first.id
+        : null;
     final TextEditingController amountController = TextEditingController();
 
     final result = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppConstants.radiusXLarge),
-        ),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (bottomSheetContext) {
-        final colorScheme = Theme.of(context).colorScheme;
-        return Padding(
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          ),
           padding: EdgeInsets.only(
-            left: AppConstants.spacingLarge,
-            right: AppConstants.spacingLarge,
-            top: AppConstants.spacingLarge,
-            bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom +
-                AppConstants.spacingLarge,
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom + 24,
           ),
           child: Form(
             key: formKey,
@@ -221,96 +395,246 @@ class _AllowanceDistributionCardState
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Handle bar
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF475569)
+                          : const Color(0xFFCBD5E1),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Header
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Depósito individual',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [_blue, _purple],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.person_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Depósito Individual',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF1E293B),
+                        ),
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.of(bottomSheetContext).pop(),
-                      icon: const Icon(Icons.close),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppConstants.spacingLarge),
-                DropdownButtonFormField<String>(
-                  initialValue: selectedChildId,
-                  decoration: InputDecoration(
-                    labelText: 'Selecione a criança',
-                    border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppConstants.radiusMedium),
+                const SizedBox(height: 24),
+                // Dropdown
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF0F172A)
+                        : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF334155)
+                          : const Color(0xFFE2E8F0),
                     ),
                   ),
-                  items: widget.children
-                      .map(
-                        (child) => DropdownMenuItem(
-                          value: child.id,
-                          child: Text(child.name),
+                  child: DropdownButtonFormField<String>(
+                    value: selectedChildId,
+                    decoration: InputDecoration(
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: _purple.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    selectedChildId = value;
-                  },
-                  validator: (value) =>
-                      value == null ? 'Selecione uma criança' : null,
-                ),
-                const SizedBox(height: AppConstants.spacingLarge),
-                TextFormField(
-                  controller: amountController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
+                        child: const Icon(
+                          Icons.child_care_rounded,
+                          color: _purple,
+                          size: 18,
+                        ),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    dropdownColor: isDark
+                        ? const Color(0xFF1E293B)
+                        : Colors.white,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    ),
+                    items: widget.children
+                        .map(
+                          (child) => DropdownMenuItem(
+                            value: child.id,
+                            child: Text(child.name),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      selectedChildId = value;
+                    },
+                    validator: (value) =>
+                        value == null ? 'Selecione uma criança' : null,
                   ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9,\.]')),
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'Valor',
-                    hintText: 'Ex.: 50,00',
-                    prefixIcon: const Icon(Icons.attach_money_rounded),
-                    border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppConstants.radiusMedium),
+                ),
+                const SizedBox(height: 16),
+                // Valor
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF0F172A)
+                        : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF334155)
+                          : const Color(0xFFE2E8F0),
                     ),
                   ),
-                  validator: (value) {
-                    final sanitized =
-                        value?.replaceAll('.', '').replaceAll(',', '.') ?? '';
-                    final parsed = double.tryParse(sanitized);
-                    if (parsed == null || parsed <= 0) {
-                      return 'Informe um valor válido';
-                    }
-                    if (parsed > widget.availableBalance) {
-                      return 'Saldo insuficiente';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppConstants.spacingLarge),
-                CustomButton(
-                  text: 'Confirmar depósito',
-                  onPressed: () {
-                    if (formKey.currentState?.validate() ?? false) {
-                      final sanitized = amountController.text
-                          .replaceAll('.', '')
-                          .replaceAll(',', '.');
+                  child: TextFormField(
+                    controller: amountController,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9,\.]')),
+                    ],
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Ex.: 50,00',
+                      hintStyle: GoogleFonts.poppins(
+                        fontSize: 15,
+                        color: isDark
+                            ? const Color(0xFF64748B)
+                            : const Color(0xFF94A3B8),
+                      ),
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: _green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.attach_money_rounded,
+                          color: _green,
+                          size: 18,
+                        ),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                    ),
+                    validator: (value) {
+                      final sanitized =
+                          value?.replaceAll('.', '').replaceAll(',', '.') ?? '';
                       final parsed = double.tryParse(sanitized);
-                      if (parsed != null && selectedChildId != null) {
-                        widget.onDepositToChild(
-                          selectedChildId!,
-                          double.parse(parsed.toStringAsFixed(2)),
-                        );
-                        Navigator.of(bottomSheetContext).pop(true);
+                      if (parsed == null || parsed <= 0) {
+                        return 'Informe um valor válido';
                       }
-                    }
-                  },
+                      if (parsed > widget.availableBalance) {
+                        return 'Saldo insuficiente';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Botão confirmar
+                Container(
+                  width: double.infinity,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [_green, Color(0xFF059669)],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _green.withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (formKey.currentState?.validate() ?? false) {
+                        final sanitized = amountController.text
+                            .replaceAll('.', '')
+                            .replaceAll(',', '.');
+                        final parsed = double.tryParse(sanitized);
+                        if (parsed != null && selectedChildId != null) {
+                          widget.onDepositToChild(
+                            selectedChildId!,
+                            double.parse(parsed.toStringAsFixed(2)),
+                          );
+                          Navigator.of(bottomSheetContext).pop(true);
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.send_rounded, size: 20),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Confirmar Depósito',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -319,26 +643,50 @@ class _AllowanceDistributionCardState
       },
     );
 
-    if (result == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Depósito realizado com sucesso.'),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
+    if (result == true && mounted) {
+      _showSuccessSnackBar(context, 'Depósito realizado com sucesso!');
     }
+  }
+
+  void _showSuccessSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Colors.white),
+            const SizedBox(width: 12),
+            Text(
+              message,
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+        backgroundColor: _green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
   }
 
   void _showLimitSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          'O valor informado ultrapassa o saldo disponível.',
-          style: GoogleFonts.poppins(color: Colors.white),
+        content: Row(
+          children: [
+            const Icon(Icons.warning_rounded, color: Colors.white),
+            const SizedBox(width: 12),
+            Text(
+              'Valor ultrapassa o saldo disponível',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            ),
+          ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: const Color(0xFFEF4444),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
 }
-

@@ -1,46 +1,205 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../domain/entities/transaction_entity.dart';
 import 'transactions_state.dart';
 
 class TransactionsCubit extends Cubit<TransactionsState> {
   TransactionsCubit() : super(const TransactionsState());
 
+  final _supabase = Supabase.instance.client;
+
   // Carregar transações
   Future<void> loadTransactions(String userId) async {
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isLoading: true, error: null));
 
     try {
-      // TODO: Buscar do backend
-      await Future.delayed(const Duration(seconds: 1));
+      // Validar entrada
+      if (userId.isEmpty) {
+        emit(state.copyWith(
+          isLoading: false,
+          error: 'ID do usuário inválido',
+        ));
+        return;
+      }
 
-      final transactions = _getMockTransactions(userId);
+      // Buscar transações do banco
+      final response = await _supabase
+          .from('transactions')
+          .select('*')
+          .eq('child_id', userId)
+          .order('date', ascending: false)
+          .order('created_at', ascending: false);
+
+      final transactions = response.map<TransactionEntity>((row) {
+        return TransactionEntity(
+          id: row['id'] as String,
+          userId: row['child_id'] as String,
+          parentId: row['parent_id'] as String?,
+          description: row['description'] as String,
+          amount: (row['amount'] as num).toDouble(),
+          type: _mapTransactionType(row['type'] as String),
+          status: _mapTransactionStatus(row['status'] as String),
+          category: row['category'] as String,
+          date: _parseDate(row['date']),
+          createdAt: _parseDate(row['created_at']),
+          rejectionReason: row['rejection_reason'] as String?,
+          metadata: row['metadata'] as Map<String, dynamic>?,
+        );
+      }).toList();
 
       emit(
         state.copyWith(
           isLoading: false,
           transactions: transactions,
           filteredTransactions: transactions,
+          error: null,
         ),
       );
     } catch (e) {
-      emit(state.copyWith(isLoading: false, error: e.toString()));
+      debugPrint('❌ Erro ao carregar transações: $e');
+      emit(state.copyWith(
+        isLoading: false,
+        error: 'Erro ao carregar transações: ${e.toString()}',
+      ));
     }
   }
 
   // Adicionar transação
   Future<void> addTransaction(TransactionEntity transaction) async {
-    final updatedTransactions = [transaction, ...state.transactions];
+    try {
+      // Validar entrada
+      if (transaction.userId.isEmpty) {
+        emit(state.copyWith(error: 'ID do usuário inválido'));
+        return;
+      }
 
-    emit(
-      state.copyWith(
-        transactions: updatedTransactions,
-        filteredTransactions: _filterTransactions(
-          updatedTransactions,
-          state.selectedCategory,
-          state.selectedType,
-        ),
-      ),
-    );
+      if (transaction.amount <= 0) {
+        emit(state.copyWith(error: 'Valor deve ser maior que zero'));
+        return;
+      }
+
+      if (transaction.description.trim().isEmpty) {
+        emit(state.copyWith(error: 'Descrição é obrigatória'));
+        return;
+      }
+
+      if (transaction.category.trim().isEmpty) {
+        emit(state.copyWith(error: 'Categoria é obrigatória'));
+        return;
+      }
+
+      // Verificar se é despesa e se há saldo suficiente
+      if (transaction.type == TransactionType.expense) {
+        final childData = await _supabase
+            .from('children')
+            .select('balance, requires_approval')
+            .eq('id', transaction.userId)
+            .maybeSingle();
+
+        if (childData != null) {
+          final balance = (childData['balance'] as num?)?.toDouble() ?? 0.0;
+          final requiresApproval = childData['requires_approval'] as bool? ?? true;
+
+          if (balance < transaction.amount) {
+            emit(state.copyWith(error: 'Saldo insuficiente'));
+            return;
+          }
+
+          // Definir status baseado em requires_approval
+          final status = requiresApproval ? 'pending' : 'approved';
+          
+          // Inserir no banco
+          await _supabase.from('transactions').insert({
+            'child_id': transaction.userId,
+            'parent_id': transaction.parentId,
+            'amount': transaction.amount,
+            'type': _mapTransactionTypeToString(transaction.type),
+            'description': transaction.description.trim(),
+            'category': transaction.category.trim(),
+            'status': status,
+            'date': transaction.date.toIso8601String(),
+            'metadata': transaction.metadata,
+          });
+
+          // Se não precisa aprovação, o trigger já atualiza o saldo
+          // Recarregar transações
+          await loadTransactions(transaction.userId);
+        } else {
+          emit(state.copyWith(error: 'Usuário não encontrado'));
+        }
+      } else {
+        // Para receitas, sempre inserir
+        await _supabase.from('transactions').insert({
+          'child_id': transaction.userId,
+          'parent_id': transaction.parentId,
+          'amount': transaction.amount,
+          'type': _mapTransactionTypeToString(transaction.type),
+          'description': transaction.description.trim(),
+          'category': transaction.category.trim(),
+          'status': 'approved',
+          'date': transaction.date.toIso8601String(),
+          'metadata': transaction.metadata,
+        });
+
+        // Recarregar transações
+        await loadTransactions(transaction.userId);
+      }
+    } catch (e) {
+      debugPrint('❌ Erro ao adicionar transação: $e');
+      emit(state.copyWith(error: 'Erro ao adicionar transação: ${e.toString()}'));
+    }
+  }
+
+  TransactionType _mapTransactionType(String value) {
+    switch (value.toLowerCase()) {
+      case 'income':
+        return TransactionType.income;
+      case 'expense':
+        return TransactionType.expense;
+      case 'allowance':
+        return TransactionType.allowance;
+      case 'reward':
+        return TransactionType.reward;
+      default:
+        return TransactionType.expense;
+    }
+  }
+
+  String _mapTransactionTypeToString(TransactionType type) {
+    switch (type) {
+      case TransactionType.income:
+        return 'income';
+      case TransactionType.expense:
+        return 'expense';
+      case TransactionType.allowance:
+        return 'allowance';
+      case TransactionType.reward:
+        return 'reward';
+    }
+  }
+
+  TransactionStatus _mapTransactionStatus(String value) {
+    switch (value.toLowerCase()) {
+      case 'pending':
+        return TransactionStatus.pending;
+      case 'approved':
+        return TransactionStatus.approved;
+      case 'rejected':
+        return TransactionStatus.rejected;
+      case 'completed':
+        return TransactionStatus.completed;
+      default:
+        return TransactionStatus.pending;
+    }
+  }
+
+  DateTime _parseDate(dynamic raw) {
+    if (raw is DateTime) return raw;
+    if (raw is String && raw.isNotEmpty) {
+      return DateTime.tryParse(raw) ?? DateTime.now();
+    }
+    return DateTime.now();
   }
 
   // Filtrar por categoria
@@ -101,55 +260,4 @@ class TransactionsCubit extends Cubit<TransactionsState> {
     return filtered;
   }
 
-  // Mock data
-  List<TransactionEntity> _getMockTransactions(String userId) {
-    final now = DateTime.now();
-
-    return [
-      TransactionEntity(
-        id: '1',
-        userId: userId,
-        description: 'Mesada de Outubro',
-        amount: 50.0,
-        type: TransactionType.allowance,
-        status: TransactionStatus.completed,
-        category: 'Mesada',
-        date: now.subtract(const Duration(days: 1)),
-        createdAt: now.subtract(const Duration(days: 1)),
-      ),
-      TransactionEntity(
-        id: '2',
-        userId: userId,
-        description: 'Sorvete na praça',
-        amount: 10.0,
-        type: TransactionType.expense,
-        status: TransactionStatus.completed,
-        category: 'Doces',
-        date: now.subtract(const Duration(days: 2)),
-        createdAt: now.subtract(const Duration(days: 2)),
-      ),
-      TransactionEntity(
-        id: '3',
-        userId: userId,
-        description: 'Recompensa por boas notas',
-        amount: 25.0,
-        type: TransactionType.reward,
-        status: TransactionStatus.completed,
-        category: 'Recompensa',
-        date: now.subtract(const Duration(days: 5)),
-        createdAt: now.subtract(const Duration(days: 5)),
-      ),
-      TransactionEntity(
-        id: '4',
-        userId: userId,
-        description: 'Novo jogo',
-        amount: 40.0,
-        type: TransactionType.expense,
-        status: TransactionStatus.completed,
-        category: 'Jogos',
-        date: now.subtract(const Duration(days: 7)),
-        createdAt: now.subtract(const Duration(days: 7)),
-      ),
-    ];
-  }
 }

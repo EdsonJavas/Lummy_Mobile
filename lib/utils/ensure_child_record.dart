@@ -28,12 +28,14 @@ class EnsureChildRecord {
         return true;
       }
 
-      debugPrint('⚠️ Registro não encontrado na tabela children. Tentando criar...');
+      debugPrint(
+        '⚠️ Registro não encontrado na tabela children. Tentando criar...',
+      );
 
       // Tentar obter dados dos metadados do usuário
       final metadata = user.userMetadata ?? {};
       final parentId = metadata['parent_id'] as String?;
-      
+
       if (parentId == null || parentId.isEmpty) {
         debugPrint('❌ parent_id não encontrado nos metadados do usuário');
         return false;
@@ -52,11 +54,12 @@ class EnsureChildRecord {
       }
 
       // Criar registro na tabela children com dados dos metadados
-      final nome = metadata['name'] as String? ?? 
-                   user.userMetadata?['full_name'] as String? ?? 
-                   user.email?.split('@').first ?? 
-                   'Usuário';
-      
+      final nome =
+          metadata['name'] as String? ??
+          user.userMetadata?['full_name'] as String? ??
+          user.email?.split('@').first ??
+          'Usuário';
+
       final cpfFromMeta = metadata['cpf'] as String?;
       // Gerar CPF temporário único baseado no ID do usuário se não fornecido
       // Converte letras do UUID em dígitos (a->0, b->1, c->2, etc) e pega 11 caracteres
@@ -70,17 +73,18 @@ class EnsureChildRecord {
         }).join();
         return digits.substring(0, 11);
       }
-      
-      final cpf = cpfFromMeta?.isNotEmpty == true 
-          ? cpfFromMeta! 
+
+      final cpf = cpfFromMeta?.isNotEmpty == true
+          ? cpfFromMeta!
           : generateTempCpf(user.id);
-      
+
       final idade = metadata['idade'] as int? ?? 10;
       final sexo = metadata['sexo'] as String? ?? 'Masculino';
 
       // Validar sexo
-      final validSexo = (sexo == 'Masculino' || sexo == 'Feminino' || sexo == 'Outro') 
-          ? sexo 
+      final validSexo =
+          (sexo == 'Masculino' || sexo == 'Feminino' || sexo == 'Outro')
+          ? sexo
           : 'Masculino';
 
       await supabase.from('children').insert({
@@ -107,4 +111,3 @@ class EnsureChildRecord {
     }
   }
 }
-

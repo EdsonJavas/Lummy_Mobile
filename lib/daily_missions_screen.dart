@@ -39,13 +39,10 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
       parent: _fadeController,
       curve: Curves.easeInOut,
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
     _fadeController.forward();
     _slideController.forward();
     _loadDailyMissions();
@@ -75,20 +72,21 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
       // Garantir que o registro existe na tabela children
       final childExists = await EnsureChildRecord.ensureChildExists();
       if (!childExists) {
-        throw Exception('Não foi possível criar o registro do usuário. Verifique se você foi registrado por um responsável.');
+        throw Exception(
+          'Não foi possível criar o registro do usuário. Verifique se você foi registrado por um responsável.',
+        );
       }
 
       debugPrint('📅 Carregando missões diárias para usuário: ${user.id}');
 
       // Chamar função para selecionar/buscar missões do dia
-      final today = DateTime.now().toIso8601String().split('T')[0]; // YYYY-MM-DD
-      
+      final today = DateTime.now().toIso8601String().split(
+        'T',
+      )[0]; // YYYY-MM-DD
+
       final result = await supabase.rpc(
         'select_daily_missions',
-        params: {
-          'p_child_id': user.id,
-          'p_selected_date': today,
-        },
+        params: {'p_child_id': user.id, 'p_selected_date': today},
       );
 
       debugPrint('✅ Resultado da função: $result');
@@ -121,7 +119,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
           final isCompleted = status?['is_completed'] ?? false;
           final progress = status?['progress'] ?? 0;
           final points = missionData['points'] as int;
-          
+
           totalPointsToday += points;
           if (isCompleted) {
             earnedPointsToday += points;
@@ -169,7 +167,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
   Future<void> _loadMissionsDirectly(String userId, String today) async {
     try {
       final supabase = Supabase.instance.client;
-      
+
       // Verificar se já existem missões para hoje
       final existingMissions = await supabase
           .from('daily_missions')
@@ -179,8 +177,10 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
 
       if (existingMissions.isNotEmpty) {
         // Buscar dados das missões
-        final missionIds = existingMissions.map((m) => m['mission_id'] as String).toList();
-        
+        final missionIds = existingMissions
+            .map((m) => m['mission_id'] as String)
+            .toList();
+
         // Usar .or() para filtrar múltiplos IDs (workaround para IN clause)
         var query = supabase.from('missions').select('*');
         if (missionIds.length == 1) {
@@ -190,7 +190,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
           final orFilter = missionIds.map((id) => 'id.eq.$id').join(',');
           query = query.or(orFilter);
         }
-        
+
         final missionsData = await query;
 
         final missionsList = <Map<String, dynamic>>[];
@@ -203,11 +203,11 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
             (dm) => dm['mission_id'] == missionId,
             orElse: () => {},
           );
-          
+
           final isCompleted = dailyMission['is_completed'] ?? false;
           final progress = dailyMission['progress'] ?? 0;
           final points = mission['points'] as int;
-          
+
           totalPointsToday += points;
           if (isCompleted) {
             earnedPointsToday += points;
@@ -244,7 +244,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
   Future<void> _selectRandomMissions(String userId, String today) async {
     try {
       final supabase = Supabase.instance.client;
-      
+
       // Buscar todas as missões ativas
       final allMissions = await supabase
           .from('missions')
@@ -298,27 +298,33 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
       // Garantir que o registro existe na tabela children
       final childExists = await EnsureChildRecord.ensureChildExists();
       if (!childExists) {
-        throw Exception('Não foi possível criar o registro do usuário. Verifique se você foi registrado por um responsável.');
+        throw Exception(
+          'Não foi possível criar o registro do usuário. Verifique se você foi registrado por um responsável.',
+        );
       }
 
       final today = DateTime.now().toIso8601String().split('T')[0];
 
       // Tentar usar a função do banco
       try {
-        final result = await supabase.rpc(
-          'complete_daily_mission',
-          params: {
-            'p_child_id': user.id,
-            'p_mission_id': missionId,
-            'p_selected_date': today,
-          },
-        ).single();
+        final result = await supabase
+            .rpc(
+              'complete_daily_mission',
+              params: {
+                'p_child_id': user.id,
+                'p_mission_id': missionId,
+                'p_selected_date': today,
+              },
+            )
+            .single();
 
         final pointsEarned = result['points_earned'] as int;
         final newTotalPoints = result['new_total_points'] as int;
         final newLevel = result['new_level'] as int;
 
-        debugPrint('✅ Missão concluída! Pontos: $pointsEarned, Total: $newTotalPoints, Nível: $newLevel');
+        debugPrint(
+          '✅ Missão concluída! Pontos: $pointsEarned, Total: $newTotalPoints, Nível: $newLevel',
+        );
 
         // Atualizar estado local
         setState(() {
@@ -346,15 +352,17 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
           ),
           backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     }
   }
 
-  Future<void> _completeMissionManually(String missionId, String userId, String today) async {
+  Future<void> _completeMissionManually(
+    String missionId,
+    String userId,
+    String today,
+  ) async {
     try {
       final supabase = Supabase.instance.client;
 
@@ -392,9 +400,10 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
 
       final currentPoints = (childData['total_points'] as int?) ?? 0;
       final currentLevel = (childData['level'] as int?) ?? 1;
-      
+
       final newPoints = currentPoints + points;
-      final newLevel = (newPoints / 1000).floor() + 1; // Nível sobe a cada 1000 pontos
+      final newLevel =
+          (newPoints / 1000).floor() + 1; // Nível sobe a cada 1000 pontos
 
       // Atualizar pontos e nível
       await supabase
@@ -406,7 +415,9 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
           })
           .eq('id', userId);
 
-      debugPrint('✅ Missão concluída! Pontos: $points, Total: $newPoints, Nível: $newLevel');
+      debugPrint(
+        '✅ Missão concluída! Pontos: $points, Total: $newPoints, Nível: $newLevel',
+      );
 
       // Atualizar estado local
       setState(() {
@@ -426,9 +437,9 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
 
   void _showCompletionDialog(String missionId, int pointsEarned) {
     final mission = missions.firstWhere((m) => m['id'] == missionId);
-    
+
     if (!mounted) return;
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -588,339 +599,382 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
           child: _isLoading
               ? _buildSkeletonLoader()
               : _errorMessage != null
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              size: 64,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _errorMessage!,
-                              style: GoogleFonts.poppins(),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 24),
-                            ElevatedButton(
-                              onPressed: _loadDailyMissions,
-                              child: const Text('Tentar Novamente'),
-                            ),
-                          ],
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Theme.of(context).colorScheme.error,
                         ),
-                      ),
-                    )
-                  : BrandedRefreshIndicator(
-                      onRefresh: _loadDailyMissions,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics(),
+                        const SizedBox(height: 16),
+                        Text(
+                          _errorMessage!,
+                          style: GoogleFonts.poppins(),
+                          textAlign: TextAlign.center,
                         ),
-                        child: Column(
-                          children: [
-                          // Header com progresso arredondado
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: Theme.of(context).brightness == Brightness.dark
-                                    ? [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)]
-                                    : [const Color(0xFF1E40AF), const Color(0xFF1E3A8A)],
-                              ),
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(32),
-                                bottomRight: Radius.circular(32),
-                              ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: _loadDailyMissions,
+                          child: const Text('Tentar Novamente'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : BrandedRefreshIndicator(
+                  onRefresh: _loadDailyMissions,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    child: Column(
+                      children: [
+                        // Header com progresso arredondado
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? [
+                                      const Color(0xFF8B5CF6),
+                                      const Color(0xFF3B82F6),
+                                    ]
+                                  : [
+                                      const Color(0xFF1E40AF),
+                                      const Color(0xFF1E3A8A),
+                                    ],
                             ),
-                            padding: EdgeInsets.fromLTRB(
-                              isSmallScreen ? 20.0 : 24.0,
-                              MediaQuery.of(context).padding.top + 16,
-                              isSmallScreen ? 20.0 : 24.0,
-                              isSmallScreen ? 20.0 : 24.0,
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(32),
+                              bottomRight: Radius.circular(32),
                             ),
-                            child: Column(
-                              children: [
-                                // Botão voltar e título
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.arrow_back_ios,
+                          ),
+                          padding: EdgeInsets.fromLTRB(
+                            isSmallScreen ? 20.0 : 24.0,
+                            MediaQuery.of(context).padding.top + 16,
+                            isSmallScreen ? 20.0 : 24.0,
+                            isSmallScreen ? 20.0 : 24.0,
+                          ),
+                          child: Column(
+                            children: [
+                              // Botão voltar e título
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.arrow_back_ios,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      'Missões Diárias',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
                                         color: Colors.white,
-                                        size: 20,
                                       ),
-                                      onPressed: () => Navigator.pop(context),
+                                      textAlign: TextAlign.center,
                                     ),
-                                    Expanded(
-                                      child: Text(
-                                        'Missões Diárias',
+                                  ),
+                                  const SizedBox(
+                                    width: 48,
+                                  ), // Para centralizar o título
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Seu Progresso',
                                         style: GoogleFonts.poppins(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white.withOpacity(0.9),
                                         ),
-                                        textAlign: TextAlign.center,
                                       ),
-                                    ),
-                                    const SizedBox(width: 48), // Para centralizar o título
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Seu Progresso',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white.withOpacity(0.9),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              earnedPoints.toString(),
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 32,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            Text(
-                                              ' / $totalPoints',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.white.withOpacity(0.7),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Pontos hoje',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.white.withOpacity(0.8),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Column(
+                                      const SizedBox(height: 4),
+                                      Row(
                                         children: [
                                           Text(
-                                            '$completedMissions/${missions.length}',
+                                            earnedPoints.toString(),
                                             style: GoogleFonts.poppins(
-                                              fontSize: 24,
+                                              fontSize: 32,
                                               fontWeight: FontWeight.w700,
                                               color: Colors.white,
                                             ),
                                           ),
                                           Text(
-                                            'Completas',
+                                            ' / $totalPoints',
                                             style: GoogleFonts.poppins(
-                                              fontSize: 12,
+                                              fontSize: 20,
                                               fontWeight: FontWeight.w500,
-                                              color: Colors.white.withOpacity(0.9),
+                                              color: Colors.white.withOpacity(
+                                                0.7,
+                                              ),
                                             ),
                                           ),
                                         ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Pontos hoje',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.white.withOpacity(0.8),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          '$completedMissions/${missions.length}',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Completas',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white.withOpacity(
+                                              0.9,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              // Barra de progresso melhorada
+                              missions.isEmpty
+                                  ? const SizedBox.shrink()
+                                  : Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Progresso Diário',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.white.withOpacity(
+                                                  0.9,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              missions.isEmpty
+                                                  ? '0%'
+                                                  : '${((completedMissions / missions.length) * 100).toStringAsFixed(0)}%',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(
+                                              0.2,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.1,
+                                                ),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            child: FractionallySizedBox(
+                                              alignment: Alignment.centerLeft,
+                                              widthFactor: missions.isEmpty
+                                                  ? 0.0
+                                                  : (completedMissions /
+                                                            missions.length)
+                                                        .clamp(0.0, 1.0),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  gradient:
+                                                      const LinearGradient(
+                                                        colors: [
+                                                          Color(0xFF10B981),
+                                                          Color(0xFF34D399),
+                                                          Color(0xFF6EE7B7),
+                                                        ],
+                                                      ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: const Color(
+                                                        0xFF10B981,
+                                                      ).withOpacity(0.5),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(
+                                                        0,
+                                                        0,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        // Lista de missões
+                        missions.isEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.all(40.0),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.assignment_outlined,
+                                      size: 64,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color
+                                          ?.withOpacity(0.5),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Nenhuma missão disponível',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'As missões diárias aparecerão aqui!',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        color: Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium?.color,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isSmallScreen ? 16.0 : 20.0,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ShaderMask(
+                                      shaderCallback: (bounds) =>
+                                          LinearGradient(
+                                            colors:
+                                                Theme.of(context).brightness ==
+                                                    Brightness.dark
+                                                ? [
+                                                    const Color(0xFF3B82F6),
+                                                    const Color(0xFF8B5CF6),
+                                                  ] // Azul → Roxo
+                                                : [
+                                                    const Color(0xFF1E293B),
+                                                    const Color(0xFF1E293B),
+                                                  ],
+                                          ).createShader(bounds),
+                                      child: Text(
+                                        'Missões de Hoje',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    ...missions.map(
+                                      (mission) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 16,
+                                        ),
+                                        child: _buildMissionCard(
+                                          mission,
+                                          isSmallScreen,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 20),
-                                // Barra de progresso melhorada
-                                missions.isEmpty
-                                    ? const SizedBox.shrink()
-                                    : Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Progresso Diário',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.white.withOpacity(0.9),
-                                                ),
-                                              ),
-                                              Text(
-                                                missions.isEmpty
-                                                    ? '0%'
-                                                    : '${((completedMissions / missions.length) * 100).toStringAsFixed(0)}%',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Container(
-                                            height: 10,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.2),
-                                              borderRadius: BorderRadius.circular(8),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.1),
-                                                  blurRadius: 4,
-                                                  offset: const Offset(0, 2),
-                                                ),
-                                              ],
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(8),
-                                              child: FractionallySizedBox(
-                                                alignment: Alignment.centerLeft,
-                                                widthFactor: missions.isEmpty
-                                                    ? 0.0
-                                                    : (completedMissions / missions.length)
-                                                        .clamp(0.0, 1.0),
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    gradient: const LinearGradient(
-                                                      colors: [
-                                                        Color(0xFF10B981),
-                                                        Color(0xFF34D399),
-                                                        Color(0xFF6EE7B7),
-                                                      ],
-                                                    ),
-                                                    borderRadius: BorderRadius.circular(8),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: const Color(0xFF10B981)
-                                                            .withOpacity(0.5),
-                                                        blurRadius: 8,
-                                                        offset: const Offset(0, 0),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          // Lista de missões
-                          missions.isEmpty
-                              ? Padding(
-                                  padding: const EdgeInsets.all(40.0),
-                                  child: Column(
-                                    children: [
-                                      Icon(
-                                        Icons.assignment_outlined,
-                                        size: 64,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium
-                                            ?.color
-                                            ?.withOpacity(0.5),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        'Nenhuma missão disponível',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'As missões diárias aparecerão aqui!',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 14,
-                                          color: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.color,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isSmallScreen ? 16.0 : 20.0,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      ShaderMask(
-                                        shaderCallback: (bounds) => LinearGradient(
-                                          colors: Theme.of(context).brightness ==
-                                                  Brightness.dark
-                                              ? [
-                                                  const Color(0xFF3B82F6),
-                                                  const Color(0xFF8B5CF6),
-                                                ] // Azul → Roxo
-                                              : [
-                                                  const Color(0xFF1E293B),
-                                                  const Color(0xFF1E293B),
-                                                ],
-                                        ).createShader(bounds),
-                                        child: Text(
-                                          'Missões de Hoje',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      ...missions.map(
-                                        (mission) => Padding(
-                                          padding: const EdgeInsets.only(bottom: 16),
-                                          child: _buildMissionCard(mission, isSmallScreen),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
+                              ),
+                        const SizedBox(height: 20),
+                      ],
                     ),
                   ),
                 ),
-              ),
-            );
+        ),
+      ),
+    );
   }
 
   Widget _buildMissionCard(Map<String, dynamic> mission, bool isSmallScreen) {
     final progress = mission['progress'] as int;
     final total = mission['total'] as int;
     final isCompleted = mission['isCompleted'] as bool;
-    final progressPercent = total > 0 ? (progress / total).clamp(0.0, 1.0) : 0.0;
+    final progressPercent = total > 0
+        ? (progress / total).clamp(0.0, 1.0)
+        : 0.0;
 
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),

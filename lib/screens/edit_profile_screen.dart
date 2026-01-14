@@ -18,7 +18,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _emailController = TextEditingController();
   final _ageController = TextEditingController();
   final _allowanceController = TextEditingController();
-  
+
   String _selectedGender = '';
   bool _requiresApproval = true;
   bool _isLoading = false;
@@ -68,13 +68,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (childData != null) {
         debugPrint('✅ Dados encontrados: $childData');
-        
+
         setState(() {
           _nameController.text = childData['nome'] ?? '';
           _cpfController.text = childData['cpf'] ?? '';
           _emailController.text = childData['email'] ?? '';
           _ageController.text = (childData['idade'] ?? '').toString();
-          _allowanceController.text = (childData['allowance'] ?? 0.0).toString();
+          _allowanceController.text = (childData['allowance'] ?? 0.0)
+              .toString();
           _selectedGender = childData['sexo'] ?? '';
           _requiresApproval = childData['requires_approval'] ?? true;
           _originalEmail = childData['email'] ?? '';
@@ -99,9 +100,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     } finally {
@@ -199,9 +198,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
       return;
@@ -228,21 +225,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'email': _emailController.text.trim(),
         'idade': int.parse(_ageController.text.trim()),
         'sexo': _selectedGender,
-        'allowance': double.tryParse(_allowanceController.text.replaceAll(',', '.')) ?? 0.0,
+        'allowance':
+            double.tryParse(_allowanceController.text.replaceAll(',', '.')) ??
+            0.0,
         'requires_approval': _requiresApproval,
         'updated_at': DateTime.now().toIso8601String(),
       };
 
       // Atualizar na tabela children
-      await supabase
-          .from('children')
-          .update(updatedData)
-          .eq('id', user.id);
+      await supabase.from('children').update(updatedData).eq('id', user.id);
 
       debugPrint('✅ Dados atualizados na tabela children');
 
       // Se o email foi alterado, atualizar também no auth.users
-      if (_originalEmail != null && _emailController.text.trim() != _originalEmail) {
+      if (_originalEmail != null &&
+          _emailController.text.trim() != _originalEmail) {
         debugPrint('📧 Email alterado, atualizando no auth.users...');
         try {
           await supabase.auth.updateUser(
@@ -256,7 +253,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
 
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -275,7 +272,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Voltar para a tela anterior após um pequeno delay
       await Future.delayed(const Duration(milliseconds: 500));
       if (!mounted) return;
-      Navigator.pop(context, true); // Retornar true indica que houve atualização
+      Navigator.pop(
+        context,
+        true,
+      ); // Retornar true indica que houve atualização
     } catch (e) {
       debugPrint('❌ Erro ao salvar perfil: $e');
       if (!mounted) return;
@@ -287,9 +287,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     } finally {
@@ -323,9 +321,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -370,10 +366,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withOpacity(0.3),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary.withOpacity(0.3),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -385,10 +380,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withOpacity(0.1),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primary.withOpacity(0.1),
                               child: Icon(
                                 Icons.person,
                                 size: 60,
@@ -430,7 +424,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Nome
               _buildTextField(
                 controller: _nameController,
@@ -447,7 +441,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // CPF
               _buildTextField(
                 controller: _cpfController,
@@ -461,7 +455,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     final formatted = _formatCPF(newValue.text);
                     return TextEditingValue(
                       text: formatted,
-                      selection: TextSelection.collapsed(offset: formatted.length),
+                      selection: TextSelection.collapsed(
+                        offset: formatted.length,
+                      ),
                     );
                   }),
                 ],
@@ -476,7 +472,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Email
               _buildTextField(
                 controller: _emailController,
@@ -487,14 +483,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira seu e-mail';
                   }
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                  if (!RegExp(
+                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                  ).hasMatch(value)) {
                     return 'Por favor, insira um e-mail válido';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Idade
               _buildTextField(
                 controller: _ageController,
@@ -517,7 +515,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Sexo (Dropdown)
               DropdownButtonFormField<String>(
                 initialValue: _selectedGender.isEmpty ? null : _selectedGender,
@@ -531,11 +529,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Theme.of(context).dividerColor),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Theme.of(context).dividerColor),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -545,12 +547,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                   labelStyle: GoogleFonts.poppins(
-                    color: Theme.of(context).inputDecorationTheme.labelStyle?.color,
+                    color: Theme.of(
+                      context,
+                    ).inputDecorationTheme.labelStyle?.color,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 items: const [
-                  DropdownMenuItem(value: 'Masculino', child: Text('Masculino')),
+                  DropdownMenuItem(
+                    value: 'Masculino',
+                    child: Text('Masculino'),
+                  ),
                   DropdownMenuItem(value: 'Feminino', child: Text('Feminino')),
                   DropdownMenuItem(value: 'Outro', child: Text('Outro')),
                 ],
@@ -567,13 +574,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Mesada (Allowance)
               _buildTextField(
                 controller: _allowanceController,
                 label: 'Valor da Mesada (R\$)',
                 icon: Icons.attach_money_outlined,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
                 ],
@@ -589,16 +598,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Requires Approval (Switch)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Theme.of(context).dividerColor,
-                  ),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
@@ -616,7 +623,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Theme.of(context).textTheme.titleMedium?.color,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.color,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -624,7 +633,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             'Transações precisam de aprovação do responsável',
                             style: GoogleFonts.poppins(
                               fontSize: 12,
-                              color: Theme.of(context).textTheme.bodyMedium?.color,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -643,7 +654,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               // Botão de salvar
               SizedBox(
                 width: double.infinity,
@@ -664,7 +675,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : Text(

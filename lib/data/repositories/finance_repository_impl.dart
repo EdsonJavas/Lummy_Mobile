@@ -14,7 +14,9 @@ class InMemoryFinanceRepository implements FinanceRepository {
       final data = dataSource.getOrCreateFinancial(userId);
       return Success<FinancialData>(data);
     } catch (e, st) {
-      return FailureResult<FinancialData>(Failure('Erro ao obter dados financeiros', cause: e, stackTrace: st));
+      return FailureResult<FinancialData>(
+        Failure('Erro ao obter dados financeiros', cause: e, stackTrace: st),
+      );
     }
   }
 
@@ -36,7 +38,9 @@ class InMemoryFinanceRepository implements FinanceRepository {
       );
       return Success<FinancialData>(data);
     } catch (e, st) {
-      return FailureResult<FinancialData>(Failure('Erro ao adicionar transação', cause: e, stackTrace: st));
+      return FailureResult<FinancialData>(
+        Failure('Erro ao adicionar transação', cause: e, stackTrace: st),
+      );
     }
   }
 
@@ -56,9 +60,9 @@ class InMemoryFinanceRepository implements FinanceRepository {
       );
       return Success<Goal>(goal);
     } catch (e, st) {
-      return FailureResult<Goal>(Failure('Erro ao definir meta', cause: e, stackTrace: st));
+      return FailureResult<Goal>(
+        Failure('Erro ao definir meta', cause: e, stackTrace: st),
+      );
     }
   }
 }
-
-

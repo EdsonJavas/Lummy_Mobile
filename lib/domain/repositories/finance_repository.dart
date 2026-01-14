@@ -18,5 +18,3 @@ abstract class FinanceRepository {
     required double amount,
   });
 }
-
-

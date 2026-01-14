@@ -26,16 +26,35 @@ class ParentDashboardScreen extends StatefulWidget {
 }
 
 class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
+  // Paleta de cores vibrantes - consistente com versão infantil
+  static const _primaryBlue = Color(0xFF3B82F6);
+  static const _deepBlue = Color(0xFF1E40AF);
+  static const _purple = Color(0xFF8B5CF6);
+  static const _orange = Color(0xFFF59E0B);
+  static const _green = Color(0xFF10B981);
+  static const _red = Color(0xFFEF4444);
+
+  // Extrai o primeiro nome do usuário
+  String _getFirstName(String? fullName) {
+    if (fullName == null || fullName.isEmpty) {
+      return 'Responsável';
+    }
+    final parts = fullName.trim().split(' ');
+    return parts.first;
+  }
+
   Future<void> _refresh(BuildContext context) async {
     await context.read<ParentDashboardCubit>().refresh();
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A1A)
+          : const Color(0xFFF8FAFC),
       body: SafeArea(
         top: false,
         child: BlocBuilder<ParentDashboardCubit, ParentDashboardState>(
@@ -60,54 +79,64 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               children: [
                 BrandedRefreshIndicator(
                   onRefresh: () => _refresh(context),
+                  color: _primaryBlue,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
                     ),
                     child: Column(
                       children: [
-                        _buildHeroSection(context, state),
+                        _buildHeroSection(context, state, isDark),
                         Transform(
-                          transform: Matrix4.translationValues(0, -32, 0),
+                          transform: Matrix4.translationValues(0, -36, 0),
                           child: Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
+                              color: isDark
+                                  ? const Color(0xFF0A0A1A)
+                                  : const Color(0xFFF8FAFC),
                               borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(36),
-                                topRight: Radius.circular(36),
+                                topLeft: Radius.circular(32),
+                                topRight: Radius.circular(32),
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.08),
-                                  blurRadius: 25,
-                                  offset: const Offset(0, -12),
+                                  color: Colors.black.withOpacity(
+                                    isDark ? 0.3 : 0.08,
+                                  ),
+                                  blurRadius: 30,
+                                  offset: const Offset(0, -15),
                                 ),
                               ],
                             ),
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(20, 40, 20, 32),
+                              padding: const EdgeInsets.fromLTRB(
+                                20,
+                                28,
+                                20,
+                                20,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _buildSectionTitle(
                                     context,
-                                    title: 'Visão geral',
-                                    subtitle:
-                                        'Resumo financeiro e ações rápidas',
+                                    title: 'Visão Geral',
+                                    subtitle: 'Resumo financeiro da família',
+                                    isDark: isDark,
                                   ),
                                   const SizedBox(height: 16),
-                                  _buildBalanceCard(context, state),
+                                  _buildBalanceCard(context, state, isDark),
                                   const SizedBox(height: 20),
-                                  _buildOverviewGrid(context, state),
-                                  const SizedBox(height: 32),
-                                  _buildQuickActions(context, state),
-                                  const SizedBox(height: 32),
+                                  _buildOverviewGrid(context, state, isDark),
+                                  const SizedBox(height: 24),
+                                  _buildQuickActions(context, state, isDark),
+                                  const SizedBox(height: 24),
                                   _buildInsightsPreview(
                                     context,
                                     state,
                                     widget.parentId,
+                                    isDark,
                                   ),
                                 ],
                               ),
@@ -121,9 +150,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 if (state.isLoading)
                   Positioned.fill(
                     child: Container(
-                      color: Theme.of(context)
-                          .scaffoldBackgroundColor
-                          .withOpacity(0.7),
+                      color: (isDark ? const Color(0xFF0A0A1A) : Colors.white)
+                          .withOpacity(0.85),
                       child: const Center(
                         child: BrandedLoader(
                           label: 'Atualizando informações...',
@@ -136,71 +164,74 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Adicionar nova criança
-        },
-        backgroundColor: colorScheme.primary,
-        icon: const Icon(Icons.person_add),
-        label: Text(
-          'Adicionar criança',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-        ),
-      ),
     );
   }
 
   Widget _buildHeroSection(
     BuildContext context,
     ParentDashboardState state,
+    bool isDark,
   ) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final gradientColors = isDark
-        ? const [
-            Color(0xFF1E293B),
-            Color(0xFF0F172A),
-            Color(0xFF1E40AF),
-          ]
-        : const [
-            Color(AppConstants.primaryBlue),
-            Color(AppConstants.secondaryBlue),
-            Color(AppConstants.purple),
-          ];
     final topInset = MediaQuery.of(context).padding.top;
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, topInset + 12, 20, 52),
+      padding: EdgeInsets.fromLTRB(20, topInset + 16, 20, 60),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: gradientColors,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: isDark
+              ? const [Color(0xFF1E293B), Color(0xFF0F172A), Color(0xFF312E81)]
+              : const [Color(0xFF3B82F6), Color(0xFF1E40AF), Color(0xFF7C3AED)],
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header com saudação e avatar
           Row(
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Olá, responsável',
-                      style: GoogleFonts.poppins(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Olá, ',
+                            style: GoogleFonts.poppins(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          ShaderMask(
+                            shaderCallback: (bounds) => const LinearGradient(
+                              colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
+                            ).createShader(bounds),
+                            child: Text(
+                              _getFirstName(state.parentName),
+                              style: GoogleFonts.poppins(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'Acompanhe e direcione os recursos da sua família em tempo real.',
+                      'Gerencie as finanças da família',
                       style: GoogleFonts.poppins(
-                        fontSize: 14,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
                         color: Colors.white.withOpacity(0.85),
                       ),
                     ),
@@ -217,37 +248,57 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   );
                 },
                 child: Container(
-                  width: 56,
-                  height: 56,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.22),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.35)),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.5),
+                      width: 2.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: const Icon(
-                    Icons.person_outline,
-                    color: Colors.white,
+                  child: const ClipOval(
+                    child: CachedAvatar(
+                      imageUrl:
+                          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
+                      size: 52,
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 28),
+          // Card de saldo principal - SALDO TOTAL DOS FILHOS
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(isDark ? 0.15 : 0.22),
-              borderRadius: BorderRadius.circular(28),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(isDark ? 0.12 : 0.2),
+                  Colors.white.withOpacity(isDark ? 0.06 : 0.1),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(isDark ? 0.2 : 0.3),
+                color: Colors.white.withOpacity(0.3),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
                 ),
               ],
             ),
@@ -260,33 +311,68 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
-                        Icons.account_balance_wallet_rounded,
+                        Icons.savings_rounded,
                         color: Colors.white,
-                        size: 20,
+                        size: 18,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Saldo familiar disponível',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.9),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Saldo Total dos Filhos',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        '${state.children.length} ${state.children.length == 1 ? 'filho' : 'filhos'}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
+                // Saldo com FittedBox - NUNCA quebra
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    AppFormatters.formatCurrency(state.walletBalance),
+                    style: GoogleFonts.poppins(
+                      fontSize: 38,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: -1,
+                      height: 1.1,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  AppFormatters.formatCurrency(state.walletBalance),
+                  'Soma do saldo de todas as contas infantis',
                   style: GoogleFonts.poppins(
-                    fontSize: 38,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white.withOpacity(0.7),
                   ),
                 ),
               ],
@@ -301,29 +387,21 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     BuildContext context, {
     required String title,
     String? subtitle,
+    required bool isDark,
   }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ShaderMask(
           shaderCallback: (bounds) => LinearGradient(
             colors: isDark
-                ? [
-                    const Color(0xFF3B82F6),
-                    const Color(0xFF8B5CF6),
-                  ]
-                : [
-                    const Color(AppConstants.primaryBlue),
-                    const Color(AppConstants.secondaryBlue),
-                  ],
+                ? [_primaryBlue, _purple]
+                : [_deepBlue, _primaryBlue],
           ).createShader(bounds),
           child: Text(
             title,
             style: GoogleFonts.poppins(
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
@@ -334,8 +412,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           Text(
             subtitle,
             style: GoogleFonts.poppins(
-              fontSize: 13,
-              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
             ),
           ),
         ],
@@ -347,38 +426,28 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     BuildContext context,
     ParentDashboardState state,
     String parentId,
+    bool isDark,
   ) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
-              ? [
-                  const Color(0xFF1E40AF).withOpacity(0.15),
-                  const Color(0xFF8B5CF6).withOpacity(0.12),
-                ]
-              : [
-                  const Color(AppConstants.primaryBlue).withOpacity(0.08),
-                  const Color(AppConstants.purple).withOpacity(0.06),
-                ],
+              ? [_purple.withOpacity(0.15), _primaryBlue.withOpacity(0.1)]
+              : [_purple.withOpacity(0.08), _primaryBlue.withOpacity(0.05)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark
-              ? const Color(0xFF3B82F6).withOpacity(0.2)
-              : const Color(AppConstants.primaryBlue).withOpacity(0.15),
+          color: isDark ? _purple.withOpacity(0.3) : _purple.withOpacity(0.2),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: _purple.withOpacity(isDark ? 0.1 : 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -388,35 +457,44 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(AppConstants.primaryBlue).withOpacity(0.12),
+                  gradient: LinearGradient(
+                    colors: [
+                      _purple.withOpacity(0.2),
+                      _primaryBlue.withOpacity(0.15),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: _purple.withOpacity(0.3)),
                 ),
                 child: const Icon(
-                  Icons.stacked_line_chart_rounded,
-                  color: Color(AppConstants.primaryBlue),
+                  Icons.insights_rounded,
+                  color: Color(0xFF8B5CF6),
                   size: 24,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Insights e desempenho',
+                      'Insights e Desempenho',
                       style: GoogleFonts.poppins(
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      'Visualize gráficos detalhados de receitas, gastos e metas.',
+                      'Gráficos detalhados de receitas e gastos',
                       style: GoogleFonts.poppins(
                         fontSize: 13,
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -432,8 +510,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   label: 'Receitas vs. Despesas',
                   value:
                       '${state.monthIncomeTotal > 0 ? ((state.monthExpenseTotal / state.monthIncomeTotal) * 100).clamp(0, 999).toStringAsFixed(0) : '0'}%',
-                  icon: Icons.pie_chart_outline_rounded,
-                  color: const Color(AppConstants.successGreen),
+                  icon: Icons.pie_chart_rounded,
+                  color: _green,
+                  isDark: isDark,
                 ),
               ),
               const SizedBox(width: 12),
@@ -441,42 +520,61 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 child: _InsightPreviewChip(
                   label: 'Metas ativas',
                   value: '${state.goalSummaries.length}',
-                  icon: Icons.flag_outlined,
-                  color: const Color(AppConstants.purple),
+                  icon: Icons.flag_rounded,
+                  color: _purple,
+                  isDark: isDark,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(AppConstants.primaryBlue),
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [_purple, Color(0xFF7C3AED)],
                 ),
-                elevation: 0,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider.value(
-                      value: context.read<ParentDashboardCubit>(),
-                      child: ParentInsightsScreen(parentId: parentId),
-                    ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: _purple.withOpacity(0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
-                );
-              },
-              icon: const Icon(Icons.chevron_right_rounded, size: 20),
-              label: Text(
-                'Ver insights completos',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                ],
+              ),
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 14,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<ParentDashboardCubit>(),
+                        child: ParentInsightsScreen(parentId: parentId),
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.trending_up_rounded, size: 20),
+                label: Text(
+                  'Ver Insights Completos',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
                 ),
               ),
             ),
@@ -489,169 +587,93 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   Widget _buildBalanceCard(
     BuildContext context,
     ParentDashboardState state,
+    bool isDark,
   ) {
-    final theme = Theme.of(context);
-    final secondaryText = theme.textTheme.bodyMedium?.color?.withOpacity(0.7);
     final childrenCount = state.children.isEmpty ? 1 : state.children.length;
     final averagePerChild = state.walletBalance / childrenCount;
 
-    return CustomCard(
-      padding: const EdgeInsets.all(24),
-      color: theme.colorScheme.surface,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(AppConstants.primaryBlue)
-                                .withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.account_balance_wallet_rounded,
-                            color: Color(AppConstants.primaryBlue),
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Saldo disponível',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: secondaryText,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      AppFormatters.formatCurrency(state.walletBalance),
-                      style: GoogleFonts.poppins(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        color: theme.textTheme.titleLarge?.color,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  // Ação futura de adicionar recursos
-                },
-                icon: const Icon(Icons.add_rounded, size: 20),
-                label: Text(
-                  'Adicionar',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(AppConstants.accentOrange),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-            ],
+    // Resumo rápido - sem redundância de saldo
+    return Row(
+      children: [
+        // Card de média por filho
+        Expanded(
+          child: _CompactInfoCard(
+            icon: Icons.child_care_rounded,
+            label: 'Média/Filho',
+            value: AppFormatters.formatCurrency(averagePerChild),
+            color: _primaryBlue,
+            isDark: isDark,
           ),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              _BalanceInfoChip(
-                icon: Icons.child_care_rounded,
-                label: 'Média por criança',
-                value: AppFormatters.formatCurrency(averagePerChild),
-                color: const Color(AppConstants.successGreen),
-              ),
-              _BalanceInfoChip(
-                icon: Icons.pending_actions_rounded,
-                label: 'Solicitações pendentes',
-                value: state.pendingApprovalsCount.toString(),
-                color: const Color(AppConstants.accentOrange),
-              ),
-            ],
+        ),
+        const SizedBox(width: 12),
+        // Card de aprovações pendentes
+        Expanded(
+          child: _CompactInfoCard(
+            icon: Icons.pending_actions_rounded,
+            label: 'Aprovações',
+            value: '${state.pendingApprovalsCount}',
+            subtitle: state.pendingApprovalsCount > 0 ? 'pendentes' : 'nenhuma',
+            color: state.pendingApprovalsCount > 0 ? _orange : _green,
+            isDark: isDark,
+            showBadge: state.pendingApprovalsCount > 0,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildOverviewGrid(
     BuildContext context,
     ParentDashboardState state,
+    bool isDark,
   ) {
     final stats = [
       _OverviewStatData(
-        title: 'Receitas do mês',
+        title: 'Receitas',
         value: AppFormatters.formatCurrency(state.monthIncomeTotal),
-        subtitle: 'Últimos 30 dias',
-        icon: Icons.trending_up,
-        color: const Color(0xFF10B981),
+        subtitle: 'Este mês',
+        icon: Icons.trending_up_rounded,
+        color: _green,
       ),
       _OverviewStatData(
-        title: 'Despesas do mês',
+        title: 'Despesas',
         value: AppFormatters.formatCurrency(state.monthExpenseTotal),
-        subtitle: 'Pagamentos aprovados',
-        icon: Icons.trending_down,
-        color: const Color(0xFFEF4444),
+        subtitle: 'Este mês',
+        icon: Icons.trending_down_rounded,
+        color: _red,
       ),
       _OverviewStatData(
-        title: 'Dependentes ativos',
+        title: 'Filhos',
         value: '${state.children.length}',
-        subtitle: 'Filhos cadastrados',
-        icon: Icons.people_alt_rounded,
-        color: const Color(0xFF3B82F6),
+        subtitle: 'Cadastrados',
+        icon: Icons.family_restroom_rounded,
+        color: _primaryBlue,
       ),
       _OverviewStatData(
-        title: 'Dispersão média',
+        title: 'Média/Filho',
         value: state.children.isEmpty
             ? '—'
             : AppFormatters.formatCurrency(
                 state.monthExpenseTotal / state.children.length,
               ),
-        subtitle: 'Gasto mensal por criança',
-        icon: Icons.scatter_plot,
-        color: const Color(0xFFF59E0B),
+        subtitle: 'Gasto mensal',
+        icon: Icons.analytics_rounded,
+        color: _orange,
       ),
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final isTwoColumns = width > 620;
-        final itemWidth =
-            isTwoColumns ? (width - 12) / 2 : width; // 12 = spacing
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: stats
-              .map(
-                (stat) => SizedBox(
-                  width: itemWidth,
-                  child: _OverviewStatCard(data: stat),
-                ),
-              )
-              .toList(),
-        );
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: stats.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.5,
+      ),
+      itemBuilder: (context, index) {
+        return _OverviewStatCard(data: stats[index], isDark: isDark);
       },
     );
   }
@@ -659,22 +681,23 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   Widget _buildQuickActions(
     BuildContext context,
     ParentDashboardState state,
+    bool isDark,
   ) {
     final quickActions = [
       _QuickActionData(
-        title: 'Dependentes',
+        title: 'Meus Filhos',
         subtitle: state.children.isEmpty
-            ? 'Cadastre sua primeira criança'
+            ? 'Adicione seu primeiro filho'
             : '${state.children.length} cadastrados',
         icon: Icons.family_restroom_rounded,
-        color: const Color(AppConstants.primaryBlue),
+        color: _purple,
         onTap: () => widget.onNavigateToTab?.call(1),
       ),
       _QuickActionData(
-        title: 'Distribuir recursos',
-        subtitle: AppFormatters.formatCurrency(state.walletBalance),
-        icon: Icons.payments_rounded,
-        color: const Color(AppConstants.accentOrange),
+        title: 'Enviar Dinheiro',
+        subtitle: 'Distribua recursos',
+        icon: Icons.send_rounded,
+        color: _orange,
         onTap: () => widget.onNavigateToTab?.call(2),
       ),
       _QuickActionData(
@@ -683,15 +706,15 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             ? '${state.pendingApprovalsCount} pendentes'
             : 'Nenhuma pendente',
         icon: Icons.verified_user_rounded,
-        color: const Color(AppConstants.successGreen),
+        color: _green,
         onTap: () => widget.onNavigateToTab?.call(3),
         badgeCount: state.pendingApprovalsCount,
       ),
       _QuickActionData(
-        title: 'Insights',
-        subtitle: 'Veja tendências completas',
-        icon: Icons.stacked_line_chart_rounded,
-        color: const Color(AppConstants.purple),
+        title: 'Relatórios',
+        subtitle: 'Análise detalhada',
+        icon: Icons.bar_chart_rounded,
+        color: _primaryBlue,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -705,33 +728,117 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       ),
     ];
 
-    final crossAxisCount = MediaQuery.of(context).size.width > 700 ? 4 : 2;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle(
           context,
-          title: 'Ações rápidas',
-          subtitle: 'Separe o que precisa de mais atenção agora',
+          title: 'Ações Rápidas',
+          subtitle: 'Gerencie tudo em um só lugar',
+          isDark: isDark,
         ),
         const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: quickActions.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: crossAxisCount > 2 ? 1.4 : 1.25,
-          ),
-          itemBuilder: (context, index) {
-            final action = quickActions[index];
-            return _QuickActionCard(data: action);
-          },
+        // Primeira linha de ações
+        Row(
+          children: [
+            Expanded(child: _buildActionCard(quickActions[0], isDark)),
+            const SizedBox(width: 16),
+            Expanded(child: _buildActionCard(quickActions[1], isDark)),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Segunda linha de ações
+        Row(
+          children: [
+            Expanded(child: _buildActionCard(quickActions[2], isDark)),
+            const SizedBox(width: 16),
+            Expanded(child: _buildActionCard(quickActions[3], isDark)),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget _buildActionCard(_QuickActionData data, bool isDark) {
+    return GestureDetector(
+      onTap: data.onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: data.color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(data.icon, color: data.color, size: 22),
+                ),
+                if (data.badgeCount > 0) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: data.color,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      data.badgeCount.toString(),
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              data.title,
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              data.subtitle,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: isDark
+                    ? const Color(0xFF94A3B8)
+                    : const Color(0xFF64748B),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -742,7 +849,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     EdgeInsetsGeometry? margin,
   }) {
     return Container(
-      margin: margin ??
+      margin:
+          margin ??
           const EdgeInsets.symmetric(horizontal: AppConstants.spacingLarge),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -782,8 +890,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         height: 56,
                         decoration: BoxDecoration(
                           color: child.gender == Gender.male
-                              ? const Color(AppConstants.primaryBlue)
-                                  .withOpacity(0.1)
+                              ? const Color(
+                                  AppConstants.primaryBlue,
+                                ).withOpacity(0.1)
                               : const Color(AppConstants.pink).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(
                             AppConstants.radiusMedium,
@@ -818,10 +927,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withOpacity(0.65),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withOpacity(0.65),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -829,10 +937,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                   width: 3,
                                   height: 3,
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withOpacity(0.25),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withOpacity(0.25),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -843,7 +950,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                     style: GoogleFonts.poppins(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
-                                      color: const Color(AppConstants.successGreen),
+                                      color: const Color(
+                                        AppConstants.successGreen,
+                                      ),
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -861,10 +970,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             style: GoogleFonts.poppins(
                               fontSize: 11,
                               fontWeight: FontWeight.w400,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.6),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.6),
                             ),
                           ),
                           Text(
@@ -880,10 +988,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       const SizedBox(width: AppConstants.spacingSmall),
                       Icon(
                         Icons.chevron_right,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.4),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.4),
                       ),
                     ],
                   ),
@@ -902,7 +1009,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     EdgeInsetsGeometry? margin,
   }) {
     return Container(
-      margin: margin ??
+      margin:
+          margin ??
           const EdgeInsets.symmetric(horizontal: AppConstants.spacingLarge),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -972,70 +1080,123 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   }
 }
 
-class _BalanceInfoChip extends StatelessWidget {
+// Card compacto para resumo rápido
+class _CompactInfoCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final String? subtitle;
   final Color color;
+  final bool isDark;
+  final bool showBadge;
 
-  const _BalanceInfoChip({
+  const _CompactInfoCard({
     required this.icon,
     required this.label,
     required this.value,
-    this.color = const Color(AppConstants.primaryBlue),
+    this.subtitle,
+    required this.color,
+    required this.isDark,
+    this.showBadge = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(icon, color: color, size: 18),
+                    if (showBadge)
+                      Positioned(
+                        top: -3,
+                        right: -3,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF1E293B)
+                                  : Colors.white,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
                   label,
                   style: GoogleFonts.poppins(
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: theme.textTheme.bodySmall?.color,
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: color,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          // Valor com FittedBox - NUNCA quebra
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              ),
             ),
           ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              subtitle!,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: color,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -1060,147 +1221,99 @@ class _QuickActionData {
   });
 }
 
-class _QuickActionCard extends StatelessWidget {
-  final _QuickActionData data;
-
-  const _QuickActionCard({required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      onTap: data.onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardTheme.color,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: data.color.withOpacity(0.2)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: data.color.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(
-                    data.icon,
-                    color: data.color,
-                  ),
-                ),
-                if (data.badgeCount > 0) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: data.color,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      data.badgeCount.toString(),
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-            const Spacer(),
-            Text(
-              data.title,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: theme.textTheme.titleMedium?.color,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              data.subtitle,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: theme.textTheme.bodyMedium?.color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _OverviewStatCard extends StatelessWidget {
   final _OverviewStatData data;
+  final bool isDark;
 
-  const _OverviewStatCard({required this.data});
+  const _OverviewStatCard({required this.data, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return CustomCard(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: data.color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(data.icon, color: data.color),
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data.title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: theme.textTheme.bodyMedium?.color,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      data.color.withOpacity(0.2),
+                      data.color.withOpacity(0.1),
+                    ],
                   ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  data.value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                if (data.subtitle != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    data.subtitle!,
+                child: Icon(data.icon, color: data.color, size: 16),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    data.title,
                     style: GoogleFonts.poppins(
                       fontSize: 12,
-                      color: theme.textTheme.bodySmall?.color
-                          ?.withOpacity(0.7),
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? const Color(0xFF94A3B8)
+                          : const Color(0xFF64748B),
                     ),
                   ),
-                ],
-              ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              data.value,
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              ),
             ),
           ),
+          if (data.subtitle != null) ...[
+            const SizedBox(height: 2),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                data.subtitle!,
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                  color: isDark
+                      ? const Color(0xFF64748B)
+                      : const Color(0xFF94A3B8),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -1228,35 +1341,44 @@ class _InsightPreviewChip extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final bool isDark;
 
   const _InsightPreviewChip({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
+    required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? color.withOpacity(0.12) : color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(0.15)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withOpacity(isDark ? 0.15 : 0.1),
+            color.withOpacity(isDark ? 0.08 : 0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(isDark ? 0.3 : 0.2),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(14),
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color),
+            child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1266,16 +1388,22 @@ class _InsightPreviewChip extends StatelessWidget {
                 Text(
                   label,
                   style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: theme.colorScheme.onSurface.withOpacity(0.65),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 2),
                 Text(
                   value,
                   style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: color,
                   ),
                 ),
               ],

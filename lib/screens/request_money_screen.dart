@@ -16,15 +16,15 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
   final TextEditingController _amountController = TextEditingController();
   final FocusNode _amountFocusNode = FocusNode();
   double? _currentAmount;
-  
+
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late AnimationController _qrController;
-  
+
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _qrScaleAnimation;
-  
+
   String _generatedLink = '';
   bool _isGenerating = false;
   bool _hasGenerated = false;
@@ -48,12 +48,12 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    
+
     _slideController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    
+
     _qrController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -64,13 +64,10 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
       curve: Curves.easeInOut,
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _qrScaleAnimation = CurvedAnimation(
       parent: _qrController,
@@ -85,7 +82,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
     setState(() {
       _currentAmount = value;
     });
-    
+
     if (_hasGenerated) {
       setState(() {
         _hasGenerated = false;
@@ -96,7 +93,10 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
 
   Future<void> _generateRequest() async {
     if (_currentAmount == null || _currentAmount! <= 0) {
-      _showSnackBar('Digite um valor válido para pedir dinheiro', isError: true);
+      _showSnackBar(
+        'Digite um valor válido para pedir dinheiro',
+        isError: true,
+      );
       return;
     }
 
@@ -106,11 +106,12 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
 
     // Simular geração do link (aqui você integraria com seu backend)
     await Future.delayed(const Duration(milliseconds: 1500));
-    
+
     // Gerar link único baseado no valor e timestamp
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final link = 'https://lummy.app/request/$timestamp/${_currentAmount!.toStringAsFixed(2)}';
-    
+    final link =
+        'https://lummy.app/request/$timestamp/${_currentAmount!.toStringAsFixed(2)}';
+
     setState(() {
       _generatedLink = link;
       _hasGenerated = true;
@@ -123,7 +124,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
 
   Future<void> _copyToClipboard() async {
     if (_generatedLink.isEmpty) return;
-    
+
     await Clipboard.setData(ClipboardData(text: _generatedLink));
     _showSnackBar('Link copiado para a área de transferência! 📋');
   }
@@ -138,13 +139,11 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             color: Colors.white,
           ),
         ),
-        backgroundColor: isError 
+        backgroundColor: isError
             ? const Color(0xFFEF4444)
             : const Color(0xFF10B981),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
       ),
     );
@@ -182,34 +181,34 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                     SizedBox(height: isSmallScreen ? 8 : 12),
                     // Header
                     _buildHeader(isSmallScreen),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // Input de valor
                     _buildAmountInput(isSmallScreen),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // Botão gerar
                     _buildGenerateButton(isSmallScreen),
-                    
+
                     if (_hasGenerated) ...[
                       const SizedBox(height: 40),
-                      
+
                       // QR Code
                       _buildQRCodeSection(isSmallScreen),
-                      
+
                       const SizedBox(height: 32),
-                      
+
                       // Link copiável
                       _buildLinkSection(isSmallScreen),
                     ],
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Dicas educativas
                     _buildEducationalTips(isSmallScreen),
-                    
+
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -371,9 +370,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.white,
-                  ),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
             : const Icon(Icons.qr_code_2_rounded, size: 24),
@@ -412,11 +409,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF8B5CF6),
-              Color(0xFF7C3AED),
-              Color(0xFF6D28D9),
-            ],
+            colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED), Color(0xFF6D28D9)],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
@@ -442,11 +435,11 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                       width: 2,
                     ),
                   ),
-            child: const Icon(
-              Icons.qr_code_2_rounded,
-              color: Colors.white,
-              size: 28,
-            ),
+                  child: const Icon(
+                    Icons.qr_code_2_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -500,7 +493,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             ),
             const SizedBox(height: 24),
             Text(
-              _currentAmount != null 
+              _currentAmount != null
                   ? 'R\$ ${_currentAmount!.toStringAsFixed(2).replaceAll('.', ',')}'
                   : 'R\$ 0,00',
               style: GoogleFonts.poppins(
@@ -622,17 +615,20 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
     final tips = [
       {
         'title': 'Dica Importante',
-        'content': 'Sempre explique para seus pais por que você precisa desse dinheiro!',
+        'content':
+            'Sempre explique para seus pais por que você precisa desse dinheiro!',
         'emoji': '💡',
       },
       {
         'title': 'Seja Específico',
-        'content': 'Diga exatamente para que vai usar o dinheiro. Isso mostra responsabilidade!',
+        'content':
+            'Diga exatamente para que vai usar o dinheiro. Isso mostra responsabilidade!',
         'emoji': '🎯',
       },
       {
         'title': 'Mostre Gratidão',
-        'content': 'Agradeça seus pais pelo dinheiro e mostre que você valoriza o esforço deles!',
+        'content':
+            'Agradeça seus pais pelo dinheiro e mostre que você valoriza o esforço deles!',
         'emoji': '🙏',
       },
     ];
@@ -671,50 +667,56 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             ],
           ),
           const SizedBox(height: 16),
-          ...tips.map((tip) => Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF8C42).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+          ...tips.map(
+            (tip) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF8C42).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      tip['emoji']!,
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ),
-                  child: Text(
-                    tip['emoji']!,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        tip['title']!,
-                        style: GoogleFonts.poppins(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).textTheme.titleMedium?.color,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          tip['title']!,
+                          style: GoogleFonts.poppins(
+                            fontSize: isSmallScreen ? 14 : 16,
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.titleMedium?.color,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        tip['content']!,
-                        style: GoogleFonts.poppins(
-                          fontSize: isSmallScreen ? 12 : 14,
-                          fontWeight: FontWeight.w400,
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        const SizedBox(height: 4),
+                        Text(
+                          tip['content']!,
+                          style: GoogleFonts.poppins(
+                            fontSize: isSmallScreen ? 12 : 14,
+                            fontWeight: FontWeight.w400,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.color,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );

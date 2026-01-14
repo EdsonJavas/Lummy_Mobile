@@ -37,13 +37,10 @@ class _NewGoalScreenState extends State<NewGoalScreen>
       parent: _fadeController,
       curve: Curves.easeInOut,
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
     _fadeController.forward();
     _slideController.forward();
   }
@@ -88,103 +85,103 @@ class _NewGoalScreenState extends State<NewGoalScreen>
         child: SlideTransition(
           position: _slideAnimation,
           child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            // Header arredondado vindo de cima
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: Theme.of(context).brightness == Brightness.dark
-                      ? [const Color(0xFF8B5CF6), const Color(0xFF6D28D9)]
-                      : [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)],
-                ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(32),
-                  bottomRight: Radius.circular(32),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              padding: EdgeInsets.fromLTRB(
-                isSmallScreen ? 20.0 : 24.0,
-                MediaQuery.of(context).padding.top + 16,
-                isSmallScreen ? 20.0 : 24.0,
-                isSmallScreen ? 28.0 : 32.0,
-              ),
-              child: Column(
-                children: [
-                  // Botão voltar e título
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        onPressed: () => Navigator.pop(context),
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                // Header arredondado vindo de cima
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: Theme.of(context).brightness == Brightness.dark
+                          ? [const Color(0xFF8B5CF6), const Color(0xFF6D28D9)]
+                          : [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)],
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(32),
+                      bottomRight: Radius.circular(32),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF8B5CF6).withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
-                      Expanded(
-                        child: Text(
-                          'Nova Meta',
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(width: 48),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  // Preview da meta no header
-                  _buildGoalPreviewInHeader(isSmallScreen),
-                ],
-              ),
-            ),
-            // Conteúdo
-            Padding(
-              padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    // Seletor de emoji
-                    _buildEmojiSelector(isSmallScreen),
-                    const SizedBox(height: 24),
-
-                    // Campo de nome
-                    _buildNameField(isSmallScreen),
-                    const SizedBox(height: 20),
-
-                    // Campo de valor
-                    _buildAmountField(isSmallScreen),
-                    const SizedBox(height: 32),
-
-                    // Botão de salvar
-                    _buildSaveButton(isSmallScreen),
-
-                    // Espaço extra para o scroll
-                    const SizedBox(height: 40),
-                  ],
+                  padding: EdgeInsets.fromLTRB(
+                    isSmallScreen ? 20.0 : 24.0,
+                    MediaQuery.of(context).padding.top + 16,
+                    isSmallScreen ? 20.0 : 24.0,
+                    isSmallScreen ? 28.0 : 32.0,
+                  ),
+                  child: Column(
+                    children: [
+                      // Botão voltar e título
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                          Expanded(
+                            child: Text(
+                              'Nova Meta',
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(width: 48),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      // Preview da meta no header
+                      _buildGoalPreviewInHeader(isSmallScreen),
+                    ],
+                  ),
                 ),
-              ),
+                // Conteúdo
+                Padding(
+                  padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        // Seletor de emoji
+                        _buildEmojiSelector(isSmallScreen),
+                        const SizedBox(height: 24),
+
+                        // Campo de nome
+                        _buildNameField(isSmallScreen),
+                        const SizedBox(height: 20),
+
+                        // Campo de valor
+                        _buildAmountField(isSmallScreen),
+                        const SizedBox(height: 32),
+
+                        // Botão de salvar
+                        _buildSaveButton(isSmallScreen),
+
+                        // Espaço extra para o scroll
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
           ),
         ),
       ),
@@ -450,6 +447,4 @@ class _NewGoalScreenState extends State<NewGoalScreen>
       }
     }
   }
-
-  
 }

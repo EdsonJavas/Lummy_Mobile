@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   bool hasActiveGoal = false;
   int _earnedMissionPoints = 0;
   RealtimeChannel? _goalsChannel;
+  bool _isLoading = true;
 
   // Lista de transações
   List<Map<String, dynamic>> transactions = [];
@@ -293,14 +294,29 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadUserName();
-    _loadEarnedPoints();
-    _loadBalance();
-    _loadGoal();
+    _initializeData();
     _subscribeGoalsRealtime();
     // Testar conexão na inicialização (apenas em debug)
     if (kDebugMode) {
       _testConnection();
+    }
+  }
+
+  Future<void> _initializeData() async {
+    setState(() => _isLoading = true);
+    try {
+      await Future.wait([
+        _loadUserName(),
+        _loadEarnedPoints(),
+        _loadBalance(),
+        _loadGoal(),
+      ]);
+    } catch (e) {
+      debugPrint('❌ Erro ao inicializar dados: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -316,21 +332,33 @@ class _HomePageState extends State<HomePage> {
             event: PostgresChangeEvent.insert,
             schema: 'public',
             table: 'goals',
-            filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'child_id', value: user.id),
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'child_id',
+              value: user.id,
+            ),
             callback: (payload) => _loadGoal(),
           )
           .onPostgresChanges(
             event: PostgresChangeEvent.update,
             schema: 'public',
             table: 'goals',
-            filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'child_id', value: user.id),
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'child_id',
+              value: user.id,
+            ),
             callback: (payload) => _loadGoal(),
           )
           .onPostgresChanges(
             event: PostgresChangeEvent.delete,
             schema: 'public',
             table: 'goals',
-            filter: PostgresChangeFilter(type: PostgresChangeFilterType.eq, column: 'child_id', value: user.id),
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'child_id',
+              value: user.id,
+            ),
             callback: (payload) => _loadGoal(),
           )
           .subscribe();
@@ -370,7 +398,7 @@ class _HomePageState extends State<HomePage> {
 
       if (user != null) {
         debugPrint('🔍 Buscando nome para usuário: ${user.id}');
-        
+
         // 1) Buscar na tabela children pelo id do usuário autenticado
         try {
           final childRow = await supabase
@@ -379,13 +407,17 @@ class _HomePageState extends State<HomePage> {
               .eq('id', user.id)
               .maybeSingle();
 
-          debugPrint('📊 Resultado da busca em children: ${childRow != null ? "encontrado" : "não encontrado"}');
-          
+          debugPrint(
+            '📊 Resultado da busca em children: ${childRow != null ? "encontrado" : "não encontrado"}',
+          );
+
           if (childRow != null && childRow['nome'] != null) {
             name = childRow['nome'] as String?;
             debugPrint('✅ Nome encontrado na tabela children: $name');
           } else {
-            debugPrint('⚠️ Nome não encontrado na tabela children, tentando fallbacks...');
+            debugPrint(
+              '⚠️ Nome não encontrado na tabela children, tentando fallbacks...',
+            );
           }
         } catch (e) {
           debugPrint('❌ Erro ao buscar na tabela children: $e');
@@ -399,7 +431,9 @@ class _HomePageState extends State<HomePage> {
         // 2) Fallback: metadata do usuário (caso exista)
         if (name == null || name.trim().isEmpty) {
           final meta = user.userMetadata ?? {};
-          name = (meta['name'] ?? meta['full_name'] ?? meta['username']) as String?;
+          name =
+              (meta['name'] ?? meta['full_name'] ?? meta['username'])
+                  as String?;
           if (name != null) {
             debugPrint('✅ Nome encontrado no metadata: $name');
           }
@@ -423,7 +457,7 @@ class _HomePageState extends State<HomePage> {
           debugPrint('✅ Nome encontrado no SharedPreferences: $name');
         }
       }
-      
+
       setState(() {
         userName = (name?.trim().isNotEmpty == true) ? name!.trim() : 'Usuário';
         debugPrint('👤 Nome final definido: $userName');
@@ -475,7 +509,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         currentBalance = bal;
       });
-      
+
       // Sincronizar meta com o novo balance
       if (hasActiveGoal) {
         final goalRow = await supabase
@@ -538,7 +572,7 @@ class _HomePageState extends State<HomePage> {
 
       final target = (goalRow['target_amount'] as num).toDouble();
       final status = goalRow['status'] as String;
-      
+
       // Se já está concluída, não atualizar
       if (status == 'completed') return;
 
@@ -591,14 +625,14 @@ class _HomePageState extends State<HomePage> {
       if (goalData != null) {
         // Sincronizar meta com cofrinho antes de exibir
         await _syncGoalWithBalance(goalData['id'] as String);
-        
+
         // Recarregar meta atualizada
         final updatedGoal = await supabase
             .from('goals')
             .select('*')
             .eq('id', goalData['id'] as String)
             .maybeSingle();
-        
+
         if (updatedGoal != null) {
           setState(() {
             goalName = updatedGoal['name'] as String;
@@ -640,7 +674,9 @@ class _HomePageState extends State<HomePage> {
             goalCurrentAmount = target; // meta concluída nunca excede o alvo
             hasActiveGoal = true; // Exibir cartão com status de concluída
           });
-          debugPrint('ℹ️ Exibindo última meta concluída na homepage: $goalName');
+          debugPrint(
+            'ℹ️ Exibindo última meta concluída na homepage: $goalName',
+          );
         } else {
           setState(() {
             hasActiveGoal = false;
@@ -672,42 +708,48 @@ class _HomePageState extends State<HomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenHeight < 700;
 
+    // Cor do refresh indicator baseada na tela (azul para versão infantil)
+    const refreshColor = Color(0xFF3B82F6);
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: BrandedRefreshIndicator(
-          onRefresh: _refreshData,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            child: Column(
-              children: [
-                // Header simples estilo Inter
-                _buildSimpleHeader(screenWidth, isSmallScreen),
+        child: _isLoading
+            ? const ChildHomeSkeleton()
+            : BrandedRefreshIndicator(
+                onRefresh: _refreshData,
+                color: refreshColor,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  child: Column(
+                    children: [
+                      // Header simples estilo Inter
+                      _buildSimpleHeader(screenWidth, isSmallScreen),
 
-                // Saldo atual
-                _buildBalanceCard(screenWidth, isSmallScreen),
+                      // Saldo atual
+                      _buildBalanceCard(screenWidth, isSmallScreen),
 
-                // Meta de economia (sempre mostra: ativa ou preview vazio)
-                hasActiveGoal 
-                    ? _buildSavingsGoal(screenWidth, isSmallScreen)
-                    : _buildEmptyGoalCard(screenWidth, isSmallScreen),
+                      // Meta de economia (sempre mostra: ativa ou preview vazio)
+                      hasActiveGoal
+                          ? _buildSavingsGoal(screenWidth, isSmallScreen)
+                          : _buildEmptyGoalCard(screenWidth, isSmallScreen),
 
-                // Ações rápidas (estilo Inter)
-                _buildQuickActionsInter(screenWidth, isSmallScreen),
+                      // Ações rápidas (estilo Inter)
+                      _buildQuickActionsInter(screenWidth, isSmallScreen),
 
-                // Educação financeira
-                _buildEducationSection(screenWidth, isSmallScreen),
+                      // Educação financeira
+                      _buildEducationSection(screenWidth, isSmallScreen),
 
-                // Conquistas melhoradas
-                _buildAchievementsImproved(screenWidth, isSmallScreen),
+                      // Conquistas melhoradas
+                      _buildAchievementsImproved(screenWidth, isSmallScreen),
 
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
       ),
     );
   }
@@ -1022,8 +1064,8 @@ class _HomePageState extends State<HomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                   Text(
-                     'R\$ ${contributed.toStringAsFixed(2)}',
+                  Text(
+                    'R\$ ${contributed.toStringAsFixed(2)}',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -1214,9 +1256,7 @@ class _HomePageState extends State<HomePage> {
       onTap: () async {
         final result = await Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => const NewGoalScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const NewGoalScreen()),
         );
 
         if (result != null) {
@@ -1228,9 +1268,7 @@ class _HomePageState extends State<HomePage> {
               SnackBar(
                 content: Text(
                   'Nova meta criada! 🎯',
-                  style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
                 ),
                 backgroundColor: const Color(0xFF8B5CF6),
                 behavior: SnackBarBehavior.floating,
@@ -1294,7 +1332,9 @@ class _HomePageState extends State<HomePage> {
                         style: GoogleFonts.poppins(
                           fontSize: isSmallScreen ? 17 : 19,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).textTheme.titleLarge?.color?.withOpacity(0.6),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.titleLarge?.color?.withOpacity(0.6),
                           height: 1.2,
                         ),
                         maxLines: 1,
@@ -1354,7 +1394,9 @@ class _HomePageState extends State<HomePage> {
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.color?.withOpacity(0.5),
                       ),
                     ),
                     Text(
@@ -1362,7 +1404,9 @@ class _HomePageState extends State<HomePage> {
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.color?.withOpacity(0.5),
                       ),
                     ),
                   ],
@@ -1385,10 +1429,7 @@ class _HomePageState extends State<HomePage> {
                         height: 10,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF8B5CF6),
-                              Color(0xFF7C3AED),
-                            ],
+                            colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
                           ),
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -1425,7 +1466,9 @@ class _HomePageState extends State<HomePage> {
                             Icon(
                               Icons.savings_outlined,
                               size: 16,
-                              color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.color?.withOpacity(0.5),
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -1446,7 +1489,9 @@ class _HomePageState extends State<HomePage> {
                           style: GoogleFonts.poppins(
                             fontSize: isSmallScreen ? 16 : 18,
                             fontWeight: FontWeight.w700,
-                            color: Theme.of(context).textTheme.titleLarge?.color?.withOpacity(0.5),
+                            color: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.color?.withOpacity(0.5),
                           ),
                         ),
                       ],
@@ -1477,7 +1522,9 @@ class _HomePageState extends State<HomePage> {
                             Icon(
                               Icons.trending_up,
                               size: 16,
-                              color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.5),
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.color?.withOpacity(0.5),
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -1498,7 +1545,9 @@ class _HomePageState extends State<HomePage> {
                           style: GoogleFonts.poppins(
                             fontSize: isSmallScreen ? 16 : 18,
                             fontWeight: FontWeight.w700,
-                            color: Theme.of(context).textTheme.titleLarge?.color?.withOpacity(0.5),
+                            color: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.color?.withOpacity(0.5),
                           ),
                         ),
                       ],
@@ -1637,7 +1686,9 @@ class _HomePageState extends State<HomePage> {
                             .where((a) => a['isCompleted'] == true)
                             .length
                             .toDouble();
-                        final weightedScore = _earnedMissionPoints.toDouble() + (completedAchievements * 5.0);
+                        final weightedScore =
+                            _earnedMissionPoints.toDouble() +
+                            (completedAchievements * 5.0);
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -1651,7 +1702,8 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                         if (result is Map && result['claimed'] == true) {
-                          final claimedAmount = ((result['amount'] ?? 0.0) as double);
+                          final claimedAmount =
+                              ((result['amount'] ?? 0.0) as double);
                           setState(() {
                             currentBalance += claimedAmount;
                           });
@@ -1661,11 +1713,16 @@ class _HomePageState extends State<HomePage> {
                             final goalRow = await Supabase.instance.client
                                 .from('goals')
                                 .select('id')
-                                .eq('child_id', Supabase.instance.client.auth.currentUser!.id)
+                                .eq(
+                                  'child_id',
+                                  Supabase.instance.client.auth.currentUser!.id,
+                                )
                                 .eq('status', 'ongoing')
                                 .maybeSingle();
                             if (goalRow != null) {
-                              await _syncGoalWithBalance(goalRow['id'] as String);
+                              await _syncGoalWithBalance(
+                                goalRow['id'] as String,
+                              );
                               await _loadGoal();
                             }
                           }

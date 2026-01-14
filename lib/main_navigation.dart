@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'home_page.dart'; // HomePage agora é importada do arquivo separado
 import 'expenses_screen.dart'; // Importando a tela de gastos
@@ -14,6 +15,7 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
+  DateTime? _lastBackPress;
 
   final List<Widget> _pages = [
     const HomePage(),
@@ -22,59 +24,103 @@ class _MainNavigationState extends State<MainNavigation> {
     const LessonsScreen(), // Usando a nova LessonsScreen ao invés do placeholder
   ];
 
+  Future<bool> _onWillPop() async {
+    // Se não estiver na primeira aba, volta para ela
+    if (_currentIndex != 0) {
+      setState(() => _currentIndex = 0);
+      return false;
+    }
+
+    // Se já estiver na primeira aba, verifica double tap para sair
+    final now = DateTime.now();
+    if (_lastBackPress == null ||
+        now.difference(_lastBackPress!) > const Duration(seconds: 2)) {
+      _lastBackPress = now;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Pressione voltar novamente para sair',
+            style: GoogleFonts.poppins(),
+          ),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: const Color(0xFF1E293B),
+        ),
+      );
+      return false;
+    }
+
+    // Fecha o app
+    SystemNavigator.pop();
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildNavItem(
-                    0,
-                    Icons.home_rounded,
-                    'Início',
-                    const Color(0xFF1E40AF),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await _onWillPop();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(index: _currentIndex, children: _pages),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildNavItem(
+                      0,
+                      Icons.home_rounded,
+                      'Início',
+                      const Color(0xFF1E40AF),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: _buildNavItem(
-                    1,
-                    Icons.receipt_long_rounded,
-                    'Gastos',
-                    const Color(0xFFEF4444),
+                  Expanded(
+                    child: _buildNavItem(
+                      1,
+                      Icons.receipt_long_rounded,
+                      'Gastos',
+                      const Color(0xFFEF4444),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: _buildNavItem(
-                    2,
-                    Icons.flag_rounded,
-                    'Metas',
-                    const Color(0xFF8B5CF6),
+                  Expanded(
+                    child: _buildNavItem(
+                      2,
+                      Icons.flag_rounded,
+                      'Metas',
+                      const Color(0xFF8B5CF6),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: _buildNavItem(
-                    3,
-                    Icons.school_rounded,
-                    'Aprender',
-                    const Color(0xFF10B981),
+                  Expanded(
+                    child: _buildNavItem(
+                      3,
+                      Icons.school_rounded,
+                      'Aprender',
+                      const Color(0xFF10B981),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

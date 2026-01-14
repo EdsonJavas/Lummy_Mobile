@@ -5,7 +5,10 @@ class InMemoryAuthRepository implements AuthRepository {
   String? _currentUserId;
 
   @override
-  Future<Result<String>> login({required String email, required String password}) async {
+  Future<Result<String>> login({
+    required String email,
+    required String password,
+  }) async {
     // Aceitar qualquer email e senha para facilitar o teste
     // Removendo a validação que estava causando problemas
     _currentUserId = email;
@@ -19,7 +22,7 @@ class InMemoryAuthRepository implements AuthRepository {
 
   @override
   String? get currentUserId => _currentUserId;
-  
+
   @override
   Future<Result<String>> register({
     required String email,
@@ -31,5 +34,3 @@ class InMemoryAuthRepository implements AuthRepository {
     return Success<String>(_currentUserId!);
   }
 }
-
-

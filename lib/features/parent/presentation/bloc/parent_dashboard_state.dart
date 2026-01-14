@@ -6,6 +6,7 @@ import '../../../../domain/entities/notification_entity.dart';
 
 class ParentDashboardState extends Equatable {
   final bool isLoading;
+  final String? parentName;
   final List<ChildEntity> children;
   final ChildEntity? selectedChild;
   final List<TransactionEntity> pendingApprovals;
@@ -21,6 +22,7 @@ class ParentDashboardState extends Equatable {
 
   const ParentDashboardState({
     this.isLoading = false,
+    this.parentName,
     this.children = const [],
     this.selectedChild,
     this.pendingApprovals = const [],
@@ -42,6 +44,7 @@ class ParentDashboardState extends Equatable {
 
   ParentDashboardState copyWith({
     bool? isLoading,
+    String? parentName,
     List<ChildEntity>? children,
     ChildEntity? selectedChild,
     List<TransactionEntity>? pendingApprovals,
@@ -57,6 +60,7 @@ class ParentDashboardState extends Equatable {
   }) {
     return ParentDashboardState(
       isLoading: isLoading ?? this.isLoading,
+      parentName: parentName ?? this.parentName,
       children: children ?? this.children,
       selectedChild: selectedChild ?? this.selectedChild,
       pendingApprovals: pendingApprovals ?? this.pendingApprovals,
@@ -75,6 +79,7 @@ class ParentDashboardState extends Equatable {
   @override
   List<Object?> get props => [
     isLoading,
+    parentName,
     children,
     selectedChild,
     pendingApprovals,
@@ -140,6 +145,11 @@ class ChildGoalSummary extends Equatable {
   });
 
   @override
-  List<Object?> get props =>
-      [childId, childName, completedGoals, totalGoals, averageProgress];
+  List<Object?> get props => [
+    childId,
+    childName,
+    completedGoals,
+    totalGoals,
+    averageProgress,
+  ];
 }

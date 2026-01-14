@@ -85,9 +85,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       try {
         // Verificar se o locator está inicializado
         if (!locator.isRegistered<AuthRepository>()) {
-          throw Exception('Sistema ainda não foi inicializado. Aguarde alguns instantes.');
+          throw Exception(
+            'Sistema ainda não foi inicializado. Aguarde alguns instantes.',
+          );
         }
-        
+
         final authRepo = locator<AuthRepository>();
         final familyService = locator<FamilyService>();
 
@@ -106,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           setState(() {
             _isLoading = false;
           });
-          
+
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -153,15 +155,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                RegisterChildrenScreen(responsavel: responsavel, parentUserId: userId),
+            builder: (context) => RegisterChildrenScreen(
+              responsavel: responsavel,
+              parentUserId: userId,
+            ),
           ),
         );
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
-        
+
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -375,8 +379,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         const Color(0xFF8B5CF6),
                                       ] // Azul → Roxo como no site
                                     : [
-                                        Theme.of(context).textTheme.titleLarge?.color ?? const Color(0xFF1E293B),
-                                        Theme.of(context).textTheme.titleLarge?.color ?? const Color(0xFF1E293B),
+                                        Theme.of(
+                                              context,
+                                            ).textTheme.titleLarge?.color ??
+                                            const Color(0xFF1E293B),
+                                        Theme.of(
+                                              context,
+                                            ).textTheme.titleLarge?.color ??
+                                            const Color(0xFF1E293B),
                                       ],
                               ).createShader(bounds),
                               child: Text(

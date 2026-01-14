@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,99 +16,139 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  late final AnimationController _fadeController;
-  late final AnimationController _scaleController;
+  // Controllers
+  late final AnimationController _logoController;
+  late final AnimationController _pulseController;
   late final AnimationController _textController;
+  late final AnimationController _loadingController;
+  late final AnimationController _particleController;
 
-  late final Animation<double> _fadeAnimation;
-  late final Animation<double> _scaleAnimation;
-  late final Animation<double> _textFadeAnimation;
-  late final Animation<Offset> _textSlideAnimation;
+  // Animações
+  late final Animation<double> _logoScale;
+  late final Animation<double> _logoOpacity;
+  late final Animation<double> _textSlide;
+  late final Animation<double> _textOpacity;
+
+  // Cores da marca Lummy
+  static const _blue = Color(0xFF3B82F6);
+  static const _purple = Color(0xFF8B5CF6);
+  static const _orange = Color(0xFFF59E0B);
+  static const _green = Color(0xFF10B981);
+
+  String _loadingText = 'Inicializando';
+  int _loadingDots = 0;
+  Timer? _dotsTimer;
 
   @override
   void initState() {
     super.initState();
+    _setupAnimations();
+    _startAnimations();
+    _startLoadingDots();
+    _bootstrap();
+  }
 
-    // Controller para fade-in geral
-    _fadeController = AnimationController(
+  void _setupAnimations() {
+    // Logo controller
+    _logoController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
 
-    // Controller para scale do logo
-    _scaleController = AnimationController(
+    // Pulse controller
+    _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 2000),
     );
 
-    // Controller para texto
+    // Text controller
     _textController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
 
+    // Loading controller
+    _loadingController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    // Particle controller
+    _particleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 4000),
+    );
+
     // Animações
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
+    _logoScale = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoController,
+        curve: const Interval(0.0, 0.7, curve: Curves.elasticOut),
+      ),
     );
 
-    _scaleAnimation = CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
+    _logoOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _logoController,
+        curve: const Interval(0.0, 0.3, curve: Curves.easeOut),
+      ),
     );
 
-    _textFadeAnimation = CurvedAnimation(
-      parent: _textController,
-      curve: const Interval(0.3, 1.0, curve: Curves.easeInOut),
+    _textSlide = Tween<double>(begin: 40.0, end: 0.0).animate(
+      CurvedAnimation(parent: _textController, curve: Curves.easeOutCubic),
     );
 
-    _textSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _textController,
-            curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
-          ),
-        );
-
-    _startAnimations();
-    _bootstrap();
+    _textOpacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _textController, curve: Curves.easeOut));
   }
 
-  Future<void> _startAnimations() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _fadeController.forward();
+  void _startAnimations() async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    _logoController.forward();
 
-    await Future.delayed(const Duration(milliseconds: 200));
-    _scaleController.forward();
+    await Future.delayed(const Duration(milliseconds: 500));
+    _pulseController.repeat(reverse: true);
+    _particleController.repeat();
 
     await Future.delayed(const Duration(milliseconds: 400));
     _textController.forward();
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    _loadingController.repeat();
+  }
+
+  void _startLoadingDots() {
+    _dotsTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (mounted) {
+        setState(() {
+          _loadingDots = (_loadingDots + 1) % 4;
+        });
+      }
+    });
   }
 
   Future<void> _bootstrap() async {
     try {
-      // Inicializar Supabase PRIMEIRO
-      debugPrint('Inicializando Supabase...');
+      setState(() => _loadingText = 'Conectando');
+
+      debugPrint('🔧 Inicializando Supabase...');
+      debugPrint('   URL: ${SupabaseConfig.url}');
+      debugPrint('   AnonKey: ${SupabaseConfig.anonKey.substring(0, 20)}...');
+
       await Supabase.initialize(
         url: SupabaseConfig.url,
         anonKey: SupabaseConfig.anonKey,
       );
-      debugPrint('Supabase inicializado com sucesso!');
-      
-      // Só depois inicializar o locator (que depende do Supabase)
-      debugPrint('Configurando dependências...');
+
+      debugPrint('✅ Supabase inicializado com sucesso');
+
+      setState(() => _loadingText = 'Configurando');
       setupLocator();
-      debugPrint('Dependências configuradas com sucesso!');
 
-      // Aguarda as animações terminarem + delay para visualização
-      await Future.delayed(const Duration(milliseconds: 2000));
-
-      if (!mounted) return;
-
-      // SEMPRE navegar para tela de login
-      debugPrint('ℹ️ Navegando para tela de login...');
-      await _fadeOut();
+      setState(() => _loadingText = 'Quase pronto');
+      await Future.delayed(const Duration(milliseconds: 1500));
 
       if (!mounted) return;
 
@@ -116,219 +157,525 @@ class _SplashScreenState extends State<SplashScreen>
           transitionDuration: const Duration(milliseconds: 600),
           pageBuilder: (_, __, ___) => const LoginScreen(),
           transitionsBuilder: (_, anim, __, child) {
-            final curved = CurvedAnimation(
-              parent: anim,
-              curve: Curves.easeInOut,
+            return FadeTransition(
+              opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.05),
+                  end: Offset.zero,
+                ).animate(anim),
+                child: child,
+              ),
             );
-            return FadeTransition(opacity: curved, child: child);
           },
         ),
       );
     } catch (e, stackTrace) {
-      // Log do erro para debug
-      debugPrint('Erro ao inicializar aplicação: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugPrint('❌ Erro ao inicializar: $e');
+      debugPrint('   Tipo: ${e.runtimeType}');
+      debugPrint('   Stack: $stackTrace');
       
-      // Em caso de erro, ainda assim navega para o login
-      if (!mounted) return;
-      
-      // Tentar inicializar o locator mesmo com erro (pode funcionar em alguns casos)
-      try {
-        debugPrint('Tentando inicializar dependências mesmo com erro...');
-        setupLocator();
-      } catch (locatorError) {
-        debugPrint('Erro ao inicializar dependências: $locatorError');
-        // Ignorar erro do locator se já tiver dado erro antes
+      // Verificar se é erro de conexão
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('socketexception') || 
+          errorString.contains('failed host lookup') ||
+          errorString.contains('no address associated')) {
+        debugPrint('⚠️ Erro de conexão detectado');
+        debugPrint('   Verifique:');
+        debugPrint('   1. Conexão com internet');
+        debugPrint('   2. URL do Supabase: ${SupabaseConfig.url}');
+        debugPrint('   3. Se está usando emulador, verifique acesso à internet');
       }
       
-      // Sempre ir para login, mesmo com erro
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-    }
-  }
+      try {
+        setupLocator();
+      } catch (_) {}
 
-  Future<void> _fadeOut() async {
-    await _fadeController.reverse();
-    await _scaleController.reverse();
-    await _textController.reverse();
+      if (!mounted) return;
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginScreen()));
+    }
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
-    _scaleController.dispose();
+    _dotsTimer?.cancel();
+    _logoController.dispose();
+    _pulseController.dispose();
     _textController.dispose();
+    _loadingController.dispose();
+    _particleController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0A1A), // Fundo escuro como o app
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0A0A1A), Color(0xFF1A1A2E), Color(0xFF16213E)],
-          ),
-        ),
-        child: SafeArea(
-          child: AnimatedBuilder(
-            animation: Listenable.merge([
-              _fadeAnimation,
-              _scaleAnimation,
-              _textFadeAnimation,
-              _textSlideAnimation,
-            ]),
-            builder: (context, child) {
-              return FadeTransition(
-                opacity: _fadeAnimation,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo principal
-                    ScaleTransition(
-                      scale: _scaleAnimation,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 20,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A2E),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFF2D3748),
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF3B82F6).withOpacity(0.2),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: _LummyLogo(),
-                      ),
-                    ),
-
-                    const SizedBox(height: 60),
-
-                    // Texto de boas-vindas
-                    SlideTransition(
-                      position: _textSlideAnimation,
-                      child: FadeTransition(
-                        opacity: _textFadeAnimation,
-                        child: Column(
-                          children: [
-                            Text(
-                              'Bem-vindo ao',
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-                              ).createShader(bounds),
-                              child: Text(
-                                'Lummy',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 48,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                  letterSpacing: 2.0,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Sua jornada financeira começa aqui!',
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xFFE2E8F0),
-                                letterSpacing: 0.3,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 80),
-
-                    // Indicador de carregamento
-                    FadeTransition(
-                      opacity: _textFadeAnimation,
-                      child: const SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 4,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color(0xFF3B82F6),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LummyLogo extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
+      backgroundColor: const Color(0xFF0F172A),
+      body: Stack(
         children: [
-          TextSpan(
-            text: 'Lu',
-            style: GoogleFonts.poppins(
-              fontSize: 32,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              letterSpacing: 1.0,
-            ),
-          ),
-          TextSpan(
-            text: 'mm',
-            style: GoogleFonts.poppins(
-              fontSize: 32,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF3B82F6),
-              letterSpacing: 1.0,
-            ),
-          ),
-          TextSpan(
-            text: 'y',
-            style: GoogleFonts.poppins(
-              fontSize: 32,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFFFF8C42),
-              letterSpacing: 1.0,
+          // Background com gradiente sutil
+          _buildBackground(),
+
+          // Partículas flutuantes
+          _buildParticles(),
+
+          // Conteúdo principal
+          SafeArea(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Spacer(flex: 2),
+
+                  // Logo animado
+                  _buildAnimatedLogo(),
+
+                  const SizedBox(height: 40),
+
+                  // Nome "Lummy" estilizado
+                  _buildLummyText(),
+
+                  const SizedBox(height: 12),
+
+                  // Subtítulo
+                  _buildSubtitle(),
+
+                  const Spacer(flex: 2),
+
+                  // Loading indicator elegante
+                  _buildLoadingSection(),
+
+                  const SizedBox(height: 50),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
+
+  Widget _buildBackground() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0F172A), Color(0xFF1E1B4B), Color(0xFF0F172A)],
+          stops: [0.0, 0.5, 1.0],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParticles() {
+    return AnimatedBuilder(
+      animation: _particleController,
+      builder: (context, _) {
+        return CustomPaint(
+          size: MediaQuery.of(context).size,
+          painter: _ParticlePainter(
+            progress: _particleController.value,
+            colors: [_blue, _purple, _orange, _green],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAnimatedLogo() {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_logoScale, _logoOpacity, _pulseController]),
+      builder: (context, _) {
+        return Opacity(
+          opacity: _logoOpacity.value,
+          child: Transform.scale(
+            scale: _logoScale.value,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Glow pulsante
+                Container(
+                  width: 180,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: _blue.withOpacity(
+                          0.2 + _pulseController.value * 0.15,
+                        ),
+                        blurRadius: 60 + _pulseController.value * 20,
+                        spreadRadius: 10,
+                      ),
+                      BoxShadow(
+                        color: _purple.withOpacity(
+                          0.15 + _pulseController.value * 0.1,
+                        ),
+                        blurRadius: 80 + _pulseController.value * 30,
+                        spreadRadius: 20,
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Container principal do logo
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF3B82F6),
+                        Color(0xFF8B5CF6),
+                        Color(0xFF6366F1),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _blue.withOpacity(0.4),
+                        blurRadius: 30,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Center(child: _buildLogoIcon()),
+                ),
+
+                // Anéis orbitais
+                ..._buildOrbitalRings(),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLogoIcon() {
+    // Ícone estilizado "L" para Lummy
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Colors.white, Color(0xFFE0E7FF)],
+      ).createShader(bounds),
+      child: Text(
+        'L',
+        style: GoogleFonts.fredoka(
+          fontSize: 72,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+          height: 1,
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildOrbitalRings() {
+    return [
+      // Anel externo
+      AnimatedBuilder(
+        animation: _particleController,
+        builder: (context, _) {
+          return Transform.rotate(
+            angle: _particleController.value * 2 * math.pi,
+            child: SizedBox(
+              width: 200,
+              height: 200,
+              child: CustomPaint(
+                painter: _OrbitalPainter(
+                  color: _blue.withOpacity(0.3),
+                  strokeWidth: 1.5,
+                  dashLength: 8,
+                  gapLength: 12,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+      // Pontos orbitais
+      AnimatedBuilder(
+        animation: _particleController,
+        builder: (context, _) {
+          return Transform.rotate(
+            angle: _particleController.value * 2 * math.pi,
+            child: SizedBox(
+              width: 200,
+              height: 200,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 100 - 6,
+                    top: 0,
+                    child: _buildOrbitalDot(_blue),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 100 - 6,
+                    child: _buildOrbitalDot(_purple),
+                  ),
+                  Positioned(
+                    left: 100 - 6,
+                    bottom: 0,
+                    child: _buildOrbitalDot(_orange),
+                  ),
+                  Positioned(
+                    left: 0,
+                    top: 100 - 6,
+                    child: _buildOrbitalDot(_green),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    ];
+  }
+
+  Widget _buildOrbitalDot(Color color) {
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.6),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLummyText() {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_textSlide, _textOpacity]),
+      builder: (context, _) {
+        return Transform.translate(
+          offset: Offset(0, _textSlide.value),
+          child: Opacity(
+            opacity: _textOpacity.value,
+            // Usando RichText idêntico à tela de login
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Lu',
+                    style: GoogleFonts.paytoneOne(
+                      fontSize: 52,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'm',
+                    style: GoogleFonts.paytoneOne(
+                      fontSize: 52,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.orange,
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'm',
+                    style: GoogleFonts.paytoneOne(
+                      fontSize: 52,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF003092),
+                    ),
+                  ),
+                  TextSpan(
+                    text: 'y',
+                    style: GoogleFonts.paytoneOne(
+                      fontSize: 52,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSubtitle() {
+    return AnimatedBuilder(
+      animation: _textOpacity,
+      builder: (context, _) {
+        final delayedOpacity = ((_textOpacity.value - 0.3) / 0.7).clamp(
+          0.0,
+          1.0,
+        );
+        return Opacity(
+          opacity: delayedOpacity,
+          child: Text(
+            'Educação Financeira Inteligente',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Colors.white.withOpacity(0.6),
+              letterSpacing: 1.5,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLoadingSection() {
+    return AnimatedBuilder(
+      animation: _loadingController,
+      builder: (context, _) {
+        return Column(
+          children: [
+            // Barra de progresso elegante
+            SizedBox(
+              width: 200,
+              child: Stack(
+                children: [
+                  // Track
+                  Container(
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  // Progress
+                  AnimatedBuilder(
+                    animation: _loadingController,
+                    builder: (context, _) {
+                      return FractionallySizedBox(
+                        widthFactor: _loadingController.value,
+                        child: Container(
+                          height: 3,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [_blue, _purple, _orange],
+                            ),
+                            borderRadius: BorderRadius.circular(2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: _purple.withOpacity(0.5),
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Texto de loading
+            Text(
+              '$_loadingText${'.' * _loadingDots}',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: Colors.white.withOpacity(0.5),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// Painter para partículas flutuantes
+class _ParticlePainter extends CustomPainter {
+  final double progress;
+  final List<Color> colors;
+
+  _ParticlePainter({required this.progress, required this.colors});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final random = math.Random(42);
+
+    for (int i = 0; i < 30; i++) {
+      final x = random.nextDouble() * size.width;
+      final baseY = random.nextDouble() * size.height;
+      final speed = 0.3 + random.nextDouble() * 0.7;
+      final particleSize = 1.5 + random.nextDouble() * 2.5;
+
+      final y = (baseY + progress * size.height * speed) % size.height;
+      final opacity =
+          (0.1 + random.nextDouble() * 0.2) *
+          (1 - (y / size.height).clamp(0.5, 1.0));
+
+      final paint = Paint()
+        ..color = colors[i % colors.length].withOpacity(opacity)
+        ..style = PaintingStyle.fill;
+
+      canvas.drawCircle(Offset(x, y), particleSize, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ParticlePainter oldDelegate) =>
+      oldDelegate.progress != progress;
+}
+
+// Painter para anéis orbitais
+class _OrbitalPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double dashLength;
+  final double gapLength;
+
+  _OrbitalPainter({
+    required this.color,
+    required this.strokeWidth,
+    required this.dashLength,
+    required this.gapLength,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    final circumference = 2 * math.pi * radius;
+    final dashCount = (circumference / (dashLength + gapLength)).floor();
+
+    for (int i = 0; i < dashCount; i++) {
+      final startAngle = (i * (dashLength + gapLength) / radius);
+      final sweepAngle = dashLength / radius;
+
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        sweepAngle,
+        false,
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _OrbitalPainter oldDelegate) => false;
 }

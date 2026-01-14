@@ -46,12 +46,10 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
       parent: _fadeController,
       curve: Curves.easeInOut,
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
     _fadeController.forward();
     _slideController.forward();
     _loadClaimed();
@@ -75,7 +73,9 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
     final scores = [widget.currentChildScore, ...widget.otherChildrenScores];
     final totalScore = scores.fold<double>(0, (a, b) => a + (b < 0 ? 0 : b));
     if (totalScore <= 0) return 0;
-    final ratio = (widget.currentChildScore <= 0 ? 0 : widget.currentChildScore) / totalScore;
+    final ratio =
+        (widget.currentChildScore <= 0 ? 0 : widget.currentChildScore) /
+        totalScore;
     final cents = (widget.totalAmount * 100).round();
     final yourCents = (cents * ratio).floor();
     return yourCents / 100.0;
@@ -88,24 +88,29 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
         'score': widget.currentChildScore,
         'isCurrent': true,
       },
-      ...widget.otherChildrenScores.asMap().entries.map((e) => {
-            'name': widget.otherChildrenNames != null && e.key < widget.otherChildrenNames!.length
-                ? widget.otherChildrenNames![e.key]
-                : 'Irmão(a) ${e.key + 1}',
-            'score': e.value,
-            'isCurrent': false,
-          })
+      ...widget.otherChildrenScores.asMap().entries.map(
+        (e) => {
+          'name':
+              widget.otherChildrenNames != null &&
+                  e.key < widget.otherChildrenNames!.length
+              ? widget.otherChildrenNames![e.key]
+              : 'Irmão(a) ${e.key + 1}',
+          'score': e.value,
+          'isCurrent': false,
+        },
+      ),
     ];
-    final totalScore = all.fold<double>(0, (a, b) => a + (b['score'] as double));
+    final totalScore = all.fold<double>(
+      0,
+      (a, b) => a + (b['score'] as double),
+    );
     return all.map((p) {
       final s = (p['score'] as double);
-      final ratio = totalScore > 0 ? (s.clamp(0, double.infinity)) / totalScore : 0.0;
+      final ratio = totalScore > 0
+          ? (s.clamp(0, double.infinity)) / totalScore
+          : 0.0;
       final amount = (widget.totalAmount * ratio);
-      return {
-        ...p,
-        'ratio': ratio,
-        'amount': (amount * 100).floor() / 100.0,
-      };
+      return {...p, 'ratio': ratio, 'amount': (amount * 100).floor() / 100.0};
     }).toList();
   }
 
@@ -113,10 +118,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
     final amount = _computeYourShare();
     setState(() => _claimed = true);
     _persistClaimed();
-    Navigator.pop(context, {
-      'claimed': true,
-      'amount': amount,
-    });
+    Navigator.pop(context, {'claimed': true, 'amount': amount});
   }
 
   Future<void> _persistClaimed() async {
@@ -209,7 +211,11 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 20),
+                          const Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF10B981),
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(

@@ -5,20 +5,22 @@ import 'package:flutter/foundation.dart';
 class SupabaseTest {
   static Future<Map<String, dynamic>> testConnection() async {
     final results = <String, dynamic>{};
-    
+
     try {
       final supabase = Supabase.instance.client;
-      
+
       // Teste 1: Verificar se Supabase está inicializado
       results['supabase_initialized'] = true;
       debugPrint('✅ Supabase está inicializado');
-      
+
       // Teste 2: Verificar se há usuário autenticado
       final user = supabase.auth.currentUser;
       results['user_authenticated'] = user != null;
       results['user_id'] = user?.id;
-      debugPrint('${user != null ? "✅" : "⚠️"} Usuário autenticado: ${user?.id ?? "Nenhum"}');
-      
+      debugPrint(
+        '${user != null ? "✅" : "⚠️"} Usuário autenticado: ${user?.id ?? "Nenhum"}',
+      );
+
       // Teste 3: Verificar se a tabela responsaveis existe e pode ser acessada
       try {
         final responsaveis = await supabase
@@ -33,7 +35,7 @@ class SupabaseTest {
         results['responsaveis_error'] = e.toString();
         debugPrint('❌ Erro ao acessar tabela responsaveis: $e');
       }
-      
+
       // Teste 4: Verificar se a tabela children existe e pode ser acessada
       try {
         final children = await supabase
@@ -48,7 +50,7 @@ class SupabaseTest {
         results['children_error'] = e.toString();
         debugPrint('❌ Erro ao acessar tabela children: $e');
       }
-      
+
       // Teste 5: Verificar políticas RLS
       if (user != null) {
         try {
@@ -65,7 +67,7 @@ class SupabaseTest {
           results['rls_responsaveis_error'] = e.toString();
           debugPrint('❌ RLS pode estar bloqueando acesso a responsaveis: $e');
         }
-        
+
         try {
           final ownChildren = await supabase
               .from('children')
@@ -80,7 +82,7 @@ class SupabaseTest {
           debugPrint('❌ RLS pode estar bloqueando acesso a children: $e');
         }
       }
-      
+
       return results;
     } catch (e, stackTrace) {
       results['error'] = e.toString();
@@ -89,63 +91,63 @@ class SupabaseTest {
       return results;
     }
   }
-  
+
   /// Testa se consegue inserir um registro de teste (apenas para debugging)
   static Future<Map<String, dynamic>> testInsert({
     required String table,
     required Map<String, dynamic> data,
   }) async {
     final results = <String, dynamic>{};
-    
+
     try {
       final supabase = Supabase.instance.client;
       final user = supabase.auth.currentUser;
-      
+
       if (user == null) {
         results['error'] = 'Usuário não autenticado';
         return results;
       }
-      
+
       debugPrint('🔄 Tentando inserir em $table: $data');
-      
+
       final response = await supabase
           .from(table)
           .insert(data)
           .select()
           .single();
-      
+
       results['success'] = true;
       results['response'] = response;
       debugPrint('✅ Inserção bem-sucedida em $table');
-      
+
       return results;
     } catch (e) {
       results['success'] = false;
       results['error'] = e.toString();
-      
+
       if (e is PostgrestException) {
         results['code'] = e.code;
         results['message'] = e.message;
         results['details'] = e.details;
         results['hint'] = e.hint;
       }
-      
+
       debugPrint('❌ Erro ao inserir em $table: $e');
       return results;
     }
   }
-  
+
   /// Verifica se um usuário específico existe na tabela children
   static Future<Map<String, dynamic>?> checkChildExists(String userId) async {
     try {
       final supabase = Supabase.instance.client;
-      
+
       final child = await supabase
           .from('children')
           .select('*')
           .eq('id', userId)
           .maybeSingle();
-      
+
       if (child != null) {
         debugPrint('✅ Criança encontrada: ${child['nome']}');
         return child;
@@ -158,18 +160,20 @@ class SupabaseTest {
       return null;
     }
   }
-  
+
   /// Verifica se um usuário específico existe na tabela responsaveis
-  static Future<Map<String, dynamic>?> checkResponsavelExists(String userId) async {
+  static Future<Map<String, dynamic>?> checkResponsavelExists(
+    String userId,
+  ) async {
     try {
       final supabase = Supabase.instance.client;
-      
+
       final responsavel = await supabase
           .from('responsaveis')
           .select('*')
           .eq('id', userId)
           .maybeSingle();
-      
+
       if (responsavel != null) {
         debugPrint('✅ Responsável encontrado: ${responsavel['nome']}');
         return responsavel;
@@ -183,4 +187,3 @@ class SupabaseTest {
     }
   }
 }
-

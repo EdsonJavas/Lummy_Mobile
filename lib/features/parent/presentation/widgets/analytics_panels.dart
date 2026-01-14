@@ -28,10 +28,7 @@ class ParentAnalyticsPanels extends StatelessWidget {
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 900;
         final spacing = AppConstants.spacingLarge;
-        final trendCard = _buildTrendCard(
-          context,
-          compact: !isWide,
-        );
+        final trendCard = _buildTrendCard(context, compact: !isWide);
         final categoryCard = _buildCategoryCard(context);
 
         return Column(
@@ -59,10 +56,7 @@ class ParentAnalyticsPanels extends StatelessWidget {
     );
   }
 
-  Widget _buildTrendCard(
-    BuildContext context, {
-    required bool compact,
-  }) {
+  Widget _buildTrendCard(BuildContext context, {required bool compact}) {
     final colorScheme = Theme.of(context).colorScheme;
     final chartHeight = compact ? 260.0 : 320.0;
 
@@ -110,13 +104,15 @@ class ParentAnalyticsPanels extends StatelessWidget {
                   children: [
                     _buildChip(
                       context,
-                      label: 'Receitas: ${AppFormatters.formatCurrency(monthIncomeTotal)}',
+                      label:
+                          'Receitas: ${AppFormatters.formatCurrency(monthIncomeTotal)}',
                       color: colorScheme.tertiary,
                     ),
                     const SizedBox(height: 8),
                     _buildChip(
                       context,
-                      label: 'Despesas: ${AppFormatters.formatCurrency(monthExpenseTotal)}',
+                      label:
+                          'Despesas: ${AppFormatters.formatCurrency(monthExpenseTotal)}',
                       color: colorScheme.error,
                     ),
                   ],
@@ -138,9 +134,12 @@ class ParentAnalyticsPanels extends StatelessWidget {
                   ),
                 ),
                 titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles:
-                      const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -180,16 +179,21 @@ class ParentAnalyticsPanels extends StatelessWidget {
                 borderData: FlBorderData(
                   show: true,
                   border: Border(
-                    bottom: BorderSide(color: colorScheme.onSurface.withOpacity(0.12)),
-                    left: BorderSide(color: colorScheme.onSurface.withOpacity(0.12)),
+                    bottom: BorderSide(
+                      color: colorScheme.onSurface.withOpacity(0.12),
+                    ),
+                    left: BorderSide(
+                      color: colorScheme.onSurface.withOpacity(0.12),
+                    ),
                     right: const BorderSide(color: Colors.transparent),
                     top: const BorderSide(color: Colors.transparent),
                   ),
                 ),
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    tooltipBorderRadius:
-                        BorderRadius.circular(AppConstants.radiusMedium),
+                    tooltipBorderRadius: BorderRadius.circular(
+                      AppConstants.radiusMedium,
+                    ),
                     tooltipPadding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 8,
@@ -218,10 +222,20 @@ class ParentAnalyticsPanels extends StatelessWidget {
                   ),
                 ),
                 minX: 0,
-                maxX: monthlyTrend.isEmpty ? 0 : (monthlyTrend.length - 1).toDouble(),
+                maxX: monthlyTrend.isEmpty
+                    ? 0
+                    : (monthlyTrend.length - 1).toDouble(),
                 lineBarsData: [
-                  _buildLine(monthlyTrend, (point) => point.expense, colorScheme.error),
-                  _buildLine(monthlyTrend, (point) => point.income, colorScheme.tertiary),
+                  _buildLine(
+                    monthlyTrend,
+                    (point) => point.expense,
+                    colorScheme.error,
+                  ),
+                  _buildLine(
+                    monthlyTrend,
+                    (point) => point.income,
+                    colorScheme.tertiary,
+                  ),
                 ],
               ),
             ),
@@ -338,7 +352,9 @@ class ParentAnalyticsPanels extends StatelessWidget {
           const SizedBox(height: AppConstants.spacingMedium),
           ...goalSummaries.map(
             (summary) => Padding(
-              padding: const EdgeInsets.only(bottom: AppConstants.spacingMedium),
+              padding: const EdgeInsets.only(
+                bottom: AppConstants.spacingMedium,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -365,14 +381,16 @@ class ParentAnalyticsPanels extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   ClipRRect(
-                    borderRadius:
-                        BorderRadius.circular(AppConstants.radiusSmall),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.radiusSmall,
+                    ),
                     child: LinearProgressIndicator(
                       value: summary.averageProgress.clamp(0.0, 1.0),
                       minHeight: 8,
                       backgroundColor: colorScheme.primary.withOpacity(0.08),
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        colorScheme.primary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -387,9 +405,7 @@ class ParentAnalyticsPanels extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        AppFormatters.formatPercentage(
-                          summary.averageProgress,
-                        ),
+                        AppFormatters.formatPercentage(summary.averageProgress),
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -424,10 +440,7 @@ class ParentAnalyticsPanels extends StatelessWidget {
       belowBarData: BarAreaData(
         show: true,
         gradient: LinearGradient(
-          colors: [
-            color.withOpacity(0.15),
-            color.withOpacity(0.02),
-          ],
+          colors: [color.withOpacity(0.15), color.withOpacity(0.02)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
@@ -435,8 +448,11 @@ class ParentAnalyticsPanels extends StatelessWidget {
     );
   }
 
-  Widget _buildChip(BuildContext context,
-      {required String label, required Color color}) {
+  Widget _buildChip(
+    BuildContext context, {
+    required String label,
+    required Color color,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -458,4 +474,3 @@ class ParentAnalyticsPanels extends StatelessWidget {
     );
   }
 }
-

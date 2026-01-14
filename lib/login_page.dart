@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +9,7 @@ import 'package:lummy_login/core/result.dart';
 import 'package:lummy_login/domain/entities/user_entity.dart';
 import 'package:lummy_login/features/parent/presentation/screens/parent_main_navigation.dart';
 import 'package:lummy_login/services/family_service.dart';
+import 'package:lummy_login/utils/login_debug_helper.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -228,31 +230,54 @@ class _LoginScreenState extends State<LoginScreen> {
     final familyService = locator<FamilyService>();
 
     try {
+      debugPrint('🚀 Navegando para perfil do usuário: $userId');
+      
       final profile = await familyService.fetchUserProfile(userId);
 
       if (!mounted) return;
 
       if (profile is ParentEntity) {
+        debugPrint('✅ Navegando para dashboard do responsável: ${profile.name}');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => ParentMainNavigation(parentId: profile.id),
+            builder: (context) => ParentMainNavigation(
+              parentId: profile.id,
+              parentName: profile.name,
+            ),
           ),
         );
       } else if (profile is ChildEntity) {
+        debugPrint('✅ Navegando para dashboard da criança: ${profile.name}');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const MainNavigation()),
         );
       } else {
-        _showLoginError(
-          'Não encontramos o perfil associado a esta conta. Complete o cadastro e tente novamente.',
-        );
+        debugPrint('⚠️ Perfil não encontrado para o usuário: $userId');
+        
+        // Executar diagnóstico
+        final diagnosis = await LoginDebugHelper.diagnoseLoginIssue(userId);
+        debugPrint('📊 Resultado do diagnóstico: $diagnosis');
+        
+        String errorMessage = 'Não encontramos o perfil associado a esta conta.\n\n';
+        errorMessage += 'Diagnóstico: ${diagnosis['diagnosis'] ?? 'Erro desconhecido'}\n\n';
+        errorMessage += 'Isso pode acontecer se:\n';
+        errorMessage += '• Você ainda não completou o cadastro\n';
+        errorMessage += '• Há um problema de conexão com o banco de dados\n';
+        errorMessage += '• Há problema de permissões (RLS) no Supabase\n\n';
+        errorMessage += 'Tente fazer o cadastro novamente ou entre em contato com o suporte.';
+        
+        _showLoginError(errorMessage);
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('❌ Erro ao navegar para perfil: $e');
+      debugPrint('   Stack trace: $stackTrace');
       if (!mounted) return;
       _showLoginError(
-        'Não foi possível carregar as informações do usuário. Tente novamente.',
+        'Não foi possível carregar as informações do usuário.\n\n'
+        'Erro: ${e.toString()}\n\n'
+        'Verifique sua conexão com a internet e tente novamente.',
       );
     }
   }
@@ -260,15 +285,10 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showLoginError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: GoogleFonts.poppins(fontSize: 14),
-        ),
+        content: Text(message, style: GoogleFonts.poppins(fontSize: 14)),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -302,9 +322,9 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         await _navigateAccordingToProfile(userId);
       } else {
-        _showLoginError(
-          result.error?.message ?? 'Erro desconhecido ao fazer login',
-        );
+        final errorMsg = result.error?.message ?? 'Erro desconhecido ao fazer login';
+        debugPrint('❌ Erro no login: $errorMsg');
+        _showLoginError(errorMsg);
       }
     }
   }
@@ -319,9 +339,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           backgroundColor: Colors.orange,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
       return;
@@ -343,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _biometricEnabled = false;
           _cachedUserId = null;
         });
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -368,7 +386,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (ok) {
         setState(() => _isLoading = true);
-        
+
         try {
           final appFacade = locator<AppFacade>();
           final loginResult = await appFacade.loginWithBiometrics(
@@ -376,7 +394,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
 
           if (!mounted) return;
-          
+
           setState(() => _isLoading = false);
 
           if (loginResult is Success<String>) {
@@ -439,9 +457,7 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.orange,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 3),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       );
     }

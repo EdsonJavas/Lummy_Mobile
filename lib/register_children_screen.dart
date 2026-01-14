@@ -8,13 +8,14 @@ import 'package:lummy_login/domain/repositories/auth_repository.dart';
 
 class RegisterChildrenScreen extends StatefulWidget {
   final Responsavel responsavel;
-  final String parentUserId; // ID do responsável no Supabase
+  final String parentUserId;
 
   const RegisterChildrenScreen({
     super.key,
     required this.responsavel,
     required this.parentUserId,
   });
+
   @override
   State<RegisterChildrenScreen> createState() => _RegisterChildrenScreenState();
 }
@@ -28,20 +29,40 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
   final _passwordController = TextEditingController();
   final _ageController = TextEditingController();
 
+  // Cores vibrantes - consistentes com o app
+  static const _blue = Color(0xFF3B82F6);
+  static const _purple = Color(0xFF8B5CF6);
+  static const _orange = Color(0xFFF59E0B);
+  static const _green = Color(0xFF10B981);
+  static const _pink = Color(0xFFEC4899);
+  static const _red = Color(0xFFEF4444);
+
   String _selectedGender = '';
   bool _isPasswordVisible = false;
   bool _isLoading = false;
-  bool _nameFocused = false;
-  bool _cpfFocused = false;
-  bool _emailFocused = false;
-  bool _passwordFocused = false;
-  bool _ageFocused = false;
+
+  late AnimationController _bounceController;
+  late Animation<double> _bounceAnimation;
 
   FamilyService get _familyService => locator<FamilyService>();
   AuthRepository get _authRepo => locator<AuthRepository>();
 
   @override
+  void initState() {
+    super.initState();
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    _bounceAnimation = Tween<double>(begin: 0, end: 10).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
   void dispose() {
+    _bounceController.dispose();
     _nameController.dispose();
     _cpfController.dispose();
     _emailController.dispose();
@@ -50,7 +71,6 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     super.dispose();
   }
 
-  // Função para formatar CPF
   String _formatCPF(String cpf) {
     cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
     if (cpf.length <= 3) return cpf;
@@ -61,7 +81,6 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     return '${cpf.substring(0, 3)}.${cpf.substring(3, 6)}.${cpf.substring(6, 9)}-${cpf.substring(9, 11)}';
   }
 
-  // Função para validar CPF
   bool _isValidCPF(String cpf) {
     cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
     if (cpf.length != 11) return false;
@@ -84,34 +103,21 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     return digit1 == int.parse(cpf[9]) && digit2 == int.parse(cpf[10]);
   }
 
-
-
   Future<void> _handleRegisterChild() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedGender.isEmpty) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Selecione o sexo da criança'),
-            backgroundColor: const Color(0xFFEF4444),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+        _showSnackBar('Selecione o sexo da criança', _red);
         return;
       }
 
       setState(() => _isLoading = true);
 
       try {
-        // Verificar se o locator está inicializado
         if (!locator.isRegistered<AuthRepository>()) {
-          throw Exception('Sistema ainda não foi inicializado. Aguarde alguns instantes.');
+          throw Exception('Sistema ainda não foi inicializado.');
         }
-        
-        // Criar conta da criança no Supabase Auth
+
         final registerResult = await _authRepo.register(
           email: _emailController.text.trim(),
           password: _passwordController.text,
@@ -127,85 +133,42 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
 
         if (!registerResult.isSuccess) {
           setState(() => _isLoading = false);
-          
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                registerResult.error?.message ?? 'Erro ao criar conta da criança',
-              ),
-              backgroundColor: const Color(0xFFEF4444),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+          _showSnackBar(
+            registerResult.error?.message ?? 'Erro ao criar conta',
+            _red,
           );
           return;
         }
 
-        // Obter o ID da criança
         final childUserId = registerResult.when(
           success: (id) => id,
           failure: (_) => throw Exception('Erro ao registrar criança'),
         );
 
-        // Mostrar sucesso imediatamente (usuário criado no Auth)
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
 
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Conta da criança criada! Salvando dados adicionais...'),
-            backgroundColor: const Color(0xFF10B981),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        _showSnackBar('Conta criada com sucesso!', _green);
 
-        // Processar inserção na tabela children de forma assíncrona
-        // Isso evita que o usuário espere muito tempo
-        _familyService.addChildData(
-          childUserId: childUserId,
-          responsavelId: widget.parentUserId,
-          nome: _nameController.text.trim(),
-          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-          email: _emailController.text.trim(),
-          idade: int.tryParse(_ageController.text.trim()) ?? 0,
-          sexo: _selectedGender,
-        ).then((_) {
-          // Sucesso na inserção dos dados adicionais
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Criança adicionada com sucesso!'),
-              backgroundColor: const Color(0xFF10B981),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          );
-        }).catchError((error) {
-          // Erro ao inserir dados adicionais (mas o usuário já foi criado)
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Conta criada, mas houve um erro ao salvar dados adicionais: $error'),
-              backgroundColor: const Color(0xFFFFA500),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              duration: const Duration(seconds: 4),
-            ),
-          );
-        });
+        _familyService
+            .addChildData(
+              childUserId: childUserId,
+              responsavelId: widget.parentUserId,
+              nome: _nameController.text.trim(),
+              cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+              email: _emailController.text.trim(),
+              idade: int.tryParse(_ageController.text.trim()) ?? 0,
+              sexo: _selectedGender,
+            )
+            .then((_) {
+              if (!mounted) return;
+              _showSnackBar('Criança adicionada com sucesso!', _green);
+            })
+            .catchError((error) {
+              if (!mounted) return;
+              _showSnackBar('Erro ao salvar dados: $error', _orange);
+            });
 
         // Limpar formulário
         _formKey.currentState?.reset();
@@ -214,173 +177,406 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         _emailController.clear();
         _passwordController.clear();
         _ageController.clear();
-        setState(() {
-          _selectedGender = '';
-        });
+        setState(() => _selectedGender = '');
       } catch (e) {
         setState(() => _isLoading = false);
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao adicionar criança: $e'),
-            backgroundColor: const Color(0xFFEF4444),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+        _showSnackBar('Erro: $e', _red);
       }
     }
   }
 
-  Widget _buildGenderSelector() {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isVerySmallScreen = screenHeight < 650;
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
 
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    return Scaffold(
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A1A)
+          : const Color(0xFFF8FAFC),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          children: [
+            // Header com gradiente
+            _buildHeader(context, isDark, topPadding),
+
+            // Conteúdo do formulário
+            Transform.translate(
+              offset: const Offset(0, -30),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF0A0A1A)
+                      : const Color(0xFFF8FAFC),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 30, 20, 40),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Título
+                        _buildTitle(isDark),
+                        const SizedBox(height: 24),
+
+                        // Seletor de gênero
+                        _buildGenderSelector(isDark),
+                        const SizedBox(height: 20),
+
+                        // Campos do formulário
+                        _buildInputField(
+                          controller: _nameController,
+                          label: 'Nome da criança',
+                          hint: 'Digite o nome completo',
+                          icon: Icons.child_care_rounded,
+                          color: _blue,
+                          isDark: isDark,
+                          textCapitalization: TextCapitalization.words,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Informe o nome';
+                            }
+                            if (value.trim().length < 2) {
+                              return 'Nome muito curto';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildInputField(
+                          controller: _ageController,
+                          label: 'Idade',
+                          hint: 'Ex: 10',
+                          icon: Icons.cake_rounded,
+                          color: _orange,
+                          isDark: isDark,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(2),
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Informe a idade';
+                            }
+                            final age = int.tryParse(value);
+                            if (age == null || age < 1 || age > 17) {
+                              return 'Idade entre 1 e 17';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildInputField(
+                          controller: _cpfController,
+                          label: 'CPF',
+                          hint: '000.000.000-00',
+                          icon: Icons.badge_rounded,
+                          color: _purple,
+                          isDark: isDark,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(11),
+                            TextInputFormatter.withFunction((
+                              oldValue,
+                              newValue,
+                            ) {
+                              final formatted = _formatCPF(newValue.text);
+                              return TextEditingValue(
+                                text: formatted,
+                                selection: TextSelection.collapsed(
+                                  offset: formatted.length,
+                                ),
+                              );
+                            }),
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Informe o CPF';
+                            }
+                            if (!_isValidCPF(value)) {
+                              return 'CPF inválido';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildInputField(
+                          controller: _emailController,
+                          label: 'E-mail',
+                          hint: 'email@exemplo.com',
+                          icon: Icons.email_rounded,
+                          color: _green,
+                          isDark: isDark,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Informe o e-mail';
+                            }
+                            if (!RegExp(
+                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                            ).hasMatch(value)) {
+                              return 'E-mail inválido';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        _buildInputField(
+                          controller: _passwordController,
+                          label: 'Senha',
+                          hint: 'Mínimo 6 caracteres',
+                          icon: Icons.lock_rounded,
+                          color: _pink,
+                          isDark: isDark,
+                          obscureText: !_isPasswordVisible,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility_rounded
+                                  : Icons.visibility_off_rounded,
+                              color: _pink,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Informe a senha';
+                            }
+                            if (value.length < 6) {
+                              return 'Mínimo 6 caracteres';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Botão de cadastrar
+                        _buildRegisterButton(isDark),
+                        const SizedBox(height: 16),
+
+                        // Botão adicionar outra criança
+                        _buildAddAnotherButton(isDark),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, bool isDark, double topPadding) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 80),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [Color(0xFF1E293B), Color(0xFF312E81), Color(0xFF4C1D95)]
+              : const [Color(0xFF3B82F6), Color(0xFF8B5CF6), Color(0xFF6366F1)],
+        ),
+      ),
+      child: Column(
+        children: [
+          // Header com voltar e logo
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Lu',
+                      style: GoogleFonts.paytoneOne(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'm',
+                      style: GoogleFonts.paytoneOne(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'm',
+                      style: GoogleFonts.paytoneOne(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF003092),
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'y',
+                      style: GoogleFonts.paytoneOne(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 30),
+
+          // Ícone de criança animado
+          AnimatedBuilder(
+            animation: _bounceAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, -_bounceAnimation.value),
+                child: child,
+              );
+            },
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 3,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.child_care_rounded,
+                size: 50,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTitle(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ShaderMask(
+          shaderCallback: (bounds) => const LinearGradient(
+            colors: [_blue, _purple],
+          ).createShader(bounds),
+          child: Text(
+            'Cadastrar Criança',
+            style: GoogleFonts.poppins(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Preencha os dados para criar a conta',
+          style: GoogleFonts.poppins(
+            fontSize: 15,
+            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderSelector(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Sexo da criança',
           style: GoogleFonts.poppins(
-            fontSize: isVerySmallScreen ? 14 : 16,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: theme.textTheme.titleMedium?.color,
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
           ),
         ),
-        SizedBox(height: isVerySmallScreen ? 8 : 12),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedGender = 'Masculino';
-                  });
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  padding: EdgeInsets.all(isVerySmallScreen ? 16 : 20),
-                  decoration: BoxDecoration(
-                    color: _selectedGender == 'Masculino'
-                        ? theme.colorScheme.primary.withOpacity(0.08)
-                        : theme.cardTheme.color,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _selectedGender == 'Masculino'
-                          ? theme.colorScheme.primary
-                          : theme.dividerColor,
-                      width: _selectedGender == 'Masculino' ? 2 : 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: isVerySmallScreen ? 32 : 40,
-                        height: isVerySmallScreen ? 32 : 40,
-                        decoration: BoxDecoration(
-                          color: _selectedGender == 'Masculino'
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.primary.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          color: _selectedGender == 'Masculino'
-                              ? Colors.white
-                              : theme.iconTheme.color,
-                          size: isVerySmallScreen ? 16 : 20,
-                        ),
-                      ),
-                      SizedBox(height: isVerySmallScreen ? 8 : 12),
-                      Text(
-                        'Menino',
-                        style: GoogleFonts.poppins(
-                          fontSize: isVerySmallScreen ? 12 : 14,
-                          fontWeight: FontWeight.w600,
-                          color: _selectedGender == 'Masculino'
-                              ? theme.colorScheme.primary
-                              : theme.textTheme.bodyMedium?.color,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              child: _buildGenderOption(
+                label: 'Menino',
+                icon: Icons.face_rounded,
+                value: 'Masculino',
+                color: _blue,
+                isDark: isDark,
               ),
             ),
-            SizedBox(width: isVerySmallScreen ? 12 : 16),
+            const SizedBox(width: 16),
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedGender = 'Feminino';
-                  });
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  padding: EdgeInsets.all(isVerySmallScreen ? 16 : 20),
-                  decoration: BoxDecoration(
-                    color: _selectedGender == 'Feminino'
-                        ? theme.colorScheme.secondary.withOpacity(0.08)
-                        : theme.cardTheme.color,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _selectedGender == 'Feminino'
-                          ? theme.colorScheme.secondary
-                          : theme.dividerColor,
-                      width: _selectedGender == 'Feminino' ? 2 : 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: isVerySmallScreen ? 32 : 40,
-                        height: isVerySmallScreen ? 32 : 40,
-                        decoration: BoxDecoration(
-                          color: _selectedGender == 'Feminino'
-                              ? theme.colorScheme.secondary
-                              : theme.colorScheme.secondary.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          color: _selectedGender == 'Feminino'
-                              ? Colors.white
-                              : theme.iconTheme.color,
-                          size: isVerySmallScreen ? 16 : 20,
-                        ),
-                      ),
-                      SizedBox(height: isVerySmallScreen ? 8 : 12),
-                      Text(
-                        'Menina',
-                        style: GoogleFonts.poppins(
-                          fontSize: isVerySmallScreen ? 12 : 14,
-                          fontWeight: FontWeight.w600,
-                          color: _selectedGender == 'Feminino'
-                              ? theme.colorScheme.secondary
-                              : theme.textTheme.bodyMedium?.color,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              child: _buildGenderOption(
+                label: 'Menina',
+                icon: Icons.face_2_rounded,
+                value: 'Feminino',
+                color: _pink,
+                isDark: isDark,
               ),
             ),
           ],
@@ -389,591 +585,241 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
     );
   }
 
+  Widget _buildGenderOption({
+    required String label,
+    required IconData icon,
+    required String value,
+    required Color color,
+    required bool isDark,
+  }) {
+    final isSelected = _selectedGender == value;
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedGender = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [color, color.withOpacity(0.8)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: isSelected
+              ? null
+              : (isDark ? const Color(0xFF1E293B) : Colors.white),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? color
+                : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.4),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Colors.white.withOpacity(0.2)
+                    : color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? Colors.white : color,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: isSelected
+                    ? Colors.white
+                    : (isDark ? Colors.white : const Color(0xFF1E293B)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInputField({
     required TextEditingController controller,
-    required String hintText,
+    required String label,
+    required String hint,
     required IconData icon,
-    required bool isFocused,
-    required Function(bool) onFocusChange,
-    required String? Function(String?) validator,
+    required Color color,
+    required bool isDark,
     TextInputType? keyboardType,
     List<TextInputFormatter>? inputFormatters,
     bool obscureText = false,
     Widget? suffixIcon,
     TextCapitalization textCapitalization = TextCapitalization.none,
+    String? Function(String?)? validator,
   }) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isVerySmallScreen = screenHeight < 650;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isFocused ? const Color(0xFF1E40AF) : Colors.transparent,
-          width: 2,
-        ),
-        boxShadow: isFocused
-            ? [
-                BoxShadow(
-                  color: const Color(0xFF1E40AF).withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-      ),
-      child: Focus(
-        onFocusChange: onFocusChange,
-        child: TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          inputFormatters: inputFormatters,
-          obscureText: obscureText,
-          textCapitalization: textCapitalization,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
           style: GoogleFonts.poppins(
-            fontSize: isVerySmallScreen ? 14 : 16,
-            color: const Color(0xFF1E293B),
-            fontWeight: FontWeight.w500,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
           ),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: GoogleFonts.poppins(
-              color: const Color(0xFF64748B),
-              fontSize: isVerySmallScreen ? 14 : 16,
-              fontWeight: FontWeight.w400,
-            ),
-            prefixIcon: Icon(
-              icon,
-              color: isFocused
-                  ? const Color(0xFF1E40AF)
-                  : const Color(0xFF64748B),
-              size: isVerySmallScreen ? 20 : 22,
-            ),
-            suffixIcon: suffixIcon,
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: isVerySmallScreen ? 16 : 20,
-              vertical: isVerySmallScreen ? 14 : 18,
-            ),
-            errorStyle: GoogleFonts.poppins(
-              fontSize: isVerySmallScreen ? 10 : 12,
-            ),
-          ),
-          validator: validator,
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-
-    final isVerySmallScreen = screenHeight < 650;
-
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: screenHeight),
-          child: Stack(
-            children: [
-              // Header com gradiente adaptativo ao tema
-              Container(
-                width: double.infinity,
-                height: isVerySmallScreen
-                    ? screenHeight * 0.35
-                    : screenHeight * 0.4,
-                decoration: BoxDecoration(
-                  gradient: Theme.of(context).brightness == Brightness.dark
-                      ? const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFF0A0A1A), Color(0xFF1A1A2E)],
-                        )
-                      : const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-                        ),
-                ),
-              ),
-
-              // Logo no topo
-              SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 24.0,
-                    top: isVerySmallScreen ? 10 : 20,
-                  ),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Lu',
-                              style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'm',
-                              style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.orange,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'm',
-                              style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xFF003092),
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'y',
-                              style: GoogleFonts.paytoneOne(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Ilustração simples no header
-              Positioned(
-                top: isVerySmallScreen
-                    ? screenHeight * 0.12
-                    : screenHeight * 0.15,
-                left: screenWidth * 0.25,
-                right: screenWidth * 0.25,
-                child: Container(
-                  height: isVerySmallScreen ? 80 : 100,
-                  width: isVerySmallScreen ? 80 : 100,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Icon(
-                    Icons.child_care,
-                    size: isVerySmallScreen ? 40 : 50,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-
-              // Formulário na parte inferior - similar ao LoginScreen
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: ClipPath(
-                  clipper: FormTopClipper(),
-                  child: Container(
-                    constraints: BoxConstraints(
-                      minHeight: isVerySmallScreen
-                          ? screenHeight * 0.7
-                          : screenHeight * 0.65,
-                      maxHeight: isVerySmallScreen
-                          ? screenHeight * 0.9
-                          : screenHeight * 0.85,
-                    ),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: theme.cardTheme.color,
-                      border: isDark ? Border.all(color: theme.dividerColor) : null,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, -5),
-                        ),
-                      ],
-                    ),
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.only(
-                        left: isVerySmallScreen ? 20.0 : 24.0,
-                        right: isVerySmallScreen ? 20.0 : 24.0,
-                        top: isVerySmallScreen ? 20.0 : 24.0,
-                        bottom:
-                            (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: isVerySmallScreen ? 25 : 40),
-
-                            // Título
-                            ShaderMask(
-                              shaderCallback: (bounds) => LinearGradient(
-                                colors: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? [theme.colorScheme.primary, theme.colorScheme.secondary]
-                                    : [theme.textTheme.titleLarge?.color ?? const Color(0xFF1E293B), theme.textTheme.titleLarge?.color ?? const Color(0xFF1E293B)],
-                              ).createShader(bounds),
-                              child: Text(
-                                'Cadastrar Criança',
-                                style: GoogleFonts.poppins(
-                                  fontSize: isVerySmallScreen ? 24 : 28,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            Text(
-                              'Adicione os dados da criança para continuar',
-                              style: GoogleFonts.poppins(
-                                fontSize: isVerySmallScreen ? 14 : 16,
-                                fontWeight: FontWeight.w400,
-                                color: theme.textTheme.bodyMedium?.color,
-                              ),
-                            ),
-
-                            SizedBox(height: isVerySmallScreen ? 20 : 30),
-
-                            // Campo Nome
-                            _buildInputField(
-                              controller: _nameController,
-                              hintText: 'Nome da criança',
-                              icon: Icons.person_outline,
-                              isFocused: _nameFocused,
-                              onFocusChange: (hasFocus) {
-                                setState(() {
-                                  _nameFocused = hasFocus;
-                                });
-                              },
-                              textCapitalization: TextCapitalization.words,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Por favor, insira o nome da criança';
-                                }
-                                if (value.trim().length < 2) {
-                                  return 'Nome deve ter pelo menos 2 caracteres';
-                                }
-                                return null;
-                              },
-                            ),
-
-                            SizedBox(height: isVerySmallScreen ? 12 : 16),
-
-                            // Seletor de sexo
-                            _buildGenderSelector(),
-
-                            SizedBox(height: isVerySmallScreen ? 12 : 16),
-
-                            // Campo Idade
-                            _buildInputField(
-                              controller: _ageController,
-                              hintText: 'Idade da criança',
-                              icon: Icons.cake_outlined,
-                              isFocused: _ageFocused,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(2),
-                              ],
-                              onFocusChange: (hasFocus) {
-                                setState(() {
-                                  _ageFocused = hasFocus;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Por favor, insira a idade da criança';
-                                }
-                                final age = int.tryParse(value);
-                                if (age == null || age < 1 || age > 17) {
-                                  return 'Idade deve ser entre 1 e 17 anos';
-                                }
-                                return null;
-                              },
-                            ),
-
-                            SizedBox(height: isVerySmallScreen ? 12 : 16),
-
-                            // Campo CPF
-                            _buildInputField(
-                              controller: _cpfController,
-                              hintText: 'CPF da criança',
-                              icon: Icons.badge_outlined,
-                              isFocused: _cpfFocused,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(11),
-                                TextInputFormatter.withFunction((
-                                  oldValue,
-                                  newValue,
-                                ) {
-                                  final formatted = _formatCPF(newValue.text);
-                                  return TextEditingValue(
-                                    text: formatted,
-                                    selection: TextSelection.collapsed(
-                                      offset: formatted.length,
-                                    ),
-                                  );
-                                }),
-                              ],
-                              onFocusChange: (hasFocus) {
-                                setState(() {
-                                  _cpfFocused = hasFocus;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Por favor, insira o CPF da criança';
-                                }
-                                if (!_isValidCPF(value)) {
-                                  return 'Por favor, insira um CPF válido';
-                                }
-                                return null;
-                              },
-                            ),
-
-                            SizedBox(height: isVerySmallScreen ? 12 : 16),
-
-                            // Campo E-mail
-                            _buildInputField(
-                              controller: _emailController,
-                              hintText: 'E-mail da criança',
-                              icon: Icons.email_outlined,
-                              isFocused: _emailFocused,
-                              keyboardType: TextInputType.emailAddress,
-                              onFocusChange: (hasFocus) {
-                                setState(() {
-                                  _emailFocused = hasFocus;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Por favor, insira o e-mail da criança';
-                                }
-                                if (!RegExp(
-                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                                ).hasMatch(value)) {
-                                  return 'Por favor, insira um e-mail válido';
-                                }
-                                return null;
-                              },
-                            ),
-
-                            SizedBox(height: isVerySmallScreen ? 12 : 16),
-
-                            // Campo Senha
-                            _buildInputField(
-                              controller: _passwordController,
-                              hintText: 'Senha da criança',
-                              icon: Icons.lock_outline,
-                              isFocused: _passwordFocused,
-                              obscureText: !_isPasswordVisible,
-                              onFocusChange: (hasFocus) {
-                                setState(() {
-                                  _passwordFocused = hasFocus;
-                                });
-                              },
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _isPasswordVisible
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: _passwordFocused
-                                      ? const Color(0xFF1E40AF)
-                                      : const Color(0xFF64748B),
-                                  size: isVerySmallScreen ? 20 : 22,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _isPasswordVisible = !_isPasswordVisible;
-                                  });
-                                },
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Por favor, insira a senha da criança';
-                                }
-                                if (value.length < 6) {
-                                  return 'A senha deve ter pelo menos 6 caracteres';
-                                }
-                                return null;
-                              },
-                            ),
-
-                            SizedBox(height: isVerySmallScreen ? 25 : 35),
-
-                            // Botão Cadastrar Criança
-                            Container(
-                              width: double.infinity,
-                              height: isVerySmallScreen ? 50 : 56,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFFF8C42),
-                                    Color(0xFFFF7A28),
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                  isVerySmallScreen ? 25 : 28,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFFFF8C42,
-                                    ).withOpacity(0.3),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: ElevatedButton(
-                                onPressed: _isLoading
-                                    ? null
-                                    : _handleRegisterChild,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      isVerySmallScreen ? 25 : 28,
-                                    ),
-                                  ),
-                                ),
-                                child: _isLoading
-                                    ? SizedBox(
-                                        height: isVerySmallScreen ? 18 : 20,
-                                        width: isVerySmallScreen ? 18 : 20,
-                                        child: const CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                        ),
-                                      )
-                                    : Text(
-                                        'Cadastrar Criança',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: isVerySmallScreen ? 16 : 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                              ),
-                            ),
-
-                            SizedBox(height: isVerySmallScreen ? 15 : 20),
-
-                            // Botão para adicionar mais crianças
-                            Center(
-                              child: TextButton.icon(
-                                onPressed: () async {
-                                  await _handleRegisterChild();
-                                },
-                                icon: const Icon(
-                                  Icons.add_circle_outline,
-                                  color: Color(0xFF1E40AF),
-                                  size: 20,
-                                ),
-                                label: Text(
-                                  'Adicionar outra criança',
-                                  style: GoogleFonts.poppins(
-                                    color: const Color(0xFF1E40AF),
-                                    fontSize: isVerySmallScreen ? 14 : 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(height: isVerySmallScreen ? 15 : 20),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
+          child: TextFormField(
+            controller: controller,
+            keyboardType: keyboardType,
+            inputFormatters: inputFormatters,
+            obscureText: obscureText,
+            textCapitalization: textCapitalization,
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white : const Color(0xFF1E293B),
+            ),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: GoogleFonts.poppins(
+                fontSize: 14,
+                color: isDark
+                    ? const Color(0xFF64748B)
+                    : const Color(0xFF94A3B8),
+              ),
+              prefixIcon: Container(
+                margin: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 20),
+              ),
+              suffixIcon: suffixIcon,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              errorStyle: GoogleFonts.poppins(fontSize: 11, color: _red),
+            ),
+            validator: validator,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegisterButton(bool isDark) {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [_purple, Color(0xFF7C3AED)]),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: _purple.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _handleRegisterChild,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: _isLoading
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.person_add_rounded, size: 22),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Cadastrar Criança',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildAddAnotherButton(bool isDark) {
+    return Center(
+      child: TextButton.icon(
+        onPressed: () async {
+          await _handleRegisterChild();
+        },
+        icon: const Icon(Icons.add_circle_outline_rounded, color: _blue),
+        label: Text(
+          'Adicionar outra criança',
+          style: GoogleFonts.poppins(
+            color: _blue,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
   }
-}
-
-class FormTopClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-
-    path.moveTo(0, size.height);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 60);
-
-    path.quadraticBezierTo(size.width * 0.75, 20, size.width * 0.5, 20);
-
-    path.quadraticBezierTo(size.width * 0.25, 20, 0, 60);
-
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

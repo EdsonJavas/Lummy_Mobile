@@ -241,7 +241,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         // Garantir que o registro existe na tabela children
         final childExists = await EnsureChildRecord.ensureChildExists();
         if (!childExists) {
-          throw Exception('Não foi possível criar o registro do usuário. Verifique se você foi registrado por um responsável.');
+          throw Exception(
+            'Não foi possível criar o registro do usuário. Verifique se você foi registrado por um responsável.',
+          );
         }
 
         // Verificar novamente se não há meta em andamento (race condition)
@@ -262,7 +264,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
               ),
               backgroundColor: const Color(0xFFEF4444),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           );
           return;
@@ -291,7 +295,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
             ),
             backgroundColor: const Color(0xFF8B5CF6),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
       } catch (e) {
@@ -305,7 +311,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
             ),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
       }
@@ -327,9 +335,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
       // Atualizar no banco
       await supabase
           .from('goals')
-          .update({
-            'current_amount': newAmount.clamp(0.0, targetAmount),
-          })
+          .update({'current_amount': newAmount.clamp(0.0, targetAmount)})
           .eq('id', goal.id)
           .eq('child_id', user.id);
 
@@ -487,14 +493,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   ShaderMask(
                     shaderCallback: (bounds) => LinearGradient(
                       colors: Theme.of(context).brightness == Brightness.dark
-                          ? [
-                              const Color(0xFF8B5CF6),
-                              const Color(0xFF3B82F6),
-                            ]
-                          : [
-                              const Color(0xFF1E293B),
-                              const Color(0xFF1E293B),
-                            ],
+                          ? [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)]
+                          : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
                     ).createShader(bounds),
                     child: Text(
                       'Minhas Metas',
@@ -538,7 +538,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                             color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: const Text('📊', style: TextStyle(fontSize: 24)),
+                          child: const Text(
+                            '📊',
+                            style: TextStyle(fontSize: 24),
+                          ),
                         ),
                         const SizedBox(width: 20),
                         Expanded(
@@ -590,7 +593,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       isSmallScreen,
                     ),
                     const SizedBox(height: 20),
-                    ...completedGoals.map((g) => _buildGoalCard(g, isSmallScreen)),
+                    ...completedGoals.map(
+                      (g) => _buildGoalCard(g, isSmallScreen),
+                    ),
                   ],
                   const SizedBox(height: 40),
                 ],
@@ -600,9 +605,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: bodyContent,
-      ),
+      body: SafeArea(child: bodyContent),
     );
   }
 
@@ -1162,7 +1165,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     const Icon(Icons.add, size: 20),
                     const SizedBox(width: 8),
                     Text(
-                      completedGoals.isNotEmpty ? 'criar nova meta' : 'Criar Primeira Meta',
+                      completedGoals.isNotEmpty
+                          ? 'criar nova meta'
+                          : 'Criar Primeira Meta',
                       style: GoogleFonts.poppins(
                         fontSize: isSmallScreen ? 16 : 18,
                         fontWeight: FontWeight.w700,
@@ -1181,12 +1186,14 @@ class _GoalsScreenState extends State<GoalsScreen> {
   void _showAddProgressDialog(Goal goal) {
     final controller = TextEditingController();
     double? currentAmount;
-    
+
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -1253,104 +1260,104 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   fontWeight: FontWeight.w600,
                   textAlign: TextAlign.center,
                 ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'Cancelar',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF64748B),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF10B981), Color(0xFF059669)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF10B981).withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (currentAmount != null && currentAmount! > 0) {
-                            _updateGoalProgress(goal, currentAmount!);
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.celebration,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Progresso adicionado! 💰',
-                                      style: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                backgroundColor: const Color(0xFF10B981),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                duration: const Duration(seconds: 3),
-                              ),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: Text(
-                          'Adicionar',
+                          'Cancelar',
                           style: GoogleFonts.poppins(
                             fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF64748B),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF10B981), Color(0xFF059669)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF10B981).withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (currentAmount != null && currentAmount! > 0) {
+                              _updateGoalProgress(goal, currentAmount!);
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.celebration,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Progresso adicionado! 💰',
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  backgroundColor: const Color(0xFF10B981),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  duration: const Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            'Adicionar',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }

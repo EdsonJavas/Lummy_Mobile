@@ -16,18 +16,19 @@ class BrandedRefreshIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final defaultColor = color ?? colorScheme.primary;
-    final defaultBackground = backgroundColor ?? Theme.of(context).scaffoldBackgroundColor;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final defaultColor = color ?? const Color(0xFF3B82F6);
+    final defaultBackground =
+        backgroundColor ?? (isDark ? const Color(0xFF1E293B) : Colors.white);
 
     return RefreshIndicator(
       color: defaultColor,
       backgroundColor: defaultBackground,
-      strokeWidth: 3,
-      displacement: 40,
+      strokeWidth: 2.5,
+      displacement: 30,
+      edgeOffset: 0,
       onRefresh: onRefresh,
       child: child,
     );
   }
 }
-

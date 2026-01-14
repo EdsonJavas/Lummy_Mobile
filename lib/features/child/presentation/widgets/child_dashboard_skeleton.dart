@@ -173,4 +173,3 @@ class ChildDashboardSkeleton extends StatelessWidget {
     );
   }
 }
-

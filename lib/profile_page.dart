@@ -40,10 +40,10 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       final supabase = Supabase.instance.client;
       final user = supabase.auth.currentUser;
-      
+
       if (user != null) {
         debugPrint('🔍 Buscando nome do usuário no perfil: ${user.id}');
-        
+
         // Buscar na tabela children
         try {
           final childRow = await supabase
@@ -65,7 +65,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
         // Fallback: metadata do usuário
         final meta = user.userMetadata ?? {};
-        final name = (meta['name'] ?? meta['full_name'] ?? meta['username']) as String?;
+        final name =
+            (meta['name'] ?? meta['full_name'] ?? meta['username']) as String?;
         if (name != null && name.trim().isNotEmpty) {
           setState(() {
             userName = name.trim();
@@ -129,7 +130,9 @@ class _ProfilePageState extends State<ProfilePage> {
             userLevel = (childData['level'] as int?) ?? 1;
             totalSaved = (childData['balance'] as num?)?.toDouble() ?? 0.0;
           });
-          debugPrint('✅ Pontos: $totalPoints, Nível: $userLevel, Saldo: $totalSaved');
+          debugPrint(
+            '✅ Pontos: $totalPoints, Nível: $userLevel, Saldo: $totalSaved',
+          );
         } else {
           // Se não encontrar dados, buscar apenas balance e inicializar resto
           final balanceData = await supabase
@@ -137,24 +140,28 @@ class _ProfilePageState extends State<ProfilePage> {
               .select('balance')
               .eq('id', user.id)
               .maybeSingle();
-          
+
           setState(() {
             totalPoints = 0;
             userLevel = 1;
             totalSaved = (balanceData?['balance'] as num?)?.toDouble() ?? 0.0;
           });
-          debugPrint('⚠️ Dados não encontrados, inicializando com valores padrão');
+          debugPrint(
+            '⚠️ Dados não encontrados, inicializando com valores padrão',
+          );
         }
       } catch (e) {
         // Se der erro (provavelmente colunas não existem), buscar apenas balance
-        debugPrint('⚠️ Erro ao buscar pontos/nível (colunas podem não existir): $e');
+        debugPrint(
+          '⚠️ Erro ao buscar pontos/nível (colunas podem não existir): $e',
+        );
         try {
           final balanceData = await supabase
               .from('children')
               .select('balance')
               .eq('id', user.id)
               .maybeSingle();
-          
+
           setState(() {
             totalPoints = 0;
             userLevel = 1;
@@ -208,7 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
           completedGoals = completedGoalsData.length;
         });
         debugPrint('✅ $completedGoals metas completadas encontradas');
-            } catch (e) {
+      } catch (e) {
         debugPrint('⚠️ Erro ao buscar metas completadas: $e');
         setState(() {
           completedGoals = 0;
@@ -224,10 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _refreshData() async {
-    await Future.wait([
-      _loadUserName(),
-      _loadUserStats(),
-    ]);
+    await Future.wait([_loadUserName(), _loadUserStats()]);
   }
 
   @override
@@ -236,9 +240,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     if (_isLoadingStats) {
-      return Scaffold(
-        body: _buildSkeletonLoader(screenWidth, screenHeight),
-      );
+      return Scaffold(body: _buildSkeletonLoader(screenWidth, screenHeight));
     }
 
     return Scaffold(
@@ -249,9 +251,7 @@ class _ProfilePageState extends State<ProfilePage> {
             parent: BouncingScrollPhysics(),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(
-              bottom: 0.0,
-            ),
+            padding: const EdgeInsets.only(bottom: 0.0),
             child: Column(
               children: [
                 _buildProfileHeader(screenWidth, screenHeight),
@@ -305,9 +305,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Container(
             height: screenHeight * 0.60,
             width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-            ),
+            decoration: BoxDecoration(color: Colors.grey[300]),
           ),
           Transform(
             transform: Matrix4.translationValues(0, -40, 0),
@@ -528,7 +526,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                             ),
                           )
                         : Text(
@@ -559,7 +559,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 height: 16,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                 ),
                               )
                             : Text(
@@ -814,10 +816,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: Builder(
                   builder: (context) {
-                    final completedCount = achievements.where((a) => a['is_completed'] == true).length;
-                    final totalCount = achievements.isNotEmpty ? achievements.length : 5; // Default 5 se não houver conquistas
+                    final completedCount = achievements
+                        .where((a) => a['is_completed'] == true)
+                        .length;
+                    final totalCount = achievements.isNotEmpty
+                        ? achievements.length
+                        : 5; // Default 5 se não houver conquistas
                     final uncompletedCount = totalCount - completedCount;
-                    
+
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -893,69 +899,72 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 )
               : achievements.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.emoji_events_outlined,
-                              size: 48,
-                              color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              'Nenhuma conquista ainda',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(context).textTheme.bodyMedium?.color,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Complete missões para desbloquear conquistas!',
-                              style: GoogleFonts.poppins(
-                                fontSize: 14,
-                                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+              ? Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.emoji_events_outlined,
+                          size: 48,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withOpacity(0.5),
                         ),
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: achievements.map((achievement) {
-                          final title = achievement['title'] ?? 'Conquista';
-                          final emoji = achievement['emoji'] ?? '🏆';
-                          final isCompleted = achievement['is_completed'] == true;
-                          
-                          // Quebrar título em 2 linhas se necessário
-                          final titleParts = title.split(' ');
-                          String displayTitle;
-                          if (titleParts.length > 1) {
-                            final mid = (titleParts.length / 2).ceil();
-                            displayTitle = '${titleParts.sublist(0, mid).join(' ')}\n${titleParts.sublist(mid).join(' ')}';
-                          } else {
-                            displayTitle = title;
-                          }
-                          
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 16),
-                            child: _buildBadge(
-                              emoji,
-                              displayTitle,
-                              isCompleted,
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Nenhuma conquista ainda',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Complete missões para desbloquear conquistas!',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
+                  ),
+                )
+              : SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: achievements.map((achievement) {
+                      final title = achievement['title'] ?? 'Conquista';
+                      final emoji = achievement['emoji'] ?? '🏆';
+                      final isCompleted = achievement['is_completed'] == true;
+
+                      // Quebrar título em 2 linhas se necessário
+                      final titleParts = title.split(' ');
+                      String displayTitle;
+                      if (titleParts.length > 1) {
+                        final mid = (titleParts.length / 2).ceil();
+                        displayTitle =
+                            '${titleParts.sublist(0, mid).join(' ')}\n${titleParts.sublist(mid).join(' ')}';
+                      } else {
+                        displayTitle = title;
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: _buildBadge(emoji, displayTitle, isCompleted),
+                      );
+                    }).toList(),
+                  ),
+                ),
         ],
       ),
     );
@@ -1113,9 +1122,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 builder: (context) => AlertDialog(
                   title: Text(
                     'Sair da conta?',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                   ),
                   content: Text(
                     'Tem certeza que deseja sair? Você precisará fazer login novamente.',
@@ -1150,9 +1157,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   // Fazer logout no Supabase
                   final authRepo = locator<AuthRepository>();
                   await authRepo.logout();
-                  
+
                   debugPrint('✅ Logout realizado com sucesso');
-                  
+
                   // Navegar para tela de login
                   if (!mounted) return;
                   Navigator.of(context).pushAndRemoveUntil(
@@ -1262,58 +1269,39 @@ class _ProfilePageState extends State<ProfilePage> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: Theme.of(context).brightness == Brightness.dark
+              colors: isDark
                   ? [
-                      const Color(0xFFF59E0B), // Dourado vibrante
-                      const Color(0xFFF97316), // Laranja vibrante
-                      const Color(0xFFEF4444), // Vermelho vibrante
+                      const Color(0xFF8B5CF6), // Roxo
+                      const Color(0xFF7C3AED), // Roxo mais escuro
                     ]
                   : [
                       const Color(0xFF3B82F6), // Azul vibrante
                       const Color(0xFF8B5CF6), // Roxo vibrante
-                      const Color(0xFFEC4899), // Rosa vibrante
                     ],
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFFF59E0B).withOpacity(0.4)
-                    : const Color(0xFF3B82F6).withOpacity(0.3),
-                blurRadius: 24,
-                offset: const Offset(0, 10),
-                spreadRadius: -4,
-              ),
-              BoxShadow(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFFF59E0B).withOpacity(0.2)
-                    : const Color(0xFF3B82F6).withOpacity(0.2),
-                blurRadius: 40,
-                offset: const Offset(0, 20),
+                color:
+                    (isDark ? const Color(0xFF8B5CF6) : const Color(0xFF3B82F6))
+                        .withOpacity(0.35),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
             ],
-            border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
           ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.4),
-                    width: 2,
-                  ),
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: Icon(
-                    isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                    color: Colors.white,
-                    size: 22,
-                    key: ValueKey(isDark),
-                  ),
+                child: Icon(
+                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                  color: Colors.white,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: 14),
@@ -1321,54 +1309,31 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            'Tema Premium',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              letterSpacing: 0.3,
-                            ),
-                            overflow: TextOverflow.visible,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
                     Text(
-                      isDark ? 'Modo escuro ativado' : 'Modo claro ativado',
+                      'Tema do App',
                       style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      isDark ? 'Modo escuro' : 'Modo claro',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: Colors.white.withOpacity(0.8),
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.4),
-                    width: 1.5,
-                  ),
-                ),
-                child: Switch(
-                  value: isDark,
-                  onChanged: (_) => themeProvider.toggleTheme(),
-                  activeThumbColor: Colors.white,
-                  activeTrackColor: Colors.white.withOpacity(0.4),
-                  inactiveThumbColor: Colors.white.withOpacity(0.9),
-                  inactiveTrackColor: Colors.white.withOpacity(0.3),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
+              Switch(
+                value: isDark,
+                onChanged: (_) => themeProvider.toggleTheme(),
+                activeColor: Colors.white,
+                activeTrackColor: Colors.white.withOpacity(0.3),
+                inactiveThumbColor: Colors.white,
+                inactiveTrackColor: Colors.white.withOpacity(0.3),
               ),
             ],
           ),

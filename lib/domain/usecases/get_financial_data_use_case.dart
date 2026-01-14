@@ -10,5 +10,3 @@ class GetFinancialDataUseCase {
     return financeRepository.getFinancialData(userId);
   }
 }
-
-

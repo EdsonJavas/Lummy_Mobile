@@ -27,27 +27,37 @@ void setupLocator() {
   // Repositories - Usando Supabase Auth agora
   // Supabase.instance.client deve estar disponível pois Supabase.initialize() já foi chamado
   locator.registerLazySingleton<AuthRepository>(() => SupabaseAuthRepository());
-  locator.registerLazySingleton<FinanceRepository>(() => InMemoryFinanceRepository(locator()));
+  locator.registerLazySingleton<FinanceRepository>(
+    () => InMemoryFinanceRepository(locator()),
+  );
 
   // Use cases
   locator.registerFactory<LoginUseCase>(() => LoginUseCase(locator()));
-  locator.registerFactory<AddTransactionUseCase>(() => AddTransactionUseCase(locator()));
+  locator.registerFactory<AddTransactionUseCase>(
+    () => AddTransactionUseCase(locator()),
+  );
   locator.registerFactory<SetGoalUseCase>(() => SetGoalUseCase(locator()));
-  locator.registerFactory<GetFinancialDataUseCase>(() => GetFinancialDataUseCase(locator()));
+  locator.registerFactory<GetFinancialDataUseCase>(
+    () => GetFinancialDataUseCase(locator()),
+  );
 
   // Services
   locator.registerLazySingleton<FamilyService>(() => FamilyService());
 
   // Biometrics
-  locator.registerLazySingleton<LocalAuthentication>(() => LocalAuthentication());
-  locator.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
-  locator.registerLazySingleton<BiometricAuthService>(() => BiometricAuthService(
-        locator<LocalAuthentication>(),
-        locator<FlutterSecureStorage>(),
-      ));
-      
+  locator.registerLazySingleton<LocalAuthentication>(
+    () => LocalAuthentication(),
+  );
+  locator.registerLazySingleton<FlutterSecureStorage>(
+    () => const FlutterSecureStorage(),
+  );
+  locator.registerLazySingleton<BiometricAuthService>(
+    () => BiometricAuthService(
+      locator<LocalAuthentication>(),
+      locator<FlutterSecureStorage>(),
+    ),
+  );
+
   // Facade
   locator.registerLazySingleton<AppFacade>(() => AppFacade.instance);
 }
-
-

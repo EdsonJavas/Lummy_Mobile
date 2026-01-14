@@ -26,8 +26,9 @@ class ParentDashboardSkeleton extends StatelessWidget {
                   child: SkeletonLoader(
                     width: double.infinity,
                     height: 140,
-                    borderRadius:
-                        BorderRadius.all(Radius.circular(AppConstants.radiusLarge)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppConstants.radiusLarge),
+                    ),
                   ),
                 ),
                 SizedBox(width: AppConstants.spacingMedium),
@@ -35,8 +36,9 @@ class ParentDashboardSkeleton extends StatelessWidget {
                   child: SkeletonLoader(
                     width: double.infinity,
                     height: 140,
-                    borderRadius:
-                        BorderRadius.all(Radius.circular(AppConstants.radiusLarge)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppConstants.radiusLarge),
+                    ),
                   ),
                 ),
               ],
@@ -93,4 +95,3 @@ class ParentDashboardSkeleton extends StatelessWidget {
     );
   }
 }
-
