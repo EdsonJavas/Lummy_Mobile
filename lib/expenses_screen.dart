@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'add_expense_screen.dart';
+import 'core/constants/app_constants.dart';
 import 'shared/widgets/widgets.dart';
 
 class ExpensesScreen extends StatefulWidget {
@@ -49,6 +53,24 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          final result = await Navigator.push<Map<String, dynamic>>(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddExpenseScreen(),
+            ),
+          );
+          if (result != null && mounted) _loadData();
+        },
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_rounded),
+        label: Text(
+          'Registrar',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 15),
+        ),
+      ),
       body: SafeArea(
         child: BrandedRefreshIndicator(
           onRefresh: _refreshData,
@@ -56,7 +78,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),
             ),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(
+              AppConstants.spacingMedium,
+              AppConstants.spacingMedium,
+              AppConstants.spacingMedium,
+              80,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -64,55 +91,51 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
-                        colors: Theme.of(context).brightness == Brightness.dark
-                            ? [
-                                const Color(0xFFEF4444),
-                                const Color(0xFFFF8C42),
-                              ] // Vermelho → Laranja como no site
-                            : [
-                                const Color(0xFF1E293B),
-                                const Color(0xFF1E293B),
-                              ],
-                      ).createShader(bounds),
-                      child: Text(
-                        'Meus Gastos',
-                        style: GoogleFonts.poppins(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
                     Text(
-                      'Vamos ver onde você gastou seu dinheirinho!',
+                      'Meus Gastos',
                       style: GoogleFonts.poppins(
-                        fontSize: 16,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                        letterSpacing: -0.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ).animate().fadeIn(duration: 200.ms).slideX(begin: -0.05, end: 0, curve: Curves.easeOut),
+                    const Gap(6),
+                    Text(
+                      'Acompanhe onde você gastou e registre novos gastos',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                         color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                    ),
+                    ).animate().fadeIn(delay: 80.ms, duration: 200.ms),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const Gap(24),
 
                 // Resumo dos gastos
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppConstants.spacingLarge),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3B82F6),
-                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF3B82F6).withOpacity(0.2),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
                       ),
                     ],
                   ),
@@ -121,54 +144,56 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     children: [
                       Row(
                         children: [
-                          const Text('📊', style: TextStyle(fontSize: 20)),
-                          const SizedBox(width: 8),
+                          Icon(Icons.pie_chart_rounded, color: Colors.white.withValues(alpha: 0.95), size: 22),
+                          const Gap(10),
                           Text(
                             'Total Gasto',
                             style: GoogleFonts.poppins(
                               fontSize: 14,
-                              color: Colors.white.withOpacity(0.9),
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white.withValues(alpha: 0.95),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const Gap(10),
                       Text(
                         'R\$ 1.247,50',
                         style: GoogleFonts.poppins(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
                           color: Colors.white,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const Gap(6),
                       Text(
                         'de R\$ 2.000,00 disponíveis',
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 13,
+                          color: Colors.white.withValues(alpha: 0.85),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const Gap(20),
 
-                // Gráfico de gastos - Reduzindo o tamanho do gráfico
+                // Gráfico de gastos
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppConstants.spacingLarge),
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardTheme.color,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
                     border: Theme.of(context).brightness == Brightness.dark
                         ? Border.all(color: Theme.of(context).dividerColor)
                         : null,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
@@ -272,7 +297,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const Gap(24),
 
                 // Filtros com Chips
                 Column(
@@ -286,7 +311,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const Gap(16),
 
                     // Filtro de Período
                     Text(
@@ -297,7 +322,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const Gap(8),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -327,7 +352,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const Gap(20),
 
                     // Filtro de Categoria
                     Text(
@@ -374,7 +399,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const Gap(24),
 
                 // Lista de transações
                 Container(
@@ -411,24 +436,28 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         'Alimentação',
                         'R\$ 15,50',
                         const Color(0xFFF59E0B),
+                        0,
                       ),
                       _buildTransactionItem(
                         'Ônibus',
                         'Transporte',
                         'R\$ 4,50',
                         const Color(0xFF3B82F6),
+                        1,
                       ),
                       _buildTransactionItem(
                         'Jogo novo',
                         'Jogos e Brinquedos',
                         'R\$ 29,90',
                         const Color(0xFF10B981),
+                        2,
                       ),
                       _buildTransactionItem(
                         'Mesada guardada',
                         'Metas',
                         'R\$ 50,00',
                         const Color(0xFF8B5CF6),
+                        3,
                       ),
                     ],
                   ),
@@ -491,28 +520,28 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF3B82F6)
+              ? Theme.of(context).colorScheme.primary
               : Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppConstants.radiusFull),
           border: Border.all(
             color: isSelected
-                ? const Color(0xFF3B82F6)
+                ? Theme.of(context).colorScheme.primary
                 : Theme.of(context).brightness == Brightness.dark
-                ? Theme.of(context).dividerColor
-                : const Color(0xFFE2E8F0),
+                    ? Theme.of(context).dividerColor
+                    : const Color(AppConstants.borderLight),
             width: 1.5,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF3B82F6).withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ]
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 4,
                     offset: const Offset(0, 1),
                   ),
@@ -537,17 +566,18 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     String category,
     String amount,
     Color categoryColor,
+    int index,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: categoryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
+              color: categoryColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               _getCategoryIcon(category),
@@ -555,7 +585,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               size: 20,
             ),
           ),
-          const SizedBox(width: 12),
+          const Gap(14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -600,7 +630,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ),
         ],
       ),
-    );
+    )
+        .animate()
+        .fadeIn(delay: (100 + index * 60).ms, duration: 280.ms)
+        .slideX(begin: 0.03, end: 0, curve: Curves.easeOut);
   }
 
   IconData _getCategoryIcon(String category) {

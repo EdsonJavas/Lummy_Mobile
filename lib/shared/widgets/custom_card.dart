@@ -25,16 +25,22 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final defaultColor = color ??
+        (isDark ? Theme.of(context).cardTheme.color : null) ??
+        const Color(AppConstants.backgroundWhite);
+    final borderColor = isDark
+        ? Theme.of(context).dividerColor
+        : const Color(AppConstants.borderLight);
+
     final Widget cardChild = Container(
       padding: padding ?? const EdgeInsets.all(AppConstants.spacingLarge),
       decoration: BoxDecoration(
-        color: gradient == null
-            ? (color ?? const Color(AppConstants.backgroundWhite))
-            : null,
+        color: gradient == null ? defaultColor : null,
         gradient: gradient,
         borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         border: style == CardStyle.outlined
-            ? Border.all(color: const Color(AppConstants.borderLight), width: 1)
+            ? Border.all(color: borderColor, width: 1)
             : null,
         boxShadow: style == CardStyle.elevated || elevation != null
             ? [

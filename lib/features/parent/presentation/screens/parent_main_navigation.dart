@@ -143,8 +143,8 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.3)
-                : Colors.black.withOpacity(0.08),
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.black.withValues(alpha: 0.08),
             blurRadius: 24,
             offset: const Offset(0, -8),
           ),
@@ -203,7 +203,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
                     ? LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [item.color, item.color.withOpacity(0.8)],
+                        colors: [item.color, item.color.withValues(alpha: 0.85)],
                       )
                     : null,
                 color: isSelected
@@ -213,7 +213,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: item.color.withOpacity(0.4),
+                          color: item.color.withValues(alpha: 0.4),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),

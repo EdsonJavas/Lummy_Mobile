@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lummy_login/core/constants/app_constants.dart';
 import 'package:lummy_login/screens/new_goal_screen.dart';
 import 'package:lummy_login/screens/request_money_screen.dart';
 import 'package:lummy_login/screens/claim_share_screen.dart';
@@ -708,44 +711,49 @@ class _HomePageState extends State<HomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenHeight < 700;
 
-    // Cor do refresh indicator baseada na tela (azul para versão infantil)
-    const refreshColor = Color(0xFF3B82F6);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: _isLoading
             ? const ChildHomeSkeleton()
             : BrandedRefreshIndicator(
                 onRefresh: _refreshData,
-                color: refreshColor,
+                color: theme.colorScheme.primary,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
                     parent: BouncingScrollPhysics(),
                   ),
                   child: Column(
                     children: [
-                      // Header simples estilo Inter
-                      _buildSimpleHeader(screenWidth, isSmallScreen),
-
-                      // Saldo atual
-                      _buildBalanceCard(screenWidth, isSmallScreen),
-
-                      // Meta de economia (sempre mostra: ativa ou preview vazio)
-                      hasActiveGoal
-                          ? _buildSavingsGoal(screenWidth, isSmallScreen)
-                          : _buildEmptyGoalCard(screenWidth, isSmallScreen),
-
-                      // Ações rápidas (estilo Inter)
-                      _buildQuickActionsInter(screenWidth, isSmallScreen),
-
-                      // Educação financeira
-                      _buildEducationSection(screenWidth, isSmallScreen),
-
-                      // Conquistas melhoradas
-                      _buildAchievementsImproved(screenWidth, isSmallScreen),
-
-                      const SizedBox(height: 20),
+                      _buildSimpleHeader(screenWidth, isSmallScreen)
+                          .animate()
+                          .fadeIn(duration: 220.ms)
+                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
+                      _buildBalanceCard(screenWidth, isSmallScreen)
+                          .animate()
+                          .fadeIn(delay: 80.ms, duration: 260.ms)
+                          .slideY(begin: 0.03, end: 0, curve: Curves.easeOut),
+                      (hasActiveGoal
+                              ? _buildSavingsGoal(screenWidth, isSmallScreen)
+                              : _buildEmptyGoalCard(screenWidth, isSmallScreen))
+                          .animate()
+                          .fadeIn(delay: 140.ms, duration: 260.ms)
+                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
+                      _buildQuickActionsInter(screenWidth, isSmallScreen)
+                          .animate()
+                          .fadeIn(delay: 200.ms, duration: 260.ms)
+                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
+                      _buildEducationSection(screenWidth, isSmallScreen)
+                          .animate()
+                          .fadeIn(delay: 260.ms, duration: 260.ms)
+                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
+                      _buildAchievementsImproved(screenWidth, isSmallScreen)
+                          .animate()
+                          .fadeIn(delay: 320.ms, duration: 260.ms)
+                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
+                      const Gap(24),
                     ],
                   ),
                 ),
@@ -755,10 +763,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildSimpleHeader(double screenWidth, bool isSmallScreen) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
     return Container(
       width: double.infinity,
-      color: Theme.of(context).scaffoldBackgroundColor,
-      padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
+      color: theme.scaffoldBackgroundColor,
+      padding: EdgeInsets.all(isSmallScreen ? AppConstants.spacingMedium : AppConstants.spacingLarge),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -773,13 +783,16 @@ class _HomePageState extends State<HomePage> {
                       style: GoogleFonts.poppins(
                         fontSize: isSmallScreen ? 24 : 28,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.bodyLarge?.color,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                     ),
                     Flexible(
                       child: ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [Color(0xFF1E40AF), Color(0xFF8B5CF6)],
+                        shaderCallback: (bounds) => LinearGradient(
+                          colors: [
+                            primary,
+                            const Color(AppConstants.purple),
+                          ],
                         ).createShader(bounds),
                         child: Text(
                           userName,
@@ -794,41 +807,36 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const Gap(4),
                 Text(
                   'Como estão suas finanças hoje?',
                   style: GoogleFonts.poppins(
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.w400,
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                    color: theme.textTheme.bodyMedium?.color,
                   ),
                 ),
               ],
             ),
           ),
-          Row(
-            children: [
-              // Botão do Perfil
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfilePage(),
-                    ),
-                  );
-                },
-                child: CachedAvatar(
-                  imageUrl:
-                      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
-                  size: isSmallScreen ? 50 : 56,
-                  borderColor: const Color(0xFF1E40AF),
-                  borderWidth: 2,
-                  fallbackIcon: Icons.person,
-                  fallbackIconColor: const Color(0xFF1E40AF),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
                 ),
-              ),
-            ],
+              );
+            },
+            child: CachedAvatar(
+              imageUrl:
+                  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
+              size: isSmallScreen ? 50 : 56,
+              borderColor: primary,
+              borderWidth: 2,
+              fallbackIcon: Icons.person_rounded,
+              fallbackIconColor: primary,
+            ),
           ),
         ],
       ),
@@ -837,20 +845,20 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildBalanceCard(double screenWidth, bool isSmallScreen) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
-      padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
+      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
+      padding: EdgeInsets.all(isSmallScreen ? 22 : 28),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [Color(0xFF1E40AF), Color(0xFF1E3A8A)],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E40AF).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: const Color(0xFF1E40AF).withOpacity(0.35),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -863,55 +871,51 @@ class _HomePageState extends State<HomePage> {
               Text(
                 'Meu Cofrinho',
                 style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 16 : 18,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white.withOpacity(0.9),
+                  fontSize: isSmallScreen ? 17 : 19,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white.withOpacity(0.95),
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white.withOpacity(0.22),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '🐷',
-                  style: TextStyle(fontSize: isSmallScreen ? 16 : 20),
+                  style: TextStyle(fontSize: isSmallScreen ? 20 : 24),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             'R\$ ${currentBalance.toStringAsFixed(2)}',
             style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 36 : 42,
+              fontSize: isSmallScreen ? 38 : 44,
               fontWeight: FontWeight.w700,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withOpacity(0.2),
+                  color: const Color(0xFF10B981).withOpacity(0.25),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.trending_up,
-                      color: Color(0xFF10B981),
-                      size: 14,
-                    ),
-                    const SizedBox(width: 4),
+                    const Icon(Icons.trending_up, color: Color(0xFF10B981), size: 16),
+                    const SizedBox(width: 6),
                     Text(
                       '+R\$ 15,00',
                       style: GoogleFonts.poppins(
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF10B981),
                       ),
@@ -919,13 +923,13 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Text(
                 'esta semana',
                 style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.88),
                 ),
               ),
             ],
@@ -944,21 +948,22 @@ class _HomePageState extends State<HomePage> {
     final progressPercent = (progress * 100).clamp(0, 100).toInt();
     final isCompleted = progress >= 1.0;
 
+    final theme = Theme.of(context);
     return Container(
-      margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-      padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
+      margin: EdgeInsets.all(isSmallScreen ? AppConstants.spacingMedium : AppConstants.spacingLarge),
+      padding: EdgeInsets.all(isSmallScreen ? AppConstants.spacingLarge : AppConstants.spacingXLarge),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(20),
+        color: theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(AppConstants.radiusXLarge),
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
+          color: theme.brightness == Brightness.dark
               ? const Color(0xFF334155)
-              : const Color(0xFFE2E8F0),
+              : const Color(AppConstants.borderLight),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -967,7 +972,6 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with badge
           Row(
             children: [
               Container(
@@ -976,22 +980,22 @@ class _HomePageState extends State<HomePage> {
                   gradient: LinearGradient(
                     colors: isCompleted
                         ? [
-                            const Color(0xFF10B981).withOpacity(0.15),
-                            const Color(0xFF10B981).withOpacity(0.05),
+                            const Color(AppConstants.successGreen).withValues(alpha: 0.15),
+                            const Color(AppConstants.successGreen).withValues(alpha: 0.05),
                           ]
                         : [
-                            const Color(0xFF1E40AF).withOpacity(0.15),
-                            const Color(0xFF1E40AF).withOpacity(0.05),
+                            theme.colorScheme.primary.withValues(alpha: 0.15),
+                            theme.colorScheme.primary.withValues(alpha: 0.05),
                           ],
                   ),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                 ),
                 child: Text(
                   goalEmoji,
                   style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
                 ),
               ),
-              const SizedBox(width: 14),
+              const Gap(14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1001,13 +1005,13 @@ class _HomePageState extends State<HomePage> {
                       style: GoogleFonts.poppins(
                         fontSize: isSmallScreen ? 17 : 19,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.titleLarge?.color,
+                        color: theme.textTheme.titleLarge?.color,
                         height: 1.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const Gap(4),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -1015,8 +1019,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       decoration: BoxDecoration(
                         color: isCompleted
-                            ? const Color(0xFF10B981).withOpacity(0.1)
-                            : const Color(0xFF3B82F6).withOpacity(0.1),
+                            ? const Color(AppConstants.successGreen).withValues(alpha: 0.12)
+                            : theme.colorScheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -1025,8 +1029,8 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                           color: isCompleted
-                              ? const Color(0xFF10B981)
-                              : const Color(0xFF3B82F6),
+                              ? const Color(AppConstants.successGreen)
+                              : theme.colorScheme.primary,
                         ),
                       ),
                     ),
@@ -1040,8 +1044,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? const Color(0xFF10B981).withOpacity(0.1)
-                      : const Color(0xFF1E40AF).withOpacity(0.1),
+                      ? const Color(AppConstants.successGreen).withValues(alpha: 0.12)
+                      : theme.colorScheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -1050,15 +1054,14 @@ class _HomePageState extends State<HomePage> {
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.w700,
                     color: isCompleted
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFF1E40AF),
+                        ? const Color(AppConstants.successGreen)
+                        : theme.colorScheme.primary,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          // Progress bar with labels
+          const Gap(24),
           Column(
             children: [
               Row(
@@ -1077,20 +1080,20 @@ class _HomePageState extends State<HomePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Theme.of(context).textTheme.bodySmall?.color,
+                      color: theme.textTheme.bodySmall?.color,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const Gap(8),
               Stack(
                 children: [
                   Container(
                     height: 10,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
+                      color: theme.brightness == Brightness.dark
                           ? const Color(0xFF334155)
-                          : const Color(0xFFE2E8F0),
+                          : const Color(AppConstants.borderLight),
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
@@ -1102,22 +1105,21 @@ class _HomePageState extends State<HomePage> {
                         gradient: LinearGradient(
                           colors: isCompleted
                               ? [
-                                  const Color(0xFF10B981),
+                                  const Color(AppConstants.successGreen),
                                   const Color(0xFF059669),
                                 ]
                               : [
-                                  const Color(0xFF3B82F6),
-                                  const Color(0xFF1E40AF),
+                                  theme.colorScheme.primary,
+                                  theme.colorScheme.primary.withValues(alpha: 0.8),
                                 ],
                         ),
                         borderRadius: BorderRadius.circular(5),
                         boxShadow: [
                           BoxShadow(
-                            color:
-                                (isCompleted
-                                        ? const Color(0xFF10B981)
-                                        : const Color(0xFF3B82F6))
-                                    .withOpacity(0.3),
+                            color: (isCompleted
+                                    ? const Color(AppConstants.successGreen)
+                                    : theme.colorScheme.primary)
+                                .withValues(alpha: 0.3),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -1129,22 +1131,21 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          // Info cards
+          const Gap(20),
           Row(
             children: [
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF1E293B).withOpacity(0.5)
-                        : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
+                    color: theme.brightness == Brightness.dark
+                        ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                        : const Color(AppConstants.backgroundGray),
+                    borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     border: Border.all(
-                      color: Theme.of(context).brightness == Brightness.dark
+                      color: theme.brightness == Brightness.dark
                           ? const Color(0xFF334155)
-                          : const Color(0xFFE2E8F0),
+                          : const Color(AppConstants.borderLight),
                       width: 1,
                     ),
                   ),
@@ -1156,47 +1157,48 @@ class _HomePageState extends State<HomePage> {
                           const Icon(
                             Icons.savings_outlined,
                             size: 16,
-                            color: Color(0xFF10B981),
+                            color: Color(AppConstants.successGreen),
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Economizado',
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.color?.withOpacity(0.7),
+                          const Gap(6),
+                          Expanded(
+                            child: Text(
+                              'Economizado',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const Gap(8),
                       Text(
                         'R\$ ${currentBalance.toStringAsFixed(2)}',
                         style: GoogleFonts.poppins(
                           fontSize: isSmallScreen ? 16 : 18,
                           fontWeight: FontWeight.w700,
-                          color: Theme.of(context).textTheme.titleLarge?.color,
+                          color: theme.textTheme.titleLarge?.color,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const Gap(12),
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF1E293B).withOpacity(0.5)
-                        : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(12),
+                    color: theme.brightness == Brightness.dark
+                        ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                        : const Color(AppConstants.backgroundGray),
+                    borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     border: Border.all(
-                      color: Theme.of(context).brightness == Brightness.dark
+                      color: theme.brightness == Brightness.dark
                           ? const Color(0xFF334155)
-                          : const Color(0xFFE2E8F0),
+                          : const Color(AppConstants.borderLight),
                       width: 1,
                     ),
                   ),
@@ -1207,33 +1209,34 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Icon(
                             remaining > 0
-                                ? Icons.trending_up
-                                : Icons.check_circle_outline,
+                                ? Icons.trending_up_rounded
+                                : Icons.check_circle_outline_rounded,
                             size: 16,
                             color: remaining > 0
-                                ? const Color(0xFFF59E0B)
-                                : const Color(0xFF10B981),
+                                ? const Color(AppConstants.warningOrange)
+                                : const Color(AppConstants.successGreen),
                           ),
-                          const SizedBox(width: 6),
-                          Text(
-                            remaining > 0 ? 'Falta' : 'Excedente',
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.color?.withOpacity(0.7),
+                          const Gap(6),
+                          Expanded(
+                            child: Text(
+                              remaining > 0 ? 'Falta' : 'Excedente',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const Gap(8),
                       Text(
                         'R\$ ${remaining.abs().toStringAsFixed(2)}',
                         style: GoogleFonts.poppins(
                           fontSize: isSmallScreen ? 16 : 18,
                           fontWeight: FontWeight.w700,
-                          color: Theme.of(context).textTheme.titleLarge?.color,
+                          color: theme.textTheme.titleLarge?.color,
                         ),
                       ),
                     ],
@@ -1248,10 +1251,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildEmptyGoalCard(double screenWidth, bool isSmallScreen) {
-    const progress = 0.0;
-    const progressPercent = 0;
-    const isCompleted = false;
-
     return GestureDetector(
       onTap: () async {
         final result = await Navigator.push(
@@ -1270,168 +1269,269 @@ class _HomePageState extends State<HomePage> {
                   'Nova meta criada! 🎯',
                   style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
                 ),
-                backgroundColor: const Color(0xFF8B5CF6),
+                backgroundColor: Theme.of(context).colorScheme.secondary,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                 ),
               ),
             );
           }
         }
       },
-      child: Container(
-        margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-        padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF334155)
-                : const Color(0xFFE2E8F0),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with badge
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF8B5CF6).withOpacity(0.15),
-                        const Color(0xFF8B5CF6).withOpacity(0.05),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '🎯',
-                    style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Sem metas ainda',
-                        style: GoogleFonts.poppins(
-                          fontSize: isSmallScreen ? 17 : 19,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(
-                            context,
-                          ).textTheme.titleLarge?.color?.withOpacity(0.6),
-                          height: 1.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF8B5CF6).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          'Crie sua primeira meta',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFF8B5CF6),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '0%',
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 16 : 18,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF8B5CF6).withOpacity(0.6),
-                    ),
-                  ),
+      child: Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          return Container(
+            margin: EdgeInsets.all(isSmallScreen ? AppConstants.spacingMedium : AppConstants.spacingLarge),
+            padding: EdgeInsets.all(isSmallScreen ? AppConstants.spacingLarge : AppConstants.spacingXLarge),
+            decoration: BoxDecoration(
+              color: theme.cardTheme.color,
+              borderRadius: BorderRadius.circular(AppConstants.radiusXLarge),
+              border: Border.all(
+                color: theme.brightness == Brightness.dark
+                    ? const Color(0xFF334155)
+                    : const Color(AppConstants.borderLight),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            // Progress bar with labels
-            Column(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'R\$ 0,00',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(
-                          context,
-                        ).textTheme.bodySmall?.color?.withOpacity(0.5),
-                      ),
-                    ),
-                    Text(
-                      'R\$ 0,00',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(
-                          context,
-                        ).textTheme.bodySmall?.color?.withOpacity(0.5),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Stack(
                   children: [
                     Container(
-                      height: 10,
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFE2E8F0),
-                        borderRadius: BorderRadius.circular(5),
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(AppConstants.purple).withValues(alpha: 0.15),
+                            const Color(AppConstants.purple).withValues(alpha: 0.05),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+                      ),
+                      child: Text(
+                        '🎯',
+                        style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
                       ),
                     ),
-                    FractionallySizedBox(
-                      widthFactor: 0.0,
-                      child: Container(
-                        height: 10,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+                    const Gap(14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Sem metas ainda',
+                            style: GoogleFonts.poppins(
+                              fontSize: isSmallScreen ? 17 : 19,
+                              fontWeight: FontWeight.w600,
+                              color: theme.textTheme.titleLarge?.color?.withValues(alpha: 0.6),
+                              height: 1.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          borderRadius: BorderRadius.circular(5),
+                          const Gap(4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(AppConstants.purple).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'Crie sua primeira meta',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(AppConstants.purple),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(AppConstants.purple).withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '0%',
+                        style: GoogleFonts.poppins(
+                          fontSize: isSmallScreen ? 16 : 18,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(AppConstants.purple).withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const Gap(24),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'R\$ 0,00',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        Text(
+                          'R\$ 0,00',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Gap(8),
+                    Stack(
+                      children: [
+                        Container(
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: theme.brightness == Brightness.dark
+                                ? const Color(0xFF334155)
+                                : const Color(AppConstants.borderLight),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        FractionallySizedBox(
+                          widthFactor: 0.0,
+                          child: Container(
+                            height: 10,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Gap(20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: theme.brightness == Brightness.dark
+                              ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                              : const Color(AppConstants.backgroundGray),
+                          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+                          border: Border.all(
+                            color: theme.brightness == Brightness.dark
+                                ? const Color(0xFF334155)
+                                : const Color(AppConstants.borderLight),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.savings_outlined,
+                                  size: 16,
+                                  color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                ),
+                                const Gap(6),
+                                Text(
+                                  'Economizado',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Gap(8),
+                            Text(
+                              'R\$ 0,00',
+                              style: GoogleFonts.poppins(
+                                fontSize: isSmallScreen ? 16 : 18,
+                                fontWeight: FontWeight.w700,
+                                color: theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Gap(12),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: theme.brightness == Brightness.dark
+                              ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                              : const Color(AppConstants.backgroundGray),
+                          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+                          border: Border.all(
+                            color: theme.brightness == Brightness.dark
+                                ? const Color(0xFF334155)
+                                : const Color(AppConstants.borderLight),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.trending_up_rounded,
+                                  size: 16,
+                                  color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                ),
+                                const Gap(6),
+                                Text(
+                                  'Falta',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Gap(8),
+                            Text(
+                              'R\$ 0,00',
+                              style: GoogleFonts.poppins(
+                                fontSize: isSmallScreen ? 16 : 18,
+                                fontWeight: FontWeight.w700,
+                                color: theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -1439,132 +1539,17 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            // Info cards
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF1E293B).withOpacity(0.5)
-                          : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFE2E8F0),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.savings_outlined,
-                              size: 16,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.color?.withOpacity(0.5),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Economizado',
-                              style: GoogleFonts.poppins(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.color?.withOpacity(0.5),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'R\$ 0,00',
-                          style: GoogleFonts.poppins(
-                            fontSize: isSmallScreen ? 16 : 18,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(
-                              context,
-                            ).textTheme.titleLarge?.color?.withOpacity(0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF1E293B).withOpacity(0.5)
-                          : const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFE2E8F0),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.trending_up,
-                              size: 16,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.bodySmall?.color?.withOpacity(0.5),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Falta',
-                              style: GoogleFonts.poppins(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.color?.withOpacity(0.5),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'R\$ 0,00',
-                          style: GoogleFonts.poppins(
-                            fontSize: isSmallScreen ? 16 : 18,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(
-                              context,
-                            ).textTheme.titleLarge?.color?.withOpacity(0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildQuickActionsInter(double screenWidth, bool isSmallScreen) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
+      margin: EdgeInsets.symmetric(
+        horizontal: isSmallScreen ? AppConstants.spacingMedium : AppConstants.spacingLarge,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

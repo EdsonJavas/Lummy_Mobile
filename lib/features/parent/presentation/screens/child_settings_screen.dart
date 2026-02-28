@@ -253,8 +253,8 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
               Switch(
                 value: _requiresApproval,
                 onChanged: (value) => setState(() => _requiresApproval = value),
-                activeColor: _green,
-                activeTrackColor: _green.withOpacity(0.3),
+                activeThumbColor: _green,
+                activeTrackColor: _green.withValues(alpha: 0.3),
               ),
             ],
           ),

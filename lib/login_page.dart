@@ -219,11 +219,117 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (shouldEnable == true) {
       final bio = locator<BiometricAuthService>();
+      await bio.cacheCredentials(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
       await bio.setBiometricEnabled(true);
       setState(() {
         _biometricEnabled = true;
       });
     }
+  }
+
+  /// Diálogo quando o usuário entrou com uma conta diferente da última que usou digital.
+  Future<bool?> _showDifferentAccountBiometricDialog() async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardTheme.color,
+            borderRadius: BorderRadius.circular(24),
+            border: Theme.of(context).brightness == Brightness.dark
+                ? Border.all(color: Theme.of(context).dividerColor, width: 1)
+                : null,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.fingerprint,
+                size: 56,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Outra conta',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Você entrou com uma conta diferente da última. Deseja usar digital para esta conta daqui pra frente?',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                  height: 1.45,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Text(
+                        'Não',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: Text(
+                        'Sim, usar digital',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _navigateAccordingToProfile(String userId) async {
@@ -312,12 +418,38 @@ class _LoginScreenState extends State<LoginScreen> {
       if (result is Success<String>) {
         final userId = result.value;
         final bio = locator<BiometricAuthService>();
-        if (_biometricAvailable) {
-          await bio.cacheUserId(_emailController.text);
-          _cachedUserId = _emailController.text;
+        final currentEmail = _emailController.text.trim();
 
-          if (!_biometricEnabled) {
+        // Ler quem estava guardado ANTES de sobrescrever (para saber se é outra conta)
+        final cachedEmailBefore = await bio.readCachedUserId();
+
+        // Sempre guardar esta conta como última que fez login (digital abre na última conta)
+        await bio.cacheUserId(currentEmail);
+        setState(() => _cachedUserId = currentEmail);
+
+        if (_biometricAvailable) {
+          final isDifferentAccount = cachedEmailBefore != null &&
+              cachedEmailBefore.trim().toLowerCase() != currentEmail.trim().toLowerCase();
+          final hadBiometricEnabled = await bio.isBiometricEnabled();
+
+          if (isDifferentAccount && hadBiometricEnabled) {
+            // Entrou com outra conta; a digital estava ativa noutra → perguntar se quer usar nesta
+            final wantToAdd = await _showDifferentAccountBiometricDialog();
+            if (wantToAdd == true) {
+              await bio.cacheCredentials(currentEmail, _passwordController.text);
+              await bio.setBiometricEnabled(true);
+              setState(() => _biometricEnabled = true);
+            } else {
+              await bio.setBiometricEnabled(false);
+              await bio.clearCachedUser();
+              setState(() => _biometricEnabled = false);
+            }
+          } else if (!hadBiometricEnabled) {
+            // Mesma conta ou primeira vez: perguntar se quer ativar digital
             await _showBiometricSetupDialog();
+          } else {
+            // Mesma conta com digital já ativa: atualizar senha em cache
+            await bio.cacheCredentials(currentEmail, _passwordController.text);
           }
         }
         await _navigateAccordingToProfile(userId);
@@ -432,7 +564,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
     } catch (e) {
-      print('Erro na autenticação biométrica: $e');
+      debugPrint('Erro na autenticação biométrica: $e');
       if (!mounted) return;
 
       // Em caso de erro, desabilitar biometria para evitar loops

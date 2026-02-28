@@ -47,7 +47,7 @@ class _MainNavigationState extends State<MainNavigation> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor ?? const Color(0xFF1E293B),
         ),
       );
       return false;
@@ -76,7 +76,7 @@ class _MainNavigationState extends State<MainNavigation> {
             color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/providers/theme_provider.dart';
+import '../../../../application/app_facade.dart';
 import '../../../../di/locator.dart';
 import '../../../../domain/repositories/auth_repository.dart';
 import '../../../../login_page.dart';
@@ -1119,6 +1120,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
       try {
         final authRepo = locator<AuthRepository>();
         await authRepo.logout();
+        await locator<BiometricAuthService>().clearCachedUser();
 
         if (!mounted) return;
         Navigator.of(context).pushAndRemoveUntil(

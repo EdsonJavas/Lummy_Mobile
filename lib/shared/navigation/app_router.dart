@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/user_entity.dart';
+import '../../login_page.dart';
+import '../../register_screen.dart';
+import '../../splash_screen.dart';
+import '../../main_navigation.dart';
+import '../../features/parent/presentation/screens/parent_main_navigation.dart';
 
 // Nomes de rotas
 class AppRoutes {
@@ -28,34 +33,60 @@ class AppRoutes {
   static const String childDetails = '/parent/child-details';
 }
 
+/// Argumentos opcionais para rotas que precisam de dados (ex: parent dashboard).
+class ParentDashboardArgs {
+  final String parentId;
+  final String parentName;
+
+  const ParentDashboardArgs({
+    required this.parentId,
+    required this.parentName,
+  });
+
+  static ParentDashboardArgs? fromMap(dynamic args) {
+    if (args is! Map) return null;
+    final id = args['parentId'] as String?;
+    final name = args['parentName'] as String?;
+    if (id == null || name == null) return null;
+    return ParentDashboardArgs(parentId: id, parentName: name);
+  }
+}
+
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case AppRoutes.splash:
-        // Importar splash_screen quando necessário
         return MaterialPageRoute(
-          builder: (_) => const Placeholder(), // TODO: Implementar
+          builder: (_) => const SplashScreen(),
         );
 
       case AppRoutes.login:
-        // Importar login_page quando necessário
         return MaterialPageRoute(
-          builder: (_) => const Placeholder(), // TODO: Implementar
+          builder: (_) => const LoginScreen(),
         );
 
       case AppRoutes.register:
         return MaterialPageRoute(
-          builder: (_) => const Placeholder(), // TODO: Implementar
+          builder: (_) => const RegisterScreen(),
         );
 
       case AppRoutes.childDashboard:
         return MaterialPageRoute(
-          builder: (_) => const Placeholder(), // TODO: Implementar
+          builder: (_) => const MainNavigation(),
         );
 
       case AppRoutes.parentDashboard:
+        final args = ParentDashboardArgs.fromMap(settings.arguments);
+        if (args != null) {
+          return MaterialPageRoute(
+            builder: (_) => ParentMainNavigation(
+              parentId: args.parentId,
+              parentName: args.parentName,
+            ),
+          );
+        }
         return MaterialPageRoute(
-          builder: (_) => const Placeholder(), // TODO: Implementar
+          builder: (_) => const LoginScreen(),
         );
 
       default:
@@ -82,11 +113,24 @@ class AppRouter {
   static void navigateToParentDashboard(
     BuildContext context, {
     bool replace = false,
+    String? parentId,
+    String? parentName,
   }) {
+    final args = (parentId != null && parentName != null)
+        ? {'parentId': parentId, 'parentName': parentName}
+        : null;
     if (replace) {
-      Navigator.pushReplacementNamed(context, AppRoutes.parentDashboard);
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.parentDashboard,
+        arguments: args,
+      );
     } else {
-      Navigator.pushNamed(context, AppRoutes.parentDashboard);
+      Navigator.pushNamed(
+        context,
+        AppRoutes.parentDashboard,
+        arguments: args,
+      );
     }
   }
 

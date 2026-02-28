@@ -51,10 +51,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
-          : const Color(0xFFF8FAFC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         top: false,
         child: BlocBuilder<ParentDashboardCubit, ParentDashboardState>(
@@ -79,7 +78,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               children: [
                 BrandedRefreshIndicator(
                   onRefresh: () => _refresh(context),
-                  color: _primaryBlue,
+                  color: theme.colorScheme.primary,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
@@ -92,17 +91,15 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           child: Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF0A0A1A)
-                                  : const Color(0xFFF8FAFC),
+                              color: theme.scaffoldBackgroundColor,
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(32),
                                 topRight: Radius.circular(32),
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(
-                                    isDark ? 0.3 : 0.08,
+                                  color: Colors.black.withValues(
+                                    alpha: isDark ? 0.3 : 0.08,
                                   ),
                                   blurRadius: 30,
                                   offset: const Offset(0, -15),
@@ -111,10 +108,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(
-                                20,
+                                AppConstants.spacingLarge,
                                 28,
-                                20,
-                                20,
+                                AppConstants.spacingLarge,
+                                AppConstants.spacingLarge,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

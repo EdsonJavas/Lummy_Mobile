@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:lummy_login/core/result.dart';
@@ -15,6 +16,7 @@ class BiometricAuthService {
 
   static const String _biometricEnabledKey = 'biometric_enabled';
   static const String _cachedUserIdKey = 'cached_user_id';
+  static const String _cachedPasswordKey = 'cached_password';
 
   BiometricAuthService(this._localAuth, this._secureStorage);
 
@@ -60,44 +62,42 @@ class BiometricAuthService {
     await _secureStorage.write(key: _cachedUserIdKey, value: userId);
   }
 
+  /// Guarda email e senha para login por biometria (só quando o utilizador ativa a digital).
+  Future<void> cacheCredentials(String email, String password) async {
+    await _secureStorage.write(key: _cachedUserIdKey, value: email);
+    await _secureStorage.write(key: _cachedPasswordKey, value: password);
+  }
+
   Future<String?> readCachedUserId() async {
     return _secureStorage.read(key: _cachedUserIdKey);
   }
 
+  Future<String?> readCachedPassword() async {
+    return _secureStorage.read(key: _cachedPasswordKey);
+  }
+
   Future<void> clearCachedUser() async {
     await _secureStorage.delete(key: _cachedUserIdKey);
+    await _secureStorage.delete(key: _cachedPasswordKey);
   }
 
   Future<bool> authenticate({String reason = 'Confirmar para entrar'}) async {
     try {
-      print('Iniciando autenticação biométrica...');
+      debugPrint('Iniciando autenticação biométrica...');
 
-      // Verificar se o dispositivo suporta biometria
       final isSupported = await _localAuth.isDeviceSupported();
-      if (!isSupported) {
-        print('Dispositivo não suporta biometria');
-        return false;
-      }
+      if (!isSupported) return false;
 
-      // Verificar se há biometrias disponíveis
       final availableBiometrics = await _localAuth.getAvailableBiometrics();
-      print('Biometrias disponíveis: $availableBiometrics');
+      if (availableBiometrics.isEmpty) return false;
 
-      if (availableBiometrics.isEmpty) {
-        print('Nenhuma biometria cadastrada');
-        return false;
-      }
-
-      // Tentar autenticação
       final didAuth = await _localAuth.authenticate(
         localizedReason: reason,
         biometricOnly: true,
       );
-
-      print('Resultado da autenticação: $didAuth');
       return didAuth;
     } catch (e) {
-      print('Erro na autenticação biométrica: $e');
+      debugPrint('Erro na autenticação biométrica: $e');
       return false;
     }
   }
@@ -120,14 +120,14 @@ class AppFacade {
     return _login(email: email, password: password);
   }
 
-  Future<Result<String>> loginWithBiometrics(String userId) {
-    // Para login com biometria, o userId (email) é usado para identificar o usuário.
-    // A senha não é necessária, mas o LoginUseCase espera ambos. Pode ser necessário ajustar o LoginUseCase
-    // ou passar uma senha placeholder se o backend exigir.
-    return _login(
-      email: userId,
-      password: '',
-    ); // Passando uma string vazia para a senha por enquanto
+  Future<Result<String>> loginWithBiometrics(String email) async {
+    final password = await locator<BiometricAuthService>().readCachedPassword();
+    if (password == null || password.isEmpty) {
+      return const FailureResult<String>(
+        Failure('Faça login com email e senha e ative a digital para usar este acesso.'),
+      );
+    }
+    return _login(email: email, password: password);
   }
 
   Future<Result<FinancialData>> getFinancialData(String userId) {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lummy_login/core/constants/app_constants.dart';
 import 'package:lummy_login/login_page.dart';
 import 'package:lummy_login/core/providers/theme_provider.dart';
 import 'package:lummy_login/screens/edit_profile_screen.dart';
@@ -9,6 +11,7 @@ import 'package:lummy_login/screens/notifications_screen.dart';
 import 'package:lummy_login/shared/widgets/cached_avatar.dart';
 import 'package:lummy_login/shared/widgets/cached_image.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy_login/application/app_facade.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/domain/repositories/auth_repository.dart';
 
@@ -267,23 +270,28 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: Colors.black.withValues(alpha: 0.15),
                           blurRadius: 25,
                           offset: const Offset(0, -15),
                         ),
                       ],
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 0.0),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppConstants.spacingLarge,
+                        50.0,
+                        AppConstants.spacingLarge,
+                        0.0,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildStatsSection(),
-                          const SizedBox(height: 20),
+                          const Gap(20),
                           _buildAchievementsSection(),
-                          const SizedBox(height: 20),
+                          const Gap(20),
                           _buildSettingsSection(),
-                          const SizedBox(height: 8),
+                          const Gap(8),
                         ],
                       ),
                     ),
@@ -478,7 +486,10 @@ class _ProfilePageState extends State<ProfilePage> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF1E40AF), width: 4),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 4,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.2),
@@ -487,14 +498,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ],
               ),
-              child: const CachedAvatar(
+              child: CachedAvatar(
                 imageUrl:
                     'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
                 size: 120,
                 borderColor: Colors.white,
                 borderWidth: 4,
-                fallbackIcon: Icons.person,
-                fallbackIconColor: Color(0xFF1E40AF),
+                fallbackIcon: Icons.person_rounded,
+                fallbackIconColor: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
@@ -1154,9 +1165,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
               if (shouldLogout == true) {
                 try {
-                  // Fazer logout no Supabase
                   final authRepo = locator<AuthRepository>();
                   await authRepo.logout();
+                  await locator<BiometricAuthService>().clearCachedUser();
 
                   debugPrint('✅ Logout realizado com sucesso');
 

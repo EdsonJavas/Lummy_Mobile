@@ -399,7 +399,6 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
           .single();
 
       final currentPoints = (childData['total_points'] as int?) ?? 0;
-      final currentLevel = (childData['level'] as int?) ?? 1;
 
       final newPoints = currentPoints + points;
       final newLevel =

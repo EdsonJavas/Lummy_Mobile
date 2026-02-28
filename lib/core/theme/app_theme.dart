@@ -8,7 +8,6 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      primaryColor: const Color(AppConstants.primaryBlue),
       scaffoldBackgroundColor: const Color(AppConstants.backgroundLight),
 
       // Color scheme
@@ -124,7 +123,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: const Color(AppConstants.backgroundWhite),
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.04),
+        shadowColor: Colors.black.withValues(alpha: 0.04),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         ),
@@ -142,6 +141,34 @@ class AppTheme {
           color: Colors.white,
         ),
       ),
+
+      // Bottom navigation bar (light)
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Color(AppConstants.backgroundWhite),
+        selectedItemColor: Color(AppConstants.primaryBlue),
+        unselectedItemColor: Color(AppConstants.textSecondary),
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+      ),
+
+      // Icon theme (light)
+      iconTheme: const IconThemeData(
+        color: Color(AppConstants.textPrimary),
+        size: 24,
+      ),
+
+      // Snackbar (light)
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: const Color(AppConstants.textPrimary),
+        contentTextStyle: GoogleFonts.poppins(
+          color: Colors.white,
+          fontSize: 14,
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        ),
+      ),
     );
   }
 
@@ -149,7 +176,6 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      primaryColor: const Color(0xFF3B82F6), // Azul vibrante como no site
       scaffoldBackgroundColor: const Color(
         0xFF0A0A1A,
       ), // Azul escuro quase preto como no site

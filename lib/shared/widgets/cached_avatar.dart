@@ -51,20 +51,20 @@ class CachedAvatar extends StatelessWidget {
                           loadingProgress.expectedTotalBytes!
                     : null,
                 strokeWidth: 2,
-                color: borderColor ?? Theme.of(context).primaryColor,
+                color: borderColor ?? Theme.of(context).colorScheme.primary,
               ),
             );
           },
           errorBuilder: (context, error, stackTrace) {
             return Container(
-              color: (borderColor ?? Theme.of(context).primaryColor)
+              color: (borderColor ?? Theme.of(context).colorScheme.primary)
                   .withOpacity(0.1),
               child: Icon(
                 fallbackIcon,
                 color:
                     fallbackIconColor ??
                     borderColor ??
-                    Theme.of(context).primaryColor,
+                    Theme.of(context).colorScheme.primary,
                 size: size * 0.5,
               ),
             );
