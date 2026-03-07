@@ -32,6 +32,7 @@ class FamilyService {
               'nome': nome,
               'cpf': cpf,
               'email': email,
+              'balance': 2300.00,
               'created_at': DateTime.now().toIso8601String(),
             })
             .select()
@@ -98,6 +99,7 @@ class FamilyService {
                     'nome': nome,
                     'cpf': cpf,
                     'email': email,
+                    'balance': 2300.00,
                     'created_at': DateTime.now().toIso8601String(),
                   })
                   .select()
@@ -155,6 +157,7 @@ class FamilyService {
               'nome': nome,
               'cpf': cpf,
               'email': email,
+              'balance': 2300.00,
               'created_at': DateTime.now().toIso8601String(),
             })
             .select()
@@ -229,6 +232,7 @@ class FamilyService {
           'email': email,
           'idade': idade,
           'sexo': sexo,
+          'balance': 0.00,
           'created_at': DateTime.now().toIso8601String(),
         });
         debugPrint('✅ Criança $childUserId criada com sucesso!');
@@ -279,6 +283,7 @@ class FamilyService {
                 'email': email,
                 'idade': idade,
                 'sexo': sexo,
+                'balance': 0.00,
                 'created_at': DateTime.now().toIso8601String(),
               });
               debugPrint(
@@ -345,6 +350,7 @@ class FamilyService {
           'email': email,
           'idade': idade,
           'sexo': sexo,
+          'balance': 0.00,
           'created_at': DateTime.now().toIso8601String(),
         });
         debugPrint(

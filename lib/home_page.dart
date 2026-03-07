@@ -35,6 +35,13 @@ class _HomePageState extends State<HomePage> {
   int _earnedMissionPoints = 0;
   RealtimeChannel? _goalsChannel;
   bool _isLoading = true;
+  bool _isClaimContextLoading = false;
+  String? _activeDistributionId;
+  double _activeDistributionAmount = 0.0;
+  bool _alreadyClaimedCurrentDistribution = false;
+  String _currentChildId = '';
+  String _currentChildName = 'Você';
+  List<Map<String, dynamic>> _realSiblings = const [];
 
   // Lista de transações
   List<Map<String, dynamic>> transactions = [];
@@ -313,6 +320,7 @@ class _HomePageState extends State<HomePage> {
         _loadEarnedPoints(),
         _loadBalance(),
         _loadGoal(),
+        _loadClaimContext(),
       ]);
     } catch (e) {
       debugPrint('❌ Erro ao inicializar dados: $e');
@@ -481,6 +489,118 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  bool get _hasRealSiblings => _realSiblings.isNotEmpty;
+
+  double get _currentWeightedScore {
+    final completedAchievements = achievements
+        .where((a) => a['isCompleted'] == true)
+        .length
+        .toDouble();
+    final score = _earnedMissionPoints.toDouble() + (completedAchievements * 5.0);
+    return score <= 0 ? 1.0 : score;
+  }
+
+  List<double> get _otherSiblingsScores =>
+      List<double>.filled(_realSiblings.length, 1.0);
+
+  List<String> get _otherSiblingsNames => _realSiblings
+      .map((s) => (s['nome'] as String?)?.trim())
+      .whereType<String>()
+      .where((n) => n.isNotEmpty)
+      .toList();
+
+  Future<void> _loadClaimContext() async {
+    setState(() => _isClaimContextLoading = true);
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        if (!mounted) return;
+        setState(() {
+          _activeDistributionId = null;
+          _activeDistributionAmount = 0.0;
+          _alreadyClaimedCurrentDistribution = false;
+          _currentChildId = '';
+          _currentChildName = 'Você';
+          _realSiblings = const [];
+          _isClaimContextLoading = false;
+        });
+        return;
+      }
+
+      final me = await supabase
+          .from('children')
+          .select('id, nome, responsavel_id')
+          .eq('id', user.id)
+          .maybeSingle();
+      if (me == null) {
+        if (!mounted) return;
+        setState(() {
+          _activeDistributionId = null;
+          _activeDistributionAmount = 0.0;
+          _alreadyClaimedCurrentDistribution = false;
+          _currentChildId = user.id;
+          _currentChildName = 'Você';
+          _realSiblings = const [];
+          _isClaimContextLoading = false;
+        });
+        return;
+      }
+
+      final parentId = me['responsavel_id'] as String?;
+      final childId = me['id'] as String? ?? user.id;
+      final childName = ((me['nome'] as String?) ?? 'Você').trim();
+
+      final siblings = parentId == null
+          ? <Map<String, dynamic>>[]
+          : (await supabase
+                  .from('children')
+                  .select('id, nome')
+                  .eq('responsavel_id', parentId)
+                  .neq('id', childId))
+              .cast<Map<String, dynamic>>();
+
+      Map<String, dynamic>? activeDistribution;
+      if (parentId != null && siblings.isNotEmpty) {
+        activeDistribution = await supabase
+            .from('allowance_distributions')
+            .select('id, total_amount')
+            .eq('parent_id', parentId)
+            .eq('status', 'active')
+            .order('created_at', ascending: false)
+            .limit(1)
+            .maybeSingle();
+      }
+
+      bool alreadyClaimed = false;
+      if (activeDistribution != null) {
+        final claim = await supabase
+            .from('allowance_claims')
+            .select('id')
+            .eq('distribution_id', activeDistribution['id'] as String)
+            .eq('child_id', childId)
+            .maybeSingle();
+        alreadyClaimed = claim != null;
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _activeDistributionId = activeDistribution?['id'] as String?;
+        _activeDistributionAmount =
+            (activeDistribution?['total_amount'] as num?)?.toDouble() ?? 0.0;
+        _alreadyClaimedCurrentDistribution = alreadyClaimed;
+        _currentChildId = childId;
+        _currentChildName = childName.isEmpty ? 'Você' : childName;
+        _realSiblings = siblings;
+        _isClaimContextLoading = false;
+      });
+    } catch (e) {
+      debugPrint('⚠️ Erro ao carregar contexto de resgate: $e');
+      if (!mounted) return;
+      setState(() => _isClaimContextLoading = false);
+    }
+  }
+
   Future<void> _refreshData() async {
     try {
       // Recarregar todos os dados
@@ -489,6 +609,7 @@ class _HomePageState extends State<HomePage> {
         _loadEarnedPoints(),
         _loadBalance(),
         _loadGoal(),
+        _loadClaimContext(),
       ]);
     } catch (e) {
       debugPrint('❌ Erro ao atualizar dados: $e');
@@ -530,23 +651,6 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       debugPrint('⚠️ Erro ao carregar balance: $e');
       setState(() => currentBalance = 0.0);
-    }
-  }
-
-  Future<void> _persistBalance() async {
-    try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-      if (user == null) return;
-      await supabase
-          .from('children')
-          .update({
-            'balance': currentBalance,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq('id', user.id);
-    } catch (e) {
-      debugPrint('⚠️ Erro ao persistir balance: $e');
     }
   }
 
@@ -1666,51 +1770,57 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
-                        // Score ponderado: pontos de missões + bônus por conquistas
-                        final completedAchievements = achievements
-                            .where((a) => a['isCompleted'] == true)
-                            .length
-                            .toDouble();
-                        final weightedScore =
-                            _earnedMissionPoints.toDouble() +
-                            (completedAchievements * 5.0);
+                        if (_isClaimContextLoading) return;
+                        if (!_hasRealSiblings) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Não há irmãos cadastrados pelo mesmo responsável.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        if (_activeDistributionId == null ||
+                            _activeDistributionAmount <= 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Sem valor ativo para resgate no momento.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        if (_alreadyClaimedCurrentDistribution) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Você já retirou sua parte desta distribuição.',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => ClaimShareScreen(
-                              totalAmount: 50.0,
-                              currentChildScore: weightedScore,
-                              otherChildrenScores: const [2.0, 3.0],
-                              otherChildrenNames: const ['Guilherme', 'Adriel'],
-                              currentChildName: 'Você',
+                              distributionId: _activeDistributionId!,
+                              childId: _currentChildId,
+                              totalAmount: _activeDistributionAmount,
+                              currentChildScore: _currentWeightedScore,
+                              otherChildrenScores: _otherSiblingsScores,
+                              otherChildrenNames: _otherSiblingsNames,
+                              currentChildName: _currentChildName,
                             ),
                           ),
                         );
                         if (result is Map && result['claimed'] == true) {
                           final claimedAmount =
                               ((result['amount'] ?? 0.0) as double);
-                          setState(() {
-                            currentBalance += claimedAmount;
-                          });
-                          await _persistBalance();
-                          // Sincronizar meta com o novo balance
-                          if (hasActiveGoal) {
-                            final goalRow = await Supabase.instance.client
-                                .from('goals')
-                                .select('id')
-                                .eq(
-                                  'child_id',
-                                  Supabase.instance.client.auth.currentUser!.id,
-                                )
-                                .eq('status', 'ongoing')
-                                .maybeSingle();
-                            if (goalRow != null) {
-                              await _syncGoalWithBalance(
-                                goalRow['id'] as String,
-                              );
-                              await _loadGoal();
-                            }
-                          }
+                          await _refreshData();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -1730,7 +1840,15 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: _buildActionCardInter(
                         'Retirar Minha Parte',
-                        'Resgate sua parte do valor do responsável',
+                        _isClaimContextLoading
+                            ? 'Carregando distribuição...'
+                            : (!_hasRealSiblings
+                                  ? 'Inativo: sem irmãos cadastrados'
+                                  : (_alreadyClaimedCurrentDistribution
+                                        ? 'Você já retirou nesta distribuição'
+                                        : (_activeDistributionId == null
+                                              ? 'Sem distribuição ativa'
+                                              : 'Resgate sua parte do valor do responsável'))),
                         Icons.payments_rounded,
                         const Color(0xFF10B981),
                         isSmallScreen,

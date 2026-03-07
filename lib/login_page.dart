@@ -783,30 +783,36 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ? 20
                                   : (isSmallScreen ? 30 : 50),
                             ), // Responsivo
-                            // Título "Faça Login" - responsivo com gradiente
-                            ShaderMask(
-                              shaderCallback: (bounds) => LinearGradient(
-                                colors:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? [
-                                        const Color(0xFF3B82F6),
-                                        const Color(0xFF8B5CF6),
-                                      ]
-                                    : [
-                                        const Color(0xFF1E293B),
-                                        const Color(0xFF1E293B),
-                                      ],
-                              ).createShader(bounds),
-                              child: Text(
-                                'Faça Login',
+                            // Título "Faça Login" - "og" em laranja e azul como Lummy
+                            RichText(
+                              text: TextSpan(
                                 style: GoogleFonts.poppins(
-                                  fontSize: isVerySmallScreen
-                                      ? 24
-                                      : 28, // Menor em telas pequenas
+                                  fontSize: isVerySmallScreen ? 24 : 28,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                                  color: Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white
+                                      : const Color(0xFF1E293B),
                                 ),
+                                children: [
+                                  const TextSpan(text: 'Faça L'),
+                                  TextSpan(
+                                    text: 'o',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: isVerySmallScreen ? 24 : 28,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: 'g',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: isVerySmallScreen ? 24 : 28,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF003092),
+                                    ),
+                                  ),
+                                  const TextSpan(text: 'in'),
+                                ],
                               ),
                             ),
 

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ClaimShareScreen extends StatefulWidget {
+  final String distributionId;
+  final String childId;
   final double totalAmount;
   final double currentChildScore;
   final List<double> otherChildrenScores;
@@ -10,6 +13,8 @@ class ClaimShareScreen extends StatefulWidget {
 
   const ClaimShareScreen({
     super.key,
+    required this.distributionId,
+    required this.childId,
     required this.totalAmount,
     required this.currentChildScore,
     required this.otherChildrenScores,
@@ -23,13 +28,14 @@ class ClaimShareScreen extends StatefulWidget {
 
 class _ClaimShareScreenState extends State<ClaimShareScreen>
     with TickerProviderStateMixin {
+  final _supabase = Supabase.instance.client;
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
   bool _claimed = false;
-  bool _alreadyClaimed = false; // temporariamente ignorado para testes
+  bool _alreadyClaimed = false;
 
   @override
   void initState() {
@@ -56,10 +62,24 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
   }
 
   Future<void> _loadClaimed() async {
-    // Temporariamente permitir múltiplos resgates para testes
-    setState(() {
-      _alreadyClaimed = false;
-    });
+    try {
+      final claim = await _supabase
+          .from('allowance_claims')
+          .select('id')
+          .eq('distribution_id', widget.distributionId)
+          .eq('child_id', widget.childId)
+          .maybeSingle();
+
+      if (!mounted) return;
+      setState(() {
+        _alreadyClaimed = claim != null;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _alreadyClaimed = false;
+      });
+    }
   }
 
   @override
@@ -114,15 +134,102 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
     }).toList();
   }
 
-  void _claim() {
+  Future<void> _claim() async {
+    if (_alreadyClaimed || _claimed) return;
+
     final amount = _computeYourShare();
+    if (amount <= 0) return;
+
     setState(() => _claimed = true);
-    _persistClaimed();
+    final ok = await _persistClaimed(amount);
+
+    if (!mounted) return;
+    if (!ok) {
+      setState(() => _claimed = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Você já retirou sua parte desta distribuição.'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _alreadyClaimed = true;
+    });
     Navigator.pop(context, {'claimed': true, 'amount': amount});
   }
 
-  Future<void> _persistClaimed() async {
-    // Temporariamente não persistir flag de resgate
+  Future<bool> _persistClaimed(double amount) async {
+    try {
+      final existing = await _supabase
+          .from('allowance_claims')
+          .select('id')
+          .eq('distribution_id', widget.distributionId)
+          .eq('child_id', widget.childId)
+          .maybeSingle();
+      if (existing != null) return false;
+
+      await _supabase.from('allowance_claims').insert({
+        'distribution_id': widget.distributionId,
+        'child_id': widget.childId,
+        'amount': amount,
+      });
+
+      final child = await _supabase
+          .from('children')
+          .select('balance')
+          .eq('id', widget.childId)
+          .maybeSingle();
+      final current = (child?['balance'] as num?)?.toDouble() ?? 0.0;
+      await _supabase
+          .from('children')
+          .update({'balance': double.parse((current + amount).toStringAsFixed(2))})
+          .eq('id', widget.childId);
+
+      await _tryCloseDistribution();
+      return true;
+    } on PostgrestException catch (e) {
+      // Unique violation: ja retirou.
+      if (e.code == '23505') return false;
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> _tryCloseDistribution() async {
+    try {
+      final distribution = await _supabase
+          .from('allowance_distributions')
+          .select('parent_id')
+          .eq('id', widget.distributionId)
+          .maybeSingle();
+      if (distribution == null) return;
+      final parentId = distribution['parent_id'] as String?;
+      if (parentId == null) return;
+
+      final children = await _supabase
+          .from('children')
+          .select('id')
+          .eq('responsavel_id', parentId);
+      final claims = await _supabase
+          .from('allowance_claims')
+          .select('id')
+          .eq('distribution_id', widget.distributionId);
+
+      if (claims.length >= children.length && children.isNotEmpty) {
+        await _supabase
+            .from('allowance_distributions')
+            .update({
+              'status': 'closed',
+              'closed_at': DateTime.now().toIso8601String(),
+            })
+            .eq('id', widget.distributionId);
+      }
+    } catch (_) {
+      // Sem efeito colateral critico para o fluxo de resgate.
+    }
   }
 
   @override
@@ -431,7 +538,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: _claim,
+                      onPressed: _alreadyClaimed || _claimed ? null : _claim,
                       icon: const Icon(Icons.payments_rounded, size: 22),
                       label: Text(
                         'Retirar minha parte',

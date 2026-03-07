@@ -87,39 +87,37 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       children: [
                         _buildHeroSection(context, state, isDark),
                         Transform(
-                          transform: Matrix4.translationValues(0, -36, 0),
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: theme.scaffoldBackgroundColor,
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(32),
-                                topRight: Radius.circular(32),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(
-                                    alpha: isDark ? 0.3 : 0.08,
+                          transform: Matrix4.translationValues(0, -20, 0),
+                          child: ClipPath(
+                            clipper: _FormTopClipper(),
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: theme.scaffoldBackgroundColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(
+                                      alpha: isDark ? 0.3 : 0.08,
+                                    ),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, -15),
                                   ),
-                                  blurRadius: 30,
-                                  offset: const Offset(0, -15),
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                AppConstants.spacingLarge,
-                                28,
-                                AppConstants.spacingLarge,
-                                AppConstants.spacingLarge,
+                                ],
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  AppConstants.spacingLarge,
+                                  64,
+                                  AppConstants.spacingLarge,
+                                  AppConstants.spacingLarge,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                   _buildSectionTitle(
                                     context,
                                     title: 'Visão Geral',
-                                    subtitle: 'Resumo financeiro da família',
+                                    subtitle: 'Resumo do saldo do responsável',
                                     isDark: isDark,
                                   ),
                                   const SizedBox(height: 16),
@@ -136,6 +134,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                     isDark,
                                   ),
                                 ],
+                                ),
                               ),
                             ),
                           ),
@@ -273,7 +272,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             ],
           ),
           const SizedBox(height: 28),
-          // Card de saldo principal - SALDO TOTAL DOS FILHOS
+          // Card de saldo principal - saldo do responsável
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -319,7 +318,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Saldo Total dos Filhos',
+                        'Saldo da Família (Responsável)',
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -337,7 +336,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        '${state.children.length} ${state.children.length == 1 ? 'filho' : 'filhos'}',
+                        'Disponível para enviar',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -365,7 +364,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Soma do saldo de todas as contas infantis',
+                  'Diminui conforme você envia para os filhos',
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
@@ -586,18 +585,15 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     ParentDashboardState state,
     bool isDark,
   ) {
-    final childrenCount = state.children.isEmpty ? 1 : state.children.length;
-    final averagePerChild = state.walletBalance / childrenCount;
-
     // Resumo rápido - sem redundância de saldo
     return Row(
       children: [
-        // Card de média por filho
+        // Card de saldo disponível do responsável
         Expanded(
           child: _CompactInfoCard(
-            icon: Icons.child_care_rounded,
-            label: 'Média/Filho',
-            value: AppFormatters.formatCurrency(averagePerChild),
+            icon: Icons.account_balance_wallet_rounded,
+            label: 'Saldo Disponível',
+            value: AppFormatters.formatCurrency(state.walletBalance),
             color: _primaryBlue,
             isDark: isDark,
           ),
@@ -1410,4 +1406,22 @@ class _InsightPreviewChip extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Curvatura do topo do card (igual à tela de cadastro do responsável).
+class _FormTopClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(0, size.height);
+    path.lineTo(size.width, size.height);
+    path.lineTo(size.width, 84);
+    path.quadraticBezierTo(size.width * 0.75, 40, size.width * 0.5, 40);
+    path.quadraticBezierTo(size.width * 0.25, 40, 0, 84);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

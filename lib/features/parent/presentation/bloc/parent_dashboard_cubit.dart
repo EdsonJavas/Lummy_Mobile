@@ -30,11 +30,8 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       // Buscar dados reais do banco
       final children = await _fetchRealChildren(parentId);
 
-      // Calcular saldo total dos filhos
-      final totalChildrenBalance = children.fold<double>(
-        0.0,
-        (sum, child) => sum + child.balance,
-      );
+      // Saldo principal do responsavel (separado do saldo dos filhos)
+      final parentBalance = await _fetchParentBalance(parentId);
 
       // Buscar dados reais do banco
       final pendingApprovals = await _fetchPendingApprovals(parentId, children);
@@ -52,7 +49,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           pendingApprovals: pendingApprovals,
           notifications: notifications,
           totalSpendingByChild: spending,
-          walletBalance: totalChildrenBalance,
+          walletBalance: parentBalance,
           monthIncomeTotal: monthlyTrend.isNotEmpty
               ? monthlyTrend.last.income
               : 0,
@@ -147,6 +144,41 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     await loadDashboard(id);
   }
 
+  Future<double> _fetchParentBalance(String parentId) async {
+    try {
+      final row = await _supabase
+          .from('responsaveis')
+          .select('balance')
+          .eq('id', parentId)
+          .maybeSingle();
+      return (row?['balance'] as num?)?.toDouble() ?? 2300.0;
+    } catch (e) {
+      debugPrint('⚠️ Erro ao buscar saldo do responsável: $e');
+      return state.walletBalance > 0 ? state.walletBalance : 2300.0;
+    }
+  }
+
+  Future<bool> _deductParentBalance(double amount) async {
+    final parentId = _parentId;
+    if (parentId == null) return false;
+    if (amount <= 0) return true;
+
+    final current = await _fetchParentBalance(parentId);
+    if (current < amount) {
+      emit(state.copyWith(error: 'Saldo do responsável insuficiente'));
+      return false;
+    }
+
+    final updated = double.parse((current - amount).toStringAsFixed(2));
+    await _supabase
+        .from('responsaveis')
+        .update({'balance': updated})
+        .eq('id', parentId);
+
+    emit(state.copyWith(walletBalance: updated));
+    return true;
+  }
+
   // Aprovar transação
   Future<void> approveTransaction(String transactionId) async {
     try {
@@ -239,6 +271,9 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         return;
       }
 
+      final hasBalance = await _deductParentBalance(amount);
+      if (!hasBalance) return;
+
       // Criar transação no banco
       await _supabase.from('transactions').insert({
         'child_id': childId,
@@ -264,45 +299,47 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     if (amount <= 0 || state.children.isEmpty) {
       return;
     }
+    await createDistributionToClaim(amount);
+  }
 
-    final count = state.children.length;
-    final valuePerChild = double.parse((amount / count).toStringAsFixed(2));
-    double remaining = amount;
-
-    final updatedChildren = <ChildEntity>[];
-
-    for (var i = 0; i < count; i++) {
-      final child = state.children[i];
-      final valueToAdd = i == count - 1
-          ? double.parse(remaining.toStringAsFixed(2))
-          : valuePerChild;
-      remaining -= valueToAdd;
-      updatedChildren.add(child.copyWith(balance: child.balance + valueToAdd));
-    }
-
-    // Calcular novo saldo total dos filhos (AUMENTA quando distribui)
-    final newTotalBalance = updatedChildren.fold<double>(
-      0.0,
-      (sum, c) => sum + c.balance,
-    );
-
-    emit(
-      state.copyWith(
-        children: updatedChildren,
-        walletBalance: newTotalBalance, // Atualiza para o novo total
-      ),
-    );
-
-    // Salvar no backend
+  Future<void> createDistributionToClaim(double amount) async {
     try {
-      for (final child in updatedChildren) {
-        await _supabase
-            .from('children')
-            .update({'balance': child.balance})
-            .eq('id', child.id);
+      if (amount <= 0) {
+        emit(state.copyWith(error: 'Valor deve ser maior que zero'));
+        return;
       }
+      if (state.children.isEmpty) {
+        emit(state.copyWith(error: 'Cadastre filhos para distribuir'));
+        return;
+      }
+      final parentId = _parentId;
+      if (parentId == null) {
+        emit(state.copyWith(error: 'Responsável não identificado'));
+        return;
+      }
+
+      final hasBalance = await _deductParentBalance(amount);
+      if (!hasBalance) return;
+
+      await _supabase
+          .from('allowance_distributions')
+          .update({
+            'status': 'closed',
+            'closed_at': DateTime.now().toIso8601String(),
+          })
+          .eq('parent_id', parentId)
+          .eq('status', 'active');
+
+      await _supabase.from('allowance_distributions').insert({
+        'parent_id': parentId,
+        'total_amount': amount,
+        'status': 'active',
+      });
+
+      await refresh();
     } catch (e) {
-      debugPrint('Erro ao atualizar saldos no banco: $e');
+      debugPrint('❌ Erro ao criar distribuição: $e');
+      emit(state.copyWith(error: 'Erro ao criar distribuição: ${e.toString()}'));
     }
   }
 
