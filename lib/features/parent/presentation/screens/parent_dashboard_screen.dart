@@ -87,7 +87,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       children: [
                         _buildHeroSection(context, state, isDark),
                         Transform(
-                          transform: Matrix4.translationValues(0, -20, 0),
+                          transform: Matrix4.translationValues(0, -64, 0),
                           child: ClipPath(
                             clipper: _FormTopClipper(),
                             child: Container(
@@ -107,33 +107,33 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
                                   AppConstants.spacingLarge,
-                                  64,
+                                  92,
                                   AppConstants.spacingLarge,
                                   AppConstants.spacingLarge,
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                  _buildSectionTitle(
-                                    context,
-                                    title: 'Visão Geral',
-                                    subtitle: 'Resumo do saldo do responsável',
-                                    isDark: isDark,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _buildBalanceCard(context, state, isDark),
-                                  const SizedBox(height: 20),
-                                  _buildOverviewGrid(context, state, isDark),
-                                  const SizedBox(height: 24),
-                                  _buildQuickActions(context, state, isDark),
-                                  const SizedBox(height: 24),
-                                  _buildInsightsPreview(
-                                    context,
-                                    state,
-                                    widget.parentId,
-                                    isDark,
-                                  ),
-                                ],
+                                    _buildSectionTitle(
+                                      context,
+                                      title: 'Visão Geral',
+                                      subtitle: 'Resumo do saldo do responsável',
+                                      isDark: isDark,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    _buildBalanceCard(context, state, isDark),
+                                    const SizedBox(height: 20),
+                                    _buildOverviewGrid(context, state, isDark),
+                                    const SizedBox(height: 24),
+                                    _buildQuickActions(context, state, isDark),
+                                    const SizedBox(height: 24),
+                                    _buildInsightsPreview(
+                                      context,
+                                      state,
+                                      widget.parentId,
+                                      isDark,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -1412,12 +1412,13 @@ class _InsightPreviewChip extends StatelessWidget {
 class _FormTopClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
+    // Curvatura idêntica à tela de login.
     final path = Path();
     path.moveTo(0, size.height);
     path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 84);
-    path.quadraticBezierTo(size.width * 0.75, 40, size.width * 0.5, 40);
-    path.quadraticBezierTo(size.width * 0.25, 40, 0, 84);
+    path.lineTo(size.width, 60);
+    path.quadraticBezierTo(size.width * 0.75, 20, size.width * 0.5, 20);
+    path.quadraticBezierTo(size.width * 0.25, 20, 0, 60);
     path.close();
     return path;
   }
