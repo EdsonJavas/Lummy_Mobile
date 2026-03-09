@@ -146,7 +146,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 if (state.isLoading)
                   Positioned.fill(
                     child: Container(
-                      color: (isDark ? const Color(0xFF1E293B) : Colors.white)
+                      color: (isDark ? const Color(0xFF121212) : Colors.white)
                           .withOpacity(0.85),
                       child: const Center(
                         child: BrandedLoader(

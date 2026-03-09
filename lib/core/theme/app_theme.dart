@@ -176,17 +176,15 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(
-        0xFF1E293B,
-      ), // Slate escuro - menos melancólico que preto
+      scaffoldBackgroundColor: const Color(0xFF121212), // Neutro, sem azul
       // Color scheme - cores inspiradas no site Lummy
       colorScheme: const ColorScheme.dark(
         primary: Color(0xFF3B82F6), // Azul vibrante
         secondary: Color(0xFFFF8C42), // Laranja vibrante
         tertiary: Color(0xFF10B981), // Verde vibrante
         error: Color(0xFFEF4444),
-        surface: Color(0xFF1A1A2E), // Surface cards - azul escuro
-        surfaceContainerHighest: Color(0xFF16213E), // Surface mais alto
+        surface: Color(0xFF1E1E1E), // Surface cards - cinza neutro
+        surfaceContainerHighest: Color(0xFF262626), // Surface mais alto
         onPrimary: Colors.white, // Texto branco em primary
         onSecondary: Colors.white, // Texto branco em secondary
         onError: Colors.white,
@@ -252,7 +250,7 @@ class AppTheme {
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF1A1A2E),
+        fillColor: const Color(0xFF1E1E1E),
         hintStyle: GoogleFonts.poppins(
           color: const Color(0xFF718096),
           fontSize: 14,
@@ -309,7 +307,7 @@ class AppTheme {
 
       // Card theme
       cardTheme: CardThemeData(
-        color: const Color(0xFF1A1A2E), // Azul escuro como no site
+        color: const Color(0xFF1E1E1E), // Cinza neutro
         elevation: 0,
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
@@ -320,7 +318,7 @@ class AppTheme {
 
       // App bar theme
       appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF1A1A2E), // Azul escuro como no site
+        backgroundColor: const Color(0xFF1E1E1E), // Cinza neutro
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -334,7 +332,7 @@ class AppTheme {
 
       // Bottom navigation bar theme
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF1A1A2E), // Azul escuro como no site
+        backgroundColor: Color(0xFF1E1E1E), // Cinza neutro
         selectedItemColor: Color(0xFF3B82F6), // Azul vibrante
         unselectedItemColor: Color(0xFF718096),
         type: BottomNavigationBarType.fixed,
@@ -352,7 +350,7 @@ class AppTheme {
 
       // Snackbar theme
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: const Color(0xFF1A1A2E), // Azul escuro como no site
+        backgroundColor: const Color(0xFF1E1E1E), // Cinza neutro
         contentTextStyle: GoogleFonts.poppins(
           color: Colors.white,
           fontSize: 14,

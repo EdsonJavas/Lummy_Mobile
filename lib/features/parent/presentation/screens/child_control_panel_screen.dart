@@ -137,7 +137,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF1E293B)
+          ? const Color(0xFF121212)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: _loadChildData,

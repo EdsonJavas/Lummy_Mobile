@@ -9,6 +9,7 @@ import 'package:lummy_login/domain/entities/user_entity.dart';
 import 'package:lummy_login/features/parent/presentation/screens/parent_main_navigation.dart';
 import 'package:lummy_login/services/family_service.dart';
 import 'package:lummy_login/utils/login_debug_helper.dart';
+import 'package:lummy_login/core/theme/app_theme.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -604,31 +605,28 @@ class _LoginScreenState extends State<LoginScreen> {
     final isVerySmallScreen = screenHeight < 650;
     final isSmallScreen = screenHeight < 700;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
+    // Tela de login sempre em tema claro (não aplica dark mode)
+    return Theme(
+      data: AppTheme.lightTheme,
+      child: Scaffold(
+        backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
+        resizeToAvoidBottomInset: true,
+        body: SingleChildScrollView(
         physics: const ClampingScrollPhysics(),
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: screenHeight),
           child: Stack(
             children: [
-              // Fundo adaptativo ao tema
+              // Fundo sempre claro (login não usa dark mode)
               Container(
                 width: double.infinity,
                 height: screenHeight,
-                decoration: BoxDecoration(
-                  gradient: Theme.of(context).brightness == Brightness.dark
-                      ? const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFF2563EB), Color(0xFF1E40AF)],
-                        )
-                      : const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
-                        ),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+                  ),
                 ),
               ),
 
@@ -1128,6 +1126,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

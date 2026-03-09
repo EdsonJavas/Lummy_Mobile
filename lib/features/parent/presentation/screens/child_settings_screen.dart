@@ -76,7 +76,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF1E293B)
+          ? const Color(0xFF121212)
           : const Color(0xFFF8FAFC),
       body: Column(
         children: [

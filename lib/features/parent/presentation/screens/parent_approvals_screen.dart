@@ -21,7 +21,7 @@ class ParentApprovalsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF121212)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: () => context.read<ParentDashboardCubit>().refresh(),
@@ -284,7 +284,7 @@ class ParentApprovalsScreen extends StatelessWidget {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? const Color(0xFF121212) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
@@ -312,7 +312,7 @@ class ParentApprovalsScreen extends StatelessWidget {
           // Action buttons
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+              color: isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),

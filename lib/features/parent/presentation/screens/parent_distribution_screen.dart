@@ -32,7 +32,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF1E293B)
+          ? const Color(0xFF121212)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: () => context.read<ParentDashboardCubit>().refresh(),

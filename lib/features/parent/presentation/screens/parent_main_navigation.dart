@@ -102,7 +102,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: const Color(0xFF121212),
         ),
       );
       return false;
@@ -139,7 +139,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
   Widget _buildPremiumBottomNav(BuildContext context, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? const Color(0xFF121212) : Colors.white,
         boxShadow: [
           BoxShadow(
             color: isDark
@@ -151,7 +151,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
         ],
         border: Border(
           top: BorderSide(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            color: isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0),
             width: 1,
           ),
         ),

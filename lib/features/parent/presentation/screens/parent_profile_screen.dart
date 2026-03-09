@@ -118,7 +118,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     if (_isLoadingStats) {
       return Scaffold(
         backgroundColor: isDark
-            ? const Color(0xFF1E293B)
+            ? const Color(0xFF121212)
             : const Color(0xFFF8FAFC),
         body: const Center(child: BrandedLoader(label: 'Carregando perfil...')),
       );
@@ -129,7 +129,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF1E293B)
+          ? const Color(0xFF121212)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: _refreshData,
@@ -478,7 +478,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? const Color(0xFF121212) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -767,7 +767,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? const Color(0xFF121212) : Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: color.withOpacity(isDark ? 0.3 : 0.2)),
           ),
@@ -795,7 +795,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? const Color(0xFF121212) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1053,7 +1053,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Row(
           children: [

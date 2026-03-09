@@ -26,7 +26,7 @@ class ParentDependentsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF1E293B)
+          ? const Color(0xFF121212)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: () => context.read<ParentDashboardCubit>().refresh(),
@@ -288,7 +288,7 @@ class ParentDependentsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? const Color(0xFF121212) : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark

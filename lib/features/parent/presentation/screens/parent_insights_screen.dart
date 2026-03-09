@@ -48,7 +48,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF121212)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: () =>
