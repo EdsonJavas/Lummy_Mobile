@@ -146,7 +146,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 if (state.isLoading)
                   Positioned.fill(
                     child: Container(
-                      color: (isDark ? const Color(0xFF0A0A1A) : Colors.white)
+                      color: (isDark ? const Color(0xFF1E293B) : Colors.white)
                           .withOpacity(0.85),
                       child: const Center(
                         child: BrandedLoader(
@@ -178,7 +178,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF1E293B), Color(0xFF0F172A), Color(0xFF312E81)]
+              ? const [Color(0xFF2563EB), Color(0xFF1E40AF), Color(0xFF4338CA)]
               : const [Color(0xFF3B82F6), Color(0xFF1E40AF), Color(0xFF7C3AED)],
         ),
       ),
@@ -368,7 +368,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withOpacity(0.85),
                   ),
                 ),
               ],
@@ -410,7 +410,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
             ),
           ),
         ],
@@ -661,9 +661,9 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       itemCount: stats.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.5,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+        childAspectRatio: 1.33,
       ),
       itemBuilder: (context, index) {
         return _OverviewStatCard(data: stats[index], isDark: isDark);
@@ -730,21 +730,21 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           subtitle: 'Gerencie tudo em um só lugar',
           isDark: isDark,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
         // Primeira linha de ações
         Row(
           children: [
             Expanded(child: _buildActionCard(quickActions[0], isDark)),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(child: _buildActionCard(quickActions[1], isDark)),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         // Segunda linha de ações
         Row(
           children: [
             Expanded(child: _buildActionCard(quickActions[2], isDark)),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(child: _buildActionCard(quickActions[3], isDark)),
           ],
         ),
@@ -753,22 +753,42 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   }
 
   Widget _buildActionCard(_QuickActionData data, bool isDark) {
+    final darkTop = Color.alphaBlend(
+      data.color.withAlpha(34),
+      const Color(0xFF1E293B),
+    );
+    final darkBorder = Color.alphaBlend(
+      data.color.withAlpha(56),
+      const Color(0xFF334155),
+    );
+
     return GestureDetector(
       onTap: data.onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        constraints: const BoxConstraints(minHeight: 168),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [darkTop, const Color(0xFF1E293B)]
+                : [Colors.white, data.color.withOpacity(0.03)],
+          ),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-            width: 1,
+            color: isDark
+                ? darkBorder
+                : data.color.withOpacity(0.12),
+            width: 1.2,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: isDark
+                  ? data.color.withAlpha(34)
+                  : data.color.withOpacity(0.08),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -778,13 +798,22 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             Row(
               children: [
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
-                    color: data.color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      colors: [
+                        data.color.withOpacity(isDark ? 0.28 : 0.18),
+                        data.color.withOpacity(isDark ? 0.12 : 0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: data.color.withOpacity(isDark ? 0.34 : 0.18),
+                      width: 1.2,
+                    ),
                   ),
-                  child: Icon(data.icon, color: data.color, size: 22),
+                  child: Icon(data.icon, color: data.color, size: 24),
                 ),
                 if (data.badgeCount > 0) ...[
                   const SizedBox(width: 8),
@@ -802,32 +831,35 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                 ],
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
             Text(
               data.title,
               style: GoogleFonts.poppins(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               data.subtitle,
               style: GoogleFonts.poppins(
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: isDark
-                    ? const Color(0xFF94A3B8)
+                    ? const Color(0xFFCBD5E1)
                     : const Color(0xFF64748B),
+                height: 1.25,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -864,7 +896,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: state.children.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   const SizedBox(height: AppConstants.spacingMedium),
               itemBuilder: (context, index) {
                 final child = state.children[index];
@@ -1038,7 +1070,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.pendingApprovals.take(3).length,
-            separatorBuilder: (_, __) =>
+            separatorBuilder: (_, _) =>
                 const SizedBox(height: AppConstants.spacingMedium),
             itemBuilder: (context, index) {
               final transaction = state.pendingApprovals[index];
@@ -1095,20 +1127,37 @@ class _CompactInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final darkTop = Color.alphaBlend(color.withAlpha(30), const Color(0xFF1E293B));
+    final darkBorder = Color.alphaBlend(
+      color.withAlpha(52),
+      const Color(0xFF334155),
+    );
+
     return Container(
-      padding: const EdgeInsets.all(14),
+      constraints: const BoxConstraints(minHeight: 140),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [darkTop, const Color(0xFF1E293B)]
+              : [Colors.white, color.withOpacity(0.04)],
+        ),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-          width: 1,
+          color: isDark
+              ? darkBorder
+              : color.withOpacity(0.15),
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: isDark
+                ? color.withAlpha(30)
+                : color.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -1119,15 +1168,20 @@ class _CompactInfoCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  gradient: LinearGradient(
+                    colors: [
+                      color.withOpacity(isDark ? 0.3 : 0.2),
+                      color.withOpacity(isDark ? 0.14 : 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Icon(icon, color: color, size: 18),
+                    Icon(icon, color: color, size: 20),
                     if (showBadge)
                       Positioned(
                         top: -3,
@@ -1173,9 +1227,9 @@ class _CompactInfoCard extends StatelessWidget {
             child: Text(
               value,
               style: GoogleFonts.poppins(
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
               ),
             ),
           ),
@@ -1222,20 +1276,40 @@ class _OverviewStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final darkTop = Color.alphaBlend(
+      data.color.withAlpha(28),
+      const Color(0xFF1E293B),
+    );
+    final darkBorder = Color.alphaBlend(
+      data.color.withAlpha(48),
+      const Color(0xFF334155),
+    );
+
     return Container(
-      padding: const EdgeInsets.all(12),
+      constraints: const BoxConstraints(minHeight: 128),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [darkTop, const Color(0xFF1E293B)]
+              : [Colors.white, data.color.withOpacity(0.03)],
+        ),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-          width: 1,
+          color: isDark
+              ? darkBorder
+              : data.color.withOpacity(0.12),
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: isDark
+                ? data.color.withAlpha(28)
+                : data.color.withOpacity(0.07),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -1246,17 +1320,17 @@ class _OverviewStatCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      data.color.withOpacity(0.2),
-                      data.color.withOpacity(0.1),
+                      data.color.withOpacity(isDark ? 0.3 : 0.2),
+                      data.color.withOpacity(isDark ? 0.14 : 0.1),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(data.icon, color: data.color, size: 16),
+                child: Icon(data.icon, color: data.color, size: 18),
               ),
               const SizedBox(width: 6),
               Expanded(
@@ -1284,7 +1358,7 @@ class _OverviewStatCard extends StatelessWidget {
             child: Text(
               data.value,
               style: GoogleFonts.poppins(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: isDark ? Colors.white : const Color(0xFF1E293B),
               ),
@@ -1301,7 +1375,7 @@ class _OverviewStatCard extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w400,
                   color: isDark
-                      ? const Color(0xFF64748B)
+                      ? const Color(0xFF94A3B8)
                       : const Color(0xFF94A3B8),
                 ),
               ),

@@ -208,7 +208,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF1E293B)
           : const Color(0xFFF8FAFC),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -224,7 +224,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF0A0A1A)
+                      ? const Color(0xFF1E293B)
                       : const Color(0xFFF8FAFC),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(32),
@@ -410,7 +410,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF1E293B), Color(0xFF312E81), Color(0xFF4C1D95)]
+              ? const [Color(0xFF1E3A5F), Color(0xFF312E81), Color(0xFF4C1D95)]
               : const [Color(0xFF3B82F6), Color(0xFF8B5CF6), Color(0xFF6366F1)],
         ),
       ),

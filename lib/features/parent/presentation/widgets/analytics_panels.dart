@@ -27,7 +27,7 @@ class ParentAnalyticsPanels extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 900;
-        final spacing = AppConstants.spacingLarge;
+        const spacing = AppConstants.spacingLarge;
         final trendCard = _buildTrendCard(context, compact: !isWide);
         final categoryCard = _buildCategoryCard(context);
 

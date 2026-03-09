@@ -8,7 +8,6 @@ import 'package:lummy_login/core/constants/app_constants.dart';
 import 'package:lummy_login/screens/new_goal_screen.dart';
 import 'package:lummy_login/screens/request_money_screen.dart';
 import 'package:lummy_login/screens/claim_share_screen.dart';
-import 'package:lummy_login/shared/widgets/cached_avatar.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lummy_login/utils/supabase_test.dart';
@@ -1061,7 +1060,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(AppConstants.radiusXLarge),
         border: Border.all(
           color: theme.brightness == Brightness.dark
-              ? const Color(0xFF334155)
+              ? const Color(0xFF475569)
               : const Color(AppConstants.borderLight),
           width: 1,
         ),
@@ -1196,7 +1195,7 @@ class _HomePageState extends State<HomePage> {
                     height: 10,
                     decoration: BoxDecoration(
                       color: theme.brightness == Brightness.dark
-                          ? const Color(0xFF334155)
+                          ? const Color(0xFF475569)
                           : const Color(AppConstants.borderLight),
                       borderRadius: BorderRadius.circular(5),
                     ),
@@ -1243,12 +1242,12 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: theme.brightness == Brightness.dark
-                        ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                        ? const Color(0xFF1E293B)
                         : const Color(AppConstants.backgroundGray),
                     borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     border: Border.all(
                       color: theme.brightness == Brightness.dark
-                          ? const Color(0xFF334155)
+                          ? const Color(0xFF475569)
                           : const Color(AppConstants.borderLight),
                       width: 1,
                     ),
@@ -1270,7 +1269,9 @@ class _HomePageState extends State<HomePage> {
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
-                                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                                color: theme.brightness == Brightness.dark
+                                    ? const Color(0xFF94A3B8)
+                                    : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1296,12 +1297,12 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: theme.brightness == Brightness.dark
-                        ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                        ? const Color(0xFF1E293B)
                         : const Color(AppConstants.backgroundGray),
                     borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     border: Border.all(
                       color: theme.brightness == Brightness.dark
-                          ? const Color(0xFF334155)
+                          ? const Color(0xFF475569)
                           : const Color(AppConstants.borderLight),
                       width: 1,
                     ),
@@ -1327,7 +1328,9 @@ class _HomePageState extends State<HomePage> {
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
-                                color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                                color: theme.brightness == Brightness.dark
+                                    ? const Color(0xFF94A3B8)
+                                    : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1394,7 +1397,7 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(AppConstants.radiusXLarge),
               border: Border.all(
                 color: theme.brightness == Brightness.dark
-                    ? const Color(0xFF334155)
+                    ? const Color(0xFF475569)
                     : const Color(AppConstants.borderLight),
                 width: 1,
               ),
@@ -1437,7 +1440,9 @@ class _HomePageState extends State<HomePage> {
                             style: GoogleFonts.poppins(
                               fontSize: isSmallScreen ? 17 : 19,
                               fontWeight: FontWeight.w600,
-                              color: theme.textTheme.titleLarge?.color?.withValues(alpha: 0.6),
+                              color: theme.brightness == Brightness.dark
+                                  ? const Color(0xFFCBD5E1)
+                                  : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.6),
                               height: 1.2,
                             ),
                             maxLines: 1,
@@ -1496,7 +1501,9 @@ class _HomePageState extends State<HomePage> {
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                            color: theme.brightness == Brightness.dark
+                                ? const Color(0xFF94A3B8)
+                                : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                           ),
                         ),
                         Text(
@@ -1504,7 +1511,9 @@ class _HomePageState extends State<HomePage> {
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                            color: theme.brightness == Brightness.dark
+                                ? const Color(0xFF94A3B8)
+                                : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                           ),
                         ),
                       ],
@@ -1516,7 +1525,7 @@ class _HomePageState extends State<HomePage> {
                           height: 10,
                           decoration: BoxDecoration(
                             color: theme.brightness == Brightness.dark
-                                ? const Color(0xFF334155)
+                                ? const Color(0xFF475569)
                                 : const Color(AppConstants.borderLight),
                             borderRadius: BorderRadius.circular(5),
                           ),
@@ -1545,12 +1554,12 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: theme.brightness == Brightness.dark
-                              ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                              ? const Color(0xFF1E293B)
                               : const Color(AppConstants.backgroundGray),
                           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                           border: Border.all(
                             color: theme.brightness == Brightness.dark
-                                ? const Color(0xFF334155)
+                                ? const Color(0xFF475569)
                                 : const Color(AppConstants.borderLight),
                             width: 1,
                           ),
@@ -1563,7 +1572,9 @@ class _HomePageState extends State<HomePage> {
                                 Icon(
                                   Icons.savings_outlined,
                                   size: 16,
-                                  color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                  color: theme.brightness == Brightness.dark
+                                      ? const Color(0xFF94A3B8)
+                                      : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                 ),
                                 const Gap(6),
                                 Text(
@@ -1571,7 +1582,9 @@ class _HomePageState extends State<HomePage> {
                                   style: GoogleFonts.poppins(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,
-                                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                    color: theme.brightness == Brightness.dark
+                                        ? const Color(0xFF94A3B8)
+                                        : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                   ),
                                 ),
                               ],
@@ -1582,7 +1595,9 @@ class _HomePageState extends State<HomePage> {
                               style: GoogleFonts.poppins(
                                 fontSize: isSmallScreen ? 16 : 18,
                                 fontWeight: FontWeight.w700,
-                                color: theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
+                                color: theme.brightness == Brightness.dark
+                                    ? const Color(0xFFCBD5E1)
+                                    : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
                               ),
                             ),
                           ],
@@ -1595,12 +1610,12 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: theme.brightness == Brightness.dark
-                              ? const Color(0xFF1E293B).withValues(alpha: 0.5)
+                              ? const Color(0xFF1E293B)
                               : const Color(AppConstants.backgroundGray),
                           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                           border: Border.all(
                             color: theme.brightness == Brightness.dark
-                                ? const Color(0xFF334155)
+                                ? const Color(0xFF475569)
                                 : const Color(AppConstants.borderLight),
                             width: 1,
                           ),
@@ -1613,7 +1628,9 @@ class _HomePageState extends State<HomePage> {
                                 Icon(
                                   Icons.trending_up_rounded,
                                   size: 16,
-                                  color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                  color: theme.brightness == Brightness.dark
+                                      ? const Color(0xFF94A3B8)
+                                      : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                 ),
                                 const Gap(6),
                                 Text(
@@ -1621,7 +1638,9 @@ class _HomePageState extends State<HomePage> {
                                   style: GoogleFonts.poppins(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,
-                                    color: theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                    color: theme.brightness == Brightness.dark
+                                        ? const Color(0xFF94A3B8)
+                                        : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                   ),
                                 ),
                               ],
@@ -1632,7 +1651,9 @@ class _HomePageState extends State<HomePage> {
                               style: GoogleFonts.poppins(
                                 fontSize: isSmallScreen ? 16 : 18,
                                 fontWeight: FontWeight.w700,
-                                color: theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
+                                color: theme.brightness == Brightness.dark
+                                    ? const Color(0xFFCBD5E1)
+                                    : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
                               ),
                             ),
                           ],
@@ -1878,7 +1899,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.dark
-              ? Theme.of(context).dividerColor
+              ? const Color(0xFF475569)
               : const Color(0xFFE2E8F0),
           width: 1,
         ),
@@ -2153,7 +2174,7 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).dividerColor
+                    ? const Color(0xFF475569)
                     : const Color(0xFFE2E8F0),
                 width: 1,
               ),
@@ -2205,13 +2226,15 @@ class _HomePageState extends State<HomePage> {
             color: isCompleted
                 ? const Color(0xFF10B981).withOpacity(0.1)
                 : Theme.of(context).brightness == Brightness.dark
-                ? Theme.of(context).colorScheme.surfaceContainerHighest
+                ? const Color(0xFF1E293B)
                 : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isCompleted
                   ? const Color(0xFF10B981).withOpacity(0.3)
-                  : Theme.of(context).dividerColor,
+                  : Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF475569)
+                      : const Color(0xFFE2E8F0),
               width: 1,
             ),
           ),

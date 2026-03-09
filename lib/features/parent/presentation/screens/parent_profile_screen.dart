@@ -118,7 +118,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     if (_isLoadingStats) {
       return Scaffold(
         backgroundColor: isDark
-            ? const Color(0xFF0A0A1A)
+            ? const Color(0xFF1E293B)
             : const Color(0xFFF8FAFC),
         body: const Center(child: BrandedLoader(label: 'Carregando perfil...')),
       );
@@ -129,7 +129,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF1E293B)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: _refreshData,
@@ -916,7 +916,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               Switch(
                 value: isDark,
                 onChanged: (_) => themeProvider.toggleTheme(),
-                activeColor: Colors.white,
+                activeThumbColor: Colors.white,
                 activeTrackColor: Colors.white.withOpacity(0.3),
                 inactiveThumbColor: Colors.white,
                 inactiveTrackColor: Colors.white.withOpacity(0.3),

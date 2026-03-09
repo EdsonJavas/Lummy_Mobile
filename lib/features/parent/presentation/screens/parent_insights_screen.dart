@@ -116,7 +116,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF1E293B), Color(0xFF312E81), Color(0xFF4C1D95)]
+              ? const [Color(0xFF2E1065), Color(0xFF312E81), Color(0xFF4C1D95)]
               : const [Color(0xFF8B5CF6), Color(0xFF7C3AED), Color(0xFF6D28D9)],
         ),
         borderRadius: const BorderRadius.only(
@@ -351,7 +351,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                     color: _purple.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.show_chart_rounded,
                     color: _purple,
                     size: 22,
@@ -388,11 +388,11 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
             ),
             const SizedBox(height: 8),
             // Legenda
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 _ChartLegendItem(label: 'Receitas', color: _green),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 _ChartLegendItem(label: 'Despesas', color: _red),
               ],
             ),
@@ -533,7 +533,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                     color: _pink.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.pie_chart_rounded, color: _pink, size: 22),
+                  child: const Icon(Icons.pie_chart_rounded, color: _pink, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -701,7 +701,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                     color: _orange.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.flag_rounded, color: _orange, size: 22),
+                  child: const Icon(Icons.flag_rounded, color: _orange, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -729,7 +729,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(

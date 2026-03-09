@@ -133,7 +133,7 @@ class ParentApprovalsScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF1E293B), Color(0xFF0F172A), Color(0xFF064E3B)]
+              ? const [Color(0xFF064E3B), Color(0xFF065F46), Color(0xFF047857)]
               : const [Color(0xFF10B981), Color(0xFF059669), Color(0xFF047857)],
         ),
         borderRadius: const BorderRadius.only(
@@ -312,7 +312,7 @@ class ParentApprovalsScreen extends StatelessWidget {
           // Action buttons
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),

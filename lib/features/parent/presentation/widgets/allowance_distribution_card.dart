@@ -50,13 +50,25 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
     return Container(
       padding: EdgeInsets.all(isSmallScreen ? 18 : 24),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [Color(0xFF334155), Color(0xFF1E293B)]
+              : [Colors.white, _orange.withOpacity(0.03)],
+        ),
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? const Color(0xFF475569) : _orange.withOpacity(0.12),
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: isDark
+                ? Colors.black.withOpacity(0.25)
+                : _orange.withOpacity(0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
           ),
         ],
       ),
@@ -94,7 +106,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                     Text(
                       'Envie para todos ou individualmente',
                       style: GoogleFonts.poppins(
-                        fontSize: 12,
+                        fontSize: 13,
                         color: isDark
                             ? const Color(0xFF94A3B8)
                             : const Color(0xFF64748B),
@@ -109,14 +121,15 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
 
           // Saldo badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: _orange.withOpacity(isDark ? 0.15 : 0.1),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: _orange.withOpacity(0.2)),
             ),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(
                   Icons.account_balance_wallet_rounded,
@@ -149,11 +162,11 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
           // Campo de valor
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark
-                    ? const Color(0xFF334155)
+                    ? const Color(0xFF475569)
                     : const Color(0xFFE2E8F0),
               ),
             ),
@@ -176,31 +189,27 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                 hintStyle: GoogleFonts.poppins(
                   fontSize: 15,
                   color: isDark
-                      ? const Color(0xFF64748B)
+                      ? const Color(0xFF94A3B8)
                       : const Color(0xFF94A3B8),
                 ),
-                prefixIcon: Container(
-                  margin: const EdgeInsets.all(12),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.attach_money_rounded,
-                    color: _orange,
-                    size: 20,
-                  ),
+                prefixIcon: const Icon(
+                  Icons.attach_money_rounded,
+                  color: _orange,
+                  size: 20,
+                ),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 44,
+                  minHeight: 44,
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 18,
+                  vertical: 20,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 22),
 
           // Botões de ação
           Row(
@@ -240,7 +249,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                   isDark: isDark,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               // Botão Depósito Individual
               Expanded(
                 child: _buildActionButton(
@@ -278,7 +287,8 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
         onTap: onPressed,
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          height: 52,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
             gradient: isEnabled
                 ? LinearGradient(colors: gradient)
@@ -322,12 +332,12 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                                 : const Color(0xFF94A3B8)),
                       size: 18,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Flexible(
                       child: Text(
                         label,
                         style: GoogleFonts.poppins(
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: isEnabled
                               ? Colors.white
@@ -335,6 +345,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                                     ? const Color(0xFF64748B)
                                     : const Color(0xFF94A3B8)),
                         ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -380,8 +391,19 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
       builder: (bottomSheetContext) {
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? const [Color(0xFF334155), Color(0xFF1E293B)]
+                  : const [Colors.white, Color(0xFFFFFBF5)],
+            ),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF475569)
+                  : const Color(0xFFF1F5F9),
+            ),
           ),
           padding: EdgeInsets.only(
             left: 24,
@@ -402,7 +424,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                     height: 4,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF475569)
+                          ? const Color(0xFF64748B)
                           : const Color(0xFFCBD5E1),
                       borderRadius: BorderRadius.circular(2),
                     ),
@@ -444,44 +466,40 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                       icon: Icon(
                         Icons.close_rounded,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
+                            ? const Color(0xFFCBD5E1)
                             : const Color(0xFF64748B),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 22),
                 // Dropdown
                 Container(
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF334155)
+                          ? const Color(0xFF475569)
                           : const Color(0xFFE2E8F0),
                     ),
                   ),
                   child: DropdownButtonFormField<String>(
-                    value: selectedChildId,
-                    decoration: InputDecoration(
-                      prefixIcon: Container(
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: _purple.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.child_care_rounded,
-                          color: _purple,
-                          size: 18,
-                        ),
+                    initialValue: selectedChildId,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(
+                        Icons.child_care_rounded,
+                        color: _purple,
+                        size: 18,
+                      ),
+                      prefixIconConstraints: BoxConstraints(
+                        minWidth: 44,
+                        minHeight: 44,
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
+                      contentPadding: EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
                       ),
@@ -514,12 +532,12 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                 Container(
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF334155)
+                          ? const Color(0xFF475569)
                           : const Color(0xFFE2E8F0),
                     ),
                   ),
@@ -541,26 +559,22 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                       hintStyle: GoogleFonts.poppins(
                         fontSize: 15,
                         color: isDark
-                            ? const Color(0xFF64748B)
+                            ? const Color(0xFF94A3B8)
                             : const Color(0xFF94A3B8),
                       ),
-                      prefixIcon: Container(
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: _green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.attach_money_rounded,
-                          color: _green,
-                          size: 18,
-                        ),
+                      prefixIcon: const Icon(
+                        Icons.attach_money_rounded,
+                        color: _green,
+                        size: 18,
+                      ),
+                      prefixIconConstraints: const BoxConstraints(
+                        minWidth: 44,
+                        minHeight: 44,
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 16,
+                        vertical: 18,
                       ),
                     ),
                     validator: (value) {
@@ -577,7 +591,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                     },
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 26),
                 // Botão confirmar
                 Container(
                   width: double.infinity,

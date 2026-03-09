@@ -93,7 +93,7 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF1E293B)
           : const Color(0xFFF8FAFC),
       body: Column(
         children: [
@@ -140,8 +140,8 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
           end: Alignment.bottomRight,
           colors: isDark
               ? [
+                  const Color(0xFF334155),
                   const Color(0xFF1E293B),
-                  const Color(0xFF0F172A),
                   _purple.withOpacity(0.3),
                 ]
               : [_purple, _purple.withOpacity(0.85), const Color(0xFF7C3AED)],
@@ -769,7 +769,7 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
                           color: isSelected
                               ? selectedColor.withOpacity(0.2)
                               : (isDark
-                                    ? const Color(0xFF0F172A)
+                                    ? const Color(0xFF1E293B)
                                     : const Color(0xFFF8FAFC)),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
@@ -856,7 +856,7 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
                     ),
                     filled: true,
                     fillColor: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -880,7 +880,7 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
                     ),
                     filled: true,
                     fillColor: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -905,7 +905,7 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
                     ),
                     filled: true,
                     fillColor: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),

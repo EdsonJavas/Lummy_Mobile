@@ -177,8 +177,8 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: const Color(
-        0xFF0A0A1A,
-      ), // Azul escuro quase preto como no site
+        0xFF1E293B,
+      ), // Slate escuro - menos melancólico que preto
       // Color scheme - cores inspiradas no site Lummy
       colorScheme: const ColorScheme.dark(
         primary: Color(0xFF3B82F6), // Azul vibrante

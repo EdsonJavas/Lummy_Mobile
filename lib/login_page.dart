@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -74,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(28),
             border: Theme.of(context).brightness == Brightness.dark
-                ? Border.all(color: Theme.of(context).dividerColor, width: 1)
+                ? Border.all(color: const Color(0xFF475569), width: 1)
                 : null,
             boxShadow: [
               BoxShadow(
@@ -160,18 +159,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             Theme.of(context).brightness == Brightness.dark
-                            ? Theme.of(context).cardTheme.color
+                            ? const Color(0xFF334155)
                             : const Color(0xFFF1F5F9),
-                        foregroundColor: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.color,
+                        foregroundColor: Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFFE2E8F0)
+                            : Theme.of(context).textTheme.bodyMedium?.color,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                           side: BorderSide(
                             color:
                                 Theme.of(context).brightness == Brightness.dark
-                                ? Theme.of(context).dividerColor
+                                ? const Color(0xFF475569)
                                 : const Color(0xFFE2E8F0),
                             width: 1,
                           ),
@@ -244,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(24),
             border: Theme.of(context).brightness == Brightness.dark
-                ? Border.all(color: Theme.of(context).dividerColor, width: 1)
+                ? Border.all(color: const Color(0xFF475569), width: 1)
                 : null,
             boxShadow: [
               BoxShadow(
@@ -623,7 +622,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? const LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [Color(0xFF0A0A1A), Color(0xFF1A1A2E)],
+                          colors: [Color(0xFF2563EB), Color(0xFF1E40AF)],
                         )
                       : const LinearGradient(
                           begin: Alignment.topCenter,
@@ -670,7 +669,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: GoogleFonts.paytoneOne(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFF003092),
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xFF60A5FA)
+                                    : const Color(0xFF003092),
                               ),
                             ),
                             TextSpan(
@@ -752,7 +753,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardTheme.color,
                       border: Theme.of(context).brightness == Brightness.dark
-                          ? Border.all(color: Theme.of(context).dividerColor)
+                          ? Border.all(color: const Color(0xFF475569))
                           : null,
                       boxShadow: [
                         BoxShadow(
@@ -808,7 +809,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     style: GoogleFonts.poppins(
                                       fontSize: isVerySmallScreen ? 24 : 28,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF003092),
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? const Color(0xFF60A5FA)
+                                          : const Color(0xFF003092),
                                     ),
                                   ),
                                   const TextSpan(text: 'in'),
@@ -1083,9 +1086,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   'Não tem uma conta?',
                                   style: GoogleFonts.poppins(
                                     fontSize: isVerySmallScreen ? 12 : 14,
-                                    color: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium?.color,
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? const Color(0xFFCBD5E1)
+                                        : Theme.of(context).textTheme.bodyMedium?.color,
                                   ),
                                 ),
                                 TextButton(

@@ -1341,7 +1341,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Switch(
                 value: isDark,
                 onChanged: (_) => themeProvider.toggleTheme(),
-                activeColor: Colors.white,
+                activeThumbColor: Colors.white,
                 activeTrackColor: Colors.white.withOpacity(0.3),
                 inactiveThumbColor: Colors.white,
                 inactiveTrackColor: Colors.white.withOpacity(0.3),

@@ -201,8 +201,8 @@ class _ChildHomeSkeletonState extends State<ChildHomeSkeleton>
               scrollDirection: Axis.horizontal,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: 4,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (_, __) => SkeletonLoader(
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (_, _) => SkeletonLoader(
                 width: 80,
                 height: 100,
                 borderRadius: BorderRadius.circular(16),

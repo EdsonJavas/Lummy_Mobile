@@ -77,7 +77,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF1E293B)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: _loadAchievements,
@@ -190,8 +190,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
+                  const Color(0xFF334155),
                   const Color(0xFF1E293B),
-                  const Color(0xFF0F172A),
                   _gold.withOpacity(0.3),
                 ]
               : [_gold, _orange, const Color(0xFFEA580C)],
@@ -276,7 +276,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDark
-                ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                ? [const Color(0xFF334155), const Color(0xFF1E293B)]
                 : [Colors.white, const Color(0xFFF8FAFC)],
           ),
           borderRadius: BorderRadius.circular(24),
@@ -492,7 +492,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                   color: isUnlocked
                       ? color.withOpacity(0.15)
                       : (isDark
-                            ? const Color(0xFF0F172A)
+                            ? const Color(0xFF1E293B)
                             : const Color(0xFFF1F5F9)),
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -705,7 +705,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                           color: isSelected
                               ? selectedColor.withOpacity(0.2)
                               : (isDark
-                                    ? const Color(0xFF0F172A)
+                                    ? const Color(0xFF1E293B)
                                     : const Color(0xFFF8FAFC)),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
@@ -792,7 +792,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                     ),
                     filled: true,
                     fillColor: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -816,7 +816,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                     ),
                     filled: true,
                     fillColor: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -841,7 +841,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                     ),
                     filled: true,
                     fillColor: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF1E293B)
                         : const Color(0xFFF8FAFC),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),

@@ -412,7 +412,7 @@ class _ChildDashboardView extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: state.recentTransactions.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   const SizedBox(height: AppConstants.spacingMedium),
               itemBuilder: (context, index) {
                 final transaction = state.recentTransactions[index];
@@ -464,7 +464,7 @@ class _ChildDashboardView extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.achievements.take(3).length,
-            separatorBuilder: (_, __) =>
+            separatorBuilder: (_, _) =>
                 const SizedBox(height: AppConstants.spacingMedium),
             itemBuilder: (context, index) {
               final achievement = state.achievements[index];

@@ -32,7 +32,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF1E293B)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: () => context.read<ParentDashboardCubit>().refresh(),
@@ -103,7 +103,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                    padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
                         _buildScanQRSection(context, state, isDark),
@@ -145,7 +145,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF1E293B), Color(0xFF78350F), Color(0xFF92400E)]
+              ? const [Color(0xFF422006), Color(0xFF78350F), Color(0xFF92400E)]
               : const [Color(0xFFF59E0B), Color(0xFFD97706), Color(0xFFB45309)],
         ),
         borderRadius: const BorderRadius.only(
@@ -272,7 +272,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
     bool isDark,
   ) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -337,7 +337,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           // Botões de ação
           Row(
             children: [
@@ -348,7 +348,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     onTap: () => _openQRScanner(context, state),
                     borderRadius: BorderRadius.circular(14),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      height: 54,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [_blue, _purple],
@@ -374,7 +375,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                           Text(
                             'Escanear',
                             style: GoogleFonts.poppins(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
@@ -385,7 +386,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Material(
                   color: Colors.transparent,
@@ -393,7 +394,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     onTap: () => _showCodeInputDialog(context, state),
                     borderRadius: BorderRadius.circular(14),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      height: 54,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         color: isDark
                             ? Colors.white.withOpacity(0.1)
@@ -413,12 +415,16 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                             size: 20,
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            'Digitar código',
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: _purple,
+                          Flexible(
+                            child: Text(
+                              'Digitar código',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: _purple,
+                              ),
                             ),
                           ),
                         ],
@@ -457,7 +463,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? Colors.white24 : Colors.black12,
+                color: isDark ? const Color(0xFF64748B) : Colors.black12,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -497,7 +503,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: isDark
-                                ? const Color(0xFF94A3B8)
+                                ? const Color(0xFFCBD5E1)
                                 : const Color(0xFF64748B),
                           ),
                         ),
@@ -508,7 +514,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     onPressed: () => Navigator.pop(context),
                     icon: Icon(
                       Icons.close_rounded,
-                      color: isDark ? Colors.white54 : Colors.black45,
+                      color: isDark ? const Color(0xFFCBD5E1) : Colors.black45,
                     ),
                   ),
                 ],
@@ -570,10 +576,21 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? const [Color(0xFF334155), Color(0xFF1E293B)]
+                  : const [Colors.white, Color(0xFFF8FAFC)],
+            ),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(32),
               topRight: Radius.circular(32),
+            ),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF475569)
+                  : const Color(0xFFE2E8F0),
             ),
           ),
           child: Column(
@@ -583,7 +600,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.black12,
+                  color: isDark ? const Color(0xFF64748B) : Colors.black12,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -634,16 +651,20 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   hintText: 'Ex: LUMMY-ABC123',
                   hintStyle: GoogleFonts.poppins(
                     color: isDark
-                        ? const Color(0xFF64748B)
+                        ? const Color(0xFF94A3B8)
                         : const Color(0xFF94A3B8),
                   ),
                   filled: true,
                   fillColor: isDark
-                      ? Colors.white.withOpacity(0.05)
+                      ? const Color(0xFF1E293B)
                       : const Color(0xFFF1F5F9),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF475569)
+                          : const Color(0xFFE2E8F0),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -652,8 +673,16 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   prefixIcon: Icon(
                     Icons.code_rounded,
                     color: isDark
-                        ? const Color(0xFF64748B)
+                        ? const Color(0xFF94A3B8)
                         : const Color(0xFF94A3B8),
+                  ),
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 44,
+                    minHeight: 44,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 18,
                   ),
                   suffixIcon: IconButton(
                     onPressed: () async {
@@ -884,13 +913,25 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
     bool isDark,
   ) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [Color(0xFF334155), Color(0xFF1E293B)]
+              : const [Colors.white, Color(0xFFFFFBF5)],
+        ),
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? const Color(0xFF475569) : _orange.withOpacity(0.14),
+          width: 1.2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+            color: isDark
+                ? Colors.black.withOpacity(0.24)
+                : _orange.withOpacity(0.08),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -914,9 +955,10 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                   Text(
                     'Envio Rápido',
                     style: GoogleFonts.poppins(
@@ -928,17 +970,18 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   Text(
                     'Selecione um valor pré-definido',
                     style: GoogleFonts.poppins(
-                      fontSize: 13,
+                      fontSize: 13.5,
                       color: isDark
                           ? const Color(0xFF94A3B8)
                           : const Color(0xFF64748B),
                     ),
                   ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           // Quick amount buttons - Design moderno
           Row(
             children: [
@@ -947,7 +990,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               Expanded(child: _buildQuickAmountChip(20.0, _amber, isDark)),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(child: _buildQuickAmountChip(50.0, _blue, isDark)),
@@ -969,7 +1012,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         },
         borderRadius: BorderRadius.circular(14),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          height: 86,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -986,20 +1030,21 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
             ),
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 AppFormatters.formatCurrency(amount),
                 style: GoogleFonts.poppins(
-                  fontSize: 18,
+                  fontSize: 19,
                   fontWeight: FontWeight.w700,
                   color: color,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               Text(
                 'Enviar',
                 style: GoogleFonts.poppins(
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: isDark
                       ? const Color(0xFF94A3B8)

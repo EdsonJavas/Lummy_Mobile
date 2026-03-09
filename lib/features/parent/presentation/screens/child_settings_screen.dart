@@ -76,7 +76,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF1E293B)
           : const Color(0xFFF8FAFC),
       body: Column(
         children: [
@@ -123,8 +123,8 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
+                  const Color(0xFF334155),
                   const Color(0xFF1E293B),
-                  const Color(0xFF0F172A),
                   _blue.withOpacity(0.3),
                 ]
               : [_blue, const Color(0xFF2563EB), const Color(0xFF1D4ED8)],
@@ -490,7 +490,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                     color: isEnabled
                         ? color.withOpacity(0.15)
                         : (isDark
-                              ? const Color(0xFF0F172A)
+                              ? const Color(0xFF1E293B)
                               : const Color(0xFFF1F5F9)),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(

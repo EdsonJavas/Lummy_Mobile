@@ -137,7 +137,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A1A)
+          ? const Color(0xFF1E293B)
           : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: _loadChildData,
@@ -715,7 +715,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+              ? [const Color(0xFF334155), const Color(0xFF1E293B)]
               : [Colors.white, const Color(0xFFF8FAFC)],
         ),
         borderRadius: BorderRadius.circular(24),
@@ -892,7 +892,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isCompleted
@@ -1623,7 +1623,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                 ),
                 filled: true,
                 fillColor: isDark
-                    ? const Color(0xFF0F172A)
+                    ? const Color(0xFF1E293B)
                     : const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -1646,7 +1646,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                 ),
                 filled: true,
                 fillColor: isDark
-                    ? const Color(0xFF0F172A)
+                    ? const Color(0xFF1E293B)
                     : const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),

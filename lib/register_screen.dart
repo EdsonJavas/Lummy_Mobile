@@ -209,7 +209,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ? const LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [Color(0xFF0A0A1A), Color(0xFF1A1A2E)],
+                          colors: [Color(0xFF1E293B), Color(0xFF1A1A2E)],
                         )
                       : const LinearGradient(
                           begin: Alignment.topCenter,

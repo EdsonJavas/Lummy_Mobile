@@ -18,7 +18,7 @@ class BrandedLoader extends StatelessWidget {
     final background = Theme.of(context).scaffoldBackgroundColor;
 
     // Conteúdo principal do loader
-    Widget loaderContent = Container(
+    final Widget loaderContent = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
