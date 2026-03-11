@@ -118,6 +118,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           throw Exception('Sistema ainda não foi inicializado.');
         }
 
+        // 1) Cria o usuário da criança no Auth (isso troca a sessão atual)
         final registerResult = await _authRepo.register(
           email: _emailController.text.trim(),
           password: _passwordController.text,
@@ -146,31 +147,28 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           failure: (_) => throw Exception('Erro ao registrar criança'),
         );
 
-        setState(() => _isLoading = false);
+        // 2) Cria o registro na tabela children
+        await _familyService.addChildData(
+          childUserId: childUserId,
+          responsavelId: widget.parentUserId,
+          nome: _nameController.text.trim(),
+          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+          email: _emailController.text.trim(),
+          idade: int.tryParse(_ageController.text.trim()) ?? 0,
+          sexo: _selectedGender,
+        );
+
+        // 3) Reativa a sessão do responsável (mantém ele logado)
+        await _authRepo.login(
+          email: widget.responsavel.email.trim(),
+          password: widget.responsavel.senha,
+        );
 
         if (!mounted) return;
-        _showSnackBar('Conta criada com sucesso!', _green);
+        setState(() => _isLoading = false);
+        _showSnackBar('Criança adicionada com sucesso!', _green);
 
-        _familyService
-            .addChildData(
-              childUserId: childUserId,
-              responsavelId: widget.parentUserId,
-              nome: _nameController.text.trim(),
-              cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-              email: _emailController.text.trim(),
-              idade: int.tryParse(_ageController.text.trim()) ?? 0,
-              sexo: _selectedGender,
-            )
-            .then((_) {
-              if (!mounted) return;
-              _showSnackBar('Criança adicionada com sucesso!', _green);
-            })
-            .catchError((error) {
-              if (!mounted) return;
-              _showSnackBar('Erro ao salvar dados: $error', _orange);
-            });
-
-        // Limpar formulário
+        // Limpar formulário somente após tudo salvo
         _formKey.currentState?.reset();
         _nameController.clear();
         _cpfController.clear();
@@ -179,9 +177,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         _ageController.clear();
         setState(() => _selectedGender = '');
       } catch (e) {
-        setState(() => _isLoading = false);
         if (!mounted) return;
-        _showSnackBar('Erro: $e', _red);
+        setState(() => _isLoading = false);
+        _showSnackBar('Erro ao salvar dados: $e', _red);
       }
     }
   }

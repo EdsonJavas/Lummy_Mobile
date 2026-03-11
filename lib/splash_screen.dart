@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/config/supabase_config.dart';
 import 'di/locator.dart';
 import 'login_page.dart';
+import 'main_navigation.dart';
+import 'features/parent/presentation/screens/parent_main_navigation.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -150,13 +152,50 @@ class _SplashScreenState extends State<SplashScreen>
       setState(() => _loadingText = 'Quase pronto');
       await Future.delayed(const Duration(milliseconds: 1500));
 
+      // Decidir próxima tela com base na sessão salva
+      final client = Supabase.instance.client;
+      final session = client.auth.currentSession;
+      Widget nextPage = const LoginScreen();
+
+      if (session != null && session.user != null) {
+        final userId = session.user!.id;
+        try {
+          // Tentar como responsável
+          final parent = await client
+              .from('responsaveis')
+              .select('id, nome')
+              .eq('id', userId)
+              .maybeSingle();
+
+          if (parent != null) {
+            nextPage = ParentMainNavigation(
+              parentId: userId,
+              parentName: (parent['nome'] ?? '') as String,
+            );
+          } else {
+            // Tentar como criança
+            final child = await client
+                .from('children')
+                .select('id')
+                .eq('id', userId)
+                .maybeSingle();
+
+            if (child != null) {
+              nextPage = const MainNavigation();
+            }
+          }
+        } catch (e) {
+          debugPrint('⚠️ Erro ao decidir próxima tela pela sessão: $e');
+        }
+      }
+
       if (!mounted) return;
 
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 600),
-          pageBuilder: (_, _, _) => const LoginScreen(),
-          transitionsBuilder: (_, anim, _, child) {
+          pageBuilder: (_, __, ___) => nextPage,
+          transitionsBuilder: (_, anim, __, child) {
             return FadeTransition(
               opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),
               child: SlideTransition(
