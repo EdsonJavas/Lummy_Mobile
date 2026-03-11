@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy_login/core/theme/app_theme.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/domain/repositories/auth_repository.dart';
 import 'package:lummy_login/services/family_service.dart';
@@ -191,29 +192,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isVerySmallScreen = screenHeight < 650;
     final isSmallScreen = screenHeight < 700;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: screenHeight),
-          child: Stack(
-            children: [
-              // Fundo adaptativo ao tema
-              Container(
-                width: double.infinity,
-                height: screenHeight,
-                decoration: BoxDecoration(
-                  gradient: Theme.of(context).brightness == Brightness.dark
-                      ? const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xFF1E293B), Color(0xFF1A1A2E)],
-                        )
-                      : const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+    // Tela de cadastro sempre em tema claro (não aplica dark mode)
+    return Theme(
+      data: AppTheme.lightTheme,
+      child: Scaffold(
+        backgroundColor: AppTheme.lightTheme.scaffoldBackgroundColor,
+        resizeToAvoidBottomInset: true,
+        body: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: screenHeight),
+            child: Stack(
+              children: [
+                // Fundo sempre claro (cadastro não usa dark mode)
+                Container(
+                  width: double.infinity,
+                  height: screenHeight,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                           colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
                         ),
                 ),
@@ -1010,6 +1008,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }
