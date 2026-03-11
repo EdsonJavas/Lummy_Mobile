@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'core/constants/app_constants.dart';
 
 /// Uma aula com link para vídeo no YouTube.
 class LessonItem {
@@ -22,15 +22,17 @@ class LessonItem {
   });
 
   String get youtubeUrl => 'https://www.youtube.com/watch?v=$youtubeVideoId';
+  String get thumbnailUrl => 'https://img.youtube.com/vi/$youtubeVideoId/mqdefault.jpg';
 }
 
-/// Lista de aulas com vídeos genéricos do YouTube (educação financeira).
+/// Vídeos infantis reais do YouTube (placeholders até os vídeos de educação financeira).
+/// Thumbnails e links funcionam; tema infantil combina com a estética do app.
 final List<LessonItem> _allLessons = [
   const LessonItem(
     id: '1',
     title: 'O que é dinheiro?',
     description: 'Aprenda de onde vem e para que serve o dinheiro.',
-    youtubeVideoId: 'xG0XBHsdBZU',
+    youtubeVideoId: 'CyFI8cN-KtY', // Galinha Pintadinha - DVD 1
     duration: '5 min',
     watched: false,
   ),
@@ -38,7 +40,7 @@ final List<LessonItem> _allLessons = [
     id: '2',
     title: 'Mesada e poupança',
     description: 'Como guardar e planejar com a mesada.',
-    youtubeVideoId: '2VZ3ri_ebc0',
+    youtubeVideoId: 'fYP-3q22too', // Super Simple Songs - If You're Happy + More
     duration: '6 min',
     watched: false,
   ),
@@ -46,7 +48,7 @@ final List<LessonItem> _allLessons = [
     id: '3',
     title: 'Diferença entre querer e precisar',
     description: 'Decidir no que gastar de forma inteligente.',
-    youtubeVideoId: '5p4qM6n8r2s',
+    youtubeVideoId: 'MEmU-VGM62M', // Turma da Mônica - episódios
     duration: '4 min',
     watched: false,
   ),
@@ -54,7 +56,7 @@ final List<LessonItem> _allLessons = [
     id: '4',
     title: 'Como economizar para uma meta',
     description: 'Passo a passo para juntar dinheiro e realizar um sonho.',
-    youtubeVideoId: '7YyX5z9K2pQ',
+    youtubeVideoId: '2lmVPBeVoWU', // Super Simple Songs - Animal Songs
     duration: '7 min',
     watched: false,
   ),
@@ -62,7 +64,7 @@ final List<LessonItem> _allLessons = [
     id: '5',
     title: 'Gastar com consciência',
     description: 'Dicas para não gastar mais do que você tem.',
-    youtubeVideoId: '9VqRohP1YcE',
+    youtubeVideoId: 'dirZ-28qnXg', // Turma da Mônica - Maratona Mônica
     duration: '5 min',
     watched: true,
   ),
@@ -70,12 +72,18 @@ final List<LessonItem> _allLessons = [
     id: '6',
     title: 'Juntando dinheiro com Leo',
     description: 'História de um amigo que aprendeu a poupar.',
-    youtubeVideoId: 'AbC1DeF2GhI',
+    youtubeVideoId: 'l4WNrvVjiTw', // Super Simple Songs - If You're Happy
     duration: '8 min',
     watched: true,
   ),
 ];
 
+/// Cor de destaque da tela de Aulas (roxo da paleta Lummy, não vermelho tipo YouTube).
+const Color _kLessonsAccent = Color(0xFF8B5CF6);
+const Color _kLessonsAccentDark = Color(0xFF7C3AED);
+
+/// Tela de Aulas com layout inspirado no YouTube: uma única página
+/// com seções bem definidas e conteúdo rico (horizontal scrolls, cards tipo thumbnail).
 class LessonsScreen extends StatefulWidget {
   const LessonsScreen({super.key});
 
@@ -84,545 +92,585 @@ class LessonsScreen extends StatefulWidget {
 }
 
 class _LessonsScreenState extends State<LessonsScreen> {
-  bool _showWatchedLessons = false;
   final List<LessonItem> _lessons = List.from(_allLessons);
 
-  List<LessonItem> get _filteredLessons => _showWatchedLessons
-      ? _lessons.where((l) => l.watched).toList()
-      : _lessons.where((l) => !l.watched).toList();
-
+  List<LessonItem> get _unwatched => _lessons.where((l) => !l.watched).toList();
+  List<LessonItem> get _watched => _lessons.where((l) => l.watched).toList();
   LessonItem? get _continueWatching =>
-      _lessons.where((l) => !l.watched).isNotEmpty ? _lessons.firstWhere((l) => !l.watched) : null;
+      _unwatched.isNotEmpty ? _unwatched.first : null;
 
-  Future<void> _openYouTubeVideo(String url) async {
+  Future<void> _openVideo(String url) async {
     final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Não foi possível abrir o vídeo.',
-              style: GoogleFonts.poppins(fontSize: 14),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+    try {
+      // Tenta abrir direto (não usar canLaunchUrl — pode dar false indevidamente no Android)
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && mounted) _showVideoError();
+    } catch (_) {
+      if (mounted) _showVideoError();
     }
+  }
+
+  void _showVideoError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Não foi possível abrir o vídeo.', style: GoogleFonts.poppins(fontSize: 14)),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
+    final topPadding = MediaQuery.of(context).padding.top;
+    final isSmallScreen = MediaQuery.of(context).size.height < 700;
     return Scaffold(
-      body: Stack(
-        children: [
-          // Header com imagem de fundo (como era antes)
-          Container(
-            height: MediaQuery.of(context).size.height * 0.34,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(
-                  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/4DB5FF%20FFA42E%2077D88F%20FF8FC2%20BBA8F9%20FEE440%20%281%29%201-6GbuJScbV9th96qhg9CZLt9VZ4YLhW.png',
-                ),
-                fit: BoxFit.cover,
-              ),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: _buildLessonsHero(context, isSmallScreen, isDark, topPadding),
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.20),
-                    Colors.black.withOpacity(0.35),
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Aulas',
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Aprenda brincando e acompanhe seu progresso',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _SegmentButton(
-                              label: 'Novas Aulas',
-                              selected: !_showWatchedLessons,
-                              onTap: () => setState(() => _showWatchedLessons = false),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _SegmentButton(
-                              label: 'Aulas Assistidas',
-                              selected: _showWatchedLessons,
-                              onTap: () => setState(() => _showWatchedLessons = true),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            if (_continueWatching != null) ...[
+              _sectionTitle('Continuar assistindo', theme),
+              _buildContinueWatchingFullWidth(context, _continueWatching!, isDark),
+            ],
+            _sectionTitle('Novas aulas', theme),
+            _horizontalLessons(
+              context,
+              _unwatched.where((l) => l.id != _continueWatching?.id).toList(),
+              isDark: isDark,
             ),
+            if (_watched.isNotEmpty) ...[
+              _sectionTitle('Assistidas', theme),
+              _horizontalLessons(
+                context,
+                _watched,
+                showWatchedBadge: true,
+                isDark: isDark,
+              ),
+            ],
+            _sectionTitle('Por tema', theme),
+            _buildThemesRow(theme, isDark),
+            const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLessonsHero(
+    BuildContext context,
+    bool isSmallScreen,
+    bool isDark,
+    double topPadding,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(20, topPadding + 12, 20, 28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  const Color(0xFF5B21B6),
+                  const Color(0xFF7C3AED),
+                  const Color(0xFF6366F1),
+                ]
+              : [
+                  const Color(0xFF8B5CF6),
+                  const Color(0xFF7C3AED),
+                  const Color(0xFF6366F1),
+                ],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: _kLessonsAccentDark.withValues(alpha: 0.35),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
-          DraggableScrollableSheet(
-            initialChildSize: 0.65,
-            minChildSize: 0.65,
-            maxChildSize: 0.95,
-            builder: (context, scrollController) {
-              return Container(
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(16),
                 ),
+                child: const Icon(
+                  Icons.video_library_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 12),
-                      height: 4,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: theme.dividerColor,
-                        borderRadius: BorderRadius.circular(2),
+                    Text(
+                      'Aulas',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 24 : 28,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    Expanded(
-                      child: ListView(
-                        controller: scrollController,
-                        padding: const EdgeInsets.all(20),
-                        children: [
-                          if (!_showWatchedLessons && _continueWatching != null)
-                            _ContinueWatchingCard(
-                              lesson: _continueWatching!,
-                              onTap: () => _openYouTubeVideo(_continueWatching!.youtubeUrl),
-                              isDark: isDark,
-                            ),
-                          if (!_showWatchedLessons && _continueWatching != null)
-                            const SizedBox(height: 20),
-                          ..._filteredLessons
-                              .where((l) => l.id != _continueWatching?.id)
-                              .map(
-                                (lesson) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  child: _LessonCard(
-                                    lesson: lesson,
-                                    onTap: () => _openYouTubeVideo(lesson.youtubeUrl),
-                                    isDark: isDark,
-                                    showWatched: _showWatchedLessons,
-                                  ),
-                                ),
-                              ),
-                          if (_filteredLessons.isEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 40),
-                              child: Center(
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.play_circle_outline_rounded,
-                                      size: 64,
-                                      color: theme.disabledColor,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      _showWatchedLessons
-                                          ? 'Nenhuma aula assistida ainda'
-                                          : 'Nenhuma aula nova no momento',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16,
-                                        color: theme.textTheme.bodyMedium?.color,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                        ],
+                    const SizedBox(height: 4),
+                    Text(
+                      'Educação financeira para você',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 13 : 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
                 ),
-              );
-            },
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _buildHeroStatChip(
+                Icons.play_circle_outline_rounded,
+                '${_unwatched.length} novas',
+                isSmallScreen,
+              ),
+              const SizedBox(width: 10),
+              _buildHeroStatChip(
+                Icons.check_circle_outline_rounded,
+                '${_watched.length} assistidas',
+                isSmallScreen,
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-}
 
-class _SegmentButton extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _SegmentButton({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: selected ? const Color(0xFF62C370) : Colors.white.withOpacity(0.28),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
+  Widget _buildHeroStatChip(IconData icon, String label, bool isSmallScreen) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.35),
+          width: 1,
         ),
-        elevation: 0,
       ),
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: isSmallScreen ? 16 : 18),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: isSmallScreen ? 11 : 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }
-}
 
-class _ContinueWatchingCard extends StatelessWidget {
-  final LessonItem lesson;
-  final VoidCallback onTap;
-  final bool isDark;
+  Widget _buildContinueWatchingFullWidth(
+    BuildContext context,
+    LessonItem lesson,
+    bool isDark,
+  ) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: _LessonThumbnailCard(
+          lesson: lesson,
+          onTap: () => _openVideo(lesson.youtubeUrl),
+          isContinueWatching: true,
+          showWatchedBadge: false,
+          isDark: isDark,
+          fullWidth: true,
+        ),
+      )
+          .animate()
+          .fadeIn(duration: 320.ms)
+          .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
+    );
+  }
 
-  const _ContinueWatchingCard({
-    required this.lesson,
-    required this.onTap,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
-        child: Container(
-          padding: const EdgeInsets.all(AppConstants.spacingMedium),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF4A90E2),
-                Color(0xFF10B981),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(AppConstants.primaryBlue).withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
+  Widget _sectionTitle(String title, ThemeData theme) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: theme.textTheme.titleLarge?.color ?? theme.colorScheme.onSurface,
               ),
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _horizontalLessons(
+    BuildContext context,
+    List<LessonItem> items, {
+    bool isContinueWatching = false,
+    bool showWatchedBadge = false,
+    bool isDark = false,
+  }) {
+    final theme = Theme.of(context);
+    if (items.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          child: Text(
+            isContinueWatching ? 'Nada em andamento' : 'Nenhuma aula aqui',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+            ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                child: Container(
-                  width: 110,
-                  height: 84,
-                  color: Colors.black.withValues(alpha: 0.25),
-                  child: const Center(
-                    child: Icon(Icons.play_circle_fill, color: Colors.white, size: 40),
+        ),
+      );
+    }
+
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: isContinueWatching ? 200 : 188,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final lesson = items[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: _LessonThumbnailCard(
+                lesson: lesson,
+                onTap: () => _openVideo(lesson.youtubeUrl),
+                isContinueWatching: isContinueWatching && index == 0,
+                showWatchedBadge: showWatchedBadge,
+                isDark: isDark,
+              ),
+            )
+                .animate()
+                .fadeIn(delay: (80 + index * 50).ms, duration: 280.ms)
+                .slideX(begin: 0.08, end: 0, curve: Curves.easeOutCubic);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemesRow(ThemeData theme, bool isDark) {
+    final surface = theme.cardTheme.color ?? theme.colorScheme.surface;
+    final fg = theme.textTheme.titleMedium?.color ?? theme.colorScheme.onSurface;
+    final themes = [
+      ('Dinheiro', Icons.payments_rounded),
+      ('Mesada', Icons.savings_rounded),
+      ('Metas', Icons.flag_rounded),
+      ('Gastos', Icons.shopping_bag_rounded),
+    ];
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 100,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          itemCount: themes.length,
+          itemBuilder: (context, index) {
+            final (label, icon) = themes[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {},
+                  borderRadius: BorderRadius.circular(16),
+                  splashColor: _kLessonsAccent.withValues(alpha: 0.2),
+                  highlightColor: _kLessonsAccent.withValues(alpha: 0.1),
+                  child: Container(
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: _kLessonsAccent.withValues(alpha: isDark ? 0.2 : 0.4),
+                        width: isDark ? 1 : 1.5,
+                      ),
+                      boxShadow: isDark
+                          ? null
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.06),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(icon, color: _kLessonsAccent, size: 28),
+                        const SizedBox(height: 8),
+                        Text(
+                          label,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: fg,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Continue assistindo',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            '60%',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      lesson.title,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 6,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: 0.6,
-                          backgroundColor: Colors.white.withValues(alpha: 0.25),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Color(AppConstants.accentOrange)),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        FilledButton.tonal(
-                          onPressed: onTap,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: const Color(AppConstants.textPrimary),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            minimumSize: const Size(0, 0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text('Continuar', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13)),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Vídeo • ${lesson.duration}',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            )
+                .animate()
+                .fadeIn(delay: (120 + index * 40).ms, duration: 260.ms)
+                .scale(begin: const Offset(0.92, 0.92), end: const Offset(1, 1), curve: Curves.easeOut);
+          },
         ),
       ),
     );
   }
 }
 
-class _LessonCard extends StatelessWidget {
+class _LessonThumbnailCard extends StatelessWidget {
   final LessonItem lesson;
   final VoidCallback onTap;
+  final bool isContinueWatching;
+  final bool showWatchedBadge;
   final bool isDark;
-  final bool showWatched;
+  final bool fullWidth;
 
-  const _LessonCard({
+  const _LessonThumbnailCard({
     required this.lesson,
     required this.onTap,
-    required this.isDark,
-    required this.showWatched,
+    this.isContinueWatching = false,
+    this.showWatchedBadge = false,
+    this.isDark = false,
+    this.fullWidth = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cardColor = theme.cardTheme.color ?? theme.colorScheme.surface;
-    final borderColor = theme.dividerColor;
-    final titleColor = showWatched
-        ? (theme.textTheme.titleLarge?.color ?? theme.colorScheme.onSurface)
-        : Colors.white;
+    // fullWidth: usa a largura que o pai der (evita RenderErrorBox por restrições)
+    final cardWidth = fullWidth
+        ? null
+        : (isContinueWatching ? 320.0 : 160.0);
+    final titleColor = theme.textTheme.titleMedium?.color ?? theme.colorScheme.onSurface;
+    final subColor = theme.textTheme.bodySmall?.color ?? theme.colorScheme.onSurfaceVariant;
+    final placeholderBg = isDark ? const Color(0xFF2D2D44) : const Color(0xFFE2E8F0);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+        borderRadius: BorderRadius.circular(14),
+        splashColor: _kLessonsAccent.withValues(alpha: 0.25),
+        highlightColor: _kLessonsAccent.withValues(alpha: 0.12),
         child: Container(
-          padding: const EdgeInsets.all(AppConstants.spacingMedium),
-          decoration: BoxDecoration(
-            gradient: showWatched
-                ? null
-                : const LinearGradient(
-                    colors: [
-                      Color(0xFF60A5FA),
-                      Color(0xFF8B5CF6),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+          width: cardWidth ?? double.infinity,
+          decoration: isDark
+              ? null
+              : BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFCBD5E1),
+                    width: 1.5,
                   ),
-            color: showWatched ? cardColor : null,
-            borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
-            border: showWatched ? Border.all(color: borderColor, width: 1) : null,
-            boxShadow: showWatched
-                ? [
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: Colors.black.withValues(alpha: 0.08),
                       blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            lesson.title,
-                            style: GoogleFonts.poppins(
-                              color: titleColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (showWatched)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(AppConstants.successGreen).withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(999),
-                              border: Border.all(
-                                color: const Color(AppConstants.successGreen).withValues(alpha: 0.35),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.check_circle, size: 12, color: Color(AppConstants.successGreen)),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Assistida',
-                                  style: GoogleFonts.poppins(
-                                    color: const Color(AppConstants.successGreen),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      lesson.description,
-                      style: GoogleFonts.poppins(
-                        color: showWatched
-                            ? (theme.textTheme.bodyMedium?.color ?? theme.colorScheme.onSurfaceVariant)
-                            : Colors.white.withValues(alpha: 0.9),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 12),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                child: Container(
-                  width: 100,
-                  height: 76,
-                  color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.2),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      const Icon(Icons.play_circle_fill, color: Colors.white, size: 36),
-                      Positioned(
-                        bottom: 6,
-                        right: 6,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: showWatched
-                                ? const Color(AppConstants.successGreen)
-                                : const Color(AppConstants.primaryBlue),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            showWatched ? 'Assistida' : 'Novo',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+          child: SizedBox(
+            width: cardWidth ?? double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                alignment: Alignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      lesson.thumbnailUrl,
+                      width: cardWidth ?? double.infinity,
+                      height: fullWidth ? 180 : (isContinueWatching ? 120 : 94),
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: cardWidth ?? double.infinity,
+                        height: fullWidth ? 180 : (isContinueWatching ? 120 : 94),
+                        color: placeholderBg,
+                        child: Icon(
+                          Icons.videocam_rounded,
+                          color: _kLessonsAccent.withValues(alpha: 0.6),
+                          size: 48,
                         ),
                       ),
-                    ],
+                    ),
                   ),
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.5),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Player centralizado (ícone outline)
+                  Center(
+                    child: Icon(
+                      Icons.play_circle_outline_rounded,
+                      color: _kLessonsAccent,
+                      size: fullWidth || isContinueWatching ? 72 : 56,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.75),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        lesson.duration,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (showWatchedBadge)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF22C55E),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 12),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Assistida',
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (isContinueWatching)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(12),
+                          bottomRight: Radius.circular(12),
+                        ),
+                        child: LinearProgressIndicator(
+                          value: 0.6,
+                          minHeight: 4,
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          valueColor: const AlwaysStoppedAnimation<Color>(_kLessonsAccent),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  lesson.title,
+                  style: GoogleFonts.poppins(
+                    fontSize: isContinueWatching ? 15 : 13,
+                    fontWeight: FontWeight.w600,
+                    color: titleColor,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (isContinueWatching) ...[
+                const SizedBox(height: 4),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Text(
+                    'Continuar assistindo',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: subColor,
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ),
-        ),
-      ),
-    );
+          ),  // Column
+        ),    // SizedBox
+        ),    // Container
+      ),      // InkWell
+    );        // Material
   }
 }

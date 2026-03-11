@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'models/goal.dart';
@@ -478,134 +479,516 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
     final goal = currentGoal;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final topPadding = MediaQuery.of(context).padding.top;
+
     final Widget bodyContent = _isLoading
         ? _buildSkeletonLoader()
         : BrandedRefreshIndicator(
             onRefresh: _loadGoals,
-            child: SingleChildScrollView(
+            child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: Theme.of(context).brightness == Brightness.dark
-                          ? [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)]
-                          : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
-                    ).createShader(bounds),
-                    child: Text(
-                      'Minhas Metas',
-                      style: GoogleFonts.poppins(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+              slivers: [
+                // Hero: gradiente + título + stats
+                SliverToBoxAdapter(
+                  child: _buildGoalsHero(
+                    context,
+                    isSmallScreen,
+                    isDark,
+                    topPadding,
+                    ongoingCount: goal != null ? 1 : 0,
+                    completedCount: completedGoals.length,
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                if (goal != null) ...[
+                  SliverToBoxAdapter(
+                    child: _buildFeaturedGoalCard(goal, isSmallScreen)
+                        .animate()
+                        .fadeIn(duration: 400.ms)
+                        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                ] else ...[
+                  SliverToBoxAdapter(
+                    child: _buildEmptyState(isSmallScreen)
+                        .animate()
+                        .fadeIn(duration: 400.ms)
+                        .slideY(begin: 0.06, end: 0, curve: Curves.easeOutCubic),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                ],
+                if (completedGoals.isNotEmpty) ...[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: _buildSectionHeader(
+                        'Concluídas',
+                        completedGoals.length,
+                        isSmallScreen,
+                      )
+                          .animate()
+                          .fadeIn(delay: 100.ms, duration: 300.ms)
+                          .slideX(begin: -0.03, end: 0, curve: Curves.easeOut),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final g = completedGoals[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: _buildGoalCard(g, isSmallScreen)
+                              .animate()
+                              .fadeIn(
+                                delay: (120 + index * 60).ms,
+                                duration: 320.ms,
+                              )
+                              .slideY(
+                                begin: 0.06,
+                                end: 0,
+                                curve: Curves.easeOutCubic,
+                              ),
+                            );
+                        },
+                        childCount: completedGoals.length,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Defina objetivos e acompanhe seu progresso',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF8B5CF6).withOpacity(0.3),
-                          blurRadius: 15,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Text(
-                            '📊',
-                            style: TextStyle(fontSize: 24),
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Acompanhe seus objetivos',
-                                style: GoogleFonts.poppins(
-                                  fontSize: isSmallScreen ? 16 : 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Transforme seus sonhos em realidade!',
-                                style: GoogleFonts.poppins(
-                                  fontSize: isSmallScreen ? 12 : 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white.withOpacity(0.8),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  if (goal != null) ...[
-                    _buildSectionHeader(
-                      goal.status == GoalStatus.completed
-                          ? 'Concluída'
-                          : 'Em Andamento',
-                      1,
-                      isSmallScreen,
-                    ),
-                    const SizedBox(height: 20),
-                    _buildGoalCard(goal, isSmallScreen),
-                    const SizedBox(height: 40),
-                  ] else ...[
-                    _buildEmptyState(isSmallScreen),
-                  ],
-                  if (completedGoals.isNotEmpty) ...[
-                    _buildSectionHeader(
-                      'Concluídas',
-                      completedGoals.length,
-                      isSmallScreen,
-                    ),
-                    const SizedBox(height: 20),
-                    ...completedGoals.map(
-                      (g) => _buildGoalCard(g, isSmallScreen),
-                    ),
-                  ],
-                  const SizedBox(height: 40),
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                ] else ...[
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
-              ),
+              ],
             ),
           );
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(child: bodyContent),
+      floatingActionButton: _isLoading
+          ? null
+          : _buildFloatingAddGoalButton(context, isSmallScreen),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  Widget _buildGoalsHero(
+    BuildContext context,
+    bool isSmallScreen,
+    bool isDark,
+    double topPadding, {
+    required int ongoingCount,
+    required int completedCount,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(20, topPadding + 12, 20, 28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  const Color(0xFF5B21B6),
+                  const Color(0xFF7C3AED),
+                  const Color(0xFF6366F1),
+                ]
+              : [
+                  const Color(0xFF8B5CF6),
+                  const Color(0xFF7C3AED),
+                  const Color(0xFF6366F1),
+                ],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7C3AED).withOpacity(0.35),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.flag_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Minhas Metas',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 24 : 28,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Transforme sonhos em realidade',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 13 : 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _buildHeroStatChip(
+                Icons.trending_up_rounded,
+                '$ongoingCount em andamento',
+                isSmallScreen,
+              ),
+              const SizedBox(width: 10),
+              _buildHeroStatChip(
+                Icons.celebration_rounded,
+                '$completedCount concluídas',
+                isSmallScreen,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroStatChip(
+    IconData icon,
+    String label,
+    bool isSmallScreen,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: isSmallScreen ? 16 : 18),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: isSmallScreen ? 11 : 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturedGoalCard(Goal goal, bool isSmallScreen) {
+    final primaryColor = goal.status == GoalStatus.completed
+        ? const Color(0xFF10B981)
+        : const Color(0xFF8B5CF6);
+    final progress = goal.progress.clamp(0.0, 1.0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: EdgeInsets.all(isSmallScreen ? 20 : 24),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: primaryColor.withOpacity(isDark ? 0.25 : 0.4),
+            width: isDark ? 1.5 : 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withOpacity(isDark ? 0.15 : 0.2),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.12),
+              blurRadius: isDark ? 12 : 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(
+                  width: isSmallScreen ? 72 : 88,
+                  height: isSmallScreen ? 72 : 88,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: isSmallScreen ? 72 : 88,
+                        height: isSmallScreen ? 72 : 88,
+                        child: CircularProgressIndicator(
+                          value: progress,
+                          strokeWidth: 6,
+                          backgroundColor: primaryColor.withOpacity(0.15),
+                          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: primaryColor.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          goal.emoji,
+                          style: TextStyle(
+                            fontSize: isSmallScreen ? 28 : 34,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          goal.status == GoalStatus.completed
+                              ? 'Concluída'
+                              : 'Em andamento',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        goal.name,
+                        style: GoogleFonts.poppins(
+                          fontSize: isSmallScreen ? 18 : 20,
+                          fontWeight: FontWeight.w800,
+                          color: Theme.of(context).textTheme.titleLarge?.color,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${(progress * 100).toInt()}% • ${_formatCurrency(goal.currentAmount)} / ${_formatCurrency(goal.targetAmount)}',
+                        style: GoogleFonts.poppins(
+                          fontSize: isSmallScreen ? 12 : 13,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 10,
+                backgroundColor: primaryColor.withOpacity(0.15),
+                valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+              ),
+            ),
+            if (goal.status != GoalStatus.completed) ...[
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildCardActionButton(
+                      context,
+                      Icons.add_circle_rounded,
+                      'Adicionar economia',
+                      primaryColor,
+                      onTap: () => _showAddProgressDialog(goal),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildCardActionButton(
+                      context,
+                      Icons.check_circle_outline_rounded,
+                      'Marcar concluída',
+                      const Color(0xFF10B981),
+                      onTap: () => _markGoalAsCompleted(goal),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _buildCardActionButton(
+                context,
+                Icons.delete_outline_rounded,
+                'Remover meta',
+                const Color(0xFFEF4444),
+                onTap: () => _showDeleteConfirmation(goal),
+                fullWidth: true,
+              ),
+            ],
+            if (goal.status == GoalStatus.completed &&
+                goal.completedDate != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFF10B981).withOpacity(0.25),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.celebration_rounded,
+                      color: Color(0xFF10B981),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Concluída em ${_formatDate(goal.completedDate!)}',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 12 : 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF10B981),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool get isDark => Theme.of(context).brightness == Brightness.dark;
+
+  Widget _buildCardActionButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    Color color, {
+    VoidCallback? onTap,
+    bool fullWidth = false,
+  }) {
+    return Material(
+      color: color.withOpacity(0.1),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+          child: Row(
+            mainAxisAlignment:
+                fullWidth ? MainAxisAlignment.center : MainAxisAlignment.start,
+            mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatCurrency(double value) {
+    return 'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
+  }
+
+  Widget _buildFloatingAddGoalButton(BuildContext context, bool isSmallScreen) {
+    return FloatingActionButton.extended(
+      heroTag: 'fab_goals',
+      onPressed: _addNewGoal,
+      backgroundColor: const Color(0xFF8B5CF6),
+      foregroundColor: Colors.white,
+      icon: const Icon(Icons.add_rounded, size: 24),
+      label: Text(
+        'Nova meta',
+        style: GoogleFonts.poppins(
+          fontSize: isSmallScreen ? 14 : 15,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      elevation: 4,
     );
   }
 
@@ -616,26 +999,29 @@ class _GoalsScreenState extends State<GoalsScreen> {
         : const Color(0xFF8B5CF6);
     final IconData headerIcon = isCompleted ? Icons.check_circle : Icons.flag;
 
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
-          colors: [
-            headerColor.withOpacity(0.05),
-            headerColor.withOpacity(0.02),
-          ],
+          colors: dark
+              ? [headerColor.withOpacity(0.05), headerColor.withOpacity(0.02)]
+              : [headerColor.withOpacity(0.12), headerColor.withOpacity(0.06)],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: headerColor.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: headerColor.withOpacity(dark ? 0.1 : 0.25),
+          width: dark ? 1 : 1.5,
+        ),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: headerColor.withOpacity(0.1),
+              color: headerColor.withOpacity(dark ? 0.1 : 0.18),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -712,6 +1098,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ? const Color(0xFF059669)
         : const Color(0xFF7C3AED);
 
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
@@ -720,19 +1107,19 @@ class _GoalsScreenState extends State<GoalsScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: goal.status == GoalStatus.completed
-              ? primaryColor.withOpacity(0.2)
-              : primaryColor.withOpacity(0.15),
-          width: 1.5,
+              ? primaryColor.withOpacity(dark ? 0.2 : 0.35)
+              : primaryColor.withOpacity(dark ? 0.15 : 0.3),
+          width: dark ? 1.5 : 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.1),
+            color: primaryColor.withOpacity(dark ? 0.1 : 0.15),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(dark ? 0.03 : 0.08),
+            blurRadius: dark ? 8 : 12,
             offset: const Offset(0, 2),
           ),
         ],

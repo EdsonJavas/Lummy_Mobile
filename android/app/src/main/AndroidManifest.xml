@@ -48,5 +48,20 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Abrir links (YouTube, etc.) no app ou navegador -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="http"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="vnd.youtube"/>
+        </intent>
+        <!-- Permite que o sistema encontre o app YouTube para abrir links -->
+        <package android:name="com.google.android.youtube"/>
     </queries>
 </manifest>

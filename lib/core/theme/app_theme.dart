@@ -8,7 +8,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: const Color(AppConstants.backgroundLight),
+      scaffoldBackgroundColor: const Color(0xFFF1F5F9), // Cinza bem suave para dar contraste com cards
 
       // Color scheme
       colorScheme: const ColorScheme.light(
@@ -16,10 +16,12 @@ class AppTheme {
         secondary: Color(AppConstants.accentOrange),
         error: Color(AppConstants.errorRed),
         surface: Color(AppConstants.backgroundWhite),
+        surfaceContainerHighest: Color(0xFFE2E8F0), // Hierarquia em modo claro
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onError: Colors.white,
         onSurface: Color(AppConstants.textPrimary),
+        outline: Color(AppConstants.borderLight),
       ),
 
       // Text theme
@@ -62,13 +64,19 @@ class AppTheme {
         bodyMedium: GoogleFonts.poppins(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: const Color(AppConstants.textSecondary),
+          color: const Color(0xFF475569), // Contraste melhor que textSecondary
         ),
         bodySmall: GoogleFonts.poppins(
           fontSize: 12,
           fontWeight: FontWeight.w400,
-          color: const Color(AppConstants.textSecondary),
+          color: const Color(0xFF64748B),
         ),
+      ),
+
+      // Divider (modo claro)
+      dividerTheme: const DividerThemeData(
+        color: Color(AppConstants.borderLight),
+        thickness: 1,
       ),
 
       // Input decoration theme
@@ -119,13 +127,14 @@ class AppTheme {
         ),
       ),
 
-      // Card theme
+      // Card theme — borda e sombra para definir bem no modo claro
       cardTheme: CardThemeData(
         color: const Color(AppConstants.backgroundWhite),
-        elevation: 2,
-        shadowColor: Colors.black.withValues(alpha: 0.04),
+        elevation: 0,
+        shadowColor: Colors.black.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+          side: const BorderSide(color: Color(AppConstants.borderLight), width: 1),
         ),
       ),
 
@@ -146,7 +155,7 @@ class AppTheme {
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Color(AppConstants.backgroundWhite),
         selectedItemColor: Color(AppConstants.primaryBlue),
-        unselectedItemColor: Color(AppConstants.textSecondary),
+        unselectedItemColor: Color(0xFF64748B),
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
