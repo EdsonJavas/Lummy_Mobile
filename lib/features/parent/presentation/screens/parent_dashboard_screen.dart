@@ -14,11 +14,17 @@ import 'parent_insights_screen.dart';
 class ParentDashboardScreen extends StatefulWidget {
   final String parentId;
   final ValueChanged<int>? onNavigateToTab;
+  /// Padding à esquerda no hero (usado quando o ícone do drawer não está no hero).
+  final double heroLeftPadding;
+  /// Abre o drawer; quando não null, o ícone hambúrguer é exibido no header (rola com a tela).
+  final VoidCallback? onOpenDrawer;
 
   const ParentDashboardScreen({
     super.key,
     required this.parentId,
     this.onNavigateToTab,
+    this.heroLeftPadding = 0,
+    this.onOpenDrawer,
   });
 
   @override
@@ -26,6 +32,12 @@ class ParentDashboardScreen extends StatefulWidget {
 }
 
 class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
+  /// Oculta/mostra o saldo no card principal (hero) — UX de privacidade.
+  bool _balanceVisible = true;
+
+  /// Saldo fixo para testes (exibido no dashboard).
+  static const _kTestBalance = 2200.0;
+
   // Paleta de cores vibrantes - consistente com versão infantil
   static const _primaryBlue = Color(0xFF3B82F6);
   static const _deepBlue = Color(0xFF1E40AF);
@@ -85,7 +97,15 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     ),
                     child: Column(
                       children: [
-                        _buildHeroSection(context, state, isDark),
+                        _buildHeroSection(
+                          context,
+                          state,
+                          isDark,
+                          balanceVisible: _balanceVisible,
+                          onToggleBalanceVisibility: () {
+                            setState(() => _balanceVisible = !_balanceVisible);
+                          },
+                        ),
                         Transform(
                           transform: Matrix4.translationValues(0, -64, 0),
                           child: ClipPath(
@@ -166,13 +186,15 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   Widget _buildHeroSection(
     BuildContext context,
     ParentDashboardState state,
-    bool isDark,
-  ) {
+    bool isDark, {
+    required bool balanceVisible,
+    required VoidCallback onToggleBalanceVisibility,
+  }) {
     final topInset = MediaQuery.of(context).padding.top;
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, topInset + 16, 20, 60),
+      padding: EdgeInsets.fromLTRB(20, topInset + 16, 20, 88),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -185,94 +207,115 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header com saudação e avatar
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Olá, ',
-                            style: GoogleFonts.poppins(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                          ShaderMask(
-                            shaderCallback: (bounds) => const LinearGradient(
-                              colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
-                            ).createShader(bounds),
-                            child: Text(
-                              _getFirstName(state.parentName),
+          // Linha "Olá, nome" + avatar; ícone hambúrguer no header quando onOpenDrawer != null (rola com a tela)
+          Padding(
+            padding: EdgeInsets.only(left: widget.onOpenDrawer != null ? 0 : widget.heroLeftPadding),
+            child: Row(
+              children: [
+                if (widget.onOpenDrawer != null) ...[
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: widget.onOpenDrawer,
+                      borderRadius: BorderRadius.circular(12),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Icon(
+                          Icons.menu_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Olá, ',
                               style: GoogleFonts.poppins(
                                 fontSize: 26,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
                             ),
-                          ),
-                        ],
+                            ShaderMask(
+                              shaderCallback: (bounds) => const LinearGradient(
+                                colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
+                              ).createShader(bounds),
+                              child: Text(
+                                _getFirstName(state.parentName),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Gerencie as finanças da família',
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(0.85),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ParentProfileScreen(),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.5),
-                      width: 2.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Gerencie as finanças da família',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white.withOpacity(0.85),
+                        ),
                       ),
                     ],
                   ),
-                  child: const ClipOval(
-                    child: CachedAvatar(
-                      imageUrl:
-                          'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
-                      size: 52,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ParentProfileScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.5),
+                        width: 2.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const ClipOval(
+                      child: CachedAvatar(
+                        imageUrl:
+                            'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
+                        size: 52,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 28),
-          // Card de saldo principal - saldo do responsável
+          // Card de saldo principal - saldo do responsável (mantém alinhamento normal)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -324,6 +367,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           fontWeight: FontWeight.w500,
                           color: Colors.white.withOpacity(0.9),
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Container(
@@ -336,40 +381,70 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        'Disponível para enviar',
+                        'Disponível',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: Colors.white.withOpacity(0.9),
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                // Saldo com FittedBox - NUNCA quebra
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    AppFormatters.formatCurrency(state.walletBalance),
-                    style: GoogleFonts.poppins(
-                      fontSize: 38,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: -1,
-                      height: 1.1,
+                // Saldo com FittedBox + olho para ocultar/mostrar (UX)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          balanceVisible
+                              ? AppFormatters.formatCurrency(_kTestBalance)
+                              : 'R\$ •••••••',
+                          style: GoogleFonts.poppins(
+                            fontSize: 38,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: -1,
+                            height: 1.1,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: onToggleBalanceVisibility,
+                        borderRadius: BorderRadius.circular(20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(
+                            balanceVisible
+                                ? Icons.visibility_rounded
+                                : Icons.visibility_off_rounded,
+                            color: Colors.white.withOpacity(0.9),
+                            size: 26,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Diminui conforme você envia para os filhos',
+                  'Diminui ao enviar para os filhos',
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
                     color: Colors.white.withOpacity(0.85),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -585,15 +660,15 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     ParentDashboardState state,
     bool isDark,
   ) {
-    // Resumo rápido - sem redundância de saldo
+    // Saldo fixo para testes; card pequeno sem olho
+    final displayBalance = AppFormatters.formatCurrency(_kTestBalance);
     return Row(
       children: [
-        // Card de saldo disponível do responsável
         Expanded(
           child: _CompactInfoCard(
             icon: Icons.account_balance_wallet_rounded,
             label: 'Saldo Disponível',
-            value: AppFormatters.formatCurrency(state.walletBalance),
+            value: displayBalance,
             color: _primaryBlue,
             isDark: isDark,
           ),
@@ -1242,6 +1317,8 @@ class _CompactInfoCard extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: color,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ],

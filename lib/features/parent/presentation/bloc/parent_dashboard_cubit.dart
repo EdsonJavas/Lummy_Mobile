@@ -151,10 +151,10 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           .select('balance')
           .eq('id', parentId)
           .maybeSingle();
-      return (row?['balance'] as num?)?.toDouble() ?? 2300.0;
+      return (row?['balance'] as num?)?.toDouble() ?? 2200.0;
     } catch (e) {
       debugPrint('⚠️ Erro ao buscar saldo do responsável: $e');
-      return state.walletBalance > 0 ? state.walletBalance : 2300.0;
+      return state.walletBalance > 0 ? state.walletBalance : 2200.0;
     }
   }
 

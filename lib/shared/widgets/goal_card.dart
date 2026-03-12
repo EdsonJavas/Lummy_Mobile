@@ -115,6 +115,7 @@ class GoalCard extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       goal.name,
@@ -123,6 +124,8 @@ class GoalCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: const Color(AppConstants.textPrimary),
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'Meta de economia',
@@ -131,16 +134,23 @@ class GoalCard extends StatelessWidget {
                         fontWeight: FontWeight.w400,
                         color: const Color(AppConstants.textSecondary),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              Text(
-                '${goal.progressPercentage}%',
-                style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 16 : 18,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(AppConstants.primaryBlue),
+              Flexible(
+                child: Text(
+                  '${goal.progressPercentage}%',
+                  style: GoogleFonts.poppins(
+                    fontSize: isSmallScreen ? 16 : 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(AppConstants.primaryBlue),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
                 ),
               ),
             ],
@@ -173,47 +183,59 @@ class GoalCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Economizado',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(AppConstants.textSecondary),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Economizado',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(AppConstants.textSecondary),
+                      ),
                     ),
-                  ),
-                  Text(
-                    AppFormatters.formatCurrency(goal.currentAmount),
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(AppConstants.textPrimary),
+                    Text(
+                      AppFormatters.formatCurrency(goal.currentAmount),
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(AppConstants.textPrimary),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Falta',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(AppConstants.textSecondary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Falta',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(AppConstants.textSecondary),
+                      ),
                     ),
-                  ),
-                  Text(
-                    AppFormatters.formatCurrency(goal.remainingAmount),
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(AppConstants.primaryBlue),
+                    Text(
+                      AppFormatters.formatCurrency(goal.remainingAmount),
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 14 : 16,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(AppConstants.primaryBlue),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
