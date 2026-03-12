@@ -491,6 +491,8 @@ class FamilyService {
           balance,
           allowance,
           requires_approval,
+          limits,
+          allowed_categories,
           created_at
           ''')
         .eq('id', childId)
@@ -511,9 +513,10 @@ class FamilyService {
       createdAt: _parseDate(response['created_at']),
       balance: (response['balance'] as num?)?.toDouble() ?? 0.0,
       allowance: (response['allowance'] as num?)?.toDouble() ?? 0.0,
-      limits: const {}, // Coluna não existe no banco de dados
+      limits: _parseLimits(response['limits']),
       requiresApproval: response['requires_approval'] as bool? ?? true,
-      allowedCategories: const [], // Coluna não existe no banco de dados
+      allowedCategories:
+          _parseAllowedCategories(response['allowed_categories']),
       profileImage: null, // Coluna não existe no banco de dados
     );
   }
@@ -541,4 +544,23 @@ class FamilyService {
     }
     return DateTime.now();
   }
+}
+
+Map<String, double> _parseLimits(dynamic raw) {
+  if (raw == null) return const {};
+  if (raw is Map) {
+    return raw.map((key, value) {
+      final numeric = value is num ? value.toDouble() : 0.0;
+      return MapEntry(key.toString(), numeric);
+    });
+  }
+  return const {};
+}
+
+List<String> _parseAllowedCategories(dynamic raw) {
+  if (raw == null) return const [];
+  if (raw is List) {
+    return raw.map((e) => e.toString()).toList();
+  }
+  return const [];
 }

@@ -187,7 +187,10 @@ class AuthCubit extends Cubit<AuthState> {
           createdAt: _parseDate(childData['created_at']),
           balance: (childData['balance'] as num?)?.toDouble() ?? 0.0,
           allowance: (childData['allowance'] as num?)?.toDouble() ?? 0.0,
+          limits: _parseLimits(childData['limits']),
           requiresApproval: childData['requires_approval'] as bool? ?? true,
+          allowedCategories:
+              _parseAllowedCategories(childData['allowed_categories']),
         );
       }
 
@@ -271,6 +274,25 @@ class AuthCubit extends Cubit<AuthState> {
       return DateTime.tryParse(raw) ?? DateTime.now();
     }
     return DateTime.now();
+  }
+
+  Map<String, double> _parseLimits(dynamic raw) {
+    if (raw == null) return const {};
+    if (raw is Map) {
+      return raw.map((key, value) {
+        final numeric = value is num ? value.toDouble() : 0.0;
+        return MapEntry(key.toString(), numeric);
+      });
+    }
+    return const {};
+  }
+
+  List<String> _parseAllowedCategories(dynamic raw) {
+    if (raw == null) return const [];
+    if (raw is List) {
+      return raw.map((e) => e.toString()).toList();
+    }
+    return const [];
   }
 
   String _getErrorMessage(String message) {

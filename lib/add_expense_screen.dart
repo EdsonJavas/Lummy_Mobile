@@ -5,7 +5,14 @@ import 'core/constants/app_constants.dart';
 import 'shared/widgets/money_text_field.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  const AddExpenseScreen({
+    super.key,
+    required this.expenseCategories,
+  });
+
+  /// Categorias de gasto permitidas, no formato:
+  /// { 'id': 'food', 'name': 'Alimentação' }
+  final List<Map<String, dynamic>> expenseCategories;
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -18,15 +25,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   double? _currentAmount;
 
   String _selectedType = 'expense';
-  String _selectedCategory = 'Alimentação';
-
-  final List<String> _expenseCategories = [
-    'Alimentação',
-    'Transporte',
-    'Diversão',
-    'Roupas',
-    'Outros',
-  ];
+  // Para despesas, guardamos o id da categoria (ex: 'food')
+  String? _selectedExpenseCategoryId;
 
   final List<String> _incomeCategories = [
     'Mesada',
@@ -34,6 +34,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     'Trabalho',
     'Outros',
   ];
+
+  String _selectedIncomeCategory = 'Mesada';
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +109,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 onTap: () {
                   setState(() {
                     _selectedType = 'expense';
-                    _selectedCategory = _expenseCategories.first;
+                    if (widget.expenseCategories.isNotEmpty) {
+                      _selectedExpenseCategoryId =
+                          widget.expenseCategories.first['id'] as String;
+                    }
                   });
                 },
                 child: Container(
@@ -151,7 +156,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 onTap: () {
                   setState(() {
                     _selectedType = 'income';
-                    _selectedCategory = _incomeCategories.first;
+                    _selectedIncomeCategory = _incomeCategories.first;
                   });
                 },
                 child: Container(
@@ -259,9 +264,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   Widget _buildCategorySelector(BuildContext context, bool isSmallScreen) {
     final theme = Theme.of(context);
-    final categories = _selectedType == 'expense'
-        ? _expenseCategories
-        : _incomeCategories;
+    final isExpense = _selectedType == 'expense';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,24 +288,48 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: _selectedCategory,
+              value: isExpense
+                  ? _selectedExpenseCategoryId
+                  : _selectedIncomeCategory,
               onChanged: (String? newValue) {
                 setState(() {
-                  _selectedCategory = newValue!;
+                  if (isExpense) {
+                    _selectedExpenseCategoryId = newValue!;
+                  } else {
+                    _selectedIncomeCategory = newValue!;
+                  }
                 });
               },
-              items: categories.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 14 : 16,
-                      color: theme.textTheme.bodyLarge?.color,
-                    ),
-                  ),
-                );
-              }).toList(),
+              items: isExpense
+                  ? widget.expenseCategories
+                      .map<DropdownMenuItem<String>>(
+                          (Map<String, dynamic> category) {
+                      final id = category['id'] as String;
+                      final name = category['name'] as String;
+                      return DropdownMenuItem<String>(
+                        value: id,
+                        child: Text(
+                          name,
+                          style: GoogleFonts.poppins(
+                            fontSize: isSmallScreen ? 14 : 16,
+                            color: theme.textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                      );
+                    }).toList()
+                  : _incomeCategories
+                      .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: GoogleFonts.poppins(
+                            fontSize: isSmallScreen ? 14 : 16,
+                            color: theme.textTheme.bodyLarge?.color,
+                          ),
+                        ),
+                      );
+                    }).toList(),
             ),
           ),
         ),
@@ -342,11 +369,37 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     if (_formKey.currentState!.validate()) {
       final amount = _currentAmount ?? 0.0;
 
+      if (_selectedType == 'expense' &&
+          (_selectedExpenseCategoryId == null ||
+              _selectedExpenseCategoryId!.isEmpty)) {
+        return;
+      }
+
+      // Para despesas, devolvemos id + nome da categoria; para ganhos, apenas nome
+      String categoryId;
+      String categoryName;
+
+      if (_selectedType == 'expense') {
+        categoryId = _selectedExpenseCategoryId!;
+        final category = widget.expenseCategories.firstWhere(
+          (c) => c['id'] == categoryId,
+          orElse: () => {
+            'id': categoryId,
+            'name': categoryId,
+          },
+        );
+        categoryName = category['name'] as String;
+      } else {
+        categoryId = _selectedIncomeCategory;
+        categoryName = _selectedIncomeCategory;
+      }
+
       Navigator.pop(context, {
         'description': _descriptionController.text,
         'amount': amount,
         'type': _selectedType,
-        'category': _selectedCategory,
+        'categoryId': categoryId,
+        'categoryName': categoryName,
       });
     }
   }
