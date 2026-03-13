@@ -3,8 +3,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'add_expense_screen.dart';
 import 'core/constants/app_constants.dart';
+import 'core/utils/formatters.dart';
 import 'shared/widgets/widgets.dart';
 
 class ExpensesScreen extends StatefulWidget {
@@ -16,8 +19,68 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   String selectedPeriod = 'Este mês';
-  String selectedCategory = 'Todas';
+  String selectedCategory = 'Todas'; // 'Todas' ou id da categoria
   bool _isLoading = true;
+
+  final _supabase = Supabase.instance.client;
+
+  // Categorias base (devem bater com as ids usadas nas configurações do responsável)
+  // id: usado no banco; name: exibido na UI; color: usado em gráficos/listas
+  final List<Map<String, dynamic>> _baseCategories = [
+    {
+      'id': 'games',
+      'name': 'Jogos',
+      'color': const Color(0xFF8B5CF6),
+    },
+    {
+      'id': 'food',
+      'name': 'Alimentação',
+      'color': const Color(0xFFF59E0B),
+    },
+    {
+      'id': 'education',
+      'name': 'Educação',
+      'color': const Color(0xFF3B82F6),
+    },
+    {
+      'id': 'clothes',
+      'name': 'Roupas',
+      'color': const Color(0xFFEC4899),
+    },
+    {
+      'id': 'entertainment',
+      'name': 'Entretenimento',
+      'color': const Color(0xFFEF4444),
+    },
+    {
+      'id': 'toys',
+      'name': 'Brinquedos',
+      'color': const Color(0xFF10B981),
+    },
+    {
+      'id': 'sports',
+      'name': 'Esportes',
+      'color': const Color(0xFF06B6D4),
+    },
+    {
+      'id': 'other',
+      'name': 'Outros',
+      'color': const Color(0xFF64748B),
+    },
+  ];
+
+  // Categorias permitidas para este filho (filtradas de _baseCategories)
+  List<Map<String, dynamic>> _allowedCategories = [];
+
+  // Transações carregadas do banco (apenas despesas)
+  // Cada item: { description, amount, categoryId, categoryName, color, date }
+  List<Map<String, dynamic>> _allTransactions = [];
+  List<Map<String, dynamic>> _visibleTransactions = [];
+
+  // Totais para UI
+  double _totalSpent = 0.0;
+  double _currentBalance = 0.0;
+  Map<String, double> _categorySpending = {};
 
   @override
   void initState() {
@@ -30,16 +93,171 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       _isLoading = true;
     });
 
-    // Simular carregamento de dados do banco
-    await Future.delayed(const Duration(milliseconds: 800));
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
 
-    setState(() {
-      _isLoading = false;
-    });
+      final childId = user.id;
+
+      // 1) Carregar configurações do filho (categorias permitidas + saldo)
+      final childRow = await _supabase
+          .from('children')
+          .select('allowed_categories, balance')
+          .eq('id', childId)
+          .maybeSingle();
+
+      final rawAllowed =
+          (childRow?['allowed_categories'] as List<dynamic>?) ?? [];
+      final allowedIds =
+          rawAllowed.map((e) => e.toString()).toList(growable: false);
+
+      _currentBalance =
+          (childRow?['balance'] as num?)?.toDouble() ?? _currentBalance;
+
+      // Se não houver categorias configuradas, permite todas as base
+      if (allowedIds.isEmpty) {
+        _allowedCategories = List<Map<String, dynamic>>.from(_baseCategories);
+      } else {
+        _allowedCategories = _baseCategories
+            .where((c) => allowedIds.contains(c['id'] as String))
+            .toList();
+
+        if (_allowedCategories.isEmpty) {
+          _allowedCategories =
+              List<Map<String, dynamic>>.from(_baseCategories);
+        }
+      }
+
+      // 2) Carregar transações de despesa do banco
+      final rows = await _supabase
+          .from('transactions')
+          .select('description, amount, category, date')
+          .eq('child_id', childId)
+          .eq('type', 'expense')
+          .order('date', ascending: false);
+
+      _allTransactions = rows.map<Map<String, dynamic>>((row) {
+        final catId = (row['category'] ?? 'other').toString();
+        final categoryConfig = _baseCategories.firstWhere(
+          (c) => c['id'] == catId,
+          orElse: () => {
+            'id': catId,
+            'name': catId,
+            'color': const Color(0xFF64748B),
+          },
+        );
+
+        final dateRaw = row['date'];
+        final date = dateRaw is String
+            ? DateTime.tryParse(dateRaw) ?? DateTime.now()
+            : (dateRaw is DateTime ? dateRaw : DateTime.now());
+
+        return {
+          'description': (row['description'] ?? '') as String,
+          'amount': (row['amount'] as num?)?.toDouble() ?? 0.0,
+          'categoryId': categoryConfig['id'] as String,
+          'categoryName': categoryConfig['name'] as String,
+          'color': categoryConfig['color'] as Color,
+          'date': date,
+        };
+      }).toList();
+
+      _applyFilters();
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (_) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _refreshData() async {
     await _loadData();
+  }
+
+  Future<void> _saveTransactionToDatabase(
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return;
+
+      final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
+      if (amount <= 0) return;
+
+      final type = (data['type'] ?? 'expense').toString();
+      final categoryId = (data['categoryId'] ?? 'other').toString();
+      final description =
+          (data['description'] as String?)?.trim() ?? 'Transação';
+
+      // Para ganhos aprovamos direto; para gastos podemos deixar como pending
+      final status = type == 'expense' ? 'pending' : 'approved';
+
+      await _supabase.from('transactions').insert({
+        'child_id': user.id,
+        'amount': amount,
+        'type': type,
+        'description': description,
+        'category': categoryId,
+        'status': status,
+        'date': DateTime.now().toIso8601String(),
+      });
+    } catch (_) {
+      // Silencia erros aqui; a tela será recarregada no _loadData
+    }
+  }
+
+  void _applyFilters() {
+    final now = DateTime.now();
+    DateTime? startDate;
+
+    switch (selectedPeriod) {
+      case 'Este mês':
+        startDate = DateTime(now.year, now.month, 1);
+        break;
+      case 'Última semana':
+        startDate = now.subtract(const Duration(days: 7));
+        break;
+      case 'Últimos 3 meses':
+        startDate = now.subtract(const Duration(days: 90));
+        break;
+    }
+
+    Iterable<Map<String, dynamic>> filtered = _allTransactions;
+
+    if (startDate != null) {
+      filtered = filtered.where(
+        (t) => (t['date'] as DateTime).isAfter(startDate!),
+      );
+    }
+
+    if (selectedCategory != 'Todas') {
+      filtered = filtered.where(
+        (t) => t['categoryId'] == selectedCategory,
+      );
+    }
+
+    final list = filtered.toList();
+    _visibleTransactions = list;
+
+    _totalSpent = 0.0;
+    _categorySpending = {};
+
+    for (final t in list) {
+      final amount = (t['amount'] as num).toDouble();
+      _totalSpent += amount;
+
+      final catId = t['categoryId'] as String;
+      _categorySpending[catId] = (_categorySpending[catId] ?? 0.0) + amount;
+    }
   }
 
   @override
@@ -166,13 +384,20 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'fab_expenses',
         onPressed: () async {
+          if (_allowedCategories.isEmpty) return;
+
           final result = await Navigator.push<Map<String, dynamic>>(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddExpenseScreen(),
+              builder: (context) =>
+                  AddExpenseScreen(expenseCategories: _allowedCategories),
             ),
           );
-          if (result != null && mounted) _loadData();
+
+          if (result != null && mounted) {
+            await _saveTransactionToDatabase(result);
+            await _loadData();
+          }
         },
         backgroundColor: const Color(0xFFF59E0B),
         foregroundColor: Colors.white,
@@ -280,7 +505,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               const SizedBox(width: 10),
               _buildHeroStatChip(
                 Icons.receipt_rounded,
-                '4 transações',
+                '${_visibleTransactions.length} transações',
                 isSmallScreen,
               ),
             ],
@@ -364,9 +589,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget _buildTotalCard(BuildContext context, bool isSmallScreen) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    const totalGasto = 1247.50;
-    const disponivel = 2000.0;
-    final usado = totalGasto / disponivel;
+    final totalGasto = _totalSpent;
+    final disponivel = _currentBalance <= 0
+        ? totalGasto
+        : _currentBalance + totalGasto; // aproximação para barra de uso
+    final usado =
+        disponivel > 0 ? (totalGasto / disponivel).clamp(0.0, 1.0) : 0.0;
 
     return Container(
       width: double.infinity,
@@ -410,7 +638,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     ),
                     const Gap(4),
                     Text(
-                      'R\$ 1.247,50',
+                      AppFormatters.formatCurrency(totalGasto),
                       style: GoogleFonts.poppins(
                         fontSize: isSmallScreen ? 20 : 22,
                         fontWeight: FontWeight.w700,
@@ -440,7 +668,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     ),
                     const Gap(4),
                     Text(
-                      'R\$ 2.000,00',
+                      AppFormatters.formatCurrency(_currentBalance),
                       style: GoogleFonts.poppins(
                         fontSize: isSmallScreen ? 20 : 22,
                         fontWeight: FontWeight.w600,
@@ -508,38 +736,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 sectionsSpace: 2,
                 centerSpaceRadius: 48,
                 borderData: FlBorderData(show: false),
-                sections: [
-                  PieChartSectionData(
-                    color: const Color(0xFF8B5CF6),
-                    value: 35,
-                    title: '',
-                    radius: 32,
-                  ),
-                  PieChartSectionData(
-                    color: const Color(0xFF3B82F6),
-                    value: 25,
-                    title: '',
-                    radius: 32,
-                  ),
-                  PieChartSectionData(
-                    color: const Color(0xFF10B981),
-                    value: 20,
-                    title: '',
-                    radius: 32,
-                  ),
-                  PieChartSectionData(
-                    color: const Color(0xFFF59E0B),
-                    value: 15,
-                    title: '',
-                    radius: 32,
-                  ),
-                  PieChartSectionData(
-                    color: const Color(0xFFE5E7EB),
-                    value: 5,
-                    title: '',
-                    radius: 32,
-                  ),
-                ],
+                sections: _buildPieSections(),
               ),
             ),
           ),
@@ -548,11 +745,23 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLegendItem('Metas', const Color(0xFF8B5CF6), 'R\$ 436,63'),
-                _buildLegendItem('Transporte', const Color(0xFF3B82F6), 'R\$ 311,88'),
-                _buildLegendItem('Jogos e Brinquedos', const Color(0xFF10B981), 'R\$ 249,50'),
-                _buildLegendItem('Alimentação', const Color(0xFFF59E0B), 'R\$ 187,13'),
-                _buildLegendItem('Outros', const Color(0xFFE5E7EB), 'R\$ 62,36'),
+                ..._categorySpending.entries.map((entry) {
+                  final catId = entry.key;
+                  final amount = entry.value;
+                  final config = _baseCategories.firstWhere(
+                    (c) => c['id'] == catId,
+                    orElse: () => {
+                      'id': catId,
+                      'name': catId,
+                      'color': const Color(0xFF64748B),
+                    },
+                  );
+                  return _buildLegendItem(
+                    config['name'] as String,
+                    config['color'] as Color,
+                    AppFormatters.formatCurrency(amount),
+                  );
+                }),
               ],
             ),
           ),
@@ -581,19 +790,28 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               _buildFilterChip(
                 'Este mês',
                 selectedPeriod == 'Este mês',
-                () => setState(() => selectedPeriod = 'Este mês'),
+                () => setState(() {
+                  selectedPeriod = 'Este mês';
+                  _applyFilters();
+                }),
               ),
               const SizedBox(width: 8),
               _buildFilterChip(
                 'Última semana',
                 selectedPeriod == 'Última semana',
-                () => setState(() => selectedPeriod = 'Última semana'),
+                () => setState(() {
+                  selectedPeriod = 'Última semana';
+                  _applyFilters();
+                }),
               ),
               const SizedBox(width: 8),
               _buildFilterChip(
                 'Últimos 3 meses',
                 selectedPeriod == 'Últimos 3 meses',
-                () => setState(() => selectedPeriod = 'Últimos 3 meses'),
+                () => setState(() {
+                  selectedPeriod = 'Últimos 3 meses';
+                  _applyFilters();
+                }),
               ),
             ],
           ),
@@ -615,26 +833,27 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               _buildFilterChip(
                 'Todas',
                 selectedCategory == 'Todas',
-                () => setState(() => selectedCategory = 'Todas'),
+                () => setState(() {
+                  selectedCategory = 'Todas';
+                  _applyFilters();
+                }),
               ),
               const SizedBox(width: 8),
-              _buildFilterChip(
-                'Metas',
-                selectedCategory == 'Metas',
-                () => setState(() => selectedCategory = 'Metas'),
-              ),
-              const SizedBox(width: 8),
-              _buildFilterChip(
-                'Transporte',
-                selectedCategory == 'Transporte',
-                () => setState(() => selectedCategory = 'Transporte'),
-              ),
-              const SizedBox(width: 8),
-              _buildFilterChip(
-                'Alimentação',
-                selectedCategory == 'Alimentação',
-                () => setState(() => selectedCategory = 'Alimentação'),
-              ),
+              ..._allowedCategories.map((category) {
+                final id = category['id'] as String;
+                final name = category['name'] as String;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _buildFilterChip(
+                    name,
+                    selectedCategory == id,
+                    () => setState(() {
+                      selectedCategory = id;
+                      _applyFilters();
+                    }),
+                  ),
+                );
+              }).toList(),
             ],
           ),
         ),
@@ -643,12 +862,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 
   Widget _buildTransactionsCard(BuildContext context) {
-    final transactions = [
-      ('Lanche na escola', 'Alimentação', 'R\$ 15,50', const Color(0xFFF59E0B)),
-      ('Ônibus', 'Transporte', 'R\$ 4,50', const Color(0xFF3B82F6)),
-      ('Jogo novo', 'Jogos e Brinquedos', 'R\$ 29,90', const Color(0xFF10B981)),
-      ('Mesada guardada', 'Metas', 'R\$ 50,00', const Color(0xFF8B5CF6)),
-    ];
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
@@ -672,12 +885,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...List.generate(
-            transactions.length,
+            _visibleTransactions.length,
             (i) => _buildTransactionItem(
-              transactions[i].$1,
-              transactions[i].$2,
-              transactions[i].$3,
-              transactions[i].$4,
+              _visibleTransactions[i]['description'] as String,
+              _visibleTransactions[i]['categoryName'] as String,
+              AppFormatters.formatCurrency(
+                (_visibleTransactions[i]['amount'] as num).toDouble(),
+              ),
+              _visibleTransactions[i]['color'] as Color,
               i,
             ),
           ),
@@ -852,6 +1067,57 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         .animate()
         .fadeIn(delay: (100 + index * 60).ms, duration: 280.ms)
         .slideX(begin: 0.03, end: 0, curve: Curves.easeOut);
+  }
+
+  List<PieChartSectionData> _buildPieSections() {
+    if (_categorySpending.isEmpty) {
+      return [
+        PieChartSectionData(
+          color: const Color(0xFFE5E7EB),
+          value: 1,
+          title: '',
+          radius: 32,
+        ),
+      ];
+    }
+
+    final total = _categorySpending.values.fold<double>(
+      0.0,
+      (prev, v) => prev + v,
+    );
+
+    if (total == 0) {
+      return [
+        PieChartSectionData(
+          color: const Color(0xFFE5E7EB),
+          value: 1,
+          title: '',
+          radius: 32,
+        ),
+      ];
+    }
+
+    return _categorySpending.entries.map((entry) {
+      final catId = entry.key;
+      final amount = entry.value;
+      final ratio = amount / total;
+
+      final config = _baseCategories.firstWhere(
+        (c) => c['id'] == catId,
+        orElse: () => {
+          'id': catId,
+          'name': catId,
+          'color': const Color(0xFF64748B),
+        },
+      );
+
+      return PieChartSectionData(
+        color: config['color'] as Color,
+        value: ratio * 100,
+        title: '',
+        radius: 32,
+      );
+    }).toList();
   }
 
   IconData _getCategoryIcon(String category) {

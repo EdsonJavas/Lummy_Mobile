@@ -93,13 +93,49 @@ class TransactionsCubit extends Cubit<TransactionsState> {
       if (transaction.type == TransactionType.expense) {
         final childData = await _supabase
             .from('children')
-            .select('balance, requires_approval')
+            .select('balance, requires_approval, limits, allowed_categories')
             .eq('id', transaction.userId)
             .maybeSingle();
 
         if (childData != null) {
           final balance = (childData['balance'] as num?)?.toDouble() ?? 0.0;
-          final requiresApproval = childData['requires_approval'] as bool? ?? true;
+          final requiresApproval =
+              childData['requires_approval'] as bool? ?? true;
+          final limits = _parseLimits(childData['limits']);
+          final allowedCategories =
+              _parseAllowedCategories(childData['allowed_categories']);
+
+          final categoryKey = transaction.category.trim();
+
+          // Verificar se a categoria é permitida
+          if (allowedCategories.isNotEmpty &&
+              !allowedCategories.contains(categoryKey)) {
+            emit(
+              state.copyWith(
+                error:
+                    'Esta categoria não está permitida pelas configurações dos responsáveis.',
+              ),
+            );
+            return;
+          }
+
+          // Verificar limite mensal por categoria (se existir)
+          final withinLimit = await _isWithinCategoryLimit(
+            transaction.userId,
+            categoryKey,
+            transaction.amount,
+            limits,
+          );
+
+          if (!withinLimit) {
+            emit(
+              state.copyWith(
+                error:
+                    'Limite mensal de gastos para esta categoria já foi atingido.',
+              ),
+            );
+            return;
+          }
 
           if (balance < transaction.amount) {
             emit(state.copyWith(error: 'Saldo insuficiente'));
@@ -108,7 +144,7 @@ class TransactionsCubit extends Cubit<TransactionsState> {
 
           // Definir status baseado em requires_approval
           final status = requiresApproval ? 'pending' : 'approved';
-          
+
           // Inserir no banco
           await _supabase.from('transactions').insert({
             'child_id': transaction.userId,
@@ -116,7 +152,7 @@ class TransactionsCubit extends Cubit<TransactionsState> {
             'amount': transaction.amount,
             'type': _mapTransactionTypeToString(transaction.type),
             'description': transaction.description.trim(),
-            'category': transaction.category.trim(),
+            'category': categoryKey,
             'status': status,
             'date': transaction.date.toIso8601String(),
             'metadata': transaction.metadata,
@@ -200,6 +236,58 @@ class TransactionsCubit extends Cubit<TransactionsState> {
       return DateTime.tryParse(raw) ?? DateTime.now();
     }
     return DateTime.now();
+  }
+
+  Map<String, double> _parseLimits(dynamic raw) {
+    if (raw == null) return const {};
+    if (raw is Map) {
+      return raw.map((key, value) {
+        final numeric = value is num ? value.toDouble() : 0.0;
+        return MapEntry(key.toString(), numeric);
+      });
+    }
+    return const {};
+  }
+
+  List<String> _parseAllowedCategories(dynamic raw) {
+    if (raw == null) return const [];
+    if (raw is List) {
+      return raw.map((e) => e.toString()).toList();
+    }
+    return const [];
+  }
+
+  Future<bool> _isWithinCategoryLimit(
+    String childId,
+    String category,
+    double amount,
+    Map<String, double> limits,
+  ) async {
+    final limit = limits[category];
+    if (limit == null || limit <= 0) return true;
+
+    final now = DateTime.now();
+    final monthStart = DateTime(now.year, now.month, 1);
+
+    var query = _supabase
+        .from('transactions')
+        .select('amount')
+        .eq('child_id', childId)
+        .eq('type', 'expense')
+        .eq('category', category)
+        .gte('date', monthStart.toIso8601String());
+
+    // Considerar apenas despesas já aprovadas/concluídas
+    query = query.or('status.eq.approved,status.eq.completed');
+
+    final response = await query;
+
+    double spent = 0.0;
+    for (final row in response) {
+      spent += (row['amount'] as num).toDouble();
+    }
+
+    return spent + amount <= limit;
   }
 
   // Filtrar por categoria

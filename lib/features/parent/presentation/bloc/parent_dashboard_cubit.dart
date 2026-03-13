@@ -84,6 +84,8 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
             balance,
             allowance,
             requires_approval,
+            limits,
+            allowed_categories,
             created_at
           ''')
           .eq('responsavel_id', parentId);
@@ -105,7 +107,10 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           createdAt: _parseDate(row['created_at']),
           balance: (row['balance'] as num?)?.toDouble() ?? 0.0,
           allowance: (row['allowance'] as num?)?.toDouble() ?? 0.0,
+          limits: _parseLimits(row['limits']),
           requiresApproval: row['requires_approval'] as bool? ?? true,
+          allowedCategories:
+              _parseAllowedCategories(row['allowed_categories']),
         );
       }).toList();
     } catch (e) {
@@ -136,6 +141,25 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       return DateTime.tryParse(raw) ?? DateTime.now();
     }
     return DateTime.now();
+  }
+
+  Map<String, double> _parseLimits(dynamic raw) {
+    if (raw == null) return const {};
+    if (raw is Map) {
+      return raw.map((key, value) {
+        final numeric = value is num ? value.toDouble() : 0.0;
+        return MapEntry(key.toString(), numeric);
+      });
+    }
+    return const {};
+  }
+
+  List<String> _parseAllowedCategories(dynamic raw) {
+    if (raw == null) return const [];
+    if (raw is List) {
+      return raw.map((e) => e.toString()).toList();
+    }
+    return const [];
   }
 
   Future<void> refresh() async {
