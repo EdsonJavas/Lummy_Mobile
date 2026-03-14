@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/user_entity.dart';
-import '../../login_page.dart';
-import '../../register_screen.dart';
-import '../../splash_screen.dart';
-import '../../main_navigation.dart';
-import '../../features/parent/presentation/screens/parent_main_navigation.dart';
+import 'package:lummy_login/screens/app/splash_screen.dart';
+import 'package:lummy_login/domain/entities/user_entity.dart';
+import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
+import 'package:lummy_login/screens/auth/login_screen.dart';
+import 'package:lummy_login/screens/child/main_navigation.dart';
+import 'package:lummy_login/screens/auth/register_screen.dart';
 
 // Nomes de rotas
 class AppRoutes {

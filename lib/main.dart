@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/theme_provider.dart';
-import 'features/auth/presentation/bloc/auth_cubit.dart';
-import 'shared/navigation/app_router.dart';
-import 'splash_screen.dart';
+import 'package:lummy_login/auth/bloc/auth_cubit.dart';
+import 'package:lummy_login/screens/app/splash_screen.dart';
+import 'package:lummy_login/shared/navigation/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
