@@ -5,6 +5,8 @@ import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/screens/auth/register_children_screen.dart';
 import 'package:lummy_login/models/responsavel_model.dart';
 import 'package:lummy_login/screens/parent/parent_subscription_screen.dart';
+import 'package:lummy_login/screens/parent/parent_edit_profile_screen.dart';
+import 'package:lummy_login/screens/parent/parent_change_password_screen.dart';
 
 class ParentProfileScreen extends StatefulWidget {
   const ParentProfileScreen({super.key});
@@ -14,16 +16,17 @@ class ParentProfileScreen extends StatefulWidget {
 }
 
 class _ParentProfileScreenState extends State<ParentProfileScreen> {
-  String userName = 'Carregando...';
+  String userName = 'Responsável';
   String userEmail = '';
   String? _parentId;
+  String? _avatarUrl;
   int childrenCount = 0;
   double totalChildrenBalance = 0.0;
   DateTime? createdAt;
   bool _isLoadingStats = true;
 
-  // URL do avatar astronauta (mesmo da versão infantil)
-  static const _avatarUrl =
+  // URL do avatar padrão (fallback quando não há foto)
+  static const _avatarUrlDefault =
       'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png';
 
   // Paleta de cores vibrantes
@@ -47,32 +50,55 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
       final user = supabase.auth.currentUser;
 
       if (user == null) {
-        setState(() => _isLoadingStats = false);
+        setState(() {
+          userName = 'Responsável';
+          _isLoadingStats = false;
+        });
         return;
       }
 
       _parentId = user.id;
+      // Fallback: nome do auth (metadata) ou "Responsável" — nunca e-mail
+      final meta = user.userMetadata ?? {};
+      final nameFallback = (meta['full_name'] ?? meta['name'] ?? meta['username'])?.toString().trim();
+      final nameFallbackOrDefault = (nameFallback != null && nameFallback.isNotEmpty) ? nameFallback : 'Responsável';
 
       // Buscar dados do responsável
       final parentData = await supabase
           .from('responsaveis')
-          .select('nome, email, created_at')
+          .select('nome, email, created_at, avatar_url')
           .eq('id', user.id)
           .maybeSingle();
 
+      DateTime? loadedCreatedAt;
       if (parentData != null) {
+        final nome = (parentData['nome'] as String?)?.trim();
+        if (parentData['created_at'] != null) {
+          loadedCreatedAt = DateTime.tryParse(parentData['created_at'] as String);
+        }
         setState(() {
-          userName = parentData['nome'] as String? ?? 'Responsável';
+          userName = (nome != null && nome.isNotEmpty) ? nome : nameFallbackOrDefault;
           userEmail = parentData['email'] as String? ?? user.email ?? '';
-          if (parentData['created_at'] != null) {
-            createdAt = DateTime.tryParse(parentData['created_at'] as String);
-          }
+          _avatarUrl = parentData['avatar_url'] as String?;
+          createdAt = loadedCreatedAt;
         });
       } else {
         setState(() {
-          userName = user.email?.split('@').first ?? 'Responsável';
+          userName = nameFallbackOrDefault;
           userEmail = user.email ?? '';
         });
+      }
+      // Fallback "Membro desde": usar data de criação do usuário no Auth se a tabela não tiver
+      if (createdAt == null) {
+        try {
+          final authCreated = user.createdAt;
+          if (authCreated.isNotEmpty) {
+            final parsed = DateTime.tryParse(authCreated);
+            if (parsed != null && mounted) {
+              setState(() => createdAt = parsed);
+            }
+          }
+        } catch (_) {}
       }
 
       // Buscar dados dos filhos
@@ -96,8 +122,19 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
       }
     } catch (e) {
       debugPrint('Erro ao carregar dados: $e');
+      final user = Supabase.instance.client.auth.currentUser;
+      if (mounted && user != null) {
+        final meta = user.userMetadata ?? {};
+        final nameFromMeta = (meta['full_name'] ?? meta['name'] ?? meta['username'])?.toString().trim();
+        setState(() {
+          userName = (nameFromMeta != null && nameFromMeta.isNotEmpty) ? nameFromMeta : 'Responsável';
+          userEmail = user.email ?? '';
+        });
+      }
     } finally {
-      setState(() => _isLoadingStats = false);
+      if (mounted) {
+        setState(() => _isLoadingStats = false);
+      }
     }
   }
 
@@ -276,9 +313,9 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                                   width: 3,
                                 ),
                               ),
-                              child: const ClipOval(
+                              child: ClipOval(
                                 child: CachedAvatar(
-                                  imageUrl: _avatarUrl,
+                                  imageUrl: _avatarUrl ?? _avatarUrlDefault,
                                   size: 74,
                                 ),
                               ),
@@ -728,7 +765,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                   label: 'Editar Perfil',
                   color: _orange,
                   isDark: isDark,
-                  onTap: () => _showComingSoon(context),
+                  onTap: () => _openEditProfile(),
                 ),
               ),
               const SizedBox(width: 12),
@@ -738,7 +775,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                   label: 'Segurança',
                   color: _green,
                   isDark: isDark,
-                  onTap: () => _showComingSoon(context),
+                  onTap: () => _openChangePassword(),
                 ),
               ),
             ],
@@ -978,6 +1015,33 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
         ),
       ],
     );
+  }
+
+  void _openChangePassword() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ParentChangePasswordScreen(),
+      ),
+    );
+  }
+
+  void _openEditProfile() {
+    if (_parentId == null) {
+      _showComingSoon(context);
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ParentEditProfileScreen(
+          parentId: _parentId!,
+          initialName: userName,
+          initialEmail: userEmail,
+          initialAvatarUrl: _avatarUrl,
+        ),
+      ),
+    ).then((_) => _loadUserData());
   }
 
   void _showComingSoon(BuildContext context) {

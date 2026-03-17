@@ -168,6 +168,9 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     await loadDashboard(id);
   }
 
+  /// Saldo de teste quando não há valor no banco (desenvolvimento/demo).
+  static const double _kTestBalance = 2200.0;
+
   Future<double> _fetchParentBalance(String parentId) async {
     try {
       final row = await _supabase
@@ -175,10 +178,13 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           .select('balance')
           .eq('id', parentId)
           .maybeSingle();
-      return (row?['balance'] as num?)?.toDouble() ?? 2200.0;
+      final balance = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+      // Em teste: se não tiver saldo no banco, usar valor fixo para demonstração
+      if (balance <= 0) return _kTestBalance;
+      return balance;
     } catch (e) {
       debugPrint('⚠️ Erro ao buscar saldo do responsável: $e');
-      return state.walletBalance > 0 ? state.walletBalance : 2200.0;
+      return state.walletBalance > 0 ? state.walletBalance : _kTestBalance;
     }
   }
 
@@ -203,6 +209,23 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     return true;
   }
 
+  Future<void> _creditChildBalance(String childId, double amount) async {
+    if (amount <= 0) return;
+
+    final row = await _supabase
+        .from('children')
+        .select('balance')
+        .eq('id', childId)
+        .maybeSingle();
+    final current = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+    final updated = double.parse((current + amount).toStringAsFixed(2));
+
+    await _supabase
+        .from('children')
+        .update({'balance': updated})
+        .eq('id', childId);
+  }
+
   // Aprovar transação
   Future<void> approveTransaction(String transactionId) async {
     try {
@@ -211,6 +234,23 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         emit(state.copyWith(error: 'ID da transação inválido'));
         return;
       }
+
+      // Buscar transação antes de aprovar para aplicar efeito no saldo quando necessário
+      final tx = await _supabase
+          .from('transactions')
+          .select('id, child_id, amount, type, status')
+          .eq('id', transactionId)
+          .maybeSingle();
+      if (tx == null) {
+        emit(state.copyWith(error: 'Transação não encontrada'));
+        return;
+      }
+
+      final alreadyApproved =
+          (tx['status'] as String?)?.toLowerCase() == 'approved';
+      final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
+      final type = (tx['type'] as String?)?.toLowerCase() ?? '';
+      final childId = (tx['child_id'] as String?) ?? '';
 
       // Atualizar status no banco
       await _supabase
@@ -221,7 +261,15 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           })
           .eq('id', transactionId);
 
-      // O trigger update_child_balance vai atualizar o saldo automaticamente
+      // Garante crédito no saldo quando não existe trigger no banco
+      final shouldCredit = !alreadyApproved &&
+          childId.isNotEmpty &&
+          amount > 0 &&
+          (type == 'income' || type == 'allowance' || type == 'reward');
+      if (shouldCredit) {
+        await _creditChildBalance(childId, amount);
+      }
+
       // Recarregar dados para refletir mudanças
       await refresh();
     } catch (e) {
@@ -286,7 +334,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       // Verificar se a criança existe
       final childExists = await _supabase
           .from('children')
-          .select('id')
+          .select('id, balance')
           .eq('id', childId)
           .maybeSingle();
 
@@ -297,6 +345,9 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
 
       final hasBalance = await _deductParentBalance(amount);
       if (!hasBalance) return;
+
+      // Creditar saldo da criança diretamente (sem depender de trigger)
+      await _creditChildBalance(childId, amount);
 
       // Criar transação no banco
       await _supabase.from('transactions').insert({
@@ -310,7 +361,6 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         'date': DateTime.now().toIso8601String(),
       });
 
-      // O trigger update_child_balance vai atualizar o balance automaticamente
       // Recarregar dados para refletir mudanças
       await refresh();
     } catch (e) {

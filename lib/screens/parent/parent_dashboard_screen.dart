@@ -35,9 +35,6 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   /// Oculta/mostra o saldo no card principal (hero) — UX de privacidade.
   bool _balanceVisible = true;
 
-  /// Saldo fixo para testes (exibido no dashboard).
-  static const _kTestBalance = 2200.0;
-
   // Paleta de cores vibrantes - consistente com versão infantil
   static const _primaryBlue = Color(0xFF3B82F6);
   static const _deepBlue = Color(0xFF1E40AF);
@@ -432,7 +429,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           balanceVisible
-                              ? AppFormatters.formatCurrency(_kTestBalance)
+                              ? AppFormatters.formatCurrency(state.walletBalance)
                               : 'R\$ •••••••',
                           style: GoogleFonts.poppins(
                             fontSize: 38,
@@ -691,8 +688,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     ParentDashboardState state,
     bool isDark,
   ) {
-    // Saldo fixo para testes; card pequeno sem olho
-    final displayBalance = AppFormatters.formatCurrency(_kTestBalance);
+    final displayBalance = AppFormatters.formatCurrency(state.walletBalance);
     return Row(
       children: [
         Expanded(

@@ -82,6 +82,9 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                   child: _buildQuickStats(context, state, isDark),
                 ),
                 SliverToBoxAdapter(
+                  child: _buildReportByChild(context, state, isDark),
+                ),
+                SliverToBoxAdapter(
                   child: _buildMonthlyChart(context, state, isDark),
                 ),
                 SliverToBoxAdapter(
@@ -307,6 +310,119 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildReportByChild(
+    BuildContext context,
+    ParentDashboardState state,
+    bool isDark,
+  ) {
+    if (state.children.isEmpty || state.totalSpendingByChild.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final totalSpent = state.totalSpendingByChild.values.fold<double>(0, (a, b) => a + b);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _cyan.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.bar_chart_rounded, color: _cyan, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Relatório por filho',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Gastos dos últimos 30 dias',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...state.children.map((child) {
+              final spent = state.totalSpendingByChild[child.id] ?? 0;
+              final pct = totalSpent > 0 ? (spent / totalSpent * 100) : 0.0;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        child.name,
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      AppFormatters.formatCurrency(spent),
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: _red,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _cyan.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${pct.toStringAsFixed(0)}%',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: _cyan,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }

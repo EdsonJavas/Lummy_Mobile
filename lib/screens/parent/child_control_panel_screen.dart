@@ -30,6 +30,9 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
   int _totalPoints = 0;
   int _level = 1;
   List<Map<String, dynamic>> _recentTransactions = [];
+  String _filterPeriod = 'Todas';
+  String _filterType = 'Todas';
+  String _filterCategory = 'Todas';
   List<Map<String, dynamic>> _activeMissions = [];
   List<Map<String, dynamic>> _achievements = [];
   List<Map<String, dynamic>> _goals = [];
@@ -98,13 +101,13 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
       _achievements = List<Map<String, dynamic>>.from(achievementsData);
       _totalAchievements = _achievements.length;
 
-      // Carregar transações recentes
+      // Carregar transações (mais para permitir filtros)
       final transactionsData = await supabase
           .from('transactions')
           .select('*')
           .eq('child_id', widget.child.id)
           .order('created_at', ascending: false)
-          .limit(10);
+          .limit(100);
 
       _recentTransactions = List<Map<String, dynamic>>.from(transactionsData);
 
@@ -1095,10 +1098,53 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     );
   }
 
+  List<Map<String, dynamic>> get _filteredTransactions {
+    var list = _recentTransactions;
+
+    // Filtro por período
+    if (_filterPeriod != 'Todas') {
+      final now = DateTime.now();
+      DateTime startDate;
+      switch (_filterPeriod) {
+        case 'Este mês':
+          startDate = DateTime(now.year, now.month, 1);
+          break;
+        case 'Última semana':
+          startDate = now.subtract(const Duration(days: 7));
+          break;
+        case 'Últimos 3 meses':
+          startDate = now.subtract(const Duration(days: 90));
+          break;
+        default:
+          return list;
+      }
+      list = list.where((t) {
+        final d = t['date'];
+        if (d == null) return false;
+        final dt = d is String ? DateTime.tryParse(d) : (d is DateTime ? d : null);
+        return dt != null && dt.isAfter(startDate);
+      }).toList();
+    }
+
+    // Filtro por tipo
+    if (_filterType != 'Todas') {
+      list = list.where((t) => t['type'] == _filterType).toList();
+    }
+
+    // Filtro por categoria
+    if (_filterCategory != 'Todas') {
+      list = list.where((t) => (t['category'] ?? '') == _filterCategory).toList();
+    }
+
+    return list;
+  }
+
   Widget _buildTransactionsTab(bool isDark) {
     if (_isLoading) {
       return const Center(child: BrandedLoader());
     }
+
+    final filtered = _filteredTransactions;
 
     if (_recentTransactions.isEmpty) {
       return Center(
@@ -1140,85 +1186,182 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
       );
     }
 
-    return ListView.builder(
+    return ListView(
       padding: const EdgeInsets.all(20),
       physics: const BouncingScrollPhysics(),
-      itemCount: _recentTransactions.length,
-      itemBuilder: (context, index) {
-        final transaction = _recentTransactions[index];
-        final isIncome = transaction['type'] == 'income';
-        final amount = (transaction['amount'] as num).toDouble();
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDark
-                    ? const Color(0xFF334155)
-                    : const Color(0xFFE2E8F0),
+      children: [
+        _buildTransactionFilters(isDark),
+        const SizedBox(height: 16),
+        ...List.generate(filtered.length, (index) {
+          final transaction = filtered[index];
+          final isIncome = transaction['type'] == 'income';
+          final amount = (transaction['amount'] as num).toDouble();
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFE2E8F0),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: (isIncome ? _green : _red).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      isIncome
+                          ? Icons.arrow_downward_rounded
+                          : Icons.arrow_upward_rounded,
+                      color: isIncome ? _green : _red,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          transaction['description'] ?? 'Transação',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF1E293B),
+                          ),
+                        ),
+                        Text(
+                          transaction['category'] ?? 'Outros',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '${isIncome ? '+' : '-'}${AppFormatters.formatCurrency(amount)}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: isIncome ? _green : _red,
+                    ),
+                  ),
+                ],
               ),
             ),
+          );
+        }),
+        const SizedBox(height: 80),
+      ],
+    );
+  }
+
+  Widget _buildTransactionFilters(bool isDark) {
+    final categories = _recentTransactions
+        .map((t) => t['category'] as String?)
+        .whereType<String>()
+        .toSet()
+        .toList()
+      ..sort();
+    categories.insert(0, 'Todas');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Filtros',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : const Color(0xFF1E293B),
+          ),
+        ),
+        const SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildFilterChip('Todas', _filterPeriod == 'Todas', () => setState(() => _filterPeriod = 'Todas')),
+              const SizedBox(width: 8),
+              _buildFilterChip('Este mês', _filterPeriod == 'Este mês', () => setState(() => _filterPeriod = 'Este mês')),
+              const SizedBox(width: 8),
+              _buildFilterChip('Última semana', _filterPeriod == 'Última semana', () => setState(() => _filterPeriod = 'Última semana')),
+              const SizedBox(width: 8),
+              _buildFilterChip('3 meses', _filterPeriod == 'Últimos 3 meses', () => setState(() => _filterPeriod = 'Últimos 3 meses')),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildFilterChip('Todas', _filterType == 'Todas', () => setState(() => _filterType = 'Todas')),
+              const SizedBox(width: 8),
+              _buildFilterChip('Entradas', _filterType == 'income', () => setState(() => _filterType = 'income')),
+              const SizedBox(width: 8),
+              _buildFilterChip('Gastos', _filterType == 'expense', () => setState(() => _filterType = 'expense')),
+            ],
+          ),
+        ),
+        if (categories.length > 1) ...[
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: (isIncome ? _green : _red).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    isIncome
-                        ? Icons.arrow_downward_rounded
-                        : Icons.arrow_upward_rounded,
-                    color: isIncome ? _green : _red,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        transaction['description'] ?? 'Transação',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF1E293B),
-                        ),
-                      ),
-                      Text(
-                        transaction['category'] ?? 'Outros',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: isDark
-                              ? const Color(0xFF94A3B8)
-                              : const Color(0xFF64748B),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  '${isIncome ? '+' : '-'}${AppFormatters.formatCurrency(amount)}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: isIncome ? _green : _red,
-                  ),
-                ),
-              ],
+              children: categories.map((c) {
+                final sel = _filterCategory == c;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _buildFilterChip(c, sel, () => setState(() => _filterCategory = c)),
+                );
+              }).toList(),
             ),
           ),
-        );
-      },
+        ],
+      ],
+    );
+  }
+
+  Widget _buildFilterChip(String label, bool selected, VoidCallback onTap) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected
+              ? _blue
+              : (isDark ? const Color(0xFF1E293B) : Colors.white),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? _blue : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: selected ? Colors.white : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+          ),
+        ),
+      ),
     );
   }
 

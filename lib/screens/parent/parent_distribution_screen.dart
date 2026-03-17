@@ -752,19 +752,30 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Parse do código - formato esperado: LUMMY-{childId}-{amount}
-    // ou apenas um link/código simples
+    // Parse do código - formatos aceitos:
+    // LUMMYREQ-{childId}-{amount}-{requestTransactionId}
+    // LUMMY-{childId}-{amount}
     try {
       double? amount;
       String? childId;
+      String? requestTransactionId;
 
-      if (code.startsWith('LUMMY-')) {
+      if (code.startsWith('LUMMYREQ-')) {
+        final parts = code.split('-');
+        if (parts.length >= 4) {
+          childId = parts[1];
+          amount = double.tryParse(parts[2]);
+          requestTransactionId = parts[3];
+        }
+      } else if (code.startsWith('LUMMY-')) {
         final parts = code.split('-');
         if (parts.length >= 3) {
           childId = parts[1];
           amount = double.tryParse(parts[2]);
         }
       }
+      final parsedAmount = amount;
+      final parsedChildId = childId;
 
       // Mostrar dialog de confirmação
       showDialog(
@@ -857,18 +868,25 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                 ),
               ),
             ),
-            if (amount != null && childId != null)
+            if (parsedAmount != null && parsedChildId != null)
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context);
-                  context.read<ParentDashboardCubit>().transferToChild(
-                    childId!,
-                    amount!,
-                  );
+                  if (requestTransactionId != null &&
+                      requestTransactionId.isNotEmpty) {
+                    await context.read<ParentDashboardCubit>().approveTransaction(
+                      requestTransactionId,
+                    );
+                  } else {
+                    await context.read<ParentDashboardCubit>().transferToChild(
+                      parsedChildId,
+                      parsedAmount,
+                    );
+                  }
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Enviado ${AppFormatters.formatCurrency(amount)} com sucesso! 🎉',
+                        'Enviado ${AppFormatters.formatCurrency(parsedAmount)} com sucesso! 🎉',
                       ),
                       backgroundColor: const Color(0xFF10B981),
                       behavior: SnackBarBehavior.floating,
@@ -985,17 +1003,49 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
           // Quick amount buttons - Design moderno
           Row(
             children: [
-              Expanded(child: _buildQuickAmountChip(10.0, _orange, isDark)),
+              Expanded(
+                child: _buildQuickAmountChip(
+                  context,
+                  state,
+                  10.0,
+                  _orange,
+                  isDark,
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _buildQuickAmountChip(20.0, _amber, isDark)),
+              Expanded(
+                child: _buildQuickAmountChip(
+                  context,
+                  state,
+                  20.0,
+                  _amber,
+                  isDark,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(child: _buildQuickAmountChip(50.0, _blue, isDark)),
+              Expanded(
+                child: _buildQuickAmountChip(
+                  context,
+                  state,
+                  50.0,
+                  _blue,
+                  isDark,
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _buildQuickAmountChip(100.0, _purple, isDark)),
+              Expanded(
+                child: _buildQuickAmountChip(
+                  context,
+                  state,
+                  100.0,
+                  _purple,
+                  isDark,
+                ),
+              ),
             ],
           ),
         ],
@@ -1003,13 +1053,17 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
     );
   }
 
-  Widget _buildQuickAmountChip(double amount, Color color, bool isDark) {
+  Widget _buildQuickAmountChip(
+    BuildContext context,
+    ParentDashboardState state,
+    double amount,
+    Color color,
+    bool isDark,
+  ) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          // Lógica de envio rápido
-        },
+        onTap: () => _openQuickSendDialog(context, state, amount),
         borderRadius: BorderRadius.circular(14),
         child: Container(
           height: 86,
@@ -1056,5 +1110,85 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _openQuickSendDialog(
+    BuildContext context,
+    ParentDashboardState state,
+    double amount,
+  ) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (state.children.isEmpty) return;
+    if (amount > state.walletBalance) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Saldo insuficiente para envio rápido.')),
+      );
+      return;
+    }
+
+    String selectedChildId = state.children.first.id;
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Envio rápido ${AppFormatters.formatCurrency(amount)}',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                ),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                initialValue: selectedChildId,
+                items: state.children
+                    .map(
+                      (child) =>
+                          DropdownMenuItem(value: child.id, child: Text(child.name)),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) selectedChildId = value;
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Selecionar filho',
+                ),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(sheetContext).pop(true),
+                  child: const Text('Enviar agora'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (confirmed == true && context.mounted) {
+      context.read<ParentDashboardCubit>().transferToChild(selectedChildId, amount);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Enviado ${AppFormatters.formatCurrency(amount)} com sucesso!',
+          ),
+        ),
+      );
+    }
   }
 }

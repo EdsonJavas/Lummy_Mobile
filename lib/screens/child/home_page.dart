@@ -11,6 +11,7 @@ import 'package:lummy_login/screens/child/claim_share_screen.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lummy_login/utils/supabase_test.dart';
+import 'package:lummy_login/utils/child_money_notification.dart';
 import 'package:lummy_login/screens/child/profile_page.dart';
 import 'package:lummy_login/screens/child/daily_missions_screen.dart';
 
@@ -33,6 +34,10 @@ class _HomePageState extends State<HomePage> {
   bool hasActiveGoal = false;
   int _earnedMissionPoints = 0;
   RealtimeChannel? _goalsChannel;
+  RealtimeChannel? _balanceChannel;
+  RealtimeChannel? _customMissionsChannel;
+  RealtimeChannel? _dailyMissionsChannel;
+  RealtimeChannel? _achievementsChannel;
   bool _isLoading = true;
   bool _isClaimContextLoading = false;
   String? _activeDistributionId;
@@ -314,6 +319,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _initializeData() async {
     setState(() => _isLoading = true);
     try {
+      await initChildMoneyNotifications();
       await Future.wait([
         _loadUserName(),
         _loadEarnedPoints(),
@@ -336,6 +342,91 @@ class _HomePageState extends State<HomePage> {
       final user = supabase.auth.currentUser;
       if (user == null) return;
 
+      _balanceChannel = supabase
+          .channel('public:children:balance:${user.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'children',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'id',
+              value: user.id,
+            ),
+            callback: (payload) {
+              // Usar o payload em tempo real para notificar na hora (não depender de nova consulta)
+              try {
+                final newRecord = payload.newRecord;
+                final newBalance =
+                    (newRecord['balance'] as num?)?.toDouble() ?? 0.0;
+                if (mounted) {
+                  setState(() => currentBalance = newBalance);
+                  checkAndNotifyBalanceIncrease(newBalance);
+                }
+              } catch (_) {}
+              _loadBalance();
+            },
+          )
+          .subscribe();
+
+      _customMissionsChannel = supabase
+          .channel('public:custom_missions:child_${user.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'custom_missions',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'child_id',
+              value: user.id,
+            ),
+            callback: (_) {
+              showChildEventNotification(
+                id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+                title: 'Nova missão adicionada! 🎯',
+                body: 'Seu responsável criou uma missão para você.',
+              );
+            },
+          )
+          .subscribe();
+
+      _dailyMissionsChannel = supabase
+          .channel('public:daily_missions:child_${user.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'daily_missions',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'child_id',
+              value: user.id,
+            ),
+            callback: (_) {
+              showChildEventNotification(
+                id: DateTime.now().millisecondsSinceEpoch ~/ 1000 + 1,
+                title: 'Missão do dia recebida! ✅',
+                body: 'Você recebeu uma nova missão diária.',
+              );
+            },
+          )
+          .subscribe();
+
+      _achievementsChannel = supabase
+          .channel('public:achievements:new')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'achievements',
+            callback: (_) {
+              showChildEventNotification(
+                id: DateTime.now().millisecondsSinceEpoch ~/ 1000 + 2,
+                title: 'Nova conquista disponível! 🏆',
+                body: 'Seu responsável adicionou uma nova conquista.',
+              );
+            },
+          )
+          .subscribe();
+
       _goalsChannel = supabase
           .channel('public:goals:child_${user.id}')
           .onPostgresChanges(
@@ -347,7 +438,14 @@ class _HomePageState extends State<HomePage> {
               column: 'child_id',
               value: user.id,
             ),
-            callback: (payload) => _loadGoal(),
+            callback: (payload) {
+              _loadGoal();
+              showChildEventNotification(
+                id: DateTime.now().millisecondsSinceEpoch ~/ 1000 + 3,
+                title: 'Nova meta criada! 🚀',
+                body: 'Seu responsável adicionou uma nova meta.',
+              );
+            },
           )
           .onPostgresChanges(
             event: PostgresChangeEvent.update,
@@ -380,6 +478,18 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     try {
+      if (_balanceChannel != null) {
+        Supabase.instance.client.removeChannel(_balanceChannel!);
+      }
+      if (_customMissionsChannel != null) {
+        Supabase.instance.client.removeChannel(_customMissionsChannel!);
+      }
+      if (_dailyMissionsChannel != null) {
+        Supabase.instance.client.removeChannel(_dailyMissionsChannel!);
+      }
+      if (_achievementsChannel != null) {
+        Supabase.instance.client.removeChannel(_achievementsChannel!);
+      }
       if (_goalsChannel != null) {
         Supabase.instance.client.removeChannel(_goalsChannel!);
       }
@@ -632,6 +742,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         currentBalance = bal;
       });
+      await checkAndNotifyBalanceIncrease(bal);
 
       // Sincronizar meta com o novo balance
       if (hasActiveGoal) {

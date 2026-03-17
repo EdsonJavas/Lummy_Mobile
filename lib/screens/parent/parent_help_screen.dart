@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Tela de Ajuda: explicações por títulos e temas das principais funcionalidades do app.
+/// Central de Ajuda (FAQ): perguntas frequentes expandíveis.
 class ParentHelpScreen extends StatelessWidget {
   const ParentHelpScreen({super.key});
 
@@ -9,6 +9,49 @@ class ParentHelpScreen extends StatelessWidget {
   static const _blue = Color(0xFF3B82F6);
   static const _green = Color(0xFF10B981);
   static const _orange = Color(0xFFF59E0B);
+
+  static final List<Map<String, dynamic>> _faqItems = [
+    {
+      'q': 'Como funciona o Lummy para responsáveis?',
+      'a': 'No Lummy você controla o saldo da família e envia dinheiro para os filhos. '
+          'Defina mesadas, aprove ou rejeite pedidos (incluindo o motivo) e acompanhe gastos e metas por criança.',
+    },
+    {
+      'q': 'O que as crianças podem fazer no app?',
+      'a': 'Os filhos usam o app para ver saldo, pedir dinheiro (informando o motivo), registrar gastos '
+          '(que podem exigir sua aprovação), cumprir metas e acompanhar aulas de educação financeira.',
+    },
+    {
+      'q': 'Como enviar dinheiro para meus filhos?',
+      'a': 'O saldo da família é o valor disponível para enviar. Use "Enviar" ou "Distribuir" para repassar valores. '
+          'O saldo diminui ao enviar e pode ser ocultado com o ícone de olho no card.',
+    },
+    {
+      'q': 'Como funcionam as aprovações?',
+      'a': 'Quando um filho faz um pedido de dinheiro ou um gasto que exige aprovação, aparece em "Aprovações". '
+          'Você vê o motivo e pode aprovar ou rejeitar. Pendentes aparecem no dashboard e no menu inferior.',
+    },
+    {
+      'q': 'O que são as metas de economia?',
+      'a': 'Crie metas de economia por filho. O valor guardado para a meta fica separado do saldo disponível. '
+          'Acompanhe o progresso na área de metas e no painel de cada criança.',
+    },
+    {
+      'q': 'Como ver gastos e relatórios?',
+      'a': 'Visualize gastos por filho e por categoria. Use a aba de gastos e os insights para entender '
+          'para onde vai o dinheiro e orientar a educação financeira.',
+    },
+    {
+      'q': 'Onde ficam as aulas de educação financeira?',
+      'a': 'O Lummy oferece conteúdo em formato de aulas. As crianças podem assistir e ganhar conquistas; '
+          'você acompanha o progresso no perfil do dependente.',
+    },
+    {
+      'q': 'Esqueci minha senha. O que fazer?',
+      'a': 'Na tela de login, toque em "Esqueci minha senha" e informe seu e-mail. '
+          'Você receberá um link para redefinir a senha.',
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +68,7 @@ class ParentHelpScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: Text(
-          'Ajuda',
+          'Central de Ajuda',
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -35,161 +78,60 @@ class ParentHelpScreen extends StatelessWidget {
         iconTheme: IconThemeData(color: titleColor),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          _HelpSection(
-            icon: Icons.family_restroom_rounded,
-            iconColor: _purple,
-            title: 'Para responsáveis',
-            body:
-                'No Lummy você controla o saldo da família e envia dinheiro para os filhos. '
-                'Defina mesadas, aprove ou rejeite pedidos de compra e acompanhe gastos e metas por criança.',
-            bg: sectionBg,
-            borderColor: borderColor,
-            titleStyle: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-            ),
-            bodyStyle: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: bodyColor,
-              height: 1.45,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _HelpSection(
-            icon: Icons.child_care_rounded,
-            iconColor: _blue,
-            title: 'Para as crianças',
-            body:
-                'Os filhos usam o app para ver saldo, fazer pedidos de compra (que podem exigir sua aprovação), '
-                'cumprir metas e acompanhar aulas de educação financeira.',
-            bg: sectionBg,
-            borderColor: borderColor,
-            titleStyle: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-            ),
-            bodyStyle: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: bodyColor,
-              height: 1.45,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [_purple, _blue],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.help_outline_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    'Perguntas frequentes',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          _HelpSection(
-            icon: Icons.account_balance_wallet_rounded,
-            iconColor: _green,
-            title: 'Saldo e envio',
-            body:
-                'O saldo da família (responsável) é o valor disponível para enviar aos filhos. '
-                'Use "Enviar" ou "Distribuir" para repassar valores. O saldo diminui ao enviar e pode ser ocultado com o ícone de olho no card.',
-            bg: sectionBg,
-            borderColor: borderColor,
-            titleStyle: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-            ),
-            bodyStyle: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: bodyColor,
-              height: 1.45,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _HelpSection(
-            icon: Icons.pending_actions_rounded,
-            iconColor: _orange,
-            title: 'Aprovações',
-            body:
-                'Quando um filho faz um pedido de compra que exige aprovação, ele aparece em "Aprovações". '
-                'Você pode aprovar ou rejeitar. Aprovações pendentes aparecem no dashboard e no menu inferior.',
-            bg: sectionBg,
-            borderColor: borderColor,
-            titleStyle: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-            ),
-            bodyStyle: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: bodyColor,
-              height: 1.45,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _HelpSection(
-            icon: Icons.flag_rounded,
-            iconColor: _purple,
-            title: 'Metas',
-            body:
-                'Crie metas de economia por filho. O valor guardado para a meta fica separado do saldo disponível. '
-                'Acompanhe o progresso na área de metas e no painel de cada criança.',
-            bg: sectionBg,
-            borderColor: borderColor,
-            titleStyle: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-            ),
-            bodyStyle: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: bodyColor,
-              height: 1.45,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _HelpSection(
-            icon: Icons.receipt_long_rounded,
-            iconColor: _blue,
-            title: 'Gastos e relatórios',
-            body:
-                'Visualize gastos por filho e por categoria. Use a aba de gastos e os insights para entender para onde vai o dinheiro '
-                'e orientar a educação financeira.',
-            bg: sectionBg,
-            borderColor: borderColor,
-            titleStyle: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-            ),
-            bodyStyle: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: bodyColor,
-              height: 1.45,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _HelpSection(
-            icon: Icons.school_rounded,
-            iconColor: _green,
-            title: 'Aulas e educação',
-            body:
-                'O Lummy oferece conteúdo de educação financeira em formato de aulas. '
-                'As crianças podem assistir e ganhar conquistas; você acompanha o progresso no perfil do dependente.',
-            bg: sectionBg,
-            borderColor: borderColor,
-            titleStyle: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-            ),
-            bodyStyle: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: bodyColor,
-              height: 1.45,
-            ),
-          ),
+          ..._faqItems.asMap().entries.map((entry) {
+            final i = entry.key;
+            final item = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _FaqTile(
+                question: item['q'] as String,
+                answer: item['a'] as String,
+                isDark: isDark,
+                sectionBg: sectionBg,
+                borderColor: borderColor,
+                accentColor: [
+                  _purple,
+                  _blue,
+                  _green,
+                  _orange,
+                ][i % 4],
+              ),
+            );
+          }),
           const SizedBox(height: 24),
           Center(
             child: Text(
@@ -208,60 +150,72 @@ class ParentHelpScreen extends StatelessWidget {
   }
 }
 
-class _HelpSection extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String body;
-  final Color bg;
+class _FaqTile extends StatelessWidget {
+  final String question;
+  final String answer;
+  final bool isDark;
+  final Color sectionBg;
   final Color borderColor;
-  final TextStyle titleStyle;
-  final TextStyle bodyStyle;
+  final Color accentColor;
 
-  const _HelpSection({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.body,
-    required this.bg,
+  const _FaqTile({
+    required this.question,
+    required this.answer,
+    required this.isDark,
+    required this.sectionBg,
     required this.borderColor,
-    required this.titleStyle,
-    required this.bodyStyle,
+    required this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final bodyColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bg,
+        color: sectionBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor, width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: iconColor, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(title, style: titleStyle),
-              ),
-            ],
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: accentColor.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.help_outline_rounded, color: accentColor, size: 20),
           ),
-          const SizedBox(height: 12),
-          Text(body, style: bodyStyle),
-        ],
+          title: Text(
+            question,
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: titleColor,
+            ),
+          ),
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                answer,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: bodyColor,
+                  height: 1.5,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+

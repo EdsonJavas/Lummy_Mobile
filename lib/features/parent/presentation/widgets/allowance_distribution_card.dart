@@ -104,7 +104,9 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                       ),
                     ),
                     Text(
-                      'Envie para todos ou individualmente',
+                      widget.children.length > 1
+                          ? 'Envie para todos ou individualmente'
+                          : 'Distribuição igual requer 2+ filhos',
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         color: isDark
@@ -221,6 +223,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                   icon: Icons.group_rounded,
                   gradient: const [_orange, _amber],
                   onPressed: _canSubmit
+                      && widget.children.length > 1
                       ? () async {
                           final amount = _parseAmount();
                           if (amount == null || amount <= 0) return;

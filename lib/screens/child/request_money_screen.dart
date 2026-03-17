@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy_login/shared/widgets/money_text_field.dart';
 
 class RequestMoneyScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class RequestMoneyScreen extends StatefulWidget {
 class _RequestMoneyScreenState extends State<RequestMoneyScreen>
     with TickerProviderStateMixin {
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _reasonController = TextEditingController();
   final FocusNode _amountFocusNode = FocusNode();
   double? _currentAmount;
 
@@ -34,6 +36,14 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
     super.initState();
     _setupAnimations();
     _amountController.addListener(() {
+      if (_hasGenerated) {
+        setState(() {
+          _hasGenerated = false;
+          _generatedLink = '';
+        });
+      }
+    });
+    _reasonController.addListener(() {
       if (_hasGenerated) {
         setState(() {
           _hasGenerated = false;
@@ -92,6 +102,14 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
   }
 
   Future<void> _generateRequest() async {
+    final motivo = _reasonController.text.trim();
+    if (motivo.isEmpty) {
+      _showSnackBar(
+        'Explique o motivo do pedido para seus pais',
+        isError: true,
+      );
+      return;
+    }
     if (_currentAmount == null || _currentAmount! <= 0) {
       _showSnackBar(
         'Digite um valor válido para pedir dinheiro',
@@ -104,22 +122,62 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
       _isGenerating = true;
     });
 
-    // Simular geração do link (aqui você integraria com seu backend)
-    await Future.delayed(const Duration(milliseconds: 1500));
+    try {
+      final supabase = Supabase.instance.client;
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        _showSnackBar('Faça login para continuar', isError: true);
+        setState(() => _isGenerating = false);
+        return;
+      }
 
-    // Gerar link único baseado no valor e timestamp
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final link =
-        'https://lummy.app/request/$timestamp/${_currentAmount!.toStringAsFixed(2)}';
+      final childRow = await supabase
+          .from('children')
+          .select('responsavel_id')
+          .eq('id', user.id)
+          .maybeSingle();
 
-    setState(() {
-      _generatedLink = link;
-      _hasGenerated = true;
-      _isGenerating = false;
-    });
+      final parentId = childRow?['responsavel_id'] as String?;
+      if (parentId == null || parentId.isEmpty) {
+        _showSnackBar('Responsável não encontrado', isError: true);
+        setState(() => _isGenerating = false);
+        return;
+      }
 
-    _qrController.forward();
-    _showSnackBar('Link gerado com sucesso! 🎉');
+      final inserted = await supabase
+          .from('transactions')
+          .insert({
+        'child_id': user.id,
+        'parent_id': parentId,
+        'amount': _currentAmount!,
+        'type': 'income',
+        'description': motivo,
+        'category': 'Pedido',
+        'status': 'pending',
+        'date': DateTime.now().toIso8601String(),
+      })
+          .select('id')
+          .single();
+
+      final requestId = inserted['id'] as String;
+      final link =
+          'LUMMYREQ-${user.id}-${_currentAmount!.toStringAsFixed(2)}-$requestId';
+
+      if (mounted) {
+        setState(() {
+          _generatedLink = link;
+          _hasGenerated = true;
+          _isGenerating = false;
+        });
+        _qrController.forward();
+        _showSnackBar('Solicitação enviada! O responsável vai ver em Aprovações.');
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isGenerating = false);
+        _showSnackBar('Erro ao enviar. Tente novamente.', isError: true);
+      }
+    }
   }
 
   Future<void> _copyToClipboard() async {
@@ -155,6 +213,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
     _slideController.dispose();
     _qrController.dispose();
     _amountController.dispose();
+    _reasonController.dispose();
     _amountFocusNode.dispose();
     super.dispose();
   }
@@ -186,6 +245,11 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
 
                     // Input de valor
                     _buildAmountInput(isSmallScreen),
+
+                    const SizedBox(height: 20),
+
+                    // Motivo do pedido
+                    _buildReasonInput(isSmallScreen),
 
                     const SizedBox(height: 32),
 
@@ -353,6 +417,101 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             fontSize: isSmallScreen ? 20 : 24,
             fontWeight: FontWeight.w600,
             textAlign: TextAlign.start,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReasonInput(bool isSmallScreen) {
+    return Container(
+      padding: EdgeInsets.all(isSmallScreen ? 20.0 : 24.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF2D3748)
+              : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B82F6).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: Color(0xFF3B82F6),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Por que você precisa?',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 16 : 18,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Explique o motivo para seus pais',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 12 : 14,
+                        fontWeight: FontWeight.w400,
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: _reasonController,
+            maxLines: 3,
+            minLines: 2,
+            decoration: InputDecoration(
+              hintText: 'Ex: Para comprar material escolar para a aula de arte...',
+              hintStyle: GoogleFonts.poppins(
+                fontSize: isSmallScreen ? 13 : 14,
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
+              filled: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFE2E8F0),
+                ),
+              ),
+            ),
+            style: GoogleFonts.poppins(fontSize: isSmallScreen ? 14 : 15),
           ),
         ],
       ),

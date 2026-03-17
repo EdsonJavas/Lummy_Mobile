@@ -63,6 +63,8 @@ class AppConstants {
 
   // Emojis de categorias
   static const Map<String, String> categoryEmojis = {
+    'Pedido': '💵',
+    'Mesada': '💰',
     'Alimentação': '🍔',
     'Doces': '🍭',
     'Brinquedos': '🧸',

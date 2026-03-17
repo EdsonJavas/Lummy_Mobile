@@ -8,6 +8,7 @@ import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/screens/auth/login_screen.dart';
 import 'package:lummy_login/screens/child/main_navigation.dart';
 import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
+import 'package:lummy_login/screens/app/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -158,10 +159,14 @@ class _SplashScreenState extends State<SplashScreen>
       }
 
       if (!mounted) return;
+      final showOnboarding = !await OnboardingScreen.hasCompleted();
+      final targetPage = showOnboarding
+          ? OnboardingScreen(nextPage: nextPage)
+          : nextPage;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 600),
-          pageBuilder: (_, __, ___) => nextPage,
+          pageBuilder: (_, __, ___) => targetPage,
           transitionsBuilder: (_, anim, __, child) {
             return FadeTransition(
               opacity: CurvedAnimation(parent: anim, curve: Curves.easeInOut),

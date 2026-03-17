@@ -6,6 +6,9 @@ import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/domain/repositories/auth_repository.dart';
 import 'package:lummy_login/application/app_facade.dart';
 import 'package:lummy_login/screens/auth/login_screen.dart';
+import 'package:lummy_login/screens/parent/parent_change_password_screen.dart';
+import 'package:lummy_login/screens/parent/parent_help_screen.dart';
+import 'package:lummy_login/screens/parent/parent_notifications_screen.dart';
 
 class ParentSettingsScreen extends StatelessWidget {
   const ParentSettingsScreen({super.key});
@@ -18,66 +21,163 @@ class ParentSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Text(
-          'Configurações',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: titleColor,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.fromLTRB(
+                20,
+                MediaQuery.of(context).padding.top + 12,
+                20,
+                24,
+              ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [const Color(0xFF2E1065), const Color(0xFF4C1D95)]
+                      : [_blue, _purple],
+                ),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(
+                          Icons.settings_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Configurações',
+                        style: GoogleFonts.poppins(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Conta, preferências e segurança',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withValues(alpha: 0.92),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        iconTheme: IconThemeData(color: titleColor),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-        children: [
-          _buildThemeToggle(context, isDark),
-          const SizedBox(height: 20),
-          _buildSettingItem(
-            context: context,
-            icon: Icons.notifications_rounded,
-            title: 'Notificações',
-            subtitle: 'Gerenciar alertas de aprovações e movimentações',
-            color: _orange,
-            isDark: isDark,
-            onTap: () => _showComingSoon(context),
-          ),
-          const SizedBox(height: 12),
-          _buildSettingItem(
-            context: context,
-            icon: Icons.lock_outline_rounded,
-            title: 'Privacidade',
-            subtitle: 'Controle de segurança da conta',
-            color: _blue,
-            isDark: isDark,
-            onTap: () => _showComingSoon(context),
-          ),
-          const SizedBox(height: 12),
-          _buildSettingItem(
-            context: context,
-            icon: Icons.help_outline_rounded,
-            title: 'Central de Ajuda',
-            subtitle: 'FAQ e suporte',
-            color: _blue,
-            isDark: isDark,
-            onTap: () => _showComingSoon(context),
-          ),
-          const SizedBox(height: 12),
-          _buildSettingItem(
-            context: context,
-            icon: Icons.logout_rounded,
-            title: 'Sair da Conta',
-            subtitle: 'Desconectar deste dispositivo',
-            color: _red,
-            isDark: isDark,
-            onTap: () => _handleLogout(context, isDark),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _buildThemeToggle(context, isDark),
+                const SizedBox(height: 20),
+                _buildSectionLabel('Conta', isDark),
+                const SizedBox(height: 10),
+                _buildSectionContainer(
+                  isDark: isDark,
+                  children: [
+                    _buildSettingItem(
+                      context: context,
+                      icon: Icons.lock_reset_rounded,
+                      title: 'Alterar senha',
+                      subtitle: 'Alterar sua senha de acesso',
+                      color: _purple,
+                      isDark: isDark,
+                      onTap: () => _openChangePassword(context),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildSettingItem(
+                      context: context,
+                      icon: Icons.lock_outline_rounded,
+                      title: 'Privacidade',
+                      subtitle: 'Controle de segurança da conta',
+                      color: _blue,
+                      isDark: isDark,
+                      onTap: () => _showComingSoon(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                _buildSectionLabel('Preferências', isDark),
+                const SizedBox(height: 10),
+                _buildSectionContainer(
+                  isDark: isDark,
+                  children: [
+                _buildSettingItem(
+                      context: context,
+                      icon: Icons.notifications_rounded,
+                      title: 'Notificações',
+                      subtitle: 'Gerenciar alertas de aprovações e movimentações',
+                      color: _orange,
+                      isDark: isDark,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ParentNotificationsScreen(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                _buildSectionLabel('Suporte', isDark),
+                const SizedBox(height: 10),
+                _buildSectionContainer(
+                  isDark: isDark,
+                  children: [
+                    _buildSettingItem(
+                      context: context,
+                      icon: Icons.help_outline_rounded,
+                      title: 'Central de Ajuda',
+                      subtitle: 'FAQ e suporte',
+                      color: _blue,
+                      isDark: isDark,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ParentHelpScreen(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildSettingItem(
+                      context: context,
+                      icon: Icons.logout_rounded,
+                      title: 'Sair da Conta',
+                      subtitle: 'Desconectar deste dispositivo',
+                      color: _red,
+                      isDark: isDark,
+                      onTap: () => _handleLogout(context, isDark),
+                    ),
+                  ],
+                ),
+              ]),
+            ),
           ),
         ],
       ),
@@ -225,6 +325,43 @@ class ParentSettingsScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label, bool isDark) {
+    return Text(
+      label,
+      style: GoogleFonts.poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+      ),
+    );
+  }
+
+  Widget _buildSectionContainer({
+    required bool isDark,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  void _openChangePassword(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ParentChangePasswordScreen(),
       ),
     );
   }
