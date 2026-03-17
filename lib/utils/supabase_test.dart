@@ -61,6 +61,7 @@ class SupabaseTest {
               .eq('id', user.id)
               .maybeSingle();
           results['rls_responsaveis'] = true;
+          results['rls_responsaveis_found'] = ownData != null;
           debugPrint('✅ RLS permite acesso a responsaveis');
         } catch (e) {
           results['rls_responsaveis'] = false;
@@ -75,6 +76,7 @@ class SupabaseTest {
               .eq('id', user.id)
               .maybeSingle();
           results['rls_children'] = true;
+          results['rls_children_found'] = ownChildren != null;
           debugPrint('✅ RLS permite acesso a children');
         } catch (e) {
           results['rls_children'] = false;

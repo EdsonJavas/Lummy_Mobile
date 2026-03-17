@@ -92,41 +92,6 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
     return formatter.format(value).trim();
   }
 
-  double? _parseCurrency(String text) {
-    if (text.isEmpty) return null;
-
-    // Remove tudo exceto números, vírgula e ponto
-    final cleanText = text.replaceAll(RegExp(r'[^\d,.]'), '');
-
-    if (cleanText.isEmpty) return null;
-
-    // Se tem vírgula, trata como decimal brasileiro
-    if (cleanText.contains(',')) {
-      final parts = cleanText.split(',');
-      if (parts.length == 2) {
-        final integerPart = parts[0].replaceAll('.', '');
-        final decimalPart = parts[1];
-        return double.tryParse('$integerPart.$decimalPart');
-      }
-    }
-
-    // Se tem ponto, pode ser decimal americano ou separador de milhares
-    if (cleanText.contains('.')) {
-      final parts = cleanText.split('.');
-      if (parts.length == 2 && parts[1].length <= 2) {
-        // Decimal americano
-        return double.tryParse(cleanText);
-      } else {
-        // Separador de milhares
-        final number = cleanText.replaceAll('.', '');
-        return double.tryParse(number);
-      }
-    }
-
-    // Apenas números
-    return double.tryParse(cleanText);
-  }
-
   void _onTextChanged(String value) {
     // Comportamento de digitação por centavos: "1" -> "0,01", "12" -> "0,12", "123" -> "1,23"
     // Mantemos apenas dígitos e convertemos para double dividindo por 100
