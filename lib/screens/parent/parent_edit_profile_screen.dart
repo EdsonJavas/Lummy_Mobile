@@ -230,7 +230,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
                                 shape: BoxShape.circle,
                                 border: Border.all(color: _purple, width: 2),
                               ),
-                              child: Icon(Icons.person_rounded, size: 48, color: _purple),
+                              child: const Icon(Icons.person_rounded, size: 48, color: _purple),
                             ),
                       if (_isUploadingAvatar)
                         const Positioned.fill(
@@ -238,7 +238,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
                             child: SizedBox(
                               width: 32,
                               height: 32,
-                              child: const CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           ),
                         )

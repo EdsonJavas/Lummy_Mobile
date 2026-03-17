@@ -538,7 +538,7 @@ class _LessonThumbnailCard extends StatelessWidget {
                       width: cardWidth ?? double.infinity,
                       height: fullWidth ? 180 : (isContinueWatching ? 120 : 94),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         width: cardWidth ?? double.infinity,
                         height: fullWidth ? 180 : (isContinueWatching ? 120 : 94),
                         color: placeholderBg,

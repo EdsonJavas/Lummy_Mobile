@@ -45,10 +45,10 @@ class ParentAnalyticsPanels extends StatelessWidget {
               )
             else ...[
               trendCard,
-              SizedBox(height: spacing),
+              const SizedBox(height: spacing),
               categoryCard,
             ],
-            SizedBox(height: spacing),
+            const SizedBox(height: spacing),
             _buildGoalsCard(context),
           ],
         );

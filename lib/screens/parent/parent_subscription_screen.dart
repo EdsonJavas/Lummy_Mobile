@@ -406,7 +406,7 @@ class _PlanCard extends StatelessWidget {
               ),
             ),
           ),
-          if (footer != null) footer!,
+          ?footer,
         ],
       ),
     );

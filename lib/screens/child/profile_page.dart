@@ -8,7 +8,6 @@ import 'package:lummy_login/screens/auth/login_screen.dart';
 import 'package:lummy_login/core/providers/theme_provider.dart';
 import 'package:lummy_login/screens/child/edit_profile_screen.dart';
 import 'package:lummy_login/screens/child/notifications_screen.dart';
-import 'package:lummy_login/shared/widgets/cached_avatar.dart';
 import 'package:lummy_login/shared/widgets/cached_image.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/application/app_facade.dart';
