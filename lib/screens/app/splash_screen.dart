@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lummy_login/application/app_facade.dart';
 import 'package:lummy_login/core/config/supabase_config.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/screens/auth/login_screen.dart';
@@ -113,6 +114,18 @@ class _SplashScreenState extends State<SplashScreen>
     });
   }
 
+  /// Carrega tudo que a tela de login precisa (biometria, cache) antes de sair da splash.
+  Future<void> _prepareLoginScreen() async {
+    try {
+      final bio = locator<BiometricAuthService>();
+      await bio.canCheckBiometrics();
+      await bio.isBiometricEnabled();
+      await bio.readCachedUserId();
+    } catch (e) {
+      debugPrint('⚠️ Prep login: $e');
+    }
+  }
+
   Future<void> _bootstrap() async {
     try {
       setState(() => _loadingText = 'Conectando');
@@ -123,8 +136,12 @@ class _SplashScreenState extends State<SplashScreen>
       );
       setState(() => _loadingText = 'Configurando');
       setupLocator();
+
+      setState(() => _loadingText = 'Preparando tela de login');
+      await _prepareLoginScreen();
+
       setState(() => _loadingText = 'Quase pronto');
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 400));
 
       final client = Supabase.instance.client;
       final session = client.auth.currentSession;
