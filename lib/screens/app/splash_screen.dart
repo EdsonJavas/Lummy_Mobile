@@ -177,6 +177,7 @@ class _SplashScreenState extends State<SplashScreen>
 
       if (!mounted) return;
       final showOnboarding = !await OnboardingScreen.hasCompleted();
+      if (!mounted) return;
       final targetPage = showOnboarding
           ? OnboardingScreen(nextPage: nextPage)
           : nextPage;

@@ -131,37 +131,9 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
         return;
       }
 
-      final childRow = await supabase
-          .from('children')
-          .select('responsavel_id')
-          .eq('id', user.id)
-          .maybeSingle();
-
-      final parentId = childRow?['responsavel_id'] as String?;
-      if (parentId == null || parentId.isEmpty) {
-        _showSnackBar('Responsável não encontrado', isError: true);
-        setState(() => _isGenerating = false);
-        return;
-      }
-
-      final inserted = await supabase
-          .from('transactions')
-          .insert({
-        'child_id': user.id,
-        'parent_id': parentId,
-        'amount': _currentAmount!,
-        'type': 'income',
-        'description': motivo,
-        'category': 'Pedido',
-        'status': 'pending',
-        'date': DateTime.now().toIso8601String(),
-      })
-          .select('id')
-          .single();
-
-      final requestId = inserted['id'] as String;
+      // Não cria pedido para aprovar: a única forma de pedir é pelo QR. O responsável escaneia e envia na hora.
       final link =
-          'LUMMYREQ-${user.id}-${_currentAmount!.toStringAsFixed(2)}-$requestId';
+          'LUMMY-${user.id}-${_currentAmount!.toStringAsFixed(2)}';
 
       if (mounted) {
         setState(() {
@@ -170,12 +142,12 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
           _isGenerating = false;
         });
         _qrController.forward();
-        _showSnackBar('Solicitação enviada! O responsável vai ver em Aprovações.');
+        _showSnackBar('QR Code gerado! Peça ao responsável para escanear e enviar o valor.');
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isGenerating = false);
-        _showSnackBar('Erro ao enviar. Tente novamente.', isError: true);
+        _showSnackBar('Erro ao gerar. Tente novamente.', isError: true);
       }
     }
   }

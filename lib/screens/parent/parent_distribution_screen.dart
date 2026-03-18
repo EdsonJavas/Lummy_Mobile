@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +11,7 @@ import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_c
 import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_state.dart';
 import 'package:lummy_login/features/parent/presentation/widgets/allowance_distribution_card.dart';
 import 'package:lummy_login/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
+import 'package:lummy_login/screens/parent/parent_qr_payment_screen.dart';
 
 class ParentDistributionScreen extends StatefulWidget {
   const ParentDistributionScreen({super.key});
@@ -441,14 +443,17 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
   }
 
   void _openQRScanner(BuildContext context, ParentDashboardState state) {
+    // Usar o contexto da tela (tem BlocProvider); o sheet usa outro contexto.
+    final parentContext = context;
+    final cubit = context.read<ParentDashboardCubit>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.85,
+      builder: (sheetContext) => Container(
+        height: MediaQuery.of(sheetContext).size.height * 0.85,
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: const BorderRadius.only(
@@ -511,7 +516,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(sheetContext),
                     icon: Icon(
                       Icons.close_rounded,
                       color: isDark ? const Color(0xFFCBD5E1) : Colors.black45,
@@ -533,8 +538,10 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     final List<Barcode> barcodes = capture.barcodes;
                     for (final barcode in barcodes) {
                       if (barcode.rawValue != null) {
-                        Navigator.pop(context);
-                        _processQRCode(context, barcode.rawValue!, state);
+                        final code = barcode.rawValue!;
+                        Navigator.pop(sheetContext);
+                        if (!parentContext.mounted) return;
+                        _processQRCodeWithCubit(parentContext, code, state, cubit);
                         break;
                       }
                     }
@@ -562,6 +569,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
   }
 
   void _showCodeInputDialog(BuildContext context, ParentDashboardState state) {
+    final parentContext = context;
+    final cubit = context.read<ParentDashboardCubit>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = TextEditingController();
 
@@ -569,9 +578,9 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
+      builder: (sheetContext) => Padding(
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
+          bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
         ),
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -703,8 +712,14 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   child: InkWell(
                     onTap: () {
                       if (controller.text.isNotEmpty) {
-                        Navigator.pop(context);
-                        _processQRCode(context, controller.text, state);
+                        Navigator.pop(sheetContext);
+                        if (!parentContext.mounted) return;
+                        _processQRCodeWithCubit(
+                          parentContext,
+                          controller.text,
+                          state,
+                          cubit,
+                        );
                       }
                     },
                     borderRadius: BorderRadius.circular(16),
@@ -745,184 +760,103 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
     );
   }
 
-  void _processQRCode(
+  void _processQRCodeWithCubit(
     BuildContext context,
     String code,
     ParentDashboardState state,
+    ParentDashboardCubit cubit,
   ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // Parse do código - formatos aceitos:
-    // LUMMYREQ-{childId}-{amount}-{requestTransactionId}
-    // LUMMY-{childId}-{amount}
+    // LUMMYREQ-{childId UUID}-{amount}-{requestId UUID} | LUMMY-{childId UUID}-{amount}
     try {
+      final codeTrimmed = code.trim();
+      if (codeTrimmed.isEmpty) {
+        _showQRInvalidSnackBar(context);
+        return;
+      }
+
       double? amount;
       String? childId;
       String? requestTransactionId;
 
-      if (code.startsWith('LUMMYREQ-')) {
-        final parts = code.split('-');
-        if (parts.length >= 4) {
-          childId = parts[1];
-          amount = double.tryParse(parts[2]);
-          requestTransactionId = parts[3];
+      bool isReasonableAmount(double? v) =>
+          v != null && v > 0 && v <= 999999.99;
+
+      int findAmountIndex(List<String> parts) {
+        for (int i = 0; i < parts.length; i++) {
+          if (parts[i].contains('.') && isReasonableAmount(double.tryParse(parts[i]))) {
+            return i;
+          }
         }
-      } else if (code.startsWith('LUMMY-')) {
-        final parts = code.split('-');
-        if (parts.length >= 3) {
-          childId = parts[1];
-          amount = double.tryParse(parts[2]);
+        for (int i = 0; i < parts.length; i++) {
+          if (isReasonableAmount(double.tryParse(parts[i]))) return i;
+        }
+        return -1;
+      }
+
+      if (codeTrimmed.startsWith('LUMMYREQ-')) {
+        final rest = codeTrimmed.substring('LUMMYREQ-'.length);
+        final parts = rest.split('-');
+        final amountIndex = findAmountIndex(parts);
+        if (amountIndex != -1 && amountIndex > 0 && amountIndex < parts.length - 1) {
+          childId = parts.sublist(0, amountIndex).join('-').trim();
+          amount = double.tryParse(parts[amountIndex]);
+          requestTransactionId = parts.sublist(amountIndex + 1).join('-').trim();
+        }
+      } else if (codeTrimmed.startsWith('LUMMY-')) {
+        final rest = codeTrimmed.substring('LUMMY-'.length);
+        final parts = rest.split('-');
+        final amountIndex = findAmountIndex(parts);
+        if (amountIndex != -1 && amountIndex > 0) {
+          childId = parts.sublist(0, amountIndex).join('-').trim();
+          amount = double.tryParse(parts[amountIndex]);
         }
       }
-      final parsedAmount = amount;
-      final parsedChildId = childId;
 
-      // Mostrar dialog de confirmação
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: _blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.qr_code_2_rounded,
-                  color: _blue,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Código detectado!',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (amount != null) ...[
-                Text(
-                  'Valor solicitado:',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  AppFormatters.formatCurrency(amount),
-                  style: GoogleFonts.poppins(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: _blue,
-                  ),
-                ),
-              ] else ...[
-                Text(
-                  'Código: $code',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Selecione o filho e o valor na seção abaixo para enviar.',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: isDark ? Colors.white70 : const Color(0xFF475569),
-                  ),
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Fechar',
-                style: GoogleFonts.poppins(
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
-                ),
+      final validAmount = amount;
+      final validChildId = childId?.isNotEmpty == true ? childId : null;
+      if (kDebugMode) {
+        debugPrint('📱 [QR] Parse: childId=$validChildId, amount=$validAmount, requestId=$requestTransactionId');
+      }
+      if (validAmount != null && validAmount > 0 &&
+          validChildId != null && validChildId.isNotEmpty) {
+        if (!context.mounted) return;
+        Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: cubit,
+              child: ParentQRPaymentScreen(
+                childId: validChildId,
+                amount: validAmount,
+                requestTransactionId: requestTransactionId,
               ),
             ),
-            if (parsedAmount != null && parsedChildId != null)
-              ElevatedButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  if (requestTransactionId != null &&
-                      requestTransactionId.isNotEmpty) {
-                    await context.read<ParentDashboardCubit>().approveTransaction(
-                      requestTransactionId,
-                    );
-                  } else {
-                    await context.read<ParentDashboardCubit>().transferToChild(
-                      parsedChildId,
-                      parsedAmount,
-                    );
-                  }
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Enviado ${AppFormatters.formatCurrency(parsedAmount)} com sucesso! 🎉',
-                      ),
-                      backgroundColor: const Color(0xFF10B981),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _blue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Enviar',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                ),
-              ),
-          ],
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Código inválido: $code'),
-          backgroundColor: const Color(0xFFEF4444),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
           ),
-        ),
-      );
+        ).then((_) {
+          if (context.mounted) cubit.refresh();
+        });
+      } else {
+        _showQRInvalidSnackBar(context);
+      }
+    } catch (e, st) {
+      debugPrint('❌ QR parse/process error: $e\n$st');
+      _showQRInvalidSnackBar(context);
     }
+  }
+
+  void _showQRInvalidSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Código inválido. Use o QR Code gerado pelo app do filho.',
+          style: GoogleFonts.poppins(),
+        ),
+        backgroundColor: const Color(0xFFEF4444),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
   }
 
   Widget _buildQuickSendSection(

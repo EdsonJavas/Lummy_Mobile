@@ -226,16 +226,15 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         .eq('id', childId);
   }
 
-  // Aprovar transação
-  Future<void> approveTransaction(String transactionId) async {
+  /// Aprova a transação. Para pedido de dinheiro (income), desconta do responsável e credita no filho.
+  /// Retorna true se aprovou com sucesso; false se falhou (ex.: saldo insuficiente).
+  Future<bool> approveTransaction(String transactionId) async {
     try {
-      // Validar entrada
       if (transactionId.isEmpty) {
         emit(state.copyWith(error: 'ID da transação inválido'));
-        return;
+        return false;
       }
 
-      // Buscar transação antes de aprovar para aplicar efeito no saldo quando necessário
       final tx = await _supabase
           .from('transactions')
           .select('id, child_id, amount, type, status')
@@ -243,7 +242,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           .maybeSingle();
       if (tx == null) {
         emit(state.copyWith(error: 'Transação não encontrada'));
-        return;
+        return false;
       }
 
       final alreadyApproved =
@@ -252,7 +251,17 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       final type = (tx['type'] as String?)?.toLowerCase() ?? '';
       final childId = (tx['child_id'] as String?) ?? '';
 
-      // Atualizar status no banco
+      // Pedido de dinheiro (income/allowance/reward): desconta do responsável e credita no filho
+      final isIncomeRequest = !alreadyApproved &&
+          childId.isNotEmpty &&
+          amount > 0 &&
+          (type == 'income' || type == 'allowance' || type == 'reward');
+      if (isIncomeRequest) {
+        final deducted = await _deductParentBalance(amount);
+        if (!deducted) return false; // saldo insuficiente; erro já emitido
+        await _creditChildBalance(childId, amount);
+      }
+
       await _supabase
           .from('transactions')
           .update({
@@ -261,27 +270,18 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           })
           .eq('id', transactionId);
 
-      // Garante crédito no saldo quando não existe trigger no banco
-      final shouldCredit = !alreadyApproved &&
-          childId.isNotEmpty &&
-          amount > 0 &&
-          (type == 'income' || type == 'allowance' || type == 'reward');
-      if (shouldCredit) {
-        await _creditChildBalance(childId, amount);
-      }
-
-      // Recarregar dados para refletir mudanças
       await refresh();
+      return true;
     } catch (e) {
       debugPrint('❌ Erro ao aprovar transação: $e');
       emit(state.copyWith(error: 'Erro ao aprovar transação: ${e.toString()}'));
+      return false;
     }
   }
 
   // Rejeitar transação
   Future<void> rejectTransaction(String transactionId, String reason) async {
     try {
-      // Validar entrada
       if (transactionId.isEmpty) {
         emit(state.copyWith(error: 'ID da transação inválido'));
         return;
@@ -292,7 +292,24 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         return;
       }
 
-      // Atualizar status no banco
+      // Buscar transação para devolver o valor ao filho (despesa já foi descontada na hora do pedido)
+      final tx = await _supabase
+          .from('transactions')
+          .select('id, child_id, amount, type, status')
+          .eq('id', transactionId)
+          .maybeSingle();
+
+      if (tx != null) {
+        final type = (tx['type'] as String?)?.toLowerCase() ?? '';
+        final status = (tx['status'] as String?)?.toLowerCase() ?? '';
+        final childId = (tx['child_id'] as String?) ?? '';
+        final amount = (tx['amount'] as num?)?.toDouble() ?? 0.0;
+        // Despesa pendente: o valor já foi descontado da criança; devolver ao rejeitar
+        if (type == 'expense' && status == 'pending' && childId.isNotEmpty && amount > 0) {
+          await _creditChildBalance(childId, amount);
+        }
+      }
+
       await _supabase
           .from('transactions')
           .update({
@@ -302,8 +319,6 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           })
           .eq('id', transactionId);
 
-      // O trigger update_child_balance vai reverter o saldo se necessário
-      // Recarregar dados para refletir mudanças
       await refresh();
     } catch (e) {
       debugPrint('❌ Erro ao rejeitar transação: $e');
@@ -311,27 +326,31 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     }
   }
 
-  // Transferir dinheiro para criança
-  Future<void> transferToChild(String childId, double amount) async {
+  /// Transfere valor do responsável para o filho.
+  /// [description] é opcional; se vazio, usa 'Transferência do responsável'.
+  /// Retorna true se a transferência foi concluída com sucesso.
+  Future<bool> transferToChild(
+    String childId,
+    double amount, {
+    String? description,
+  }) async {
     try {
-      // Validar entrada
       if (childId.isEmpty) {
         emit(state.copyWith(error: 'ID da criança inválido'));
-        return;
+        return false;
       }
 
       if (amount <= 0) {
         emit(state.copyWith(error: 'Valor deve ser maior que zero'));
-        return;
+        return false;
       }
 
       final parentId = _parentId;
       if (parentId == null) {
         emit(state.copyWith(error: 'Responsável não identificado'));
-        return;
+        return false;
       }
 
-      // Verificar se a criança existe
       final childExists = await _supabase
           .from('children')
           .select('id, balance')
@@ -340,32 +359,35 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
 
       if (childExists == null) {
         emit(state.copyWith(error: 'Criança não encontrada'));
-        return;
+        return false;
       }
 
       final hasBalance = await _deductParentBalance(amount);
-      if (!hasBalance) return;
+      if (!hasBalance) return false;
 
-      // Creditar saldo da criança diretamente (sem depender de trigger)
       await _creditChildBalance(childId, amount);
 
-      // Criar transação no banco
+      final desc = (description != null && description.trim().isNotEmpty)
+          ? description.trim()
+          : 'Transferência do responsável';
+
       await _supabase.from('transactions').insert({
         'child_id': childId,
         'parent_id': parentId,
         'amount': amount,
         'type': 'income',
-        'description': 'Transferência do responsável',
+        'description': desc,
         'category': 'Transferência',
-        'status': 'approved', // Aprovada automaticamente
+        'status': 'approved',
         'date': DateTime.now().toIso8601String(),
       });
 
-      // Recarregar dados para refletir mudanças
       await refresh();
+      return true;
     } catch (e) {
       debugPrint('❌ Erro ao transferir dinheiro: $e');
       emit(state.copyWith(error: 'Erro ao transferir dinheiro: ${e.toString()}'));
+      return false;
     }
   }
 
@@ -504,7 +526,15 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
 
       final response = await query.order('created_at', ascending: false);
 
-      return response.map<TransactionEntity>((row) {
+      // Pedir dinheiro é só via QR (não aparece em Aprovar). Exclui antigos "Pedido" + income.
+      final filtered = response.where((row) {
+        final cat = (row['category'] as String? ?? '').toLowerCase();
+        final type = (row['type'] as String? ?? '').toLowerCase();
+        final isMoneyRequestQrFlow = type == 'income' && cat == 'pedido';
+        return !isMoneyRequestQrFlow;
+      }).toList();
+
+      return filtered.map<TransactionEntity>((row) {
         return TransactionEntity(
           id: row['id'] as String,
           userId: row['child_id'] as String,

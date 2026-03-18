@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy_login/core/utils/formatters.dart';
 import 'package:lummy_login/domain/entities/user_entity.dart';
+import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/screens/parent/child_missions_manager_screen.dart';
 import 'package:lummy_login/screens/parent/child_achievements_screen.dart';
@@ -1835,89 +1837,14 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
   }
 
   Future<void> _sendMoney(double amount, String description) async {
-    try {
-      final supabase = Supabase.instance.client;
-
-      // Validar entrada
-      if (amount <= 0) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Valor deve ser maior que zero',
-                style: GoogleFonts.poppins(),
-              ),
-              backgroundColor: _red,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-          );
-        }
-        return;
-      }
-
-      // Buscar ID do responsável atual
-      final currentUser = supabase.auth.currentUser;
-      if (currentUser == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Usuário não autenticado',
-                style: GoogleFonts.poppins(),
-              ),
-              backgroundColor: _red,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-          );
-        }
-        return;
-      }
-
-      // Criar transação no banco
-      await supabase.from('transactions').insert({
-        'child_id': widget.child.id,
-        'parent_id': currentUser.id,
-        'amount': amount,
-        'type': 'income',
-        'description': description.isEmpty
-            ? 'Envio do responsável'
-            : description,
-        'category': 'Mesada',
-        'status': 'approved',
-        'date': DateTime.now().toIso8601String(),
-      });
-
-      // O trigger update_child_balance vai atualizar o saldo automaticamente
-      // Não é necessário chamar RPC ou atualizar manualmente
-
+    if (amount <= 0) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'R\$ ${amount.toStringAsFixed(2)} enviado com sucesso!',
+              'Valor deve ser maior que zero',
               style: GoogleFonts.poppins(),
             ),
-            backgroundColor: _green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        );
-        _loadChildData();
-      }
-    } catch (e) {
-      debugPrint('Erro ao enviar dinheiro: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao enviar: $e', style: GoogleFonts.poppins()),
             backgroundColor: _red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -1926,6 +1853,45 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           ),
         );
       }
+      return;
+    }
+
+    final cubit = context.read<ParentDashboardCubit>();
+    final ok = await cubit.transferToChild(
+      widget.child.id,
+      amount,
+      description: description.isEmpty ? null : description,
+    );
+
+    if (!mounted) return;
+
+    if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'R\$ ${amount.toStringAsFixed(2)} enviado com sucesso!',
+            style: GoogleFonts.poppins(),
+          ),
+          backgroundColor: _green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      );
+      _loadChildData();
+    } else {
+      final message = cubit.state.error ?? 'Erro ao enviar dinheiro.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message, style: GoogleFonts.poppins()),
+          backgroundColor: _red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      );
     }
   }
 }

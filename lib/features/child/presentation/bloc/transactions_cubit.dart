@@ -67,6 +67,7 @@ class TransactionsCubit extends Cubit<TransactionsState> {
 
   // Adicionar transação
   Future<void> addTransaction(TransactionEntity transaction) async {
+    bool deducted = false;
     try {
       // Validar entrada
       if (transaction.userId.isEmpty) {
@@ -142,10 +143,13 @@ class TransactionsCubit extends Cubit<TransactionsState> {
             return;
           }
 
-          // Definir status baseado em requires_approval
           final status = requiresApproval ? 'pending' : 'approved';
 
-          // Inserir no banco
+          if (status == 'pending') {
+            await _deductChildBalance(transaction.userId, transaction.amount);
+            deducted = true;
+          }
+
           await _supabase.from('transactions').insert({
             'child_id': transaction.userId,
             'parent_id': transaction.parentId,
@@ -158,8 +162,6 @@ class TransactionsCubit extends Cubit<TransactionsState> {
             'metadata': transaction.metadata,
           });
 
-          // Se não precisa aprovação, o trigger já atualiza o saldo
-          // Recarregar transações
           await loadTransactions(transaction.userId);
         } else {
           emit(state.copyWith(error: 'Usuário não encontrado'));
@@ -183,8 +185,44 @@ class TransactionsCubit extends Cubit<TransactionsState> {
       }
     } catch (e) {
       debugPrint('❌ Erro ao adicionar transação: $e');
+      // Rollback só se já tínhamos descontado (despesa pendente)
+      if (deducted) {
+        try {
+          await _creditChildBalance(transaction.userId, transaction.amount);
+        } catch (_) {}
+      }
       emit(state.copyWith(error: 'Erro ao adicionar transação: ${e.toString()}'));
     }
+  }
+
+  Future<void> _deductChildBalance(String childId, double amount) async {
+    if (childId.isEmpty || amount <= 0) return;
+    final row = await _supabase
+        .from('children')
+        .select('balance')
+        .eq('id', childId)
+        .maybeSingle();
+    final current = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+    final updated = double.parse((current - amount).toStringAsFixed(2));
+    await _supabase
+        .from('children')
+        .update({'balance': updated})
+        .eq('id', childId);
+  }
+
+  Future<void> _creditChildBalance(String childId, double amount) async {
+    if (childId.isEmpty || amount <= 0) return;
+    final row = await _supabase
+        .from('children')
+        .select('balance')
+        .eq('id', childId)
+        .maybeSingle();
+    final current = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+    final updated = double.parse((current + amount).toStringAsFixed(2));
+    await _supabase
+        .from('children')
+        .update({'balance': updated})
+        .eq('id', childId);
   }
 
   TransactionType _mapTransactionType(String value) {

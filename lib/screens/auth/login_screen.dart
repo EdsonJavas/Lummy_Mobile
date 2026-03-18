@@ -745,6 +745,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Ignorar erro ao limpar
       }
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

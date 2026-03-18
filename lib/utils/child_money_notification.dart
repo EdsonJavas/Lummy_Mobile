@@ -19,7 +19,7 @@ Future<void> initChildMoneyNotifications() async {
   );
   const settings = InitializationSettings(android: android, iOS: ios);
   await _plugin.initialize(
-    settings,
+    settings: settings,
     onDidReceiveNotificationResponse: (_) {},
   );
   if (Platform.isAndroid) {
@@ -62,10 +62,10 @@ Future<void> checkAndNotifyBalanceIncrease(double newBalance) async {
       );
       const details = NotificationDetails(android: android, iOS: ios);
       await _plugin.show(
-        1,
-        'Você recebeu dinheiro! 💰',
-        'Seu responsável enviou um valor para você. Confira seu saldo.',
-        details,
+        id: 1,
+        title: 'Você recebeu dinheiro! 💰',
+        body: 'Seu responsável enviou um valor para você. Confira seu saldo.',
+        notificationDetails: details,
       );
     }
     await prefs.setDouble(_prefKeyLastBalance, newBalance);
@@ -95,7 +95,12 @@ Future<void> showChildEventNotification({
       presentSound: true,
     );
     const details = NotificationDetails(android: android, iOS: ios);
-    await _plugin.show(id, title, body, details);
+    await _plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+    );
   } catch (e) {
     debugPrint('Erro ao exibir notificação: $e');
   }

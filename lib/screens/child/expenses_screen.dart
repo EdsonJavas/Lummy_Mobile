@@ -183,23 +183,35 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     await _loadData();
   }
 
-  Future<void> _saveTransactionToDatabase(
+  /// Retorna true se salvou com sucesso; false se saldo insuficiente ou erro.
+  Future<bool> _saveTransactionToDatabase(
     Map<String, dynamic> data,
   ) async {
     try {
       final user = _supabase.auth.currentUser;
-      if (user == null) return;
+      if (user == null) return false;
 
       final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
-      if (amount <= 0) return;
+      if (amount <= 0) return false;
 
       final type = (data['type'] ?? 'expense').toString();
       final categoryId = (data['categoryId'] ?? 'other').toString();
       final description =
           (data['description'] as String?)?.trim() ?? 'Transação';
 
-      // Para ganhos aprovamos direto; para gastos podemos deixar como pending
       final status = type == 'expense' ? 'pending' : 'approved';
+
+      if (type == 'expense' && status == 'pending') {
+        final childRow = await _supabase
+            .from('children')
+            .select('balance')
+            .eq('id', user.id)
+            .maybeSingle();
+        final balance = (childRow?['balance'] as num?)?.toDouble() ?? 0.0;
+        if (balance < amount) return false;
+        // Descontar primeiro; se o insert falhar, devolvemos o valor
+        await _deductChildBalance(user.id, amount);
+      }
 
       await _supabase.from('transactions').insert({
         'child_id': user.id,
@@ -210,9 +222,50 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         'status': status,
         'date': DateTime.now().toIso8601String(),
       });
+      return true;
     } catch (_) {
-      // Silencia erros aqui; a tela será recarregada no _loadData
+      // Rollback: se era despesa pendente, já descontamos — devolver o valor
+      final user = _supabase.auth.currentUser;
+      final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
+      final type = (data['type'] ?? 'expense').toString();
+      final status = type == 'expense' ? 'pending' : 'approved';
+      if (user != null && amount > 0 && type == 'expense' && status == 'pending') {
+        try {
+          await _creditChildBalance(user.id, amount);
+        } catch (_) {}
+      }
+      return false;
     }
+  }
+
+  Future<void> _deductChildBalance(String childId, double amount) async {
+    if (childId.isEmpty || amount <= 0) return;
+    final row = await _supabase
+        .from('children')
+        .select('balance')
+        .eq('id', childId)
+        .maybeSingle();
+    final current = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+    final updated = double.parse((current - amount).toStringAsFixed(2));
+    await _supabase
+        .from('children')
+        .update({'balance': updated})
+        .eq('id', childId);
+  }
+
+  Future<void> _creditChildBalance(String childId, double amount) async {
+    if (childId.isEmpty || amount <= 0) return;
+    final row = await _supabase
+        .from('children')
+        .select('balance')
+        .eq('id', childId)
+        .maybeSingle();
+    final current = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+    final updated = double.parse((current + amount).toStringAsFixed(2));
+    await _supabase
+        .from('children')
+        .update({'balance': updated})
+        .eq('id', childId);
   }
 
   void _applyFilters() {
@@ -395,8 +448,21 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           );
 
           if (result != null && mounted) {
-            await _saveTransactionToDatabase(result);
+            final ok = await _saveTransactionToDatabase(result);
+            if (!mounted) return;
             await _loadData();
+            if (!ok && mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Saldo insuficiente ou erro ao registrar. Tente novamente.',
+                    style: GoogleFonts.poppins(),
+                  ),
+                  backgroundColor: const Color(0xFFEF4444),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
           }
         },
         backgroundColor: const Color(0xFFF59E0B),
