@@ -114,6 +114,9 @@ class AppConstants {
   static const String errorNetwork = 'Erro de conexão. Verifique sua internet.';
   static const String errorAuth = 'Erro de autenticação. Faça login novamente.';
 
+  /// Plano **Lummy For You**: máximo de dependentes. Acima disso, o indicado é **Lummy Pro** (ilimitado).
+  static const int lummyForYouMaxChildren = 3;
+
   // Validações
   static const int minPasswordLength = 6;
   static const int minNameLength = 2;

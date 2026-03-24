@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy_login/core/constants/app_constants.dart';
 
 class ParentSubscriptionScreen extends StatefulWidget {
   const ParentSubscriptionScreen({super.key});
@@ -12,6 +13,12 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
   int _childrenCount = 2;
 
   double get _forYouPrice => 19.9 + (_childrenCount * 9.9);
+
+  List<String> get _lummyForYouFeatures => [
+        'Até ${AppConstants.lummyForYouMaxChildren} filhos no plano',
+        'Preço proporcional ao número de filhos',
+        'Mesmo controle financeiro por filho',
+      ];
 
   static String _formatPrice(double value) {
     final s = value.toStringAsFixed(2);
@@ -102,11 +109,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
             subtitle: 'Você paga conforme a quantidade de filhos',
             badge: 'Seu plano atual',
             priceLabel: '${_formatPrice(_forYouPrice)}/mês',
-            features: const [
-              'Preço proporcional ao número de filhos',
-              'Ideal para famílias menores',
-              'Mesmo controle financeiro por filho',
-            ],
+            features: _lummyForYouFeatures,
             gradient: const [Color(0xFFF59E0B), Color(0xFFFB7185)],
             isDark: isDark,
             footer: _buildChildrenSelector(isDark, titleColor, subtitleColor),
@@ -132,7 +135,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Dica: com muitos filhos, o LummyPro tende a compensar mais.',
+                    'Lummy For You inclui até ${AppConstants.lummyForYouMaxChildren} filhos. Do 4º em diante, o Lummy Pro é o plano certo.',
                     style: GoogleFonts.poppins(
                       color: subtitleColor,
                       fontSize: 12,
@@ -249,8 +252,8 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
             child: Slider(
               value: _childrenCount.toDouble(),
               min: 1,
-              max: 10,
-              divisions: 9,
+              max: AppConstants.lummyForYouMaxChildren.toDouble(),
+              divisions: AppConstants.lummyForYouMaxChildren - 1,
               label: '$_childrenCount',
               onChanged: (value) {
                 setState(() => _childrenCount = value.round());
@@ -258,7 +261,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
             ),
           ),
           Text(
-            'Base de R\$ 19,90 + R\$ 9,90 por filho.',
+            'Plano For You: no máximo ${AppConstants.lummyForYouMaxChildren} filhos. Base R\$ 19,90 + R\$ 9,90 por filho.',
             style: GoogleFonts.poppins(
               color: subtitleColor,
               fontSize: 11,

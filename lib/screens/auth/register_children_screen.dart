@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy_login/core/constants/app_constants.dart';
 import 'package:lummy_login/models/responsavel_model.dart';
+import 'package:lummy_login/screens/parent/parent_subscription_screen.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/services/family_service.dart';
 import 'package:lummy_login/domain/repositories/auth_repository.dart';
@@ -111,6 +113,126 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         return;
       }
 
+      final existingChildren =
+          await _familyService.countChildrenForParent(widget.parentUserId);
+      if (!mounted) return;
+      if (existingChildren >= AppConstants.lummyForYouMaxChildren) {
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              'Limite do Lummy For You',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+              ),
+            ),
+            content: Text(
+              'Este plano inclui até ${AppConstants.lummyForYouMaxChildren} dependentes. '
+              'Para cadastrar mais filhos, o indicado é o Lummy Pro, com dependentes ilimitados.',
+              style: GoogleFonts.poppins(fontSize: 14, height: 1.4),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(
+                  'Entendi',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    color: _purple,
+                  ),
+                ),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const ParentSubscriptionScreen(),
+                    ),
+                  );
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: _purple,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(
+                  'Ver planos',
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      final childEmail = _emailController.text.trim();
+      if (FamilyService.normalizeSignupEmail(childEmail) ==
+          FamilyService.normalizeSignupEmail(widget.responsavel.email)) {
+        if (!mounted) return;
+        _showSnackBar(
+          'O e-mail do dependente deve ser diferente do e-mail do responsável.',
+          _red,
+        );
+        return;
+      }
+
+      final emailStatus =
+          await _familyService.getEmailRegistrationStatus(childEmail);
+      if (emailStatus == EmailRegistrationStatus.usedByParent) {
+        if (!mounted) return;
+        _showSnackBar(
+          'Este e-mail já está em uso em uma conta de responsável. '
+          'Use outro e-mail para o dependente.',
+          _red,
+        );
+        return;
+      }
+      if (emailStatus == EmailRegistrationStatus.usedByChild) {
+        if (!mounted) return;
+        _showSnackBar(
+          'Este e-mail já está em uso em outra conta de dependente.',
+          _red,
+        );
+        return;
+      }
+
+      final childCpf =
+          _cpfController.text.replaceAll(RegExp(r'[^0-9]'), '');
+      if (FamilyService.normalizeSignupCpf(childCpf) ==
+          FamilyService.normalizeSignupCpf(widget.responsavel.cpf)) {
+        if (!mounted) return;
+        _showSnackBar(
+          'O CPF do dependente deve ser diferente do CPF do responsável.',
+          _red,
+        );
+        return;
+      }
+
+      final cpfStatus =
+          await _familyService.getCpfRegistrationStatus(childCpf);
+      if (cpfStatus == CpfRegistrationStatus.usedByParent) {
+        if (!mounted) return;
+        _showSnackBar(
+          'Este CPF já está em uso em uma conta de responsável. '
+          'Use outro CPF para o dependente.',
+          _red,
+        );
+        return;
+      }
+      if (cpfStatus == CpfRegistrationStatus.usedByChild) {
+        if (!mounted) return;
+        _showSnackBar(
+          'Este CPF já está em uso em outra conta de dependente.',
+          _red,
+        );
+        return;
+      }
+
       setState(() => _isLoading = true);
 
       try {
@@ -120,11 +242,11 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
 
         // 1) Cria o usuário da criança no Auth (isso troca a sessão atual)
         final registerResult = await _authRepo.register(
-          email: _emailController.text.trim(),
+          email: childEmail,
           password: _passwordController.text,
           name: _nameController.text.trim(),
           metadata: {
-            'cpf': _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+            'cpf': childCpf,
             'role': 'child',
             'parent_id': widget.parentUserId,
             'idade': int.tryParse(_ageController.text.trim()) ?? 0,
@@ -152,8 +274,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           childUserId: childUserId,
           responsavelId: widget.parentUserId,
           nome: _nameController.text.trim(),
-          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-          email: _emailController.text.trim(),
+          cpf: childCpf,
+          email: childEmail,
           idade: int.tryParse(_ageController.text.trim()) ?? 0,
           sexo: _selectedGender,
         );
@@ -321,6 +443,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                             if (!_isValidCPF(value)) {
                               return 'CPF inválido';
                             }
+                            if (FamilyService.normalizeSignupCpf(value) ==
+                                FamilyService.normalizeSignupCpf(
+                                  widget.responsavel.cpf,
+                                )) {
+                              return 'Use um CPF diferente do responsável';
+                            }
                             return null;
                           },
                         ),
@@ -342,6 +470,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                               r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                             ).hasMatch(value)) {
                               return 'E-mail inválido';
+                            }
+                            if (FamilyService.normalizeSignupEmail(value) ==
+                                FamilyService.normalizeSignupEmail(
+                                  widget.responsavel.email,
+                                )) {
+                              return 'Use um e-mail diferente do responsável';
                             }
                             return null;
                           },

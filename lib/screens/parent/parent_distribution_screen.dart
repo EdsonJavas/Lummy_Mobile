@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import 'package:lummy_login/application/app_facade.dart';
 import 'package:lummy_login/core/utils/formatters.dart';
+import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
 import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_state.dart';
@@ -997,7 +999,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => _openQuickSendDialog(context, state, amount),
+        onTap: () => _beginQuickSendWithAuth(context, state, amount),
         borderRadius: BorderRadius.circular(14),
         child: Container(
           height: 86,
@@ -1044,6 +1046,44 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _beginQuickSendWithAuth(
+    BuildContext context,
+    ParentDashboardState state,
+    double amount,
+  ) async {
+    if (state.children.isEmpty) return;
+    if (amount > state.walletBalance) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Saldo insuficiente para envio rápido.')),
+      );
+      return;
+    }
+
+    final ok = await locator<BiometricAuthService>().authenticateSensitiveAction(
+      reason:
+          'Autentique para autorizar o envio rápido de ${AppFormatters.formatCurrency(amount)}.',
+    );
+
+    if (!context.mounted) return;
+    if (ok) {
+      await _openQuickSendDialog(context, state, amount);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Não foi possível confirmar a identidade. Tente novamente.',
+            style: GoogleFonts.poppins(),
+          ),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: const Color(0xFFEF4444),
+        ),
+      );
+    }
   }
 
   Future<void> _openQuickSendDialog(

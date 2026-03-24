@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lummy_login/core/constants/app_constants.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/screens/auth/register_children_screen.dart';
 import 'package:lummy_login/models/responsavel_model.dart';
@@ -892,7 +893,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                       ),
                     ),
                     Text(
-                      'Proporcional ao número de filhos',
+                      'Até ${AppConstants.lummyForYouMaxChildren} filhos · proporcional',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: isDark

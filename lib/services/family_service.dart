@@ -2,11 +2,89 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/entities/user_entity.dart';
 
+/// Resultado da checagem de e-mail nas tabelas `responsaveis` / `children`.
+enum EmailRegistrationStatus {
+  available,
+  usedByParent,
+  usedByChild,
+  /// RPC indisponível ou erro de rede — o app pode seguir e confiar no Auth.
+  checkFailed,
+}
+
+/// Resultado da checagem de CPF nas tabelas `responsaveis` / `children`.
+enum CpfRegistrationStatus {
+  available,
+  usedByParent,
+  usedByChild,
+  checkFailed,
+}
+
 class FamilyService {
   final SupabaseClient _supabase;
 
   FamilyService({SupabaseClient? supabase})
     : _supabase = supabase ?? Supabase.instance.client;
+
+  static String normalizeSignupEmail(String email) =>
+      email.trim().toLowerCase();
+
+  /// Apenas dígitos, para comparar CPF com ou sem máscara.
+  static String normalizeSignupCpf(String cpf) =>
+      cpf.replaceAll(RegExp(r'[^0-9]'), '');
+
+  /// Usa a RPC `email_registered_kind` (migration no repositório). Se não existir, retorna checkFailed.
+  Future<EmailRegistrationStatus> getEmailRegistrationStatus(
+    String email,
+  ) async {
+    final normalized = normalizeSignupEmail(email);
+    if (normalized.isEmpty) return EmailRegistrationStatus.checkFailed;
+    try {
+      final res = await _supabase.rpc(
+        'email_registered_kind',
+        params: {'check_email': normalized},
+      );
+      final s = (res as String?)?.toLowerCase().trim() ?? 'none';
+      if (s == 'parent') return EmailRegistrationStatus.usedByParent;
+      if (s == 'child') return EmailRegistrationStatus.usedByChild;
+      return EmailRegistrationStatus.available;
+    } catch (e) {
+      debugPrint('getEmailRegistrationStatus (RPC email_registered_kind): $e');
+      return EmailRegistrationStatus.checkFailed;
+    }
+  }
+
+  /// Quantidade de dependentes já cadastrados para o responsável.
+  Future<int> countChildrenForParent(String responsavelId) async {
+    try {
+      final response = await _supabase
+          .from('children')
+          .select('id')
+          .eq('responsavel_id', responsavelId);
+      return response.length;
+    } catch (e, st) {
+      debugPrint('countChildrenForParent: $e\n$st');
+      return 0;
+    }
+  }
+
+  /// Usa a RPC `cpf_registered_kind` (migration no repositório). Se não existir, retorna checkFailed.
+  Future<CpfRegistrationStatus> getCpfRegistrationStatus(String cpf) async {
+    final normalized = normalizeSignupCpf(cpf);
+    if (normalized.length != 11) return CpfRegistrationStatus.checkFailed;
+    try {
+      final res = await _supabase.rpc(
+        'cpf_registered_kind',
+        params: {'check_cpf': normalized},
+      );
+      final s = (res as String?)?.toLowerCase().trim() ?? 'none';
+      if (s == 'parent') return CpfRegistrationStatus.usedByParent;
+      if (s == 'child') return CpfRegistrationStatus.usedByChild;
+      return CpfRegistrationStatus.available;
+    } catch (e) {
+      debugPrint('getCpfRegistrationStatus (RPC cpf_registered_kind): $e');
+      return CpfRegistrationStatus.checkFailed;
+    }
+  }
 
   // Salva dados adicionais do responsável na tabela responsaveis
   // A autenticação já foi feita pelo AuthRepository

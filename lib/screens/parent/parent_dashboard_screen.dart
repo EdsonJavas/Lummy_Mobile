@@ -689,8 +689,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     bool isDark,
   ) {
     final displayBalance = AppFormatters.formatCurrency(state.walletBalance);
-    return Row(
-      children: [
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
         Expanded(
           child: _CompactInfoCard(
             icon: Icons.account_balance_wallet_rounded,
@@ -713,7 +715,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             showBadge: state.pendingApprovalsCount > 0,
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -1207,7 +1210,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   }
 }
 
-// Card compacto para resumo rápido
+/// Cards de topo (Saldo / Aprovações): mesmo vocabulário dos chips de Insights.
 class _CompactInfoCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -1227,128 +1230,119 @@ class _CompactInfoCard extends StatelessWidget {
     this.showBadge = false,
   });
 
+  static const _radius = 16.0;
+
   @override
   Widget build(BuildContext context) {
-    final darkTop = Color.alphaBlend(color.withAlpha(30), const Color(0xFF1E293B));
-    final darkBorder = Color.alphaBlend(
-      color.withAlpha(52),
-      const Color(0xFF334155),
-    );
+    final badgeRing =
+        isDark ? const Color(0xFF0F172A) : Colors.white;
 
-    return Container(
-      constraints: const BoxConstraints(minHeight: 140),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [darkTop, const Color(0xFF1E293B)]
-              : [Colors.white, color.withOpacity(0.04)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark
-              ? darkBorder
-              : color.withOpacity(0.15),
-          width: 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? color.withAlpha(30)
-                : color.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+    return Semantics(
+      container: true,
+      label: '$label: $value${subtitle != null ? ', $subtitle' : ''}',
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 140),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: isDark ? 0.2 : 0.14),
+              color.withValues(alpha: isDark ? 0.09 : 0.05),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      color.withOpacity(isDark ? 0.3 : 0.2),
-                      color.withOpacity(isDark ? 0.14 : 0.1),
-                    ],
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(
+            color: color.withValues(alpha: isDark ? 0.34 : 0.26),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: isDark ? 0.14 : 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: isDark ? 0.22 : 0.16),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Icon(icon, color: color, size: 20),
-                    if (showBadge)
-                      Positioned(
-                        top: -3,
-                        right: -3,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isDark
-                                  ? const Color(0xFF1E293B)
-                                  : Colors.white,
-                              width: 1.5,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Icon(icon, color: color, size: 20),
+                      if (showBadge)
+                        Positioned(
+                          top: -3,
+                          right: -3,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: badgeRing,
+                                width: 1.5,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
+                    ],
                   ),
                 ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? const Color(0xFF94A3B8)
+                          : const Color(0xFF64748B),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: GoogleFonts.poppins(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                subtitle!,
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: color,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
-          ),
-          const SizedBox(height: 10),
-          // Valor com FittedBox - NUNCA quebra
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              value,
-              style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
-              ),
-            ),
-          ),
-          if (subtitle != null) ...[
-            const SizedBox(height: 2),
-            Text(
-              subtitle!,
-              style: GoogleFonts.poppins(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: color,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -1378,114 +1372,104 @@ class _OverviewStatCard extends StatelessWidget {
 
   const _OverviewStatCard({required this.data, required this.isDark});
 
+  static const _radius = 16.0;
+
   @override
   Widget build(BuildContext context) {
-    final darkTop = Color.alphaBlend(
-      data.color.withAlpha(28),
-      const Color(0xFF1E293B),
-    );
-    final darkBorder = Color.alphaBlend(
-      data.color.withAlpha(48),
-      const Color(0xFF334155),
-    );
+    final c = data.color;
 
-    return Container(
-      constraints: const BoxConstraints(minHeight: 128),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [darkTop, const Color(0xFF1E293B)]
-              : [Colors.white, data.color.withOpacity(0.03)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark
-              ? darkBorder
-              : data.color.withOpacity(0.12),
-          width: 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? data.color.withAlpha(28)
-                : data.color.withOpacity(0.07),
-            blurRadius: 14,
-            offset: const Offset(0, 5),
+    return Semantics(
+      container: true,
+      label: '${data.title}: ${data.value}${data.subtitle != null ? ', ${data.subtitle}' : ''}',
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 128),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              c.withValues(alpha: isDark ? 0.2 : 0.14),
+              c.withValues(alpha: isDark ? 0.09 : 0.05),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      data.color.withOpacity(isDark ? 0.3 : 0.2),
-                      data.color.withOpacity(isDark ? 0.14 : 0.1),
-                    ],
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(
+            color: c.withValues(alpha: isDark ? 0.34 : 0.26),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: c.withValues(alpha: isDark ? 0.14 : 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: c.withValues(alpha: isDark ? 0.22 : 0.16),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  borderRadius: BorderRadius.circular(10),
+                  child: Icon(data.icon, color: c, size: 18),
                 ),
-                child: Icon(data.icon, color: data.color, size: 18),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    data.title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      data.title,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: isDark
+                            ? const Color(0xFF94A3B8)
+                            : const Color(0xFF64748B),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              data.value,
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
+              ],
             ),
-          ),
-          if (data.subtitle != null) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: 8),
             FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(
-                data.subtitle!,
+                data.value,
                 style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400,
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF94A3B8),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: c,
                 ),
               ),
             ),
+            if (data.subtitle != null) ...[
+              const SizedBox(height: 2),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  data.subtitle!,
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400,
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
+                  ),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -1524,63 +1508,76 @@ class _InsightPreviewChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            color.withOpacity(isDark ? 0.15 : 0.1),
-            color.withOpacity(isDark ? 0.08 : 0.05),
+    // Mesmo vocabulário visual dos cards de insights (gradiente + borda na cor do tema).
+    return Semantics(
+      container: true,
+      label: '$label: $value',
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: isDark ? 0.18 : 0.12),
+              color.withValues(alpha: isDark ? 0.08 : 0.05),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: color.withValues(alpha: isDark ? 0.32 : 0.24),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: isDark ? 0.12 : 0.07),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withOpacity(isDark ? 0.3 : 0.2),
-          width: 1,
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? const Color(0xFF94A3B8)
+                          : const Color(0xFF64748B),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: color,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: color,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

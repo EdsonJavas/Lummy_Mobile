@@ -94,13 +94,95 @@ class _RegisterScreenState extends State<RegisterScreen> {
         final authRepo = locator<AuthRepository>();
         final familyService = locator<FamilyService>();
 
+        final emailRaw = _emailController.text.trim();
+        final emailStatus =
+            await familyService.getEmailRegistrationStatus(emailRaw);
+        if (emailStatus == EmailRegistrationStatus.usedByChild) {
+          setState(() => _isLoading = false);
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Este e-mail já é de uma conta de dependente. '
+                'Use outro e-mail para cadastrar o responsável.',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              ),
+              backgroundColor: const Color(0xFFEF4444),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+          return;
+        }
+        if (emailStatus == EmailRegistrationStatus.usedByParent) {
+          setState(() => _isLoading = false);
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Este e-mail já está cadastrado como responsável.',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              ),
+              backgroundColor: const Color(0xFFEF4444),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+          return;
+        }
+
+        final cpfRaw = _cpfController.text.replaceAll(RegExp(r'[^0-9]'), '');
+        final cpfStatus =
+            await familyService.getCpfRegistrationStatus(cpfRaw);
+        if (cpfStatus == CpfRegistrationStatus.usedByChild) {
+          setState(() => _isLoading = false);
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Este CPF já está vinculado a uma conta de dependente. '
+                'Use outro CPF para o responsável.',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              ),
+              backgroundColor: const Color(0xFFEF4444),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+          return;
+        }
+        if (cpfStatus == CpfRegistrationStatus.usedByParent) {
+          setState(() => _isLoading = false);
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Este CPF já está cadastrado como responsável.',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              ),
+              backgroundColor: const Color(0xFFEF4444),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+          return;
+        }
+
         // Criar conta no Supabase Auth
         final registerResult = await authRepo.register(
-          email: _emailController.text.trim(),
+          email: emailRaw,
           password: _passwordController.text,
           name: _nameController.text.trim(),
           metadata: {
-            'cpf': _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+            'cpf': cpfRaw,
             'role': 'parent',
           },
         );
@@ -134,8 +216,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         await familyService.createResponsavelData(
           userId: userId,
           nome: _nameController.text.trim(),
-          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-          email: _emailController.text.trim(),
+          cpf: cpfRaw,
+          email: emailRaw,
         );
 
         setState(() {
@@ -147,8 +229,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // Criar objeto Responsavel com o ID do Supabase
         final responsavel = Responsavel(
           nome: _nameController.text.trim(),
-          cpf: _cpfController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-          email: _emailController.text.trim(),
+          cpf: cpfRaw,
+          email: emailRaw,
           senha: _passwordController.text,
         );
 

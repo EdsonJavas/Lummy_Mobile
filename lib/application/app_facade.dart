@@ -101,6 +101,31 @@ class BiometricAuthService {
       return false;
     }
   }
+
+  /// Confirma identidade para ações sensíveis (ex.: envio rápido).
+  /// Com biometria no aparelho usa só o sensor; caso contrário permite PIN/padrão do sistema.
+  Future<bool> authenticateSensitiveAction({
+    String reason = 'Confirme a sua identidade para continuar.',
+  }) async {
+    try {
+      final supported = await _localAuth.isDeviceSupported();
+      if (!supported) {
+        debugPrint('Dispositivo sem autenticação local');
+        return false;
+      }
+
+      final biometrics = await _localAuth.getAvailableBiometrics();
+      final biometricOnly = biometrics.isNotEmpty;
+
+      return await _localAuth.authenticate(
+        localizedReason: reason,
+        biometricOnly: biometricOnly,
+      );
+    } catch (e, st) {
+      debugPrint('Erro em authenticateSensitiveAction: $e\n$st');
+      return false;
+    }
+  }
 }
 
 /// Application Facade to expose use cases to UI without coupling to implementations.
