@@ -773,6 +773,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   Widget _buildChartCard(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasData = _categorySpending.isNotEmpty;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppConstants.spacingLarge),
@@ -791,48 +793,89 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 140,
-            height: 140,
-            child: PieChart(
-              PieChartData(
-                startDegreeOffset: -90,
-                sectionsSpace: 2,
-                centerSpaceRadius: 48,
-                borderData: FlBorderData(show: false),
-                sections: _buildPieSections(),
+      child: hasData
+          ? Row(
+              children: [
+                SizedBox(
+                  width: 140,
+                  height: 140,
+                  child: PieChart(
+                    PieChartData(
+                      startDegreeOffset: -90,
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 48,
+                      borderData: FlBorderData(show: false),
+                      sections: _buildPieSections(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ..._categorySpending.entries.map((entry) {
+                        final catId = entry.key;
+                        final amount = entry.value;
+                        final config = _baseCategories.firstWhere(
+                          (c) => c['id'] == catId,
+                          orElse: () => {
+                            'id': catId,
+                            'name': catId,
+                            'color': const Color(0xFF64748B),
+                          },
+                        );
+                        return _buildLegendItem(
+                          config['name'] as String,
+                          config['color'] as Color,
+                          AppFormatters.formatCurrency(amount),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : Padding(
+              padding: const EdgeInsets.symmetric(vertical: 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 48, height: 48,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
+                          : const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.pie_chart_outline_rounded,
+                      size: 24,
+                      color: isDark ? const Color(0xFF7C3AED) : const Color(0xFF8B5CF6),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Nenhum gasto neste período',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Registre um gasto para visualizar o gráfico',
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ..._categorySpending.entries.map((entry) {
-                  final catId = entry.key;
-                  final amount = entry.value;
-                  final config = _baseCategories.firstWhere(
-                    (c) => c['id'] == catId,
-                    orElse: () => {
-                      'id': catId,
-                      'name': catId,
-                      'color': const Color(0xFF64748B),
-                    },
-                  );
-                  return _buildLegendItem(
-                    config['name'] as String,
-                    config['color'] as Color,
-                    AppFormatters.formatCurrency(amount),
-                  );
-                }),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -947,23 +990,64 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...List.generate(
-            _visibleTransactions.length,
-            (i) => _buildTransactionItem(
-              _visibleTransactions[i]['description'] as String,
-              _visibleTransactions[i]['categoryName'] as String,
-              AppFormatters.formatCurrency(
-                (_visibleTransactions[i]['amount'] as num).toDouble(),
+      child: _visibleTransactions.isEmpty
+          ? Padding(
+              padding: const EdgeInsets.symmetric(vertical: 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 48, height: 48,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFFEF4444).withValues(alpha: 0.1)
+                          : const Color(0xFFEF4444).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.receipt_long_outlined,
+                      size: 24,
+                      color: isDark ? const Color(0xFFF87171) : const Color(0xFFEF4444),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Nenhuma transação recente',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Suas movimentações aparecerão aqui',
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                    ),
+                  ),
+                ],
               ),
-              _visibleTransactions[i]['color'] as Color,
-              i,
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ...List.generate(
+                  _visibleTransactions.length,
+                  (i) => _buildTransactionItem(
+                    _visibleTransactions[i]['description'] as String,
+                    _visibleTransactions[i]['categoryName'] as String,
+                    AppFormatters.formatCurrency(
+                      (_visibleTransactions[i]['amount'] as num).toDouble(),
+                    ),
+                    _visibleTransactions[i]['color'] as Color,
+                    i,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 

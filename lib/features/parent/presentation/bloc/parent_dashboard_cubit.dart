@@ -5,6 +5,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../domain/entities/user_entity.dart';
 import '../../../../domain/entities/transaction_entity.dart';
 import '../../../../domain/entities/notification_entity.dart';
+import '../../../../utils/parent_notification_service.dart';
 import 'parent_dashboard_state.dart';
 
 class ParentDashboardCubit extends Cubit<ParentDashboardState> {
@@ -25,6 +26,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       _parentName = parentName;
     }
     emit(state.copyWith(isLoading: true, parentName: _parentName));
+    initParentNotifications();
 
     try {
       // Buscar dados reais do banco
@@ -35,7 +37,17 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
 
       // Buscar dados reais do banco
       final pendingApprovals = await _fetchPendingApprovals(parentId, children);
-      final notifications = _getMockNotifications(parentId, children); // TODO: Implementar quando tiver tabela de notificações
+
+      final prevCount = state.pendingApprovals.length;
+      if (pendingApprovals.length > prevCount && prevCount > 0) {
+        final newest = pendingApprovals.first;
+        notifyNewChildRequest(
+          newest.description,
+          newest.amount,
+        );
+      }
+
+      final notifications = _getMockNotifications(parentId, children);
       final spending = await _calculateSpending(children);
       final monthlyTrend = await _fetchMonthlyTrend(parentId, children);
       final categoryBreakdown = await _fetchCategoryBreakdown(parentId, children);
@@ -280,16 +292,16 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
   }
 
   // Rejeitar transação
-  Future<void> rejectTransaction(String transactionId, String reason) async {
+  Future<bool> rejectTransaction(String transactionId, String reason) async {
     try {
       if (transactionId.isEmpty) {
         emit(state.copyWith(error: 'ID da transação inválido'));
-        return;
+        return false;
       }
 
       if (reason.trim().isEmpty) {
         emit(state.copyWith(error: 'Motivo da rejeição é obrigatório'));
-        return;
+        return false;
       }
 
       // Buscar transação para devolver o valor ao filho (despesa já foi descontada na hora do pedido)
@@ -320,9 +332,11 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           .eq('id', transactionId);
 
       await refresh();
+      return true;
     } catch (e) {
       debugPrint('❌ Erro ao rejeitar transação: $e');
       emit(state.copyWith(error: 'Erro ao rejeitar transação: ${e.toString()}'));
+      return false;
     }
   }
 
@@ -391,31 +405,31 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     }
   }
 
-  Future<void> distributeAmount(double amount) async {
+  Future<bool> distributeAmount(double amount) async {
     if (amount <= 0 || state.children.isEmpty) {
-      return;
+      return false;
     }
-    await createDistributionToClaim(amount);
+    return createDistributionToClaim(amount);
   }
 
-  Future<void> createDistributionToClaim(double amount) async {
+  Future<bool> createDistributionToClaim(double amount) async {
     try {
       if (amount <= 0) {
         emit(state.copyWith(error: 'Valor deve ser maior que zero'));
-        return;
+        return false;
       }
       if (state.children.isEmpty) {
         emit(state.copyWith(error: 'Cadastre filhos para distribuir'));
-        return;
+        return false;
       }
       final parentId = _parentId;
       if (parentId == null) {
         emit(state.copyWith(error: 'Responsável não identificado'));
-        return;
+        return false;
       }
 
       final hasBalance = await _deductParentBalance(amount);
-      if (!hasBalance) return;
+      if (!hasBalance) return false;
 
       await _supabase
           .from('allowance_distributions')
@@ -433,9 +447,11 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       });
 
       await refresh();
+      return true;
     } catch (e) {
       debugPrint('❌ Erro ao criar distribuição: $e');
       emit(state.copyWith(error: 'Erro ao criar distribuição: ${e.toString()}'));
+      return false;
     }
   }
 

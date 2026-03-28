@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:lummy_login/application/app_facade.dart';
+import 'package:lummy_login/di/locator.dart';
+import 'package:lummy_login/shared/widgets/lummy_feedback.dart';
+
 class ParentChangePasswordScreen extends StatefulWidget {
   const ParentChangePasswordScreen({super.key});
 
@@ -32,6 +36,20 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final bio = locator<BiometricAuthService>();
+    final authorized = await bio.authenticateSensitiveAction(
+      reason: 'Confirme sua identidade para alterar a senha',
+    );
+    if (!authorized) {
+      if (mounted) {
+        LummyFeedback.error(
+          context,
+          'Não foi possível confirmar a identidade.',
+        );
+      }
+      return;
+    }
 
     setState(() => _isLoading = true);
 

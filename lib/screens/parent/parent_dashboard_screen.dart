@@ -150,6 +150,14 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                       widget.parentId,
                                       isDark,
                                     ),
+                                    if (state.goalSummaries.isNotEmpty) ...[
+                                      const SizedBox(height: 24),
+                                      _buildGoalsSummary(
+                                        context,
+                                        state,
+                                        isDark,
+                                      ),
+                                    ],
                                   ],
                                 ),
                               ),
@@ -521,6 +529,116 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     );
   }
 
+  Widget _buildGoalsSummary(
+    BuildContext context,
+    ParentDashboardState state,
+    bool isDark,
+  ) {
+    final titleColor =
+        isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor =
+        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final cardBg = isDark ? const Color(0xFF1A1A2E) : Colors.white;
+    final borderColor =
+        isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Metas dos filhos',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: titleColor,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...state.goalSummaries.map((summary) {
+          final progress = summary.averageProgress.clamp(0.0, 1.0);
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: borderColor),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: _primaryBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.flag_rounded,
+                    color: _primaryBlue,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        summary.childName,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: titleColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: progress,
+                                minHeight: 6,
+                                backgroundColor: borderColor,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  _green,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${(progress * 100).toInt()}%',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: _green,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${summary.completedGoals}/${summary.totalGoals} metas concluídas',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: subtitleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
   Widget _buildInsightsPreview(
     BuildContext context,
     ParentDashboardState state,
@@ -742,8 +860,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       ),
       _OverviewStatData(
         title: 'Filhos',
-        value: '${state.children.length}',
-        subtitle: 'Cadastrados',
+        value: '${state.children.length}/${AppConstants.lummyForYouMaxChildren}',
+        subtitle: 'Lummy For You',
         icon: Icons.family_restroom_rounded,
         color: _primaryBlue,
       ),

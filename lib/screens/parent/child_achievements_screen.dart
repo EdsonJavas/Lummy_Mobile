@@ -20,14 +20,15 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
   List<Map<String, dynamic>> _allAchievements = [];
   bool _isLoading = true;
 
-  // Cores
   static const _purple = Color(0xFF8B5CF6);
   static const _blue = Color(0xFF3B82F6);
   static const _green = Color(0xFF10B981);
   static const _orange = Color(0xFFF59E0B);
+  // ignore: unused_field
   static const _red = Color(0xFFEF4444);
   static const _pink = Color(0xFFEC4899);
   static const _gold = Color(0xFFD97706);
+  static const _goldLight = Color(0xFFF59E0B);
 
   @override
   void initState() {
@@ -40,7 +41,6 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
     try {
       final supabase = Supabase.instance.client;
 
-      // Carregar todas as conquistas disponíveis
       final allAchievementsData = await supabase
           .from('achievements')
           .select('*')
@@ -48,7 +48,6 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
 
       _allAchievements = List<Map<String, dynamic>>.from(allAchievementsData);
 
-      // Carregar conquistas desbloqueadas pelo filho
       final unlockedData = await supabase
           .from('child_achievements')
           .select('*, achievements(*)')
@@ -76,22 +75,18 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
         .toSet();
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+      backgroundColor:
+          isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       body: BrandedRefreshIndicator(
         onRefresh: _loadAchievements,
         color: _gold,
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // Header
             SliverToBoxAdapter(
               child: _buildHeader(context, isDark, topPadding),
             ),
-            // Stats
             SliverToBoxAdapter(child: _buildStatsSection(isDark)),
-            // Seção de conquistas recentes
             if (_unlockedAchievements.isNotEmpty) ...[
               SliverToBoxAdapter(
                 child: Padding(
@@ -101,7 +96,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
               ),
               SliverToBoxAdapter(
                 child: SizedBox(
-                  height: 140,
+                  height: 150,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -127,7 +122,6 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 ),
               ),
             ],
-            // Todas as conquistas
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
@@ -137,16 +131,26 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
             if (_isLoading)
               const SliverFillRemaining(child: Center(child: BrandedLoader()))
             else if (_allAchievements.isEmpty)
-              SliverFillRemaining(child: _buildEmptyState(isDark))
+              SliverFillRemaining(
+                child: EmptyState(
+                  emoji: '🏆',
+                  title: 'Nenhuma conquista disponível',
+                  message: 'Crie conquistas para motivar ${widget.child.name}!',
+                  icon: Icons.emoji_events_outlined,
+                  iconColor: _gold,
+                  buttonText: 'Criar Conquista',
+                  onButtonPressed: () => _showCreateAchievementDialog(context, isDark),
+                ),
+              )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
                 sliver: SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     mainAxisSpacing: 16,
                     crossAxisSpacing: 16,
-                    childAspectRatio: 0.85,
+                    childAspectRatio: 0.82,
                   ),
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final achievement = _allAchievements[index];
@@ -166,58 +170,97 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateAchievementDialog(context, isDark),
-        backgroundColor: _gold,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: Text(
-          'Nova Conquista',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+      floatingActionButton: _buildFab(isDark),
+    );
+  }
+
+  // ──────────────────────── FAB ────────────────────────
+
+  Widget _buildFab(bool isDark) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => _showCreateAchievementDialog(context, isDark),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [_gold, _goldLight]),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: _gold.withValues(alpha: 0.45),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+              const SizedBox(width: 8),
+              Text(
+                'Nova Conquista',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
+  // ──────────────────────── Header ────────────────────────
+
   Widget _buildHeader(BuildContext context, bool isDark, double topPadding) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 24),
+      padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 28),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [
-                  const Color(0xFF334155),
-                  const Color(0xFF1E293B),
-                  _gold.withOpacity(0.3),
-                ]
+              ? [const Color(0xFF1C1917), _gold.withValues(alpha: 0.4)]
               : [_gold, _orange, const Color(0xFFEA580C)],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: _gold.withValues(alpha: isDark ? 0.15 : 0.3),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
-                    size: 20,
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
@@ -238,17 +281,16 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                       'Medalhas de ${widget.child.name}',
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
                 ),
               ),
-              // Trophy icon
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Text('🏆', style: TextStyle(fontSize: 28)),
@@ -260,12 +302,13 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
     );
   }
 
+  // ──────────────────────── Stats ────────────────────────
+
   Widget _buildStatsSection(bool isDark) {
     final totalAchievements = _allAchievements.length;
     final unlockedCount = _unlockedAchievements.length;
-    final progress = totalAchievements > 0
-        ? unlockedCount / totalAchievements
-        : 0.0;
+    final progress =
+        totalAchievements > 0 ? unlockedCount / totalAchievements : 0.0;
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -276,16 +319,16 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDark
-                ? [const Color(0xFF334155), const Color(0xFF1E293B)]
-                : [Colors.white, const Color(0xFFF8FAFC)],
+                ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                : [Colors.white, const Color(0xFFFFFBEB)],
           ),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            color: _gold.withValues(alpha: isDark ? 0.15 : 0.12),
           ),
           boxShadow: [
             BoxShadow(
-              color: _gold.withOpacity(isDark ? 0.1 : 0.08),
+              color: _gold.withValues(alpha: isDark ? 0.08 : 0.1),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -304,11 +347,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                   isDark,
                 ),
                 Container(
-                  width: 1,
-                  height: 50,
-                  color: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0),
+                  width: 1, height: 50,
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                 ),
                 _buildStatItem(
                   '${totalAchievements - unlockedCount}',
@@ -318,11 +358,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                   isDark,
                 ),
                 Container(
-                  width: 1,
-                  height: 50,
-                  color: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0),
+                  width: 1, height: 50,
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                 ),
                 _buildStatItem(
                   '${(progress * 100).toInt()}%',
@@ -334,14 +371,33 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: _gold.withOpacity(0.2),
-                valueColor: const AlwaysStoppedAnimation(_gold),
-                minHeight: 10,
-              ),
+            Stack(
+              children: [
+                Container(
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: _gold.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                FractionallySizedBox(
+                  widthFactor: progress.clamp(0.0, 1.0),
+                  child: Container(
+                    height: 12,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [_gold, _goldLight]),
+                      borderRadius: BorderRadius.circular(6),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _gold.withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -358,7 +414,14 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
   ) {
     return Column(
       children: [
-        Icon(icon, color: color, size: 24),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
         const SizedBox(height: 8),
         Text(
           value,
@@ -379,6 +442,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
     );
   }
 
+  // ──────────────────────── Section title ────────────────────────
+
   Widget _buildSectionTitle(String title, bool isDark) {
     return ShaderMask(
       shaderCallback: (bounds) =>
@@ -394,6 +459,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
     );
   }
 
+  // ──────────────────────── Recent card ────────────────────────
+
   Widget _buildRecentAchievementCard(
     String name,
     String emoji,
@@ -408,12 +475,12 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [color, color.withOpacity(0.8)],
+          colors: [color, color.withValues(alpha: 0.75)],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.4),
+            color: color.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -423,10 +490,11 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 48, height: 48,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              gradient: LinearGradient(
+                colors: [Colors.white.withValues(alpha: 0.3), Colors.white.withValues(alpha: 0.1)],
+              ),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -444,10 +512,24 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+          if (description.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(
+              description,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                color: Colors.white.withValues(alpha: 0.7),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ],
       ),
     );
   }
+
+  // ──────────────────────── Achievement grid card ────────────────────────
 
   Widget _buildAchievementCard(
     String name,
@@ -461,81 +543,85 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        gradient: isUnlocked
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [const Color(0xFF1E293B), color.withValues(alpha: 0.12)]
+                    : [Colors.white, color.withValues(alpha: 0.06)],
+              )
+            : null,
+        color: isUnlocked ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isUnlocked
-              ? color.withOpacity(0.5)
+              ? color.withValues(alpha: 0.4)
               : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
           width: isUnlocked ? 2 : 1,
         ),
         boxShadow: isUnlocked
             ? [
                 BoxShadow(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
               ]
-            : null,
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Badge
           Stack(
             alignment: Alignment.center,
             children: [
               Container(
-                width: 64,
-                height: 64,
+                width: 64, height: 64,
                 decoration: BoxDecoration(
+                  gradient: isUnlocked
+                      ? LinearGradient(
+                          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.08)],
+                        )
+                      : null,
                   color: isUnlocked
-                      ? color.withOpacity(0.15)
-                      : (isDark
-                            ? const Color(0xFF1E293B)
-                            : const Color(0xFFF1F5F9)),
+                      ? null
+                      : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isUnlocked
-                        ? color.withOpacity(0.3)
-                        : (isDark
-                              ? const Color(0xFF334155)
-                              : const Color(0xFFE2E8F0)),
+                        ? color.withValues(alpha: 0.3)
+                        : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                     width: 2,
                   ),
                 ),
                 child: Center(
-                  child: Text(
-                    emoji,
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: isUnlocked ? null : Colors.grey,
-                    ),
-                  ),
+                  child: Text(emoji, style: const TextStyle(fontSize: 28)),
                 ),
               ),
               if (!isUnlocked)
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 64, height: 64,
                   decoration: BoxDecoration(
-                    color: (isDark ? Colors.black : Colors.white).withOpacity(
-                      0.5,
-                    ),
+                    color: (isDark ? const Color(0xFF0F172A) : Colors.white)
+                        .withValues(alpha: 0.6),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.lock_rounded,
-                    color: isDark
-                        ? const Color(0xFF64748B)
-                        : const Color(0xFF94A3B8),
+                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
                     size: 24,
                   ),
                 ),
             ],
           ),
           const SizedBox(height: 12),
-          // Name
           Text(
             name,
             style: GoogleFonts.poppins(
@@ -543,20 +629,20 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
               fontWeight: FontWeight.w600,
               color: isUnlocked
                   ? (isDark ? Colors.white : const Color(0xFF1E293B))
-                  : (isDark
-                        ? const Color(0xFF64748B)
-                        : const Color(0xFF94A3B8)),
+                  : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
             ),
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
-          // Points required
+          const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: (isUnlocked ? _green : _purple).withOpacity(0.15),
+              gradient: isUnlocked
+                  ? LinearGradient(colors: [_green.withValues(alpha: 0.2), _green.withValues(alpha: 0.1)])
+                  : null,
+              color: isUnlocked ? null : _purple.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
@@ -573,56 +659,63 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: _gold.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.emoji_events_outlined,
-                size: 48,
-                color: _gold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Nenhuma conquista disponível',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Crie conquistas para motivar ${widget.child.name}!',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: isDark
-                    ? const Color(0xFF94A3B8)
-                    : const Color(0xFF64748B),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // ──────────────────────── Helpers ────────────────────────
 
   Color _hexToColor(String hex) {
     hex = hex.replaceAll('#', '');
     if (hex.length == 6) hex = 'FF$hex';
     return Color(int.parse(hex, radix: 16));
   }
+
+  InputDecoration _achieveFieldDecor(String hint, bool isDark, {Widget? prefixIcon, String? suffixText}) {
+    final fillColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: GoogleFonts.poppins(
+        color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+        fontSize: 14,
+      ),
+      prefixIcon: prefixIcon,
+      suffixText: suffixText,
+      suffixStyle: GoogleFonts.poppins(
+        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+        fontWeight: FontWeight.w500,
+      ),
+      filled: true,
+      fillColor: fillColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(
+          color: isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: _gold, width: 2),
+      ),
+    );
+  }
+
+  Widget _dialogSectionLabel(String text, bool isDark) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+        ),
+      ),
+    );
+  }
+
+  // ──────────────────────── Create Dialog ────────────────────────
 
   void _showCreateAchievementDialog(BuildContext context, bool isDark) {
     final nameController = TextEditingController();
@@ -641,84 +734,120 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Container(
           padding: EdgeInsets.fromLTRB(
-            20,
-            20,
-            20,
+            20, 0, 20,
             MediaQuery.of(context).viewInsets.bottom + 20,
           ),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+              topLeft: Radius.circular(28),
+              topRight: Radius.circular(28),
             ),
           ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFFCBD5E1),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
+                const SizedBox(height: 12),
+                Container(
+                  width: 40, height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  'Criar Nova Conquista',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                const SizedBox(height: 16),
+                // Live preview header
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [selectedColor, selectedColor.withValues(alpha: 0.75)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: selectedColor.withValues(alpha: 0.35),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 56, height: 56,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(selectedEmoji, style: const TextStyle(fontSize: 30)),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Nova Conquista',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              'Pré-visualização',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                color: Colors.white.withValues(alpha: 0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 20),
                 // Emoji selector
-                Text(
-                  'Escolha um emoji',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
-                ),
+                _dialogSectionLabel('Escolha um emoji', isDark),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 10,
+                  runSpacing: 10,
                   children: emojis.map((emoji) {
                     final isSelected = emoji == selectedEmoji;
-                    return GestureDetector(
-                      onTap: () => setModalState(() => selectedEmoji = emoji),
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? selectedColor.withOpacity(0.2)
-                              : (isDark
-                                    ? const Color(0xFF1E293B)
-                                    : const Color(0xFFF8FAFC)),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
+                    return Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => setModalState(() => selectedEmoji = emoji),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 48, height: 48,
+                          decoration: BoxDecoration(
+                            gradient: isSelected
+                                ? LinearGradient(colors: [selectedColor.withValues(alpha: 0.25), selectedColor.withValues(alpha: 0.1)])
+                                : null,
                             color: isSelected
-                                ? selectedColor
-                                : Colors.transparent,
-                            width: 2,
+                                ? null
+                                : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC)),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? selectedColor : Colors.transparent,
+                              width: 2,
+                            ),
+                            boxShadow: isSelected
+                                ? [BoxShadow(color: selectedColor.withValues(alpha: 0.2), blurRadius: 8)]
+                                : null,
                           ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            emoji,
-                            style: const TextStyle(fontSize: 24),
+                          child: Center(
+                            child: Text(emoji, style: const TextStyle(fontSize: 24)),
                           ),
                         ),
                       ),
@@ -727,158 +856,133 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 ),
                 const SizedBox(height: 16),
                 // Color selector
-                Text(
-                  'Escolha uma cor',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
-                ),
+                _dialogSectionLabel('Escolha uma cor', isDark),
                 const SizedBox(height: 10),
                 Wrap(
-                  spacing: 10,
+                  spacing: 12,
                   children: colors.map((color) {
                     final isSelected = color == selectedColor;
-                    return GestureDetector(
-                      onTap: () => setModalState(() => selectedColor = color),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
-                                ? Colors.white
-                                : Colors.transparent,
-                            width: 3,
+                    return Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () => setModalState(() => selectedColor = color),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [color, color.withValues(alpha: 0.8)],
+                            ),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? Colors.white : Colors.transparent,
+                              width: 3,
+                            ),
+                            boxShadow: isSelected
+                                ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 10, spreadRadius: 2)]
+                                : null,
                           ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: color.withOpacity(0.5),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
-                                  ),
-                                ]
+                          child: isSelected
+                              ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
                               : null,
                         ),
-                        child: isSelected
-                            ? const Icon(
-                                Icons.check_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              )
-                            : null,
                       ),
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
+                // Fields
+                _dialogSectionLabel('Nome da Conquista', isDark),
+                const SizedBox(height: 8),
                 TextField(
                   controller: nameController,
                   style: GoogleFonts.poppins(
                     color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
-                  decoration: InputDecoration(
-                    labelText: 'Nome da Conquista',
-                    labelStyle: GoogleFonts.poppins(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
-                    filled: true,
-                    fillColor: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
+                  decoration: _achieveFieldDecor('Ex: Super Economista', isDark),
                 ),
                 const SizedBox(height: 12),
+                _dialogSectionLabel('Descrição', isDark),
+                const SizedBox(height: 8),
                 TextField(
                   controller: descriptionController,
                   style: GoogleFonts.poppins(
                     color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
                   maxLines: 2,
-                  decoration: InputDecoration(
-                    labelText: 'Descrição',
-                    labelStyle: GoogleFonts.poppins(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
-                    filled: true,
-                    fillColor: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
+                  decoration: _achieveFieldDecor('Descreva a conquista...', isDark),
                 ),
                 const SizedBox(height: 12),
+                _dialogSectionLabel('Pontos Necessários', isDark),
+                const SizedBox(height: 8),
                 TextField(
                   controller: pointsController,
                   keyboardType: TextInputType.number,
                   style: GoogleFonts.poppins(
                     color: isDark ? Colors.white : const Color(0xFF1E293B),
                   ),
-                  decoration: InputDecoration(
-                    labelText: 'Pontos Necessários',
-                    suffixText: 'pts',
-                    labelStyle: GoogleFonts.poppins(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                  decoration: _achieveFieldDecor(
+                    '100',
+                    isDark,
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 4),
+                      child: Icon(Icons.star_rounded, color: _gold, size: 20),
                     ),
-                    filled: true,
-                    fillColor: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
+                    suffixText: 'pontos',
                   ),
                 ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (nameController.text.isNotEmpty) {
-                        await _createAchievement(
-                          nameController.text,
-                          descriptionController.text,
-                          selectedEmoji,
-                          int.tryParse(pointsController.text) ?? 100,
-                          selectedColor,
-                        );
-                        if (context.mounted) Navigator.pop(context);
+                const SizedBox(height: 24),
+                // Create button
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () async {
+                      if (nameController.text.trim().isEmpty) {
+                        LummyFeedback.warning(context, 'Dê um nome à conquista');
+                        return;
                       }
+                      await _createAchievement(
+                        nameController.text.trim(),
+                        descriptionController.text.trim(),
+                        selectedEmoji,
+                        int.tryParse(pointsController.text) ?? 100,
+                        selectedColor,
+                      );
+                      if (context.mounted) Navigator.pop(context);
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedColor,
-                      foregroundColor: Colors.white,
+                    child: Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [selectedColor, selectedColor.withValues(alpha: 0.8)],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: selectedColor.withValues(alpha: 0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Criar Conquista',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.emoji_events_rounded, color: Colors.white, size: 20),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Criar Conquista',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -891,6 +995,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
     );
   }
 
+  // ──────────────────────── Create Achievement ────────────────────────
+
   Future<void> _createAchievement(
     String name,
     String description,
@@ -901,7 +1007,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
     try {
       final supabase = Supabase.instance.client;
       final colorHex =
-          '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
+          '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
 
       await supabase.from('achievements').insert({
         'name': name,
@@ -915,36 +1021,12 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
       _loadAchievements();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Conquista criada com sucesso!',
-              style: GoogleFonts.poppins(),
-            ),
-            backgroundColor: _green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        );
+        LummyFeedback.success(context, 'Conquista "$name" criada!');
       }
     } catch (e) {
       debugPrint('Erro ao criar conquista: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Erro ao criar conquista: $e',
-              style: GoogleFonts.poppins(),
-            ),
-            backgroundColor: _red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        );
+        LummyFeedback.error(context, 'Erro ao criar conquista');
       }
     }
   }

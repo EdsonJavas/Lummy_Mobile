@@ -14,3 +14,7 @@ export 'branded_loader.dart';
 export 'branded_refresh_indicator.dart';
 export 'child_home_skeleton.dart';
 export 'cached_avatar.dart';
+export 'connectivity_banner.dart';
+export 'lummy_feedback.dart';
+export 'reward_celebration.dart';
+export 'xp_progress_bar.dart';

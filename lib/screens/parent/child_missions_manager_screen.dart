@@ -15,7 +15,8 @@ class ChildMissionsManagerScreen extends StatefulWidget {
       _ChildMissionsManagerScreenState();
 }
 
-class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
+class _ChildMissionsManagerScreenState
+    extends State<ChildMissionsManagerScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -24,8 +25,8 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
   List<Map<String, dynamic>> _customMissions = [];
   bool _isLoading = true;
 
-  // Cores
   static const _purple = Color(0xFF8B5CF6);
+  static const _purpleDark = Color(0xFF6D28D9);
   static const _blue = Color(0xFF3B82F6);
   static const _green = Color(0xFF10B981);
   static const _orange = Color(0xFFF59E0B);
@@ -51,7 +52,6 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
       final supabase = Supabase.instance.client;
       final today = DateTime.now().toIso8601String().split('T')[0];
 
-      // Carregar todas as missões disponíveis
       final allMissionsData = await supabase
           .from('missions')
           .select('*')
@@ -60,16 +60,15 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
 
       _allMissions = List<Map<String, dynamic>>.from(allMissionsData);
 
-      // Carregar missões diárias do filho
       final dailyMissionsData = await supabase
           .from('daily_missions')
           .select('*, missions(*)')
           .eq('child_id', widget.child.id)
           .eq('selected_date', today);
 
-      _childDailyMissions = List<Map<String, dynamic>>.from(dailyMissionsData);
+      _childDailyMissions =
+          List<Map<String, dynamic>>.from(dailyMissionsData);
 
-      // Carregar missões personalizadas criadas pelo responsável
       final customMissionsData = await supabase
           .from('custom_missions')
           .select('*')
@@ -80,28 +79,25 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
     } catch (e) {
       debugPrint('Erro ao carregar missões: $e');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Build
+  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final topPadding = MediaQuery.of(context).padding.top;
+    final bg = isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF8FAFC);
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+      backgroundColor: bg,
       body: Column(
         children: [
-          // Header
-          _buildHeader(context, isDark, topPadding),
-          // Tab Bar
+          _buildHeader(context, isDark),
           _buildTabBar(isDark),
-          // Content
           Expanded(
             child: _isLoading
                 ? const Center(child: BrandedLoader())
@@ -116,62 +112,51 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateMissionDialog(context, isDark),
-        backgroundColor: _purple,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: Text(
-          'Nova Missão',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-      ),
+      floatingActionButton: _buildFab(),
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isDark, double topPadding) {
+  // ---------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------
+
+  Widget _buildHeader(BuildContext context, bool isDark) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    final completedToday = _childDailyMissions
+        .where((m) => m['is_completed'] == true)
+        .length;
+    final totalToday = _childDailyMissions.length;
+
     return Container(
-      padding: EdgeInsets.fromLTRB(20, topPadding + 16, 20, 24),
+      padding: EdgeInsets.fromLTRB(20, topPadding + 12, 20, 24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [
-                  const Color(0xFF334155),
-                  const Color(0xFF1E293B),
-                  _purple.withOpacity(0.3),
-                ]
-              : [_purple, _purple.withOpacity(0.85), const Color(0xFF7C3AED)],
+              ? [const Color(0xFF1E1B4B), _purpleDark.withValues(alpha: 0.7)]
+              : [_purple, _purpleDark],
         ),
         borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: _purple.withValues(alpha: isDark ? 0.15 : 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Top row: back + title
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
+              _headerBackButton(context),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,34 +167,58 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
+                        height: 1.2,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      'Gerenciar missões de ${widget.child.name}',
+                      widget.child.name,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.8),
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
                 ),
               ),
+              // Mini avatar
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.rocket_launch_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 20),
-          // Stats
+          // Stats row
           Row(
             children: [
-              _buildStatChip(
-                '${_childDailyMissions.where((m) => m['is_completed'] == true).length}/${_childDailyMissions.length}',
-                'Hoje',
-                Icons.today_rounded,
+              _buildHeaderStat(
+                '$completedToday/$totalToday',
+                'Concluídas hoje',
+                Icons.check_circle_outline_rounded,
               ),
               const SizedBox(width: 12),
-              _buildStatChip(
+              _buildHeaderStat(
                 '${_customMissions.length}',
                 'Personalizadas',
-                Icons.star_rounded,
+                Icons.auto_awesome_rounded,
+              ),
+              const SizedBox(width: 12),
+              _buildHeaderStat(
+                '${_allMissions.length}',
+                'Disponíveis',
+                Icons.list_alt_rounded,
               ),
             ],
           ),
@@ -218,89 +227,177 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
     );
   }
 
-  Widget _buildStatChip(String value, String label, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 18),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                label,
-                style: GoogleFonts.poppins(
-                  fontSize: 11,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-            ],
+  Widget _headerBackButton(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.15),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: () => Navigator.pop(context),
+        borderRadius: BorderRadius.circular(12),
+        child: const SizedBox(
+          width: 44,
+          height: 44,
+          child: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 18,
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabBar(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-          borderRadius: BorderRadius.circular(14),
         ),
-        child: TabBar(
-          controller: _tabController,
-          indicator: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [_purple, Color(0xFF7C3AED)],
+      ),
+    );
+  }
+
+  Widget _buildHeaderStat(String value, String label, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white, size: 18),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
             ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          labelColor: Colors.white,
-          unselectedLabelColor: isDark
-              ? const Color(0xFF94A3B8)
-              : const Color(0xFF64748B),
-          labelStyle: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedLabelStyle: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-          tabs: const [
-            Tab(text: 'Hoje'),
-            Tab(text: 'Personalizadas'),
-            Tab(text: 'Todas'),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.w400,
+                color: Colors.white.withValues(alpha: 0.75),
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Tab bar
+  // ---------------------------------------------------------------------------
+
+  Widget _buildTabBar(bool isDark) {
+    final trackColor =
+        isDark ? const Color(0xFF1E293B) : const Color(0xFFEDE9FE);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: trackColor,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: TabBar(
+          controller: _tabController,
+          dividerHeight: 0,
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicator: BoxDecoration(
+            gradient: const LinearGradient(colors: [_purple, _purpleDark]),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: _purple.withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          labelColor: Colors.white,
+          unselectedLabelColor:
+              isDark ? const Color(0xFF94A3B8) : const Color(0xFF7C3AED),
+          labelStyle:
+              GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
+          unselectedLabelStyle:
+              GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+          padding: const EdgeInsets.all(3),
+          tabs: const [
+            Tab(text: 'Hoje'),
+            Tab(text: 'Criadas'),
+            Tab(text: 'Catálogo'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // FAB
+  // ---------------------------------------------------------------------------
+
+  Widget _buildFab() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [_purple, _purpleDark]),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: _purple.withValues(alpha: 0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () => _showCreateMissionDialog(
+            context,
+            Theme.of(context).brightness == Brightness.dark,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+                const SizedBox(width: 8),
+                Text(
+                  'Nova Missão',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tabs content
+  // ---------------------------------------------------------------------------
+
   Widget _buildDailyMissionsTab(bool isDark) {
     if (_childDailyMissions.isEmpty) {
-      return _buildEmptyState(
-        'Nenhuma missão hoje',
-        'As missões diárias aparecerão aqui.',
-        Icons.assignment_outlined,
-        isDark,
+      return EmptyState(
+        emoji: '📋',
+        title: 'Nenhuma missão hoje',
+        message:
+            'Atribua missões do catálogo ou crie uma personalizada para ${widget.child.name}.',
+        icon: Icons.assignment_outlined,
+        iconColor: _purple,
+        buttonText: 'Ver catálogo',
+        onButtonPressed: () => _tabController.animateTo(2),
       );
     }
 
@@ -308,26 +405,26 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
       onRefresh: _loadMissions,
       color: _purple,
       child: ListView.builder(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
         itemCount: _childDailyMissions.length,
         itemBuilder: (context, index) {
           final mission = _childDailyMissions[index];
-          final missionData = mission['missions'] as Map<String, dynamic>?;
+          final data = mission['missions'] as Map<String, dynamic>?;
           final isCompleted = mission['is_completed'] == true;
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _buildMissionCard(
-              missionData?['title'] ?? 'Missão',
-              missionData?['description'] ?? '',
-              missionData?['emoji'] ?? '🎯',
-              missionData?['points'] ?? 0,
-              isCompleted,
-              _hexToColor(missionData?['color_hex'] ?? '#8B5CF6'),
-              isDark,
+            child: _MissionCard(
+              title: data?['title'] ?? 'Missão',
+              description: data?['description'] ?? '',
+              emoji: data?['emoji'] ?? '🎯',
+              points: data?['points'] ?? 0,
+              isCompleted: isCompleted,
+              color: _hexToColor(data?['color_hex'] ?? '#8B5CF6'),
+              isDark: isDark,
             ),
           );
         },
@@ -337,11 +434,15 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
 
   Widget _buildCustomMissionsTab(bool isDark) {
     if (_customMissions.isEmpty) {
-      return _buildEmptyState(
-        'Nenhuma missão personalizada',
-        'Crie missões especiais para ${widget.child.name}!',
-        Icons.star_outline_rounded,
-        isDark,
+      return EmptyState(
+        emoji: '⭐',
+        title: 'Nenhuma missão criada',
+        message:
+            'Crie missões especiais e personalizadas para ${widget.child.name}!',
+        icon: Icons.auto_awesome_rounded,
+        iconColor: _orange,
+        buttonText: 'Criar missão',
+        onButtonPressed: () => _showCreateMissionDialog(context, isDark),
       );
     }
 
@@ -349,7 +450,7 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
       onRefresh: _loadMissions,
       color: _purple,
       child: ListView.builder(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
@@ -360,15 +461,16 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _buildMissionCard(
-              mission['title'] ?? 'Missão',
-              mission['description'] ?? '',
-              mission['emoji'] ?? '⭐',
-              mission['reward_points'] ?? 0,
-              isCompleted,
-              _hexToColor(mission['color_hex'] ?? '#F59E0B'),
-              isDark,
-              isCustom: true,
+            child: _MissionCard(
+              title: mission['title'] ?? 'Missão',
+              description: mission['description'] ?? '',
+              emoji: mission['emoji'] ?? '⭐',
+              points: mission['reward_points'] ?? 0,
+              isCompleted: isCompleted,
+              color: _hexToColor(mission['color_hex'] ?? '#F59E0B'),
+              isDark: isDark,
+              badge: 'Personalizada',
+              badgeColor: _orange,
               onDelete: () => _deleteCustomMission(mission['id']),
             ),
           );
@@ -379,11 +481,12 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
 
   Widget _buildAllMissionsTab(bool isDark) {
     if (_allMissions.isEmpty) {
-      return _buildEmptyState(
-        'Nenhuma missão disponível',
-        'Missões do sistema aparecerão aqui.',
-        Icons.list_alt_rounded,
-        isDark,
+      return const EmptyState(
+        emoji: '🎯',
+        title: 'Catálogo vazio',
+        message: 'As missões do sistema aparecerão aqui quando disponíveis.',
+        icon: Icons.explore_outlined,
+        iconColor: _blue,
       );
     }
 
@@ -391,26 +494,25 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
       onRefresh: _loadMissions,
       color: _purple,
       child: ListView.builder(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
         itemCount: _allMissions.length,
         itemBuilder: (context, index) {
           final mission = _allMissions[index];
-
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _buildMissionCard(
-              mission['title'] ?? 'Missão',
-              mission['description'] ?? '',
-              mission['emoji'] ?? '🎯',
-              mission['points'] ?? 0,
-              false,
-              _hexToColor(mission['color_hex'] ?? '#3B82F6'),
-              isDark,
-              showAssignButton: true,
-              onAssign: () => _assignMission(mission),
+            child: _MissionCard(
+              title: mission['title'] ?? 'Missão',
+              description: mission['description'] ?? '',
+              emoji: mission['emoji'] ?? '🎯',
+              points: mission['points'] ?? 0,
+              isCompleted: false,
+              color: _hexToColor(mission['color_hex'] ?? '#3B82F6'),
+              isDark: isDark,
+              actionLabel: 'Atribuir',
+              onAction: () => _assignMission(mission),
             ),
           );
         },
@@ -418,53 +520,538 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
     );
   }
 
-  Widget _buildMissionCard(
+  // ---------------------------------------------------------------------------
+  // Create mission dialog
+  // ---------------------------------------------------------------------------
+
+  void _showCreateMissionDialog(BuildContext context, bool isDark) {
+    final titleCtl = TextEditingController();
+    final descCtl = TextEditingController();
+    final pointsCtl = TextEditingController(text: '50');
+    String selectedEmoji = '⭐';
+    Color selectedColor = _purple;
+
+    const emojis = [
+      '⭐', '🎯', '📚', '🧹', '🍎', '💪', '🎨', '🎮', '🏃', '💰',
+      '🎵', '🧠',
+    ];
+    const colors = [_purple, _blue, _green, _orange, _pink, _red];
+
+    final cardBg = isDark ? const Color(0xFF1A1A2E) : Colors.white;
+    final fieldBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final labelColor =
+        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModal) {
+          return Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(ctx).size.height * 0.88,
+            ),
+            padding: EdgeInsets.fromLTRB(
+              24,
+              16,
+              24,
+              MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(28),
+              ),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF334155)
+                            : const Color(0xFFCBD5E1),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+
+                  // Title
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              selectedColor,
+                              selectedColor.withValues(alpha: 0.7),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          selectedEmoji,
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Nova Missão',
+                          style: GoogleFonts.poppins(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: titleColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Emoji selector
+                  _sectionLabel('Emoji', labelColor),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: emojis.map((e) {
+                      final sel = e == selectedEmoji;
+                      return GestureDetector(
+                        onTap: () => setModal(() => selectedEmoji = e),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: sel
+                                ? selectedColor.withValues(alpha: 0.15)
+                                : fieldBg,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: sel
+                                  ? selectedColor
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            e,
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Color selector
+                  _sectionLabel('Cor', labelColor),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: colors.map((c) {
+                      final sel = c == selectedColor;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: GestureDetector(
+                          onTap: () => setModal(() => selectedColor = c),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: c,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color:
+                                    sel ? Colors.white : Colors.transparent,
+                                width: 3,
+                              ),
+                              boxShadow: sel
+                                  ? [
+                                      BoxShadow(
+                                        color: c.withValues(alpha: 0.5),
+                                        blurRadius: 10,
+                                        spreadRadius: 1,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            alignment: Alignment.center,
+                            child: sel
+                                ? const Icon(
+                                    Icons.check_rounded,
+                                    color: Colors.white,
+                                    size: 20,
+                                  )
+                                : null,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Title field
+                  _sectionLabel('Título', labelColor),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: titleCtl,
+                    style: GoogleFonts.poppins(color: titleColor),
+                    decoration: _fieldDecor(
+                      'Ex: Arrumar o quarto',
+                      fieldBg,
+                      isDark,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Description field
+                  _sectionLabel('Descrição (opcional)', labelColor),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: descCtl,
+                    style: GoogleFonts.poppins(color: titleColor),
+                    maxLines: 2,
+                    decoration: _fieldDecor(
+                      'Detalhe o que precisa ser feito...',
+                      fieldBg,
+                      isDark,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Points field
+                  _sectionLabel('Recompensa', labelColor),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: pointsCtl,
+                    keyboardType: TextInputType.number,
+                    style: GoogleFonts.poppins(color: titleColor),
+                    decoration: _fieldDecor(
+                      '50',
+                      fieldBg,
+                      isDark,
+                    ).copyWith(
+                      suffixText: 'pontos',
+                      suffixStyle: GoogleFonts.poppins(
+                        color: labelColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.star_rounded,
+                        color: selectedColor,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // Create button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            selectedColor,
+                            selectedColor.withValues(alpha: 0.8),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: selectedColor.withValues(alpha: 0.35),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () async {
+                            if (titleCtl.text.trim().isEmpty) {
+                              LummyFeedback.warning(
+                                ctx,
+                                'Dê um título para a missão.',
+                              );
+                              return;
+                            }
+                            await _createCustomMission(
+                              titleCtl.text.trim(),
+                              descCtl.text.trim(),
+                              selectedEmoji,
+                              int.tryParse(pointsCtl.text) ?? 50,
+                              selectedColor,
+                            );
+                            if (ctx.mounted) Navigator.pop(ctx);
+                          },
+                          child: Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.add_rounded,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Criar Missão',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _sectionLabel(String text, Color color) {
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: color,
+      ),
+    );
+  }
+
+  InputDecoration _fieldDecor(String hint, Color fillColor, bool isDark) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: GoogleFonts.poppins(
+        color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+        fontSize: 14,
+      ),
+      filled: true,
+      fillColor: fillColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(
+          color: isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: const BorderSide(color: _purple, width: 2),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // CRUD operations
+  // ---------------------------------------------------------------------------
+
+  Color _hexToColor(String hex) {
+    hex = hex.replaceAll('#', '');
+    if (hex.length == 6) hex = 'FF$hex';
+    return Color(int.parse(hex, radix: 16));
+  }
+
+  Future<void> _createCustomMission(
     String title,
     String description,
     String emoji,
     int points,
-    bool isCompleted,
     Color color,
-    bool isDark, {
-    bool isCustom = false,
-    bool showAssignButton = false,
-    VoidCallback? onDelete,
-    VoidCallback? onAssign,
-  }) {
+  ) async {
+    try {
+      final supabase = Supabase.instance.client;
+      final colorHex =
+          '#${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
+
+      await supabase.from('custom_missions').insert({
+        'child_id': widget.child.id,
+        'parent_id': supabase.auth.currentUser?.id,
+        'title': title,
+        'description': description,
+        'emoji': emoji,
+        'reward_points': points,
+        'color_hex': colorHex,
+        'is_completed': false,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
+      _loadMissions();
+      if (mounted) LummyFeedback.success(context, 'Missão criada!');
+    } catch (e) {
+      debugPrint('Erro ao criar missão: $e');
+      if (mounted) LummyFeedback.error(context, 'Erro ao criar missão.');
+    }
+  }
+
+  Future<void> _deleteCustomMission(String missionId) async {
+    try {
+      final supabase = Supabase.instance.client;
+      await supabase.from('custom_missions').delete().eq('id', missionId);
+      _loadMissions();
+      if (mounted) LummyFeedback.success(context, 'Missão removida!');
+    } catch (e) {
+      debugPrint('Erro ao deletar missão: $e');
+      if (mounted) LummyFeedback.error(context, 'Erro ao remover missão.');
+    }
+  }
+
+  Future<void> _assignMission(Map<String, dynamic> mission) async {
+    try {
+      final supabase = Supabase.instance.client;
+      final today = DateTime.now().toIso8601String().split('T')[0];
+
+      final existing = await supabase
+          .from('daily_missions')
+          .select('id')
+          .eq('child_id', widget.child.id)
+          .eq('mission_id', mission['id'])
+          .eq('selected_date', today)
+          .maybeSingle();
+
+      if (existing != null) {
+        if (mounted) {
+          LummyFeedback.warning(
+            context,
+            'Esta missão já foi atribuída hoje!',
+          );
+        }
+        return;
+      }
+
+      await supabase.from('daily_missions').insert({
+        'child_id': widget.child.id,
+        'mission_id': mission['id'],
+        'selected_date': today,
+        'is_completed': false,
+        'progress': 0,
+      });
+
+      _loadMissions();
+      if (mounted) LummyFeedback.success(context, 'Missão atribuída!');
+    } catch (e) {
+      debugPrint('Erro ao atribuir missão: $e');
+      if (mounted) LummyFeedback.error(context, 'Erro ao atribuir missão.');
+    }
+  }
+}
+
+// =============================================================================
+// Mission Card (extracted for readability)
+// =============================================================================
+
+class _MissionCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final String emoji;
+  final int points;
+  final bool isCompleted;
+  final Color color;
+  final bool isDark;
+  final String? badge;
+  final Color? badgeColor;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+  final VoidCallback? onDelete;
+
+  const _MissionCard({
+    required this.title,
+    required this.description,
+    required this.emoji,
+    required this.points,
+    required this.isCompleted,
+    required this.color,
+    required this.isDark,
+    this.badge,
+    this.badgeColor,
+    this.actionLabel,
+    this.onAction,
+    this.onDelete,
+  });
+
+  static const _green = Color(0xFF10B981);
+  static const _red = Color(0xFFEF4444);
+
+  @override
+  Widget build(BuildContext context) {
+    final cardBg = isDark ? const Color(0xFF1A1A2E) : Colors.white;
+    final borderColor = isCompleted
+        ? _green.withValues(alpha: 0.3)
+        : (isDark ? const Color(0xFF2D2D2D) : color.withValues(alpha: 0.15));
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor =
+        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isCompleted
-              ? _green.withOpacity(0.3)
-              : color.withOpacity(isDark ? 0.3 : 0.15),
-          width: 1.5,
-        ),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor, width: 1.5),
         boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(isDark ? 0.1 : 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
+          if (!isDark)
+            BoxShadow(
+              color: color.withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Top row: emoji + title + badge
           Row(
             children: [
+              // Emoji container with subtle gradient
               Container(
-                width: 52,
-                height: 52,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      color.withValues(alpha: 0.15),
+                      color.withValues(alpha: 0.06),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 26)),
-                ),
+                alignment: Alignment.center,
+                child: Text(emoji, style: const TextStyle(fontSize: 24)),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -479,78 +1066,82 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
                             style: GoogleFonts.poppins(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? Colors.white
-                                  : const Color(0xFF1E293B),
+                              color: titleColor,
                               decoration: isCompleted
                                   ? TextDecoration.lineThrough
                                   : null,
+                              decorationColor: _green,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (isCustom)
+                        if (badge != null) ...[
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
-                              vertical: 4,
+                              vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: _orange.withOpacity(0.15),
+                              color: (badgeColor ?? color)
+                                  .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              'Personalizada',
+                              badge!,
                               style: GoogleFonts.poppins(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                color: _orange,
+                                color: badgeColor ?? color,
                               ),
                             ),
                           ),
+                        ],
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                    if (description.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        description,
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: subtitleColor,
+                          height: 1.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    ],
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 14),
+
+          // Bottom row: points + status / actions
           Row(
             children: [
+              // Points chip
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: 10,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.star_rounded,
-                      color: Colors.amber,
-                      size: 16,
-                    ),
+                    Icon(Icons.star_rounded, color: color, size: 16),
                     const SizedBox(width: 4),
                     Text(
                       '+$points pts',
                       style: GoogleFonts.poppins(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: color,
                       ),
@@ -559,14 +1150,16 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
                 ),
               ),
               const Spacer(),
+
+              // Status / Action buttons
               if (isCompleted)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: 10,
+                    vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: _green.withOpacity(0.15),
+                    color: _green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -589,516 +1182,57 @@ class _ChildMissionsManagerScreenState extends State<ChildMissionsManagerScreen>
                     ],
                   ),
                 ),
-              if (showAssignButton && onAssign != null)
-                GestureDetector(
-                  onTap: onAssign,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [color, color.withOpacity(0.8)],
+              if (actionLabel != null && onAction != null)
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onAction,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 7,
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      'Atribuir',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              if (isCustom && onDelete != null)
-                GestureDetector(
-                  onTap: onDelete,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: _red.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.delete_outline_rounded,
-                      color: _red,
-                      size: 20,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(
-    String title,
-    String subtitle,
-    IconData icon,
-    bool isDark,
-  ) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: _purple.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 48, color: _purple),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: isDark
-                    ? const Color(0xFF94A3B8)
-                    : const Color(0xFF64748B),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _hexToColor(String hex) {
-    hex = hex.replaceAll('#', '');
-    if (hex.length == 6) hex = 'FF$hex';
-    return Color(int.parse(hex, radix: 16));
-  }
-
-  void _showCreateMissionDialog(BuildContext context, bool isDark) {
-    final titleController = TextEditingController();
-    final descriptionController = TextEditingController();
-    final pointsController = TextEditingController(text: '50');
-    String selectedEmoji = '⭐';
-    Color selectedColor = _purple;
-
-    final emojis = ['⭐', '🎯', '📚', '🧹', '🍎', '💪', '🎨', '🎮', '🏃', '💰'];
-    final colors = [_purple, _blue, _green, _orange, _pink, _red];
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          padding: EdgeInsets.fromLTRB(
-            20,
-            20,
-            20,
-            MediaQuery.of(context).viewInsets.bottom + 20,
-          ),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-            ),
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFFCBD5E1),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Criar Missão Personalizada',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Emoji selector
-                Text(
-                  'Escolha um emoji',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  children: emojis.map((emoji) {
-                    final isSelected = emoji == selectedEmoji;
-                    return GestureDetector(
-                      onTap: () => setModalState(() => selectedEmoji = emoji),
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? selectedColor.withOpacity(0.2)
-                              : (isDark
-                                    ? const Color(0xFF1E293B)
-                                    : const Color(0xFFF8FAFC)),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected
-                                ? selectedColor
-                                : Colors.transparent,
-                            width: 2,
-                          ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [color, color.withValues(alpha: 0.8)],
                         ),
-                        child: Center(
-                          child: Text(
-                            emoji,
-                            style: const TextStyle(fontSize: 24),
-                          ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        actionLabel!,
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                // Color selector
-                Text(
-                  'Escolha uma cor',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 10,
-                  children: colors.map((color) {
-                    final isSelected = color == selectedColor;
-                    return GestureDetector(
-                      onTap: () => setModalState(() => selectedColor = color),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
-                                ? Colors.white
-                                : Colors.transparent,
-                            width: 3,
-                          ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: color.withOpacity(0.5),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: isSelected
-                            ? const Icon(
-                                Icons.check_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              )
-                            : null,
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: titleController,
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Título da Missão',
-                    labelStyle: GoogleFonts.poppins(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
-                    filled: true,
-                    fillColor: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: descriptionController,
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
-                  ),
-                  maxLines: 2,
-                  decoration: InputDecoration(
-                    labelText: 'Descrição',
-                    labelStyle: GoogleFonts.poppins(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
-                    filled: true,
-                    fillColor: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: pointsController,
-                  keyboardType: TextInputType.number,
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Pontos de Recompensa',
-                    suffixText: 'pts',
-                    labelStyle: GoogleFonts.poppins(
-                      color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
-                    ),
-                    filled: true,
-                    fillColor: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (titleController.text.isNotEmpty) {
-                        await _createCustomMission(
-                          titleController.text,
-                          descriptionController.text,
-                          selectedEmoji,
-                          int.tryParse(pointsController.text) ?? 50,
-                          selectedColor,
-                        );
-                        if (context.mounted) Navigator.pop(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Criar Missão',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+              if (onDelete != null) ...[
+                const SizedBox(width: 8),
+                Material(
+                  color: _red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  child: InkWell(
+                    onTap: onDelete,
+                    borderRadius: BorderRadius.circular(10),
+                    child: const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Icon(
+                        Icons.delete_outline_rounded,
+                        color: _red,
+                        size: 18,
                       ),
                     ),
                   ),
                 ),
               ],
-            ),
+            ],
           ),
-        ),
+        ],
       ),
     );
-  }
-
-  Future<void> _createCustomMission(
-    String title,
-    String description,
-    String emoji,
-    int points,
-    Color color,
-  ) async {
-    try {
-      final supabase = Supabase.instance.client;
-      final colorHex =
-          '#${color.value.toRadixString(16).substring(2).toUpperCase()}';
-
-      await supabase.from('custom_missions').insert({
-        'child_id': widget.child.id,
-        'parent_id': supabase.auth.currentUser?.id,
-        'title': title,
-        'description': description,
-        'emoji': emoji,
-        'reward_points': points,
-        'color_hex': colorHex,
-        'is_completed': false,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-
-      _loadMissions();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Missão criada com sucesso!',
-              style: GoogleFonts.poppins(),
-            ),
-            backgroundColor: _green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      debugPrint('Erro ao criar missão: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Erro ao criar missão: $e',
-              style: GoogleFonts.poppins(),
-            ),
-            backgroundColor: _red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _deleteCustomMission(String missionId) async {
-    try {
-      final supabase = Supabase.instance.client;
-      await supabase.from('custom_missions').delete().eq('id', missionId);
-      _loadMissions();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Missão removida!', style: GoogleFonts.poppins()),
-            backgroundColor: _orange,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      debugPrint('Erro ao deletar missão: $e');
-    }
-  }
-
-  Future<void> _assignMission(Map<String, dynamic> mission) async {
-    try {
-      final supabase = Supabase.instance.client;
-      final today = DateTime.now().toIso8601String().split('T')[0];
-
-      // Verificar se a missão já foi atribuída hoje
-      final existing = await supabase
-          .from('daily_missions')
-          .select('id')
-          .eq('child_id', widget.child.id)
-          .eq('mission_id', mission['id'])
-          .eq('selected_date', today)
-          .maybeSingle();
-
-      if (existing != null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Esta missão já foi atribuída hoje!',
-                style: GoogleFonts.poppins(),
-              ),
-              backgroundColor: _orange,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-          );
-        }
-        return;
-      }
-
-      await supabase.from('daily_missions').insert({
-        'child_id': widget.child.id,
-        'mission_id': mission['id'],
-        'selected_date': today,
-        'is_completed': false,
-        'progress': 0,
-      });
-
-      _loadMissions();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Missão atribuída com sucesso!',
-              style: GoogleFonts.poppins(),
-            ),
-            backgroundColor: _green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      debugPrint('Erro ao atribuir missão: $e');
-    }
   }
 }

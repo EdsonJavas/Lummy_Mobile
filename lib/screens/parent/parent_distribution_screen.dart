@@ -120,9 +120,10 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                           onDistributeEqually: (amount) => context
                               .read<ParentDashboardCubit>()
                               .distributeAmount(amount),
-                          onDepositToChild: (childId, amount) => context
-                              .read<ParentDashboardCubit>()
-                              .transferToChild(childId, amount),
+                          onDepositToChild: (childId, amount) =>
+                              context
+                                  .read<ParentDashboardCubit>()
+                                  .transferToChild(childId, amount),
                         ),
                       ]),
                     ),
@@ -1055,9 +1056,12 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
   ) async {
     if (state.children.isEmpty) return;
     if (amount > state.walletBalance) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Saldo insuficiente para envio rápido.')),
-      );
+      if (context.mounted) {
+        LummyFeedback.warning(
+          context,
+          'Saldo insuficiente para envio rápido.',
+        );
+      }
       return;
     }
 
@@ -1070,18 +1074,9 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
     if (ok) {
       await _openQuickSendDialog(context, state, amount);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Não foi possível confirmar a identidade. Tente novamente.',
-            style: GoogleFonts.poppins(),
-          ),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          backgroundColor: const Color(0xFFEF4444),
-        ),
+      LummyFeedback.error(
+        context,
+        'Não foi possível confirmar a identidade. Tente novamente.',
       );
     }
   }
@@ -1094,9 +1089,12 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     if (state.children.isEmpty) return;
     if (amount > state.walletBalance) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Saldo insuficiente para envio rápido.')),
-      );
+      if (context.mounted) {
+        LummyFeedback.warning(
+          context,
+          'Saldo insuficiente para envio rápido.',
+        );
+      }
       return;
     }
 
@@ -1155,13 +1153,13 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
     );
 
     if (confirmed == true && context.mounted) {
-      context.read<ParentDashboardCubit>().transferToChild(selectedChildId, amount);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
+      final cubit = context.read<ParentDashboardCubit>();
+      await LummyFeedback.withLoading(
+        context,
+        action: () => cubit.transferToChild(selectedChildId, amount),
+        successMessage:
             'Enviado ${AppFormatters.formatCurrency(amount)} com sucesso!',
-          ),
-        ),
+        errorMessage: cubit.state.error ?? 'Erro ao enviar. Tente novamente.',
       );
     }
   }

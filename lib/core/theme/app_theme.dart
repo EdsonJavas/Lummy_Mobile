@@ -8,7 +8,9 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      scaffoldBackgroundColor: const Color(0xFFF1F5F9), // Cinza bem suave para dar contraste com cards
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      visualDensity: VisualDensity.standard,
+      scaffoldBackgroundColor: const Color(0xFFF1F5F9),
 
       // Color scheme
       colorScheme: const ColorScheme.light(
@@ -116,6 +118,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(AppConstants.accentOrange),
           foregroundColor: Colors.white,
+          minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(
             horizontal: AppConstants.spacingLarge,
             vertical: AppConstants.spacingMedium,
@@ -127,7 +130,51 @@ class AppTheme {
         ),
       ),
 
-      // Card theme — borda e sombra para definir bem no modo claro
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: const Color(AppConstants.primaryBlue),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.spacingLarge,
+            vertical: AppConstants.spacingMedium,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          ),
+        ),
+      ),
+
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color(AppConstants.primaryBlue),
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.spacingLarge,
+            vertical: AppConstants.spacingMedium,
+          ),
+          side: const BorderSide(color: Color(AppConstants.borderLight)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          ),
+        ),
+      ),
+
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: const Color(AppConstants.primaryBlue),
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.spacingMedium,
+            vertical: AppConstants.spacingSmall,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          ),
+        ),
+      ),
+
+      // Card theme
       cardTheme: CardThemeData(
         color: const Color(AppConstants.backgroundWhite),
         elevation: 0,
@@ -184,8 +231,10 @@ class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
+      materialTapTargetSize: MaterialTapTargetSize.padded,
+      visualDensity: VisualDensity.standard,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF121212), // Neutro, sem azul
+      scaffoldBackgroundColor: const Color(0xFF121212),
       // Color scheme - cores inspiradas no site Lummy
       colorScheme: const ColorScheme.dark(
         primary: Color(0xFF3B82F6), // Azul vibrante

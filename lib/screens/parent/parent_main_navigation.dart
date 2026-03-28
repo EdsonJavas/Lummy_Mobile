@@ -150,7 +150,9 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
           children: [
             Scaffold(
               key: _scaffoldKey,
-              body: IndexedStack(index: _currentIndex, children: _pages),
+              body: ConnectivityBanner(
+                child: IndexedStack(index: _currentIndex, children: _pages),
+              ),
               bottomNavigationBar: _buildPremiumBottomNav(context, isDark),
             ),
             IgnorePointer(
@@ -280,10 +282,14 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
   }) {
     final isSelected = _currentIndex == index;
 
-    return GestureDetector(
-      onTap: () => _setTab(index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
+    return Semantics(
+      label: item.label,
+      button: true,
+      selected: isSelected,
+      child: GestureDetector(
+        onTap: () => _setTab(index),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
@@ -360,6 +366,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
             ),
           ],
         ),
+      ),
       ),
     );
   }

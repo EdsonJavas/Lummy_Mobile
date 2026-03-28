@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../application/app_facade.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../di/locator.dart';
 import '../../../../domain/entities/user_entity.dart';
+import '../../../../shared/widgets/lummy_feedback.dart';
 
 class AllowanceDistributionCard extends StatefulWidget {
   final double availableBalance;
   final List<ChildEntity> children;
-  final void Function(double amount) onDistributeEqually;
-  final void Function(String childId, double amount) onDepositToChild;
+  final Future<bool> Function(double amount) onDistributeEqually;
+  final Future<bool> Function(String childId, double amount) onDepositToChild;
 
   const AllowanceDistributionCard({
     super.key,
@@ -228,22 +231,37 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                           final amount = _parseAmount();
                           if (amount == null || amount <= 0) return;
                           if (amount > widget.availableBalance) {
-                            _showLimitSnackBar(context);
+                            LummyFeedback.warning(
+                              context,
+                              'Valor ultrapassa o saldo disponível',
+                            );
                             return;
                           }
-                          setState(() => _isProcessing = true);
-                          await Future<void>.delayed(
-                            const Duration(milliseconds: 250),
+                          final bio = locator<BiometricAuthService>();
+                          final auth =
+                              await bio.authenticateSensitiveAction(
+                            reason:
+                                'Confirme para distribuir ${AppFormatters.formatCurrency(amount)}',
                           );
-                          widget.onDistributeEqually(amount);
+                          if (!auth || !mounted) return;
+                          setState(() => _isProcessing = true);
+                          final ctx = context;
+                          final ok =
+                              await widget.onDistributeEqually(amount);
+                          if (!mounted) return;
                           setState(() {
                             _isProcessing = false;
-                            _amountController.clear();
+                            if (ok) _amountController.clear();
                           });
-                          if (mounted) {
-                            _showSuccessSnackBar(
-                              context,
+                          if (ok) {
+                            LummyFeedback.success(
+                              ctx,
                               'Distribuição realizada com sucesso!',
+                            );
+                          } else {
+                            LummyFeedback.error(
+                              ctx,
+                              'Erro ao distribuir. Tente novamente.',
                             );
                           }
                         }
@@ -613,18 +631,26 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                     ],
                   ),
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (formKey.currentState?.validate() ?? false) {
                         final sanitized = amountController.text
                             .replaceAll('.', '')
                             .replaceAll(',', '.');
                         final parsed = double.tryParse(sanitized);
                         if (parsed != null && selectedChildId != null) {
-                          widget.onDepositToChild(
+                          final bio = locator<BiometricAuthService>();
+                          final auth =
+                              await bio.authenticateSensitiveAction(
+                            reason: 'Confirme para depositar',
+                          );
+                          if (!auth) return;
+                          final ok = await widget.onDepositToChild(
                             selectedChildId!,
                             double.parse(parsed.toStringAsFixed(2)),
                           );
-                          Navigator.of(bottomSheetContext).pop(true);
+                          if (bottomSheetContext.mounted) {
+                            Navigator.of(bottomSheetContext).pop(ok);
+                          }
                         }
                       }
                     },
@@ -660,50 +686,13 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
       },
     );
 
-    if (result == true && mounted) {
-      _showSuccessSnackBar(context, 'Depósito realizado com sucesso!');
+    if (!mounted) return;
+    final ctx = context;
+    if (result == true) {
+      LummyFeedback.success(ctx, 'Depósito realizado com sucesso!');
+    } else if (result == false) {
+      LummyFeedback.error(ctx, 'Erro ao depositar. Tente novamente.');
     }
   }
 
-  void _showSuccessSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(
-              message,
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-        backgroundColor: _green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
-
-  void _showLimitSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.warning_rounded, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(
-              'Valor ultrapassa o saldo disponível',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFFEF4444),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'core/services/connectivity_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/theme_provider.dart';
 import 'package:lummy_login/auth/bloc/auth_cubit.dart';
@@ -27,11 +28,9 @@ class LummyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Theme Provider
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        // Auth Cubit global
+        ChangeNotifierProvider(create: (_) => ConnectivityService()),
         BlocProvider(create: (context) => AuthCubit()),
-        // Outros providers globais podem ser adicionados aqui
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {

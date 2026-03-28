@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy_login/core/utils/formatters.dart';
 import 'package:lummy_login/domain/entities/user_entity.dart';
-import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/screens/parent/child_missions_manager_screen.dart';
 import 'package:lummy_login/screens/parent/child_achievements_screen.dart';
@@ -182,12 +180,12 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
               ? [
                   const Color(0xFF1E293B),
                   const Color(0xFF0F172A),
-                  cardColor.withOpacity(0.3),
+                  cardColor.withValues(alpha: 0.3),
                 ]
               : [
                   cardColor,
-                  cardColor.withOpacity(0.85),
-                  cardColor.withOpacity(0.7),
+                  cardColor.withValues(alpha: 0.85),
+                  cardColor.withValues(alpha: 0.7),
                 ],
         ),
         borderRadius: const BorderRadius.only(
@@ -196,7 +194,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: cardColor.withOpacity(isDark ? 0.2 : 0.3),
+            color: cardColor.withValues(alpha: isDark ? 0.2 : 0.3),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -207,34 +205,42 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           // Top bar
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
-                    size: 20,
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
               const Spacer(),
-              GestureDetector(
-                onTap: () => _navigateToSettings(context),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.settings_rounded,
-                    color: Colors.white,
-                    size: 20,
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => _navigateToSettings(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.settings_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
@@ -253,7 +259,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -280,15 +286,65 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
-                        _buildInfoChip(
-                          '${widget.child.age} anos',
-                          Icons.cake_rounded,
+                        // Level tag (highlighted)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFFD700).withValues(alpha: 0.4),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.bolt_rounded, color: Colors.white, size: 14),
+                              const SizedBox(width: 3),
+                              Text(
+                                'Nível $_level',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(width: 8),
-                        _buildInfoChip('Nível $_level', Icons.star_rounded),
+                        // Age chip
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.cake_rounded, color: Colors.white, size: 13),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${widget.child.age} anos',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -301,9 +357,9 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -316,7 +372,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -331,28 +387,39 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(14),
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFFFD700).withValues(alpha: 0.25),
+                        const Color(0xFFFFA500).withValues(alpha: 0.15),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+                    ),
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.stars_rounded,
-                        color: Colors.amber,
-                        size: 20,
-                      ),
+                      const Icon(Icons.stars_rounded, color: Color(0xFFFFD700), size: 18),
                       const SizedBox(width: 6),
                       Text(
-                        '$_totalPoints pts',
+                        '$_totalPoints',
                         style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFFFFD700),
+                        ),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        'pts',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -366,30 +433,6 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     );
   }
 
-  Widget _buildInfoChip(String text, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 14),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildStatsGrid(BuildContext context, bool isDark) {
     return Padding(
@@ -447,12 +490,12 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: color.withOpacity(isDark ? 0.3 : 0.15),
+          color: color.withValues(alpha: isDark ? 0.3 : 0.15),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(isDark ? 0.1 : 0.08),
+            color: color.withValues(alpha: isDark ? 0.1 : 0.08),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -463,7 +506,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 22),
@@ -493,7 +536,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: color.withOpacity(0.2),
+                backgroundColor: color.withValues(alpha: 0.2),
                 valueColor: AlwaysStoppedAnimation(color),
                 minHeight: 4,
               ),
@@ -536,28 +579,12 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionButton(
-                  'Enviar Dinheiro',
-                  Icons.send_rounded,
-                  _green,
-                  isDark,
-                  () => _showSendMoneyDialog(context, isDark),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionButton(
-                  'Configurações',
-                  Icons.tune_rounded,
-                  _blue,
-                  isDark,
-                  () => _navigateToSettings(context),
-                ),
-              ),
-            ],
+          _buildActionButton(
+            'Configurações',
+            Icons.tune_rounded,
+            _blue,
+            isDark,
+            () => _navigateToSettings(context),
           ),
         ],
       ),
@@ -589,40 +616,45 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     bool isDark,
     VoidCallback onTap,
   ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [color, color.withOpacity(0.8)],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [color, color.withValues(alpha: 0.8)],
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 22),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                label,
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.white, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-          ],
+              Icon(Icons.arrow_forward_ios_rounded, color: Colors.white.withValues(alpha: 0.6), size: 14),
+            ],
+          ),
         ),
       ),
     );
@@ -632,10 +664,17 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Container(
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: TabBar(
           controller: _tabController,
@@ -644,27 +683,34 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
               colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
             ),
             borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: _blue.withValues(alpha: 0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           indicatorSize: TabBarIndicatorSize.tab,
           dividerColor: Colors.transparent,
           labelColor: Colors.white,
           unselectedLabelColor: isDark
-              ? const Color(0xFF94A3B8)
-              : const Color(0xFF64748B),
+              ? const Color(0xFF64748B)
+              : const Color(0xFF94A3B8),
           labelStyle: GoogleFonts.poppins(
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
           unselectedLabelStyle: GoogleFonts.poppins(
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
           labelPadding: const EdgeInsets.symmetric(horizontal: 4),
           tabs: const [
-            Tab(text: 'Resumo', height: 36),
-            Tab(text: 'Missões', height: 36),
-            Tab(text: 'Transações', height: 36),
-            Tab(text: 'Metas', height: 36),
+            Tab(text: 'Resumo', height: 38),
+            Tab(text: 'Missões', height: 38),
+            Tab(text: 'Transações', height: 38),
+            Tab(text: 'Metas', height: 38),
           ],
         ),
       ),
@@ -694,24 +740,89 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Progresso Semanal
           _buildProgressCard(isDark),
           const SizedBox(height: 20),
-          // Missões Recentes
           _buildRecentMissionsCard(isDark),
           const SizedBox(height: 20),
-          // Últimas Conquistas
           _buildRecentAchievementsCard(isDark),
+          const SizedBox(height: 20),
+          _buildRecentGoalsCard(isDark),
           const SizedBox(height: 100),
         ],
       ),
     );
   }
 
+  Widget _summaryCard({
+    required bool isDark,
+    required Widget child,
+    Color? accent,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: accent != null
+              ? accent.withValues(alpha: isDark ? 0.15 : 0.1)
+              : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: (accent ?? Colors.black).withValues(alpha: isDark ? 0.08 : 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _summaryHeader(String title, IconData icon, Color color, bool isDark, {VoidCallback? onSeeAll}) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.08)]),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 16, fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : const Color(0xFF1E293B),
+            ),
+          ),
+        ),
+        if (onSeeAll != null)
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: onSeeAll,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(
+                  'Ver todas',
+                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: color),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _buildProgressCard(bool isDark) {
-    final progressPercent = _totalMissions > 0
-        ? (_completedMissions / _totalMissions * 100).toInt()
-        : 0;
+    final progress = _totalMissions > 0 ? _completedMissions / _totalMissions : 0.0;
+    final progressPercent = (progress * 100).toInt();
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -720,16 +831,13 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF334155), const Color(0xFF1E293B)]
-              : [Colors.white, const Color(0xFFF8FAFC)],
+              ? [const Color(0xFF064E3B), _green.withValues(alpha: 0.3)]
+              : [_green, const Color(0xFF059669)],
         ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-        ),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: _green.withValues(alpha: isDark ? 0.15 : 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -741,53 +849,63 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Progresso de Hoje',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.trending_up_rounded, color: Colors.white, size: 18),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Progresso de Hoje',
+                    style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: _green.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   '$progressPercent%',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: _green,
+                  style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Stack(
+            children: [
+              Container(
+                height: 12,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              FractionallySizedBox(
+                widthFactor: progress.clamp(0.0, 1.0),
+                child: Container(
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.4), blurRadius: 6)],
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: _totalMissions > 0
-                  ? _completedMissions / _totalMissions
-                  : 0,
-              backgroundColor: _green.withOpacity(0.2),
-              valueColor: const AlwaysStoppedAnimation(_green),
-              minHeight: 12,
-            ),
-          ),
           const SizedBox(height: 12),
           Text(
             '$_completedMissions de $_totalMissions missões completadas',
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-            ),
+            style: GoogleFonts.poppins(fontSize: 13, color: Colors.white.withValues(alpha: 0.8)),
           ),
         ],
       ),
@@ -795,91 +913,24 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
   }
 
   Widget _buildRecentMissionsCard(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+    return _summaryCard(
+      isDark: isDark,
+      accent: _blue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Missões de Hoje',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                ),
-              ),
-              TextButton(
-                onPressed: () => _navigateToMissions(context),
-                child: Text(
-                  'Ver todas',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: _blue,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
+          _summaryHeader('Missões de Hoje', Icons.flag_rounded, _blue, isDark,
+              onSeeAll: () => _navigateToMissions(context)),
+          const SizedBox(height: 16),
           if (_activeMissions.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.assignment_outlined,
-                      size: 48,
-                      color: isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFF94A3B8),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Nenhuma missão hoje',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
+            _miniEmpty('🎯', 'Nenhuma missão hoje', isDark)
           else
             ...(_activeMissions.take(3).map((mission) {
-              final missionData = mission['missions'] as Map<String, dynamic>?;
-              final isCompleted = mission['is_completed'] == true;
-
+              final d = mission['missions'] as Map<String, dynamic>?;
               return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _buildMissionItem(
-                  missionData?['title'] ?? 'Missão',
-                  missionData?['emoji'] ?? '🎯',
-                  missionData?['points'] ?? 0,
-                  isCompleted,
-                  isDark,
-                ),
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _missionRow(d?['title'] ?? 'Missão', d?['emoji'] ?? '🎯',
+                    d?['points'] ?? 0, mission['is_completed'] == true, isDark),
               );
             })),
         ],
@@ -887,36 +938,30 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     );
   }
 
-  Widget _buildMissionItem(
-    String title,
-    String emoji,
-    int points,
-    bool isCompleted,
-    bool isDark,
-  ) {
+  Widget _missionRow(String title, String emoji, int pts, bool done, bool isDark) {
+    final color = done ? _green : _blue;
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+        gradient: done
+            ? LinearGradient(colors: [_green.withValues(alpha: 0.08), _green.withValues(alpha: 0.03)])
+            : null,
+        color: done ? null : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC)),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isCompleted
-              ? _green.withOpacity(0.3)
-              : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+          color: done ? _green.withValues(alpha: 0.25) : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
         ),
       ),
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 42, height: 42,
             decoration: BoxDecoration(
-              color: (isCompleted ? _green : _blue).withOpacity(0.15),
+              gradient: LinearGradient(colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.08)]),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: Text(emoji, style: const TextStyle(fontSize: 22)),
-            ),
+            alignment: Alignment.center,
+            child: Text(emoji, style: const TextStyle(fontSize: 20)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -926,27 +971,32 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                 Text(
                   title,
                   style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
-                    decoration: isCompleted ? TextDecoration.lineThrough : null,
+                    fontSize: 14, fontWeight: FontWeight.w600,
+                    color: done
+                        ? _green
+                        : (isDark ? Colors.white : const Color(0xFF1E293B)),
+                    decoration: done ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 Text(
-                  '+$points pontos',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: isCompleted ? _green : _orange,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  '+$pts pontos',
+                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w500, color: done ? _green : _orange),
                 ),
               ],
             ),
           ),
-          Icon(
-            isCompleted ? Icons.check_circle_rounded : Icons.circle_outlined,
-            color: isCompleted ? _green : const Color(0xFF94A3B8),
-            size: 24,
+          Container(
+            width: 28, height: 28,
+            decoration: BoxDecoration(
+              gradient: done ? const LinearGradient(colors: [_green, Color(0xFF059669)]) : null,
+              color: done ? null : (isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0)),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              done ? Icons.check_rounded : Icons.circle_outlined,
+              color: done ? Colors.white : const Color(0xFF94A3B8),
+              size: done ? 16 : 20,
+            ),
           ),
         ],
       ),
@@ -954,89 +1004,24 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
   }
 
   Widget _buildRecentAchievementsCard(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+    return _summaryCard(
+      isDark: isDark,
+      accent: _orange,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Conquistas Recentes',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                ),
-              ),
-              TextButton(
-                onPressed: () => _navigateToAchievements(context),
-                child: Text(
-                  'Ver todas',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: _orange,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
+          _summaryHeader('Conquistas Recentes', Icons.emoji_events_rounded, _orange, isDark,
+              onSeeAll: () => _navigateToAchievements(context)),
+          const SizedBox(height: 16),
           if (_achievements.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.emoji_events_outlined,
-                      size: 48,
-                      color: isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFF94A3B8),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Nenhuma conquista ainda',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
+            _miniEmpty('🏆', 'Nenhuma conquista ainda', isDark)
           else
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: _achievements.take(6).map((achievement) {
-                final achievementData =
-                    achievement['achievements'] as Map<String, dynamic>?;
-                return _buildAchievementBadge(
-                  achievementData?['emoji'] ?? '🏆',
-                  achievementData?['name'] ?? 'Conquista',
-                  isDark,
-                );
+              children: _achievements.take(6).map((a) {
+                final d = a['achievements'] as Map<String, dynamic>?;
+                return _achieveBadge(d?['emoji'] ?? '🏆', d?['name'] ?? 'Conquista', isDark);
               }).toList(),
             ),
         ],
@@ -1044,15 +1029,13 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     );
   }
 
-  Widget _buildAchievementBadge(String emoji, String name, bool isDark) {
+  Widget _achieveBadge(String emoji, String name, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [_orange.withOpacity(0.15), _orange.withOpacity(0.08)],
-        ),
+        gradient: LinearGradient(colors: [_orange.withValues(alpha: 0.15), _orange.withValues(alpha: 0.06)]),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _orange.withOpacity(0.2)),
+        border: Border.all(color: _orange.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1062,8 +1045,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           Text(
             name,
             style: GoogleFonts.poppins(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontSize: 12, fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : const Color(0xFF1E293B),
             ),
           ),
@@ -1072,9 +1054,164 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     );
   }
 
+  Widget _buildRecentGoalsCard(bool isDark) {
+    final active = _goals.where((g) => g['status'] != 'completed' && g['status'] != 'cancelled').take(2).toList();
+    final completed = _goals.where((g) => g['status'] == 'completed').take(2).toList();
+
+    return _summaryCard(
+      isDark: isDark,
+      accent: _purple,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _summaryHeader('Metas', Icons.savings_rounded, _purple, isDark,
+              onSeeAll: () => _tabController.animateTo(3)),
+          const SizedBox(height: 16),
+          if (_goals.isEmpty)
+            _miniEmpty('🎯', 'Nenhuma meta criada', isDark)
+          else ...[
+            ...active.map((g) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _miniGoalRow(g, false, isDark),
+            )),
+            ...completed.map((g) => Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _miniGoalRow(g, true, isDark),
+            )),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _miniGoalRow(Map<String, dynamic> goal, bool done, bool isDark) {
+    final emoji = goal['emoji'] ?? '🎯';
+    final name = goal['name'] ?? 'Meta';
+    final target = (goal['target_amount'] as num?)?.toDouble() ?? 0.0;
+    final current = (goal['current_amount'] as num?)?.toDouble() ?? 0.0;
+    final progress = target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
+    final color = done ? _green : _purple;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: done
+            ? LinearGradient(colors: [_green.withValues(alpha: 0.08), _green.withValues(alpha: 0.03)])
+            : null,
+        color: done ? null : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC)),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: done ? _green.withValues(alpha: 0.2) : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.08)]),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            alignment: Alignment.center,
+            child: Text(emoji, style: const TextStyle(fontSize: 18)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : const Color(0xFF1E293B))),
+                const SizedBox(height: 4),
+                if (!done)
+                  Stack(
+                    children: [
+                      Container(height: 5, decoration: BoxDecoration(
+                        color: _purple.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3))),
+                      FractionallySizedBox(widthFactor: progress, child: Container(height: 5,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: [_purple, Color(0xFF7C3AED)]),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      )),
+                    ],
+                  )
+                else
+                  Text('Concluída!', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: _green)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (done)
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(gradient: LinearGradient(colors: [_green, Color(0xFF059669)]), shape: BoxShape.circle),
+              child: const Icon(Icons.check_rounded, color: Colors.white, size: 14),
+            )
+          else
+            Text('${(progress * 100).toInt()}%', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: _purple)),
+        ],
+      ),
+    );
+  }
+
+  Widget _miniEmpty(String emoji, String text, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 20)),
+          const SizedBox(width: 8),
+          Text(text, style: GoogleFonts.poppins(
+            fontSize: 13, fontWeight: FontWeight.w500,
+            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget _inlineEmpty(IconData icon, String text, bool isDark) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52, height: 52,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
+                    : const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 26, color: isDark ? const Color(0xFF7C3AED) : const Color(0xFF8B5CF6)),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 14, fontWeight: FontWeight.w600,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ──────────────────────── Missions Tab ────────────────────────
+
   Widget _buildMissionsTab(bool isDark) {
-    if (_isLoading) {
-      return const Center(child: BrandedLoader());
+    if (_isLoading) return const Center(child: BrandedLoader());
+
+    if (_activeMissions.isEmpty) {
+      return _inlineEmpty(Icons.assignment_outlined, 'Nenhuma missão hoje', isDark);
     }
 
     return ListView.builder(
@@ -1083,18 +1220,11 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
       itemCount: _activeMissions.length,
       itemBuilder: (context, index) {
         final mission = _activeMissions[index];
-        final missionData = mission['missions'] as Map<String, dynamic>?;
-        final isCompleted = mission['is_completed'] == true;
-
+        final d = mission['missions'] as Map<String, dynamic>?;
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: _buildMissionItem(
-            missionData?['title'] ?? 'Missão',
-            missionData?['emoji'] ?? '🎯',
-            missionData?['points'] ?? 0,
-            isCompleted,
-            isDark,
-          ),
+          child: _missionRow(d?['title'] ?? 'Missão', d?['emoji'] ?? '🎯',
+              d?['points'] ?? 0, mission['is_completed'] == true, isDark),
         );
       },
     );
@@ -1142,50 +1272,12 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
   }
 
   Widget _buildTransactionsTab(bool isDark) {
-    if (_isLoading) {
-      return const Center(child: BrandedLoader());
-    }
+    if (_isLoading) return const Center(child: BrandedLoader());
 
     final filtered = _filteredTransactions;
 
     if (_recentTransactions.isEmpty) {
-      return Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.receipt_long_outlined,
-                size: 56,
-                color: isDark
-                    ? const Color(0xFF64748B)
-                    : const Color(0xFF94A3B8),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Nenhuma transação',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'As transações aparecerão aqui',
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      return _inlineEmpty(Icons.receipt_long_outlined, 'Nenhuma transação recente', isDark);
     }
 
     return ListView(
@@ -1195,37 +1287,42 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         _buildTransactionFilters(isDark),
         const SizedBox(height: 16),
         ...List.generate(filtered.length, (index) {
-          final transaction = filtered[index];
-          final isIncome = transaction['type'] == 'income';
-          final amount = (transaction['amount'] as num).toDouble();
+          final tx = filtered[index];
+          final isIncome = tx['type'] == 'income';
+          final amount = (tx['amount'] as num).toDouble();
+          final color = isIncome ? _green : _red;
+
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: 10),
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0),
+                  color: color.withValues(alpha: isDark ? 0.12 : 0.08),
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: isDark ? 0.06 : 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 44, height: 44,
                     decoration: BoxDecoration(
-                      color: (isIncome ? _green : _red).withOpacity(0.15),
+                      gradient: LinearGradient(
+                        colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.08)],
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      isIncome
-                          ? Icons.arrow_downward_rounded
-                          : Icons.arrow_upward_rounded,
-                      color: isIncome ? _green : _red,
-                      size: 22,
+                      isIncome ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+                      color: color, size: 22,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1234,33 +1331,41 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          transaction['description'] ?? 'Transação',
+                          tx['description'] ?? 'Transação',
                           style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF1E293B),
+                            fontSize: 14, fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
                           ),
                         ),
-                        Text(
-                          transaction['category'] ?? 'Outros',
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B),
+                        const SizedBox(height: 2),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            tx['category'] ?? 'Outros',
+                            style: GoogleFonts.poppins(
+                              fontSize: 10, fontWeight: FontWeight.w500,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Text(
-                    '${isIncome ? '+' : '-'}${AppFormatters.formatCurrency(amount)}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: isIncome ? _green : _red,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [color.withValues(alpha: 0.15), color.withValues(alpha: 0.06)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${isIncome ? '+' : '-'}${AppFormatters.formatCurrency(amount)}',
+                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700, color: color),
                     ),
                   ),
                 ],
@@ -1342,25 +1447,36 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
 
   Widget _buildFilterChip(String label, bool selected, VoidCallback onTap) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected
-              ? _blue
-              : (isDark ? const Color(0xFF1E293B) : Colors.white),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: selected ? _blue : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: selected
+                ? const LinearGradient(colors: [_blue, Color(0xFF2563EB)])
+                : null,
+            color: selected
+                ? null
+                : (isDark ? const Color(0xFF1E293B) : Colors.white),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: selected ? _blue : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+            ),
+            boxShadow: selected
+                ? [BoxShadow(color: _blue.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
+                : null,
           ),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: selected ? Colors.white : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+          child: Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+              color: selected ? Colors.white : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+            ),
           ),
         ),
       ),
@@ -1368,11 +1484,8 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
   }
 
   Widget _buildGoalsTab(bool isDark) {
-    if (_isLoading) {
-      return const Center(child: BrandedLoader());
-    }
+    if (_isLoading) return const Center(child: BrandedLoader());
 
-    // Separar metas em andamento e concluídas
     final activeGoals = _goals
         .where((g) => g['status'] != 'completed' && g['status'] != 'cancelled')
         .toList();
@@ -1381,162 +1494,149 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         .toList();
 
     if (_goals.isEmpty) {
-      return Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: _purple.withOpacity(0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.savings_rounded,
-                  size: 40,
-                  color: _purple,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Nenhuma meta',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Seu filho ainda não criou metas de economia',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      return _inlineEmpty(Icons.savings_outlined, 'Nenhuma meta criada ainda', isDark);
     }
+
+    final hasOnlyCompleted = activeGoals.isEmpty && completedGoals.isNotEmpty;
 
     return ListView(
       padding: const EdgeInsets.all(20),
       physics: const BouncingScrollPhysics(),
       children: [
-        // Metas em andamento
         if (activeGoals.isNotEmpty) ...[
-          _buildGoalsSectionHeader(
-            'Em Andamento',
-            '${activeGoals.length}',
-            _orange,
-            Icons.trending_up_rounded,
-            isDark,
-          ),
+          _goalSectionHeader('Em Andamento', '${activeGoals.length}', _orange, Icons.trending_up_rounded, isDark),
           const SizedBox(height: 12),
-          ...activeGoals.map((goal) => _buildGoalCard(goal, isDark)),
+          ...activeGoals.map((g) => _goalCard(g, isDark)),
           const SizedBox(height: 24),
         ],
-
-        // Metas concluídas
+        if (hasOnlyCompleted) ...[
+          _goalsCelebrationBanner(isDark, completedGoals.length),
+          const SizedBox(height: 20),
+        ],
         if (completedGoals.isNotEmpty) ...[
-          _buildGoalsSectionHeader(
-            'Concluídas',
+          _goalSectionHeader(
+            hasOnlyCompleted ? 'Todas Concluídas' : 'Concluídas',
             '${completedGoals.length}',
             _green,
             Icons.check_circle_rounded,
             isDark,
           ),
           const SizedBox(height: 12),
-          ...completedGoals.map(
-            (goal) => _buildGoalCard(goal, isDark, isCompleted: true),
-          ),
+          ...completedGoals.map((g) => _goalCard(g, isDark, isCompleted: true)),
         ],
-
         const SizedBox(height: 80),
       ],
     );
   }
 
-  Widget _buildGoalsSectionHeader(
-    String title,
-    String count,
-    Color color,
-    IconData icon,
-    bool isDark,
-  ) {
+  Widget _goalsCelebrationBanner(bool isDark, int count) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [const Color(0xFF064E3B), _green.withValues(alpha: 0.25)]
+              : [_green, const Color(0xFF059669)],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: _green.withValues(alpha: isDark ? 0.15 : 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52, height: 52,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            alignment: Alignment.center,
+            child: const Text('🏆', style: TextStyle(fontSize: 28)),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Parabéns!',
+                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+                ),
+                Text(
+                  '$count ${count == 1 ? 'meta concluída' : 'metas concluídas'} com sucesso',
+                  style: GoogleFonts.poppins(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _goalSectionHeader(String title, String count, Color color, IconData icon, bool isDark) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
+            gradient: LinearGradient(colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.08)]),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color, size: 18),
         ),
         const SizedBox(width: 10),
-        Text(
-          title,
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
-          ),
-        ),
+        Text(title, style: GoogleFonts.poppins(
+          fontSize: 16, fontWeight: FontWeight.w600,
+          color: isDark ? Colors.white : const Color(0xFF1E293B),
+        )),
         const Spacer(),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
+            gradient: LinearGradient(colors: [color.withValues(alpha: 0.18), color.withValues(alpha: 0.08)]),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Text(
-            count,
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
-          ),
+          child: Text(count, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
         ),
       ],
     );
   }
 
-  Widget _buildGoalCard(
-    Map<String, dynamic> goal,
-    bool isDark, {
-    bool isCompleted = false,
-  }) {
+  Widget _goalCard(Map<String, dynamic> goal, bool isDark, {bool isCompleted = false}) {
     final name = goal['name'] ?? 'Meta';
     final emoji = goal['emoji'] ?? '🎯';
-    final targetAmount = (goal['target_amount'] as num?)?.toDouble() ?? 0.0;
-    final currentAmount = (goal['current_amount'] as num?)?.toDouble() ?? 0.0;
-    final progress = targetAmount > 0
-        ? (currentAmount / targetAmount).clamp(0.0, 1.0)
-        : 0.0;
-    final progressPercent = (progress * 100).toInt();
-
-    final cardColor = isCompleted ? _green : _purple;
+    final target = (goal['target_amount'] as num?)?.toDouble() ?? 0.0;
+    final current = (goal['current_amount'] as num?)?.toDouble() ?? 0.0;
+    final progress = target > 0 ? (current / target).clamp(0.0, 1.0) : 0.0;
+    final pct = (progress * 100).toInt();
+    final color = isCompleted ? _green : _purple;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cardColor.withOpacity(isDark ? 0.2 : 0.15)),
+        gradient: isCompleted
+            ? LinearGradient(
+                colors: isDark
+                    ? [const Color(0xFF1E293B), _green.withValues(alpha: 0.1)]
+                    : [Colors.white, _green.withValues(alpha: 0.04)],
+              )
+            : null,
+        color: isCompleted ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.12)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
-            blurRadius: 10,
+            color: color.withValues(alpha: isDark ? 0.08 : 0.06),
+            blurRadius: 14,
             offset: const Offset(0, 4),
           ),
         ],
@@ -1547,127 +1647,92 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 48, height: 48,
                 decoration: BoxDecoration(
-                  color: cardColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.08)]),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Center(
-                  child: Text(emoji, style: const TextStyle(fontSize: 22)),
-                ),
+                alignment: Alignment.center,
+                child: Text(emoji, style: const TextStyle(fontSize: 24)),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      name,
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    Text(name, style: GoogleFonts.poppins(
+                      fontSize: 15, fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    ), maxLines: 1, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 2),
                     Text(
-                      'Meta: ${AppFormatters.formatCurrency(targetAmount)}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
-                      ),
+                      'Meta: ${AppFormatters.formatCurrency(target)}',
+                      style: GoogleFonts.poppins(fontSize: 12,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                     ),
                   ],
                 ),
               ),
               if (isCompleted)
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: _green.withOpacity(0.15),
+                    gradient: const LinearGradient(colors: [_green, Color(0xFF059669)]),
                     borderRadius: BorderRadius.circular(12),
+                    boxShadow: [BoxShadow(color: _green.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.check_rounded, color: _green, size: 14),
+                      const Icon(Icons.check_rounded, color: Colors.white, size: 14),
                       const SizedBox(width: 4),
-                      Text(
-                        'Concluída',
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: _green,
-                        ),
-                      ),
+                      Text('Concluída', style: GoogleFonts.poppins(
+                        fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white,
+                      )),
                     ],
                   ),
                 )
               else
-                Text(
-                  '$progressPercent%',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: cardColor,
-                  ),
-                ),
+                Text('$pct%', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: color)),
             ],
           ),
           if (!isCompleted) ...[
-            const SizedBox(height: 14),
-            // Progress bar
+            const SizedBox(height: 16),
             Stack(
               children: [
-                Container(
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: cardColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
+                Container(height: 10, decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(5))),
                 FractionallySizedBox(
                   widthFactor: progress,
-                  child: Container(
-                    height: 8,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [cardColor, cardColor.withOpacity(0.7)],
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
+                  child: Container(height: 10, decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.7)]),
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 2))],
+                  )),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Economizado: ${AppFormatters.formatCurrency(currentAmount)}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: cardColor,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      width: 8, height: 8,
+                      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      AppFormatters.formatCurrency(current),
+                      style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: color),
+                    ),
+                  ],
                 ),
                 Text(
-                  'Falta: ${AppFormatters.formatCurrency(targetAmount - currentAmount)}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
-                  ),
+                  'Falta ${AppFormatters.formatCurrency(target - current)}',
+                  style: GoogleFonts.poppins(fontSize: 12,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                 ),
               ],
             ),
@@ -1704,194 +1769,4 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     );
   }
 
-  void _showSendMoneyDialog(BuildContext context, bool isDark) {
-    final amountController = TextEditingController();
-    final descriptionController = TextEditingController();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          20,
-          20,
-          MediaQuery.of(context).viewInsets.bottom + 20,
-        ),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF64748B)
-                      : const Color(0xFFCBD5E1),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Enviar para ${widget.child.name}',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: amountController,
-              keyboardType: TextInputType.number,
-              style: GoogleFonts.poppins(
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
-              decoration: InputDecoration(
-                labelText: 'Valor',
-                prefixText: 'R\$ ',
-                labelStyle: GoogleFonts.poppins(
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
-                ),
-                filled: true,
-                fillColor: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF8FAFC),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: descriptionController,
-              style: GoogleFonts.poppins(
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
-              ),
-              decoration: InputDecoration(
-                labelText: 'Descrição (opcional)',
-                labelStyle: GoogleFonts.poppins(
-                  color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
-                ),
-                filled: true,
-                fillColor: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF8FAFC),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  final amount = double.tryParse(
-                    amountController.text.replaceAll(',', '.'),
-                  );
-                  if (amount != null && amount > 0) {
-                    await _sendMoney(amount, descriptionController.text);
-                    if (context.mounted) Navigator.pop(context);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _green,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Enviar',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _sendMoney(double amount, String description) async {
-    if (amount <= 0) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Valor deve ser maior que zero',
-              style: GoogleFonts.poppins(),
-            ),
-            backgroundColor: _red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        );
-      }
-      return;
-    }
-
-    final cubit = context.read<ParentDashboardCubit>();
-    final ok = await cubit.transferToChild(
-      widget.child.id,
-      amount,
-      description: description.isEmpty ? null : description,
-    );
-
-    if (!mounted) return;
-
-    if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'R\$ ${amount.toStringAsFixed(2)} enviado com sucesso!',
-            style: GoogleFonts.poppins(),
-          ),
-          backgroundColor: _green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
-      _loadChildData();
-    } else {
-      final message = cubit.state.error ?? 'Erro ao enviar dinheiro.';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message, style: GoogleFonts.poppins()),
-          backgroundColor: _red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
-    }
-  }
 }

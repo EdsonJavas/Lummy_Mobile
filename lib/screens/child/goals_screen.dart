@@ -512,20 +512,35 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 32)),
                 ] else ...[
-                  SliverToBoxAdapter(
-                    child: _buildEmptyState(isSmallScreen)
-                        .animate()
-                        .fadeIn(duration: 400.ms)
-                        .slideY(begin: 0.06, end: 0, curve: Curves.easeOutCubic),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                  if (completedGoals.isNotEmpty) ...[
+                    // Celebration banner when only completed goals exist
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: _buildCelebrationBanner(isSmallScreen)
+                            .animate()
+                            .fadeIn(duration: 400.ms)
+                            .slideY(begin: 0.04, end: 0, curve: Curves.easeOutCubic),
+                      ),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                  ] else ...[
+                    // Subtle hint when truly nothing exists
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
+                        child: _buildSubtleEmptyHint(isSmallScreen),
+                      ),
+                    ),
+                  ],
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
                 ],
                 if (completedGoals.isNotEmpty) ...[
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: _buildSectionHeader(
-                        'Concluídas',
+                        goal == null ? 'Todas Concluídas' : 'Concluídas',
                         completedGoals.length,
                         isSmallScreen,
                       )
@@ -1435,138 +1450,104 @@ class _GoalsScreenState extends State<GoalsScreen> {
     );
   }
 
-  Widget _buildEmptyState(bool isSmallScreen) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Enhanced icon container with gradient
-            Container(
-              width: isSmallScreen ? 120 : 140,
-              height: isSmallScreen ? 120 : 140,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.flag_rounded,
-                color: Colors.white,
-                size: 70,
-              ),
-            ),
-            const SizedBox(height: 32),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    '🚀 Comece sua jornada!',
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 20 : 24,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1E293B),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Nenhuma meta criada ainda',
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 16 : 18,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF64748B),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Crie sua primeira meta e comece a transformar seus sonhos em realidade!',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: isSmallScreen ? 14 : 16,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF64748B),
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: _addNewGoal,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: Colors.white,
-                  shadowColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.add, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      completedGoals.isNotEmpty
-                          ? 'criar nova meta'
-                          : 'Criar Primeira Meta',
-                      style: GoogleFonts.poppins(
-                        fontSize: isSmallScreen ? 16 : 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+  Widget _buildCelebrationBanner(bool isSmallScreen) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: dark
+              ? [const Color(0xFF064E3B), const Color(0xFF10B981).withValues(alpha: 0.25)]
+              : [const Color(0xFF10B981), const Color(0xFF059669)],
         ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF10B981).withValues(alpha: dark ? 0.15 : 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
+      child: Row(
+        children: [
+          Container(
+            width: 52, height: 52,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            alignment: Alignment.center,
+            child: const Text('🏆', style: TextStyle(fontSize: 28)),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Parabéns!',
+                  style: GoogleFonts.poppins(
+                    fontSize: isSmallScreen ? 17 : 19,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'Crie uma nova meta para continuar evoluindo!',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubtleEmptyHint(bool isSmallScreen) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 56, height: 56,
+          decoration: BoxDecoration(
+            color: dark
+                ? const Color(0xFF8B5CF6).withValues(alpha: 0.12)
+                : const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.flag_rounded,
+            size: 28,
+            color: dark ? const Color(0xFF7C3AED) : const Color(0xFF8B5CF6),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Nenhuma meta criada ainda',
+          style: GoogleFonts.poppins(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Toque no botão abaixo para começar',
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            color: dark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+          ),
+        ),
+      ],
     );
   }
 

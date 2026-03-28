@@ -137,8 +137,9 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
           const SizedBox(height: 8),
         ],
         Container(
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: _isFocused
                   ? const Color(0xFF3B82F6)

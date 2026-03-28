@@ -42,12 +42,12 @@ class CustomButton extends StatelessWidget {
       case ButtonSize.small:
         fontSize = isSmallScreen ? 12 : 14;
         padding = isSmallScreen ? 12 : 16;
-        height = isSmallScreen ? 36 : 40;
+        height = 48;
         break;
       case ButtonSize.medium:
         fontSize = isSmallScreen ? 14 : 16;
         padding = isSmallScreen ? 16 : 20;
-        height = isSmallScreen ? 44 : 50;
+        height = isSmallScreen ? 48 : 52;
         break;
       case ButtonSize.large:
         fontSize = isSmallScreen ? 16 : 18;

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:lummy_login/application/app_facade.dart';
+import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
 import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_state.dart';
@@ -327,12 +329,16 @@ class ParentApprovalsScreen extends StatelessWidget {
                     icon: Icons.close_rounded,
                     color: _red,
                     isDark: isDark,
-                    onTap: () {
-                      cubit.rejectTransaction(transaction.id, 'Rejeitado');
-                      _showSnack(
+                    onTap: () async {
+                      await LummyFeedback.withLoading(
                         context,
-                        message: 'Transação rejeitada!',
-                        color: _red,
+                        action: () => cubit.rejectTransaction(
+                          transaction.id,
+                          'Rejeitado',
+                        ),
+                        successMessage: 'Transação rejeitada!',
+                        errorMessage:
+                            cubit.state.error ?? 'Erro ao rejeitar.',
                       );
                     },
                   ),
@@ -345,12 +351,19 @@ class ParentApprovalsScreen extends StatelessWidget {
                     color: _green,
                     isDark: isDark,
                     isPrimary: true,
-                    onTap: () {
-                      cubit.approveTransaction(transaction.id);
-                      _showSnack(
+                    onTap: () async {
+                      final bio = locator<BiometricAuthService>();
+                      final ok = await bio.authenticateSensitiveAction(
+                        reason: 'Confirme para aprovar a transação',
+                      );
+                      if (!ok || !context.mounted) return;
+                      await LummyFeedback.withLoading(
                         context,
-                        message: 'Transação aprovada! 🎉',
-                        color: _green,
+                        action: () =>
+                            cubit.approveTransaction(transaction.id),
+                        successMessage: 'Transação aprovada!',
+                        errorMessage:
+                            cubit.state.error ?? 'Erro ao aprovar.',
                       );
                     },
                   ),
@@ -449,37 +462,4 @@ class ParentApprovalsScreen extends StatelessWidget {
     );
   }
 
-  void _showSnack(
-    BuildContext context, {
-    required String message,
-    required Color color,
-  }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              color == _green
-                  ? Icons.check_circle_rounded
-                  : Icons.cancel_rounded,
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              message,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: color,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
 }

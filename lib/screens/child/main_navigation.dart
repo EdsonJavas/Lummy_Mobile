@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'home_page.dart'; // HomePage agora é importada do arquivo separado
-import 'expenses_screen.dart'; // Importando a tela de gastos
-import 'lessons_screen.dart'; // Importando a nova LessonsScreen estilizada
-import 'goals_screen.dart'; // Importando a nova tela de metas
+import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'home_page.dart';
+import 'expenses_screen.dart';
+import 'lessons_screen.dart';
+import 'goals_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -70,7 +71,9 @@ class _MainNavigationState extends State<MainNavigation> {
         }
       },
       child: Scaffold(
-        body: IndexedStack(index: _currentIndex, children: _pages),
+        body: ConnectivityBanner(
+          child: IndexedStack(index: _currentIndex, children: _pages),
+        ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,

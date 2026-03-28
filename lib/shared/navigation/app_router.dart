@@ -61,33 +61,26 @@ class AppRouter {
         );
 
       case AppRoutes.login:
-        return MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
-        );
+        return _smoothRoute(const LoginScreen(), settings);
 
       case AppRoutes.register:
-        return MaterialPageRoute(
-          builder: (_) => const RegisterScreen(),
-        );
+        return _smoothRoute(const RegisterScreen(), settings);
 
       case AppRoutes.childDashboard:
-        return MaterialPageRoute(
-          builder: (_) => const MainNavigation(),
-        );
+        return _smoothRoute(const MainNavigation(), settings);
 
       case AppRoutes.parentDashboard:
         final args = ParentDashboardArgs.fromMap(settings.arguments);
         if (args != null) {
-          return MaterialPageRoute(
-            builder: (_) => ParentMainNavigation(
+          return _smoothRoute(
+            ParentMainNavigation(
               parentId: args.parentId,
               parentName: args.parentName,
             ),
+            settings,
           );
         }
-        return MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
-        );
+        return _smoothRoute(const LoginScreen(), settings);
 
       default:
         return MaterialPageRoute(
@@ -96,6 +89,32 @@ class AppRouter {
           ),
         );
     }
+  }
+
+  static Route<dynamic> _smoothRoute(Widget page, RouteSettings settings) {
+    return PageRouteBuilder(
+      settings: settings,
+      transitionDuration: const Duration(milliseconds: 350),
+      reverseTransitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final fadeIn = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOut,
+        );
+        final slideIn = Tween<Offset>(
+          begin: const Offset(0.05, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+        ));
+        return FadeTransition(
+          opacity: fadeIn,
+          child: SlideTransition(position: slideIn, child: child),
+        );
+      },
+    );
   }
 
   // Navegação helper methods
