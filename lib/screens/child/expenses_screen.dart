@@ -21,6 +21,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   String selectedPeriod = 'Este mês';
   String selectedCategory = 'Todas'; // 'Todas' ou id da categoria
   bool _isLoading = true;
+  String? _loadError;
 
   final _supabase = Supabase.instance.client;
 
@@ -91,6 +92,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
+      _loadError = null;
     });
 
     try {
@@ -98,6 +100,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       if (user == null) {
         setState(() {
           _isLoading = false;
+          _loadError = 'Sessão não encontrada. Entre de novo no app.';
         });
         return;
       }
@@ -171,10 +174,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
       setState(() {
         _isLoading = false;
+        _loadError = null;
       });
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('❌ expenses_screen _loadData: $e\n$st');
       setState(() {
         _isLoading = false;
+        _loadError =
+            'Não foi possível carregar seus gastos. Verifique a internet e tente de novo.';
       });
     }
   }
@@ -323,6 +330,52 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(child: _buildSkeletonLoader()),
+      );
+    }
+
+    if (_loadError != null) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.cloud_off_rounded,
+                    size: 56,
+                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                  ),
+                  const Gap(20),
+                  Text(
+                    _loadError!,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      height: 1.45,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                    ),
+                  ),
+                  const Gap(28),
+                  FilledButton.icon(
+                    onPressed: _loadData,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: Text(
+                      'Tentar de novo',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    ),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       );
     }
 
@@ -656,17 +709,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final totalGasto = _totalSpent;
-    final disponivel = _currentBalance <= 0
-        ? totalGasto
-        : _currentBalance + totalGasto; // aproximação para barra de uso
-    final usado =
-        disponivel > 0 ? (totalGasto / disponivel).clamp(0.0, 1.0) : 0.0;
+    final muted = theme.textTheme.bodySmall?.color?.withValues(alpha: 0.9) ??
+        (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B));
 
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: isSmallScreen ? 18 : 22,
-        vertical: isSmallScreen ? 16 : 20,
+        vertical: isSmallScreen ? 18 : 22,
       ),
       decoration: BoxDecoration(
         color: theme.cardTheme.color ?? theme.colorScheme.surface,
@@ -688,82 +738,64 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Total gasto',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: theme.textTheme.bodyMedium?.color,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      AppFormatters.formatCurrency(totalGasto),
-                      style: GoogleFonts.poppins(
-                        fontSize: isSmallScreen ? 20 : 22,
-                        fontWeight: FontWeight.w700,
-                        color: theme.textTheme.titleLarge?.color,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 40,
-                color: theme.dividerColor,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Disponível',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: theme.textTheme.bodyMedium?.color,
-                      ),
-                    ),
-                    const Gap(4),
-                    Text(
-                      AppFormatters.formatCurrency(_currentBalance),
-                      style: GoogleFonts.poppins(
-                        fontSize: isSmallScreen ? 20 : 22,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF10B981),
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const Gap(16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: usado.clamp(0.0, 1.0),
-              minHeight: 6,
-              backgroundColor: (theme.textTheme.bodyMedium?.color ?? Colors.grey).withValues(alpha: 0.15),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF59E0B)),
+          Text(
+            'Saldo no cofrinho',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: theme.textTheme.bodyMedium?.color,
             ),
           ),
           const Gap(6),
           Text(
-            '${(usado * 100).round()}% do limite usado',
+            AppFormatters.formatCurrency(_currentBalance),
+            style: GoogleFonts.poppins(
+              fontSize: isSmallScreen ? 26 : 28,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF10B981),
+              letterSpacing: -0.6,
+            ),
+          ),
+          const Gap(4),
+          Text(
+            'Dinheiro disponível agora (atualizado quando você recebe ou gasta).',
             style: GoogleFonts.poppins(
               fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: theme.textTheme.bodySmall?.color,
+              fontWeight: FontWeight.w400,
+              height: 1.35,
+              color: muted,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Divider(height: 1, color: theme.dividerColor),
+          ),
+          Text(
+            'Gasto no período',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: theme.textTheme.bodyMedium?.color,
+            ),
+          ),
+          const Gap(6),
+          Text(
+            '− ${AppFormatters.formatCurrency(totalGasto)}',
+            style: GoogleFonts.poppins(
+              fontSize: isSmallScreen ? 18 : 20,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFFEF4444),
+              letterSpacing: -0.4,
+            ),
+          ),
+          const Gap(4),
+          Text(
+            'Soma só das despesas com os filtros atuais ($selectedPeriod${selectedCategory != 'Todas' ? ', categoria selecionada' : ''}).',
+            style: GoogleFonts.poppins(
+              fontSize: 11,
+              fontWeight: FontWeight.w400,
+              height: 1.35,
+              color: muted,
             ),
           ),
         ],
@@ -1199,11 +1231,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ),
           Flexible(
             child: Text(
-              amount,
+              '− $amount',
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).textTheme.titleMedium?.color,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFFEF4444),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy_login/core/constants/app_constants.dart';
+import 'package:lummy_login/core/utils/formatters.dart';
 import 'package:lummy_login/screens/child/new_goal_screen.dart';
 import 'package:lummy_login/screens/child/request_money_screen.dart';
 import 'package:lummy_login/screens/child/claim_share_screen.dart';
@@ -27,6 +28,8 @@ class _HomePageState extends State<HomePage> {
   String userName = '';
   final String userRole = 'Pequeno Empreendedor';
   double currentBalance = 0.0;
+  bool _balanceLoadFailed = false;
+  double _weekIncomeTotal = 0.0;
   double savingsGoal = 0.0;
   String goalName = '';
   String goalEmoji = '🎯';
@@ -360,7 +363,10 @@ class _HomePageState extends State<HomePage> {
                 final newBalance =
                     (newRecord['balance'] as num?)?.toDouble() ?? 0.0;
                 if (mounted) {
-                  setState(() => currentBalance = newBalance);
+                  setState(() {
+                    currentBalance = newBalance;
+                    _balanceLoadFailed = false;
+                  });
                   checkAndNotifyBalanceIncrease(newBalance);
                 }
               } catch (_) {}
@@ -730,7 +736,11 @@ class _HomePageState extends State<HomePage> {
       final supabase = Supabase.instance.client;
       final user = supabase.auth.currentUser;
       if (user == null) {
-        setState(() => currentBalance = 0.0);
+        setState(() {
+          currentBalance = 0.0;
+          _balanceLoadFailed = true;
+          _weekIncomeTotal = 0.0;
+        });
         return;
       }
       final row = await supabase
@@ -739,8 +749,34 @@ class _HomePageState extends State<HomePage> {
           .eq('id', user.id)
           .maybeSingle();
       final bal = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+
+      final weekStart = DateTime.now().subtract(const Duration(days: 7));
+      double weekIn = 0.0;
+      try {
+        final tRows = await supabase
+            .from('transactions')
+            .select('amount, type, status')
+            .eq('child_id', user.id)
+            .gte('date', weekStart.toIso8601String());
+        for (final r in tRows) {
+          final type = (r['type'] ?? '').toString();
+          if (!['income', 'allowance', 'reward'].contains(type)) continue;
+          final st = (r['status'] ?? '').toString();
+          if (st.isNotEmpty &&
+              st != 'approved' &&
+              st != 'completed') {
+            continue;
+          }
+          weekIn += (r['amount'] as num?)?.toDouble() ?? 0.0;
+        }
+      } catch (e) {
+        debugPrint('⚠️ Erro ao somar entradas da semana: $e');
+      }
+
       setState(() {
         currentBalance = bal;
+        _balanceLoadFailed = false;
+        _weekIncomeTotal = weekIn;
       });
       await checkAndNotifyBalanceIncrease(bal);
 
@@ -760,7 +796,7 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       debugPrint('⚠️ Erro ao carregar balance: $e');
-      setState(() => currentBalance = 0.0);
+      setState(() => _balanceLoadFailed = true);
     }
   }
 
@@ -1058,97 +1094,131 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBalanceCard(double screenWidth, bool isSmallScreen) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
-      padding: EdgeInsets.all(isSmallScreen ? 22 : 28),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1E40AF), Color(0xFF1E3A8A)],
-        ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: _balanceLoadFailed ? () => _loadBalance() : null,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1E40AF).withOpacity(0.35),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Meu Cofrinho',
-                style: GoogleFonts.poppins(
-                  fontSize: isSmallScreen ? 17 : 19,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white.withOpacity(0.95),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.22),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '🐷',
-                  style: TextStyle(fontSize: isSmallScreen ? 20 : 24),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'R\$ ${currentBalance.toStringAsFixed(2)}',
-            style: GoogleFonts.poppins(
-              fontSize: isSmallScreen ? 38 : 44,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
+          padding: EdgeInsets.all(isSmallScreen ? 22 : 28),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF1E40AF), Color(0xFF1E3A8A)],
             ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.trending_up, color: Color(0xFF10B981), size: 16),
-                    const SizedBox(width: 6),
-                    Text(
-                      '+R\$ 15,00',
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF10B981),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'esta semana',
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white.withOpacity(0.88),
-                ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1E40AF).withOpacity(0.35),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Meu Cofrinho',
+                    style: GoogleFonts.poppins(
+                      fontSize: isSmallScreen ? 17 : 19,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withOpacity(0.95),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.22),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '🐷',
+                      style: TextStyle(fontSize: isSmallScreen ? 20 : 24),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                _balanceLoadFailed
+                    ? '—'
+                    : 'R\$ ${currentBalance.toStringAsFixed(2)}',
+                style: GoogleFonts.poppins(
+                  fontSize: isSmallScreen ? 38 : 44,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              if (_balanceLoadFailed) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Não foi possível carregar o saldo. Toque aqui para tentar de novo.',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withOpacity(0.9),
+                    height: 1.35,
+                  ),
+                ),
+              ] else ...[
+                const SizedBox(height: 10),
+                if (_weekIncomeTotal > 0)
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withOpacity(0.25),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.trending_up, color: Color(0xFF10B981), size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              '+${AppFormatters.formatCurrency(_weekIncomeTotal)}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF10B981),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'entradas nos últimos 7 dias',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.88),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    'Nenhuma entrada registrada nos últimos 7 dias',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withOpacity(0.85),
+                    ),
+                  ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1391,7 +1461,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const Gap(8),
                       Text(
-                        'R\$ ${currentBalance.toStringAsFixed(2)}',
+                        _balanceLoadFailed
+                            ? '—'
+                            : 'R\$ ${currentBalance.toStringAsFixed(2)}',
                         style: GoogleFonts.poppins(
                           fontSize: isSmallScreen ? 16 : 18,
                           fontWeight: FontWeight.w700,

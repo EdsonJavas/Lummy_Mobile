@@ -25,7 +25,13 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     if (parentName != null) {
       _parentName = parentName;
     }
-    emit(state.copyWith(isLoading: true, parentName: _parentName));
+    emit(
+      state.copyWith(
+        isLoading: true,
+        parentName: _parentName,
+        error: null,
+      ),
+    );
     initParentNotifications();
 
     try {
@@ -178,6 +184,12 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
     final id = _parentId;
     if (id == null) return;
     await loadDashboard(id);
+  }
+
+  void clearError() {
+    if (state.error != null) {
+      emit(state.copyWith(error: null));
+    }
   }
 
   /// Saldo de teste quando não há valor no banco (desenvolvimento/demo).

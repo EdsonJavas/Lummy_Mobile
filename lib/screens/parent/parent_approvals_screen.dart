@@ -17,6 +17,20 @@ class ParentApprovalsScreen extends StatelessWidget {
   static const _red = Color(0xFFEF4444);
   static const _blue = Color(0xFF3B82F6);
 
+  static String _friendlyLoadError(String raw) {
+    final s = raw.toLowerCase();
+    if (s.contains('socket') ||
+        s.contains('failed host') ||
+        s.contains('network') ||
+        s.contains('connection')) {
+      return 'Sem conexão ou servidor indisponível. Verifique a internet e tente de novo.';
+    }
+    if (s.contains('timeout')) {
+      return 'A conexão demorou demais. Tente novamente em instantes.';
+    }
+    return 'Não foi possível carregar as solicitações. Puxe para atualizar ou use o botão abaixo.';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -30,15 +44,99 @@ class ParentApprovalsScreen extends StatelessWidget {
         color: _green,
         child: BlocBuilder<ParentDashboardCubit, ParentDashboardState>(
           builder: (context, state) {
+            final cubit = context.read<ParentDashboardCubit>();
+
             if (state.isLoading && state.pendingApprovals.isEmpty) {
-              return const ParentDashboardSkeleton();
+              return const CustomScrollView(
+                physics: AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                slivers: [
+                  SliverFillRemaining(
+                    child: ParentDashboardSkeleton(),
+                  ),
+                ],
+              );
+            }
+
+            if (!state.isLoading &&
+                state.error != null &&
+                state.pendingApprovals.isEmpty) {
+              final msg = _friendlyLoadError(state.error!);
+              return CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            size: 56,
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            msg,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              height: 1.45,
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1E293B),
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          FilledButton.icon(
+                            onPressed: () => cubit.refresh(),
+                            icon: const Icon(Icons.refresh_rounded),
+                            label: Text(
+                              'Tentar de novo',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: _green,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
             }
 
             return CustomScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
               slivers: [
                 // Header com gradiente
                 SliverToBoxAdapter(child: _buildHeader(context, state, isDark)),
+                if (state.error != null && state.pendingApprovals.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: _buildActionErrorBanner(
+                      context,
+                      state.error!,
+                      cubit,
+                      isDark,
+                    ),
+                  ),
                 // Lista de aprovações ou estado vazio
                 if (state.pendingApprovals.isEmpty)
                   SliverFillRemaining(
@@ -274,6 +372,56 @@ class ParentApprovalsScreen extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionErrorBanner(
+    BuildContext context,
+    String error,
+    ParentDashboardCubit cubit,
+    bool isDark,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+      child: Material(
+        color: isDark
+            ? const Color(0xFF7F1D1D).withValues(alpha: 0.4)
+            : const Color(0xFFFEF2F2),
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: _red, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  error,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                    color: isDark
+                        ? const Color(0xFFFCA5A5)
+                        : const Color(0xFF991B1B),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.close_rounded,
+                  size: 20,
+                  color: isDark ? Colors.white54 : Colors.black54,
+                ),
+                onPressed: cubit.clearError,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
