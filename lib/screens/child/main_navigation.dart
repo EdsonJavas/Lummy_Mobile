@@ -93,7 +93,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   Expanded(
                     child: _buildNavItem(
                       0,
-                      Icons.home_rounded,
+                      Iconsax.home_1,
                       'Início',
                       const Color(0xFF1E40AF),
                     ),
@@ -101,7 +101,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   Expanded(
                     child: _buildNavItem(
                       1,
-                      Icons.receipt_long_rounded,
+                      Iconsax.receipt_2,
                       'Gastos',
                       const Color(0xFFF59E0B),
                     ),
@@ -109,7 +109,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   Expanded(
                     child: _buildNavItem(
                       2,
-                      Icons.flag_rounded,
+                      Iconsax.flag_2,
                       'Metas',
                       const Color(0xFF8B5CF6),
                     ),
@@ -117,7 +117,7 @@ class _MainNavigationState extends State<MainNavigation> {
                   Expanded(
                     child: _buildNavItem(
                       3,
-                      Icons.school_rounded,
+                      Iconsax.teacher,
                       'Aprender',
                       const Color(0xFF059669),
                     ),
@@ -227,7 +227,7 @@ class TransactionsPage extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.receipt_long_rounded,
+                          Iconsax.receipt_2,
                           color: Color(0xFFEF4444),
                           size: 50,
                         ),

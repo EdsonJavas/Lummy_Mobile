@@ -40,22 +40,22 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
   // Cores vibrantes consistentes com a versão infantil
   static const _navItems = [
     _NavItemData(
-      icon: Icons.home_rounded,
+      icon: Iconsax.home_1,
       label: 'Início',
       color: Color(0xFF3B82F6), // Azul vibrante
     ),
     _NavItemData(
-      icon: Icons.family_restroom_rounded,
+      icon: Iconsax.people,
       label: 'Filhos',
       color: Color(0xFF8B5CF6), // Roxo vibrante
     ),
     _NavItemData(
-      icon: Icons.payments_rounded,
+      icon: Iconsax.card_send,
       label: 'Enviar',
       color: Color(0xFFF59E0B), // Amarelo/Laranja vibrante
     ),
     _NavItemData(
-      icon: Icons.verified_user_rounded,
+      icon: Iconsax.shield_tick,
       label: 'Aprovar',
       color: Color(0xFF10B981), // Verde vibrante
     ),
