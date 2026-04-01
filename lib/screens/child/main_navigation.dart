@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy_login/core/constants/app_constants.dart';
+import 'package:lummy_login/core/theme/design_tokens.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'home_page.dart';
 import 'expenses_screen.dart';
@@ -87,7 +89,7 @@ class _MainNavigationState extends State<MainNavigation> {
           ),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               child: Row(
                 children: [
                   Expanded(
@@ -95,7 +97,7 @@ class _MainNavigationState extends State<MainNavigation> {
                       0,
                       Iconsax.home_1,
                       'Início',
-                      const Color(0xFF1E40AF),
+                      const Color(AppConstants.primaryBlue),
                     ),
                   ),
                   Expanded(
@@ -103,7 +105,7 @@ class _MainNavigationState extends State<MainNavigation> {
                       1,
                       Iconsax.receipt_2,
                       'Gastos',
-                      const Color(0xFFF59E0B),
+                      LummyColors.orange,
                     ),
                   ),
                   Expanded(
@@ -111,7 +113,7 @@ class _MainNavigationState extends State<MainNavigation> {
                       2,
                       Iconsax.flag_2,
                       'Metas',
-                      const Color(0xFF8B5CF6),
+                      LummyColors.purple,
                     ),
                   ),
                   Expanded(
@@ -119,7 +121,7 @@ class _MainNavigationState extends State<MainNavigation> {
                       3,
                       Iconsax.teacher,
                       'Aprender',
-                      const Color(0xFF059669),
+                      LummyColors.green,
                     ),
                   ),
                 ],
@@ -142,7 +144,7 @@ class _MainNavigationState extends State<MainNavigation> {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
@@ -151,7 +153,7 @@ class _MainNavigationState extends State<MainNavigation> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
                 color: isSelected ? color : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
@@ -164,7 +166,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 size: 24,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Text(
               label,
               style: GoogleFonts.poppins(

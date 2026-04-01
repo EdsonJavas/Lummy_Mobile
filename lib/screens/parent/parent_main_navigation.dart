@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:lummy_login/core/theme/design_tokens.dart';
 import 'package:lummy_login/core/utils/formatters.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
@@ -37,27 +38,26 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
   DateTime? _lastBackPress;
   bool _drawerOpen = false;
 
-  // Cores vibrantes consistentes com a versão infantil
   static const _navItems = [
     _NavItemData(
       icon: Iconsax.home_1,
       label: 'Início',
-      color: Color(0xFF3B82F6), // Azul vibrante
+      color: LummyColors.purple,
     ),
     _NavItemData(
       icon: Iconsax.people,
       label: 'Filhos',
-      color: Color(0xFF8B5CF6), // Roxo vibrante
+      color: LummyColors.purpleDark,
     ),
     _NavItemData(
       icon: Iconsax.card_send,
       label: 'Enviar',
-      color: Color(0xFFF59E0B), // Amarelo/Laranja vibrante
+      color: LummyColors.orange,
     ),
     _NavItemData(
       icon: Iconsax.shield_tick,
       label: 'Aprovar',
-      color: Color(0xFF10B981), // Verde vibrante
+      color: LummyColors.green,
     ),
   ];
 
@@ -257,7 +257,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(_navItems.length, (index) {
@@ -290,83 +290,80 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
         onTap: () => _setTab(index),
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Ícone com fundo animado
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              padding: EdgeInsets.all(isSelected ? 12 : 10),
-              decoration: BoxDecoration(
-                gradient: isSelected
-                    ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [item.color, item.color.withValues(alpha: 0.85)],
-                      )
-                    : null,
-                color: isSelected
-                    ? null
-                    : (isDark ? Colors.transparent : Colors.transparent),
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: item.color.withValues(alpha: 0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : null,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                padding: EdgeInsets.all(isSelected ? 11 : 9),
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [item.color, item.color.withValues(alpha: 0.85)],
+                        )
+                      : null,
+                  color: isSelected
+                      ? null
+                      : (isDark ? Colors.transparent : Colors.transparent),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: item.color.withValues(alpha: 0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Icon(
+                  item.icon,
+                  color: isSelected
+                      ? Colors.white
+                      : (isDark
+                            ? const Color(0xFF64748B)
+                            : const Color(0xFF94A3B8)),
+                  size: isSelected ? 24 : 22,
+                ),
               ),
-              child: Icon(
-                item.icon,
-                color: isSelected
-                    ? Colors.white
-                    : (isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFF94A3B8)),
-                size: isSelected ? 24 : 22,
+              const SizedBox(height: 5),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: GoogleFonts.poppins(
+                  fontSize: isSelected ? 12 : 11,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected
+                      ? item.color
+                      : (isDark
+                            ? const Color(0xFF64748B)
+                            : const Color(0xFF94A3B8)),
+                ),
+                child: Text(
+                  item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
               ),
-            ),
-            const SizedBox(height: 6),
-            // Label com cor vibrante quando selecionado (maxLines + overflow evita assertion no TextPainter)
-            AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 200),
-              style: GoogleFonts.poppins(
-                fontSize: isSelected ? 12 : 11,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected
-                    ? item.color
-                    : (isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFF94A3B8)),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                margin: const EdgeInsets.only(top: 3),
+                height: 3,
+                width: isSelected ? 20 : 0,
+                decoration: BoxDecoration(
+                  color: item.color,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-              child: Text(
-                item.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            // Indicador animado
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              margin: const EdgeInsets.only(top: 4),
-              height: 3,
-              width: isSelected ? 20 : 0,
-              decoration: BoxDecoration(
-                color: item.color,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
