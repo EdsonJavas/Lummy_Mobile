@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy_login/core/constants/app_constants.dart';
+import 'package:lummy_login/core/utils/network_errors.dart';
 import 'package:lummy_login/core/utils/formatters.dart';
 import 'package:lummy_login/screens/child/new_goal_screen.dart';
 import 'package:lummy_login/screens/child/request_money_screen.dart';
@@ -331,7 +332,7 @@ class _HomePageState extends State<HomePage> {
         _loadClaimContext(),
       ]);
     } catch (e) {
-      debugPrint('❌ Erro ao inicializar dados: $e');
+      debugLogDataLoad('Erro ao inicializar dados', e);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -477,7 +478,7 @@ class _HomePageState extends State<HomePage> {
           )
           .subscribe();
     } catch (e) {
-      debugPrint('⚠️ Erro ao assinar realtime de goals: $e');
+      debugLogDataLoad('Erro ao assinar realtime', e);
     }
   }
 
@@ -512,7 +513,7 @@ class _HomePageState extends State<HomePage> {
         debugPrint('   $key: $value');
       });
     } catch (e) {
-      debugPrint('❌ Erro ao testar conexão: $e');
+      debugLogDataLoad('Teste de conexão Supabase', e);
     }
   }
 
@@ -546,11 +547,15 @@ class _HomePageState extends State<HomePage> {
             );
           }
         } catch (e) {
-          debugPrint('❌ Erro ao buscar na tabela children: $e');
-          if (e is PostgrestException) {
-            debugPrint('   Código: ${e.code}');
-            debugPrint('   Mensagem: ${e.message}');
-            debugPrint('   Detalhes: ${e.details}');
+          if (isNetworkFailure(e)) {
+            debugLogDataLoad('Busca nome em children', e);
+          } else {
+            debugPrint('❌ Erro ao buscar na tabela children: $e');
+            if (e is PostgrestException) {
+              debugPrint('   Código: ${e.code}');
+              debugPrint('   Mensagem: ${e.message}');
+              debugPrint('   Detalhes: ${e.details}');
+            }
           }
         }
 
@@ -589,8 +594,7 @@ class _HomePageState extends State<HomePage> {
         debugPrint('👤 Nome final definido: $userName');
       });
     } catch (e, stackTrace) {
-      debugPrint('❌ Erro ao carregar nome do usuário: $e');
-      debugPrint('Stack trace: $stackTrace');
+      debugLogDataLoad('Erro ao carregar nome do usuário', e, stackTrace);
       setState(() {
         userName = 'Usuário';
       });
@@ -710,7 +714,7 @@ class _HomePageState extends State<HomePage> {
         _isClaimContextLoading = false;
       });
     } catch (e) {
-      debugPrint('⚠️ Erro ao carregar contexto de resgate: $e');
+      debugLogDataLoad('Contexto de resgate', e);
       if (!mounted) return;
       setState(() => _isClaimContextLoading = false);
     }
@@ -727,7 +731,7 @@ class _HomePageState extends State<HomePage> {
         _loadClaimContext(),
       ]);
     } catch (e) {
-      debugPrint('❌ Erro ao atualizar dados: $e');
+      debugLogDataLoad('Atualizar dados (refresh)', e);
     }
   }
 
@@ -770,7 +774,7 @@ class _HomePageState extends State<HomePage> {
           weekIn += (r['amount'] as num?)?.toDouble() ?? 0.0;
         }
       } catch (e) {
-        debugPrint('⚠️ Erro ao somar entradas da semana: $e');
+        debugLogDataLoad('Entradas da semana', e);
       }
 
       setState(() {
@@ -795,7 +799,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
     } catch (e) {
-      debugPrint('⚠️ Erro ao carregar balance: $e');
+      debugLogDataLoad('Carregar saldo', e);
       setState(() => _balanceLoadFailed = true);
     }
   }
@@ -851,7 +855,7 @@ class _HomePageState extends State<HomePage> {
             .eq('child_id', user.id);
       }
     } catch (e) {
-      debugPrint('⚠️ Erro ao sincronizar meta com balance na homepage: $e');
+      debugLogDataLoad('Sincronizar meta com saldo', e);
     }
   }
 
@@ -942,7 +946,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
     } catch (e) {
-      debugPrint('❌ Erro ao carregar meta na homepage: $e');
+      debugLogDataLoad('Carregar meta na homepage', e);
       setState(() {
         hasActiveGoal = false;
       });
@@ -1760,14 +1764,18 @@ class _HomePageState extends State<HomePage> {
                                       : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                 ),
                                 const Gap(6),
-                                Text(
-                                  'Economizado',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: theme.brightness == Brightness.dark
-                                        ? const Color(0xFF94A3B8)
-                                        : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                Expanded(
+                                  child: Text(
+                                    'Economizado',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.brightness == Brightness.dark
+                                          ? const Color(0xFF94A3B8)
+                                          : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -1816,14 +1824,18 @@ class _HomePageState extends State<HomePage> {
                                       : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                 ),
                                 const Gap(6),
-                                Text(
-                                  'Falta',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: theme.brightness == Brightness.dark
-                                        ? const Color(0xFF94A3B8)
-                                        : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                Expanded(
+                                  child: Text(
+                                    'Falta',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.brightness == Brightness.dark
+                                          ? const Color(0xFF94A3B8)
+                                          : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],

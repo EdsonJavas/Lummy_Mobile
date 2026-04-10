@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lummy_login/core/providers/theme_provider.dart';
 import 'package:lummy_login/application/app_facade.dart';
 import 'package:lummy_login/core/config/supabase_config.dart';
 import 'package:lummy_login/di/locator.dart';
@@ -181,6 +183,10 @@ class _SplashScreenState extends State<SplashScreen>
       final targetPage = showOnboarding
           ? OnboardingScreen(nextPage: nextPage)
           : nextPage;
+
+      if (!mounted) return;
+      context.read<ThemeProvider>().setPreLoginLightOnly(nextPage is LoginScreen);
+
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 600),
@@ -206,6 +212,7 @@ class _SplashScreenState extends State<SplashScreen>
         setupLocator();
       } catch (_) {}
       if (!mounted) return;
+      context.read<ThemeProvider>().setPreLoginLightOnly(true);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
       );

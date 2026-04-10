@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:lummy_login/core/services/connectivity_service.dart';
 import 'package:lummy_login/screens/child/main_navigation.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/application/app_facade.dart';
@@ -11,6 +14,7 @@ import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
 import 'package:lummy_login/services/family_service.dart';
 import 'package:lummy_login/utils/login_debug_helper.dart';
 import 'package:lummy_login/core/theme/app_theme.dart';
+import 'package:lummy_login/core/providers/theme_provider.dart';
 import 'package:lummy_login/screens/auth/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -345,6 +349,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (profile is ParentEntity) {
         debugPrint('✅ Navegando para dashboard do responsável: ${profile.name}');
+        if (!mounted) return;
+        context.read<ThemeProvider>().setPreLoginLightOnly(false);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -356,6 +362,8 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else if (profile is ChildEntity) {
         debugPrint('✅ Navegando para dashboard da criança: ${profile.name}');
+        if (!mounted) return;
+        context.read<ThemeProvider>().setPreLoginLightOnly(false);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const MainNavigation()),
@@ -566,6 +574,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
+      if (!context.read<ConnectivityService>().isOnline) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Sem internet. Conecte-se e toque em TENTAR NOVAMENTE no aviso acima.',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: const Color(0xFFEA580C),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
@@ -637,6 +666,22 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.orange,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
+    if (!context.read<ConnectivityService>().isOnline) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Sem internet. A biometria precisa de conexão para validar o login.',
+            style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: const Color(0xFFEA580C),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
       return;
@@ -1309,10 +1354,173 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+              Consumer<ConnectivityService>(
+                builder: (context, connectivity, _) {
+                  final pad = MediaQuery.paddingOf(context);
+                  return Positioned(
+                    top: pad.top + 8,
+                    left: 16,
+                    right: 16,
+                    child: AnimatedSize(
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeInOutCubic,
+                      alignment: Alignment.topCenter,
+                      clipBehavior: Clip.hardEdge,
+                      child: connectivity.isOnline
+                          ? const SizedBox(width: double.infinity, height: 0)
+                          : _LoginOfflineCard(
+                              onRetry: () => connectivity.recheck(),
+                              compact: isVerySmallScreen,
+                            ),
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
       ),
+      ),
+    );
+  }
+}
+
+/// Faixa no topo do login quando não há internet (alinhada ao visual Lummy).
+class _LoginOfflineCard extends StatelessWidget {
+  final VoidCallback onRetry;
+  final bool compact;
+
+  const _LoginOfflineCard({
+    required this.onRetry,
+    required this.compact,
+  });
+
+  static const _accent = Color(0xFFEA580C);
+  static const _accentSoft = Color(0xFFFFF7ED);
+  static const _title = Color(0xFF1E293B);
+  static const _subtitle = Color(0xFF64748B);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 12 : 14,
+          vertical: compact ? 10 : 12,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.96),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _accent.withValues(alpha: 0.35),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.14),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final narrow = constraints.maxWidth < 340;
+            final iconBox = Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _accentSoft,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.wifi_off_rounded,
+                color: _accent,
+                size: 22,
+              ),
+            );
+
+            final titleStyle = GoogleFonts.poppins(
+              fontSize: compact ? 13 : 14,
+              fontWeight: FontWeight.w700,
+              height: 1.2,
+              color: _title,
+            );
+            final bodyStyle = GoogleFonts.poppins(
+              fontSize: compact ? 11.5 : 12,
+              fontWeight: FontWeight.w500,
+              height: 1.3,
+              color: _subtitle,
+            );
+            final actionStyle = GoogleFonts.poppins(
+              fontSize: compact ? 12 : 13,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF4A90E2),
+            );
+
+            final textBlock = Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Sem conexão com a internet', style: titleStyle),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Você precisa estar online para entrar ou criar conta.',
+                    style: bodyStyle,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            );
+
+            final retry = TextButton(
+              onPressed: onRetry,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF4A90E2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: const Size(48, 40),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text('TENTAR NOVAMENTE', style: actionStyle),
+            );
+
+            if (narrow) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      iconBox,
+                      const SizedBox(width: 10),
+                      textBlock,
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: retry,
+                  ),
+                ],
+              );
+            }
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                iconBox,
+                const SizedBox(width: 12),
+                textBlock,
+                retry,
+              ],
+            );
+          },
+        ),
       ),
     );
   }

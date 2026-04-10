@@ -38,7 +38,7 @@ class LummyApp extends StatelessWidget {
             title: 'Lummy - Educação Financeira',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeMode,
+            themeMode: themeProvider.materialThemeMode,
             home: const SplashScreen(),
             onGenerateRoute: AppRouter.generateRoute,
             debugShowCheckedModeBanner: false,

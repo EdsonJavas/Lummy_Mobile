@@ -467,6 +467,7 @@ class ParentSettingsScreen extends StatelessWidget {
         await locator<BiometricAuthService>().clearCachedUser();
 
         if (!context.mounted) return;
+        context.read<ThemeProvider>().setPreLoginLightOnly(true);
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const LoginScreen()),
           (route) => false,

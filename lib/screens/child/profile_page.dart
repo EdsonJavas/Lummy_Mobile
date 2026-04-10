@@ -1172,6 +1172,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   // Navegar para tela de login
                   if (!mounted) return;
+                  context.read<ThemeProvider>().setPreLoginLightOnly(true);
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (_) => const LoginScreen()),
                     (route) => false,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:lummy_login/core/providers/theme_provider.dart';
 import 'package:lummy_login/screens/app/splash_screen.dart';
 import 'package:lummy_login/domain/entities/user_entity.dart';
 import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
@@ -166,6 +168,7 @@ class AppRouter {
   }
 
   static void navigateToLogin(BuildContext context, {bool replace = false}) {
+    context.read<ThemeProvider>().setPreLoginLightOnly(true);
     if (replace) {
       Navigator.pushReplacementNamed(context, AppRoutes.login);
     } else {

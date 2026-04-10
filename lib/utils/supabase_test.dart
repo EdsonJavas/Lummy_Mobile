@@ -1,6 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
+import 'package:lummy_login/core/utils/network_errors.dart';
+
 /// Utilitário para testar a conexão com Supabase e verificar se as tabelas existem
 class SupabaseTest {
   static Future<Map<String, dynamic>> testConnection() async {
@@ -33,7 +35,7 @@ class SupabaseTest {
       } catch (e) {
         results['responsaveis_table'] = false;
         results['responsaveis_error'] = e.toString();
-        debugPrint('❌ Erro ao acessar tabela responsaveis: $e');
+        debugLogSupabaseCheck('Tabela responsaveis', e);
       }
 
       // Teste 4: Verificar se a tabela children existe e pode ser acessada
@@ -48,7 +50,7 @@ class SupabaseTest {
       } catch (e) {
         results['children_table'] = false;
         results['children_error'] = e.toString();
-        debugPrint('❌ Erro ao acessar tabela children: $e');
+        debugLogSupabaseCheck('Tabela children', e);
       }
 
       // Teste 5: Verificar políticas RLS
@@ -66,7 +68,7 @@ class SupabaseTest {
         } catch (e) {
           results['rls_responsaveis'] = false;
           results['rls_responsaveis_error'] = e.toString();
-          debugPrint('❌ RLS pode estar bloqueando acesso a responsaveis: $e');
+          debugLogSupabaseCheck('RLS responsaveis', e);
         }
 
         try {
@@ -81,7 +83,7 @@ class SupabaseTest {
         } catch (e) {
           results['rls_children'] = false;
           results['rls_children_error'] = e.toString();
-          debugPrint('❌ RLS pode estar bloqueando acesso a children: $e');
+          debugLogSupabaseCheck('RLS children', e);
         }
       }
 
@@ -89,7 +91,7 @@ class SupabaseTest {
     } catch (e, stackTrace) {
       results['error'] = e.toString();
       results['stack_trace'] = stackTrace.toString();
-      debugPrint('❌ Erro geral no teste: $e');
+      debugLogDataLoad('Teste Supabase (geral)', e, stackTrace);
       return results;
     }
   }
@@ -134,7 +136,7 @@ class SupabaseTest {
         results['hint'] = e.hint;
       }
 
-      debugPrint('❌ Erro ao inserir em $table: $e');
+      debugLogSupabaseCheck('Inserir em $table', e);
       return results;
     }
   }
@@ -158,7 +160,7 @@ class SupabaseTest {
         return null;
       }
     } catch (e) {
-      debugPrint('❌ Erro ao buscar criança: $e');
+      debugLogSupabaseCheck('Buscar criança', e);
       return null;
     }
   }
@@ -184,7 +186,7 @@ class SupabaseTest {
         return null;
       }
     } catch (e) {
-      debugPrint('❌ Erro ao buscar responsável: $e');
+      debugLogSupabaseCheck('Buscar responsável', e);
       return null;
     }
   }

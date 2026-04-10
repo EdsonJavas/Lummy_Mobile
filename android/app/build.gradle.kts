@@ -8,8 +8,7 @@ plugins {
 android {
     namespace = "com.example.lummy"
     compileSdk = flutter.compileSdkVersion
-
-    // NDK not required for this project; omit explicit ndkVersion to avoid enforcing install
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
