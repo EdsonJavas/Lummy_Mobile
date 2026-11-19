@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lummy/shared/widgets/money_text_field.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/child/widgets/v1/v1_format.dart';
 
 class NewGoalScreen extends StatefulWidget {
   const NewGoalScreen({super.key});
@@ -163,7 +164,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        hasAmount ? 'R\$ ${_currentAmount!.toStringAsFixed(2)}' : 'R\$ 0,00',
+                        hasAmount ? V1Format.brl(_currentAmount!) : 'R\$ 0,00',
                         style: LummyFonts.body(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,

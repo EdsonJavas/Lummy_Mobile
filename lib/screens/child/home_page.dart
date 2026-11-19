@@ -1,28 +1,45 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:gap/gap.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy/core/constants/app_constants.dart';
-import 'package:lummy/core/utils/network_errors.dart';
-import 'package:lummy/screens/child/new_goal_screen.dart';
-import 'package:lummy/screens/child/request_money_screen.dart';
-import 'package:lummy/screens/child/claim_share_screen.dart';
-import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lummy/utils/child_money_notification.dart';
-import 'package:lummy/screens/child/profile_page.dart';
-import 'package:lummy/screens/child/daily_missions_screen.dart';
-import 'package:lummy/core/utils/app_log.dart';
-import 'package:lummy/core/theme/design_tokens.dart';
-import 'package:lummy/screens/child/widgets/home/home_achievements_section.dart';
-import 'package:lummy/screens/child/widgets/home/home_balance_card.dart';
-import 'package:lummy/screens/child/widgets/home/home_education_section.dart';
-import 'package:lummy/screens/child/widgets/home/home_educational_tips.dart';
-import 'package:lummy/screens/child/widgets/home/home_empty_goal_card.dart';
-import 'package:lummy/screens/child/widgets/home/home_header.dart';
-import 'package:lummy/screens/child/widgets/home/home_quick_actions.dart';
-import 'package:lummy/screens/child/widgets/home/home_savings_goal_card.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:lummy/core/providers/child_data_changes.dart';
+import 'package:lummy/core/providers/child_profile_controller.dart';
+import 'package:lummy/core/providers/child_theme_color_controller.dart';
+import 'package:lummy/core/theme/app_theme.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/utils/network_errors.dart';
+import 'package:lummy/data/child/child_achievements_repository.dart';
+import 'package:lummy/data/child/child_goals_repository.dart';
+import 'package:lummy/data/child/child_missions_repository.dart';
+import 'package:lummy/screens/child/claim_share_screen.dart';
+import 'package:lummy/screens/child/flows/criar_meta_flow.dart';
+import 'package:lummy/screens/child/notifications_screen.dart';
+import 'package:lummy/screens/child/request_money_screen.dart';
+import 'package:lummy/screens/child/widgets/home/home_bottom_sections.dart';
+import 'package:lummy/screens/child/widgets/home/home_v1_claim_row.dart';
+import 'package:lummy/screens/child/widgets/home/home_v1_header.dart';
+import 'package:lummy/screens/child/widgets/home/home_v1_level.dart';
+import 'package:lummy/screens/child/widgets/home/home_v1_piggy_card.dart';
+import 'package:lummy/screens/child/widgets/home/home_v1_quick_actions.dart';
+import 'package:lummy/screens/child/widgets/sheets/money_sheets.dart';
+import 'package:lummy/screens/child/widgets/v1/v1.dart';
+import 'package:lummy/shared/widgets/branded_refresh_indicator.dart';
+import 'package:lummy/shared/widgets/child_home_skeleton.dart';
+import 'package:lummy/shared/widgets/lummy_feedback.dart';
+import 'package:lummy/utils/child_money_notification.dart';
+
+/// Aba Início da criança (`Main.dc.html`): cabeçalho, nível, cofrinho
+/// espacial com a meta, linha "Retirar" (DECISOES 20), ações rápidas e as
+/// seções de baixo ([HomeBottomSections]).
+///
+/// Esta tela é dona das cargas (saldo, meta, sequência, contexto de resgate),
+/// do realtime e do puxar-para-atualizar. Nome e nível vêm do
+/// [ChildProfileController]; mudanças feitas por outras telas chegam pelo
+/// [ChildDataChanges].
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -31,24 +48,38 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Dados do usuário
-  String userName = '';
-  final String userRole = 'Pequeno Empreendedor';
-  double currentBalance = 0.0;
-  bool _balanceLoadFailed = false;
-  double _weekIncomeTotal = 0.0;
-  double savingsGoal = 0.0;
-  String goalName = '';
-  String goalEmoji = '🎯';
-  double goalCurrentAmount = 0.0;
-  bool hasActiveGoal = false;
-  int _earnedMissionPoints = 0;
-  RealtimeChannel? _goalsChannel;
-  RealtimeChannel? _balanceChannel;
-  RealtimeChannel? _customMissionsChannel;
-  RealtimeChannel? _dailyMissionsChannel;
-  RealtimeChannel? _achievementsChannel;
-  bool _isLoading = true;
+  final _goalsRepo = ChildGoalsRepository();
+  final _missionsRepo = ChildMissionsRepository();
+  final _achievementsRepo = ChildAchievementsRepository();
+
+  late final ChildDataChanges _changes;
+  late final ChildProfileController _perfil;
+  int _versaoSaldo = 0;
+  int _versaoMeta = 0;
+  int _versaoMissoes = 0;
+
+  /// Só a primeira carga mostra o esqueleto.
+  bool _carregando = true;
+
+  /// Saldo do cofrinho. Nulo = a primeira leitura falhou (mostra "—"). Se uma
+  /// recarga falhar depois, fica o último valor lido.
+  double? _saldo;
+
+  /// Meta sincronizada com o saldo. Nulo = não deu para ler.
+  ChildGoalState? _estadoMeta;
+
+  ChildStreak? _streak;
+
+  /// Muda a cada puxar-para-atualizar (as seções de baixo recarregam).
+  int _refreshTick = 0;
+
+  // Descarta respostas antigas quando duas cargas se cruzam.
+  int _pedidoSaldoMeta = 0;
+  int _pedidoSequencia = 0;
+
+  // Resgate ("Retirar minha parte").
+  int _pontosDeMissao = 0;
+  int _conquistasConcluidas = 0;
   bool _isClaimContextLoading = false;
   String? _activeDistributionId;
   double _activeDistributionAmount = 0.0;
@@ -57,335 +88,147 @@ class _HomePageState extends State<HomePage> {
   String _currentChildName = 'Você';
   List<Map<String, dynamic>> _realSiblings = const [];
 
-  // Lista de transações
-  List<Map<String, dynamic>> transactions = [];
+  RealtimeChannel? _goalsChannel;
+  RealtimeChannel? _balanceChannel;
+  RealtimeChannel? _customMissionsChannel;
+  RealtimeChannel? _dailyMissionsChannel;
+  RealtimeChannel? _achievementsChannel;
 
-  // Lista de conquistas
-  List<Map<String, dynamic>> achievements = [
-    {
-      'id': 'first_saving',
-      'title': 'Primeira Economia',
-      'description': 'Você guardou seu primeiro dinheiro!',
-      'emoji': '🥇',
-      'isCompleted': true,
-    },
-    {
-      'id': 'expense_control',
-      'title': 'Controle de Gastos',
-      'description': 'Anotou gastos por 7 dias seguidos',
-      'emoji': '📊',
-      'isCompleted': true,
-    },
-    {
-      'id': 'goal_reached',
-      'title': 'Meta Alcançada',
-      'description': 'Complete sua primeira meta de economia',
-      'emoji': '🎯',
-      'isCompleted': false,
-    },
-  ];
-
-  // Lista de dicas educativas - MUITAS dicas!
-  int currentTipIndex = 0;
-  final List<EducationalTip> educationalTips = buildHomeEducationalTips();
+  /// Junta os avisos de missão do realtime (as 5 do dia chegam de uma vez).
+  Timer? _avisoMissoesTimer;
 
   @override
   void initState() {
     super.initState();
-    _initializeData();
-    _subscribeGoalsRealtime();
-  }
+    _changes = context.read<ChildDataChanges>();
+    _perfil = context.read<ChildProfileController>();
+    _versaoSaldo = _changes.versao(ChildDataKind.saldo);
+    _versaoMeta = _changes.versao(ChildDataKind.meta);
+    _versaoMissoes = _changes.versao(ChildDataKind.missoes);
+    _changes.addListener(_aoMudarDados);
 
-  Future<void> _initializeData() async {
-    setState(() => _isLoading = true);
-    try {
-      await initChildMoneyNotifications();
-      await Future.wait([
-        _loadUserName(),
-        _loadEarnedPoints(),
-        _loadBalance(),
-        _loadGoal(),
-        _loadClaimContext(),
-      ]);
-    } catch (e) {
-      debugLogDataLoad('Erro ao inicializar dados', e);
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  void _subscribeGoalsRealtime() {
-    try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-      if (user == null) return;
-
-      _balanceChannel = supabase
-          .channel('public:children:balance:${user.id}')
-          .onPostgresChanges(
-            event: PostgresChangeEvent.update,
-            schema: 'public',
-            table: 'children',
-            filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'id',
-              value: user.id,
-            ),
-            callback: (payload) {
-              // Usar o payload em tempo real para notificar na hora (não depender de nova consulta)
-              try {
-                final newRecord = payload.newRecord;
-                final newBalance =
-                    (newRecord['balance'] as num?)?.toDouble() ?? 0.0;
-                if (mounted) {
-                  setState(() {
-                    currentBalance = newBalance;
-                    _balanceLoadFailed = false;
-                  });
-                  checkAndNotifyBalanceIncrease(newBalance);
-                }
-              } catch (_) {}
-              _loadBalance();
-            },
-          )
-          .subscribe();
-
-      _customMissionsChannel = supabase
-          .channel('public:custom_missions:child_${user.id}')
-          .onPostgresChanges(
-            event: PostgresChangeEvent.insert,
-            schema: 'public',
-            table: 'custom_missions',
-            filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'child_id',
-              value: user.id,
-            ),
-            callback: (_) {
-              showChildEventNotification(
-                id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-                title: 'Nova missão adicionada! 🎯',
-                body: 'Seu responsável criou uma missão para você.',
-              );
-            },
-          )
-          .subscribe();
-
-      _dailyMissionsChannel = supabase
-          .channel('public:daily_missions:child_${user.id}')
-          .onPostgresChanges(
-            event: PostgresChangeEvent.insert,
-            schema: 'public',
-            table: 'daily_missions',
-            filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'child_id',
-              value: user.id,
-            ),
-            callback: (_) {
-              showChildEventNotification(
-                id: DateTime.now().millisecondsSinceEpoch ~/ 1000 + 1,
-                title: 'Missão do dia recebida! ✅',
-                body: 'Você recebeu uma nova missão diária.',
-              );
-            },
-          )
-          .subscribe();
-
-      _achievementsChannel = supabase
-          .channel('public:achievements:new')
-          .onPostgresChanges(
-            event: PostgresChangeEvent.insert,
-            schema: 'public',
-            table: 'achievements',
-            callback: (_) {
-              showChildEventNotification(
-                id: DateTime.now().millisecondsSinceEpoch ~/ 1000 + 2,
-                title: 'Nova conquista disponível! 🏆',
-                body: 'Seu responsável adicionou uma nova conquista.',
-              );
-            },
-          )
-          .subscribe();
-
-      _goalsChannel = supabase
-          .channel('public:goals:child_${user.id}')
-          .onPostgresChanges(
-            event: PostgresChangeEvent.insert,
-            schema: 'public',
-            table: 'goals',
-            filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'child_id',
-              value: user.id,
-            ),
-            callback: (payload) {
-              _loadGoal();
-              showChildEventNotification(
-                id: DateTime.now().millisecondsSinceEpoch ~/ 1000 + 3,
-                title: 'Nova meta criada! 🚀',
-                body: 'Seu responsável adicionou uma nova meta.',
-              );
-            },
-          )
-          .onPostgresChanges(
-            event: PostgresChangeEvent.update,
-            schema: 'public',
-            table: 'goals',
-            filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'child_id',
-              value: user.id,
-            ),
-            callback: (payload) => _loadGoal(),
-          )
-          .onPostgresChanges(
-            event: PostgresChangeEvent.delete,
-            schema: 'public',
-            table: 'goals',
-            filter: PostgresChangeFilter(
-              type: PostgresChangeFilterType.eq,
-              column: 'child_id',
-              value: user.id,
-            ),
-            callback: (payload) => _loadGoal(),
-          )
-          .subscribe();
-    } catch (e) {
-      debugLogDataLoad('Erro ao assinar realtime', e);
-    }
+    unawaited(_iniciarNotificacoes());
+    unawaited(_cargaInicial());
+    _assinarRealtime();
   }
 
   @override
   void dispose() {
+    _changes.removeListener(_aoMudarDados);
+    _avisoMissoesTimer?.cancel();
     try {
-      if (_balanceChannel != null) {
-        Supabase.instance.client.removeChannel(_balanceChannel!);
-      }
-      if (_customMissionsChannel != null) {
-        Supabase.instance.client.removeChannel(_customMissionsChannel!);
-      }
-      if (_dailyMissionsChannel != null) {
-        Supabase.instance.client.removeChannel(_dailyMissionsChannel!);
-      }
-      if (_achievementsChannel != null) {
-        Supabase.instance.client.removeChannel(_achievementsChannel!);
-      }
-      if (_goalsChannel != null) {
-        Supabase.instance.client.removeChannel(_goalsChannel!);
+      final supabase = Supabase.instance.client;
+      for (final canal in [
+        _balanceChannel,
+        _customMissionsChannel,
+        _dailyMissionsChannel,
+        _achievementsChannel,
+        _goalsChannel,
+      ]) {
+        if (canal != null) supabase.removeChannel(canal);
       }
     } catch (_) {}
     super.dispose();
   }
 
-  Future<void> _loadUserName() async {
+  // ── Cargas ──
+
+  Future<void> _iniciarNotificacoes() async {
     try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-      String? name;
-
-      if (user != null) {
-
-        // 1) Buscar na tabela children pelo id do usuário autenticado
-        try {
-          final childRow = await supabase
-              .from('children')
-              .select('nome')
-              .eq('id', user.id)
-              .maybeSingle();
-
-
-          if (childRow != null && childRow['nome'] != null) {
-            name = childRow['nome'] as String?;
-          } else {
-            appLog(
-              '⚠️ Nome não encontrado na tabela children, tentando fallbacks...',
-            );
-          }
-        } catch (e) {
-          if (isNetworkFailure(e)) {
-            debugLogDataLoad('Busca nome em children', e);
-          } else {
-            appLog('❌ Erro ao buscar na tabela children: $e');
-            if (e is PostgrestException) {
-              appLog('   Código: ${e.code}');
-              appLog('   Mensagem: ${e.message}');
-              appLog('   Detalhes: ${e.details}');
-            }
-          }
-        }
-
-        // 2) Fallback: metadata do usuário (caso exista)
-        if (name == null || name.trim().isEmpty) {
-          final meta = user.userMetadata ?? {};
-          name =
-              (meta['name'] ?? meta['full_name'] ?? meta['username'])
-                  as String?;
-          if (name != null) {
-            appLog('✅ Nome encontrado no metadata: $name');
-          }
-        }
-
-        // 3) Fallback: prefixo do email
-        if (name == null || name.trim().isEmpty) {
-          name = user.email?.split('@').first;
-          if (name != null) {
-            appLog('✅ Usando prefixo do email: $name');
-          }
-        }
-      } else {
-        appLog('⚠️ Nenhum usuário autenticado');
-      }
-
-      // 4) Fallback: valor salvo localmente (se existir)
-      if (name == null || name.trim().isEmpty) {
-        name = (await SharedPreferences.getInstance()).getString('user_name');
-        if (name != null) {
-          appLog('✅ Nome encontrado no SharedPreferences: $name');
-        }
-      }
-
-      setState(() {
-        userName = (name?.trim().isNotEmpty == true) ? name!.trim() : 'Usuário';
-      });
-    } catch (e, stackTrace) {
-      debugLogDataLoad('Erro ao carregar nome do usuário', e, stackTrace);
-      setState(() {
-        userName = 'Usuário';
-      });
+      await initChildMoneyNotifications();
+    } catch (e, st) {
+      debugLogDataLoad('Home: iniciar notificações', e, st);
     }
   }
 
-  Future<void> _loadEarnedPoints() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _earnedMissionPoints = prefs.getInt('missions_earned_points') ?? 0;
-    });
+  Future<void> _cargaInicial() async {
+    await Future.wait<void>([_carregarTudo(), _esperarPerfil()]);
+    if (!mounted) return;
+    setState(() => _carregando = false);
   }
 
-  bool get _hasRealSiblings => _realSiblings.isNotEmpty;
-
-  double get _currentWeightedScore {
-    final completedAchievements = achievements
-        .where((a) => a['isCompleted'] == true)
-        .length
-        .toDouble();
-    final score = _earnedMissionPoints.toDouble() + (completedAchievements * 5.0);
-    return score <= 0 ? 1.0 : score;
+  /// Cada carga trata o próprio erro; esta função não lança.
+  Future<void> _carregarTudo() async {
+    await Future.wait<void>([
+      _carregarSaldoEMeta(),
+      _carregarSequencia(),
+      _loadClaimContext(),
+      _carregarConquistas(),
+      _carregarPontosDeMissao(),
+    ]);
   }
 
-  List<double> get _otherSiblingsScores =>
-      List<double>.filled(_realSiblings.length, 1.0);
+  /// Espera o perfil (carregado pela casca) para a saudação não piscar.
+  /// Desiste em 3 s: a tela abre mesmo sem o nome.
+  Future<void> _esperarPerfil() {
+    if (_perfil.carregado) return Future.value();
+    final pronto = Completer<void>();
+    void ouvir() {
+      if (_perfil.carregado && !pronto.isCompleted) pronto.complete();
+    }
 
-  List<String> get _otherSiblingsNames => _realSiblings
-      .map((s) => (s['nome'] as String?)?.trim())
-      .whereType<String>()
-      .where((n) => n.isNotEmpty)
-      .toList();
+    _perfil.addListener(ouvir);
+    return pronto.future
+        .timeout(const Duration(seconds: 3), onTimeout: () {})
+        .whenComplete(() => _perfil.removeListener(ouvir));
+  }
+
+  Future<void> _carregarSaldoEMeta() async {
+    final pedido = ++_pedidoSaldoMeta;
+    try {
+      final estado = await _goalsRepo.carregarMetaSincronizada();
+      if (!mounted || pedido != _pedidoSaldoMeta) return;
+      setState(() {
+        _estadoMeta = estado;
+        _saldo = estado.saldo;
+      });
+      unawaited(checkAndNotifyBalanceIncrease(estado.saldo));
+    } catch (e, st) {
+      // Sem rede numa recarga: mantém o último saldo e a última meta lidos.
+      // Só a primeira carga que falha deixa nulo (o cofrinho mostra "—" e o
+      // "tentar de novo").
+      debugLogDataLoad('Home: saldo e meta', e, st);
+    }
+  }
+
+  Future<void> _carregarSequencia() async {
+    final pedido = ++_pedidoSequencia;
+    try {
+      final streak = await _missionsRepo.sequencia();
+      if (!mounted || pedido != _pedidoSequencia) return;
+      setState(() => _streak = streak);
+    } catch (e, st) {
+      // Sem dado, a pílula e a seção ficam como estavam.
+      debugLogDataLoad('Home: sequência de dias', e, st);
+    }
+  }
+
+  /// Só para a pontuação do resgate (a lista de conquistas é das seções de
+  /// baixo).
+  Future<void> _carregarConquistas() async {
+    try {
+      final resultado = await _achievementsRepo.listar();
+      if (!mounted) return;
+      setState(() => _conquistasConcluidas = resultado.totalConquistadas);
+    } catch (e, st) {
+      debugLogDataLoad('Home: conquistas (pontuação do resgate)', e, st);
+    }
+  }
+
+  Future<void> _carregarPontosDeMissao() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
+      setState(() {
+        _pontosDeMissao = prefs.getInt('missions_earned_points') ?? 0;
+      });
+    } catch (e, st) {
+      debugLogDataLoad('Home: pontos de missão', e, st);
+    }
+  }
 
   Future<void> _loadClaimContext() async {
+    if (!mounted) return;
     setState(() => _isClaimContextLoading = true);
     try {
       final supabase = Supabase.instance.client;
@@ -438,6 +281,7 @@ class _HomePageState extends State<HomePage> {
 
       Map<String, dynamic>? activeDistribution;
       if (parentId != null && siblings.isNotEmpty) {
+        // 'active' aqui é o status de allowance_distributions (não o de goals).
         activeDistribution = await supabase
             .from('allowance_distributions')
             .select('id, total_amount')
@@ -470,464 +314,280 @@ class _HomePageState extends State<HomePage> {
         _realSiblings = siblings;
         _isClaimContextLoading = false;
       });
-    } catch (e) {
-      debugLogDataLoad('Contexto de resgate', e);
+    } catch (e, st) {
+      debugLogDataLoad('Contexto de resgate', e, st);
       if (!mounted) return;
       setState(() => _isClaimContextLoading = false);
     }
   }
 
+  /// Puxar para atualizar: tudo de novo, sem esqueleto.
   Future<void> _refreshData() async {
-    try {
-      // Recarregar todos os dados
-      await Future.wait([
-        _loadUserName(),
-        _loadEarnedPoints(),
-        _loadBalance(),
-        _loadGoal(),
-        _loadClaimContext(),
-      ]);
-    } catch (e) {
-      debugLogDataLoad('Atualizar dados (refresh)', e);
+    if (mounted) setState(() => _refreshTick++);
+    await Future.wait<void>([_carregarTudo(), _perfil.refresh()]);
+  }
+
+  // ── Avisos de outras telas e realtime ──
+
+  /// "Quem grava avisa; quem mostra escuta." Recarrega sem esqueleto e sem
+  /// mexer na rolagem.
+  void _aoMudarDados() {
+    if (!mounted) return;
+    final saldo = _changes.versao(ChildDataKind.saldo);
+    final meta = _changes.versao(ChildDataKind.meta);
+    final missoes = _changes.versao(ChildDataKind.missoes);
+    final saldoMudou = saldo != _versaoSaldo;
+    final metaMudou = meta != _versaoMeta;
+    final missoesMudaram = missoes != _versaoMissoes;
+    _versaoSaldo = saldo;
+    _versaoMeta = meta;
+    _versaoMissoes = missoes;
+
+    if (saldoMudou || metaMudou) unawaited(_carregarSaldoEMeta());
+    if (saldoMudou) unawaited(_loadClaimContext());
+    if (missoesMudaram) {
+      unawaited(_carregarSequencia());
+      unawaited(_perfil.refresh());
     }
   }
 
-  Future<void> _loadBalance() async {
-    try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
-      if (user == null) {
-        setState(() {
-          currentBalance = 0.0;
-          _balanceLoadFailed = true;
-          _weekIncomeTotal = 0.0;
-        });
-        return;
-      }
-      final row = await supabase
-          .from('children')
-          .select('balance')
-          .eq('id', user.id)
-          .maybeSingle();
-      final bal = (row?['balance'] as num?)?.toDouble() ?? 0.0;
+  /// Chamado pelas seções de baixo ao voltar da tela de Missões. O listener
+  /// acima recarrega sequência e perfil; o das seções recarrega a lista.
+  void _aoVoltarDasMissoes() {
+    if (!mounted) return;
+    _changes.avisar({ChildDataKind.missoes});
+  }
 
-      final weekStart = DateTime.now().subtract(const Duration(days: 7));
-      double weekIn = 0.0;
-      try {
-        final tRows = await supabase
-            .from('transactions')
-            .select('amount, type, status')
-            .eq('child_id', user.id)
-            .gte('date', weekStart.toIso8601String());
-        for (final r in tRows) {
-          final type = (r['type'] ?? '').toString();
-          if (!['income', 'allowance', 'reward'].contains(type)) continue;
-          final st = (r['status'] ?? '').toString();
-          if (st.isNotEmpty &&
-              st != 'approved' &&
-              st != 'completed') {
-            continue;
-          }
-          weekIn += (r['amount'] as num?)?.toDouble() ?? 0.0;
-        }
-      } catch (e) {
-        debugLogDataLoad('Entradas da semana', e);
-      }
+  void _avisarMissoesEmLote() {
+    _avisoMissoesTimer?.cancel();
+    _avisoMissoesTimer = Timer(const Duration(milliseconds: 400), () {
+      if (!mounted) return;
+      _changes.avisar({ChildDataKind.missoes});
+    });
+  }
 
+  void _aoMudarSaldoNoBanco(PostgresChangePayload payload) {
+    if (!mounted) return;
+    final novo = (payload.newRecord['balance'] as num?)?.toDouble();
+    final anterior = _saldo;
+    final saldoMudou =
+        novo != null && (anterior == null || (novo - anterior).abs() >= 0.005);
+
+    if (novo != null) {
+      // Mostra na hora pelo payload, sem esperar a nova consulta.
       setState(() {
-        currentBalance = bal;
-        _balanceLoadFailed = false;
-        _weekIncomeTotal = weekIn;
-      });
-      await checkAndNotifyBalanceIncrease(bal);
-
-      // Sincronizar meta com o novo balance
-      if (hasActiveGoal) {
-        final goalRow = await supabase
-            .from('goals')
-            .select('id')
-            .eq('child_id', user.id)
-            .eq('status', 'ongoing')
-            .maybeSingle();
-        if (goalRow != null) {
-          await _syncGoalWithBalance(goalRow['id'] as String);
-          // Recarregar meta para atualizar a UI
-          await _loadGoal();
+        _saldo = novo;
+        final estado = _estadoMeta;
+        if (estado != null) {
+          _estadoMeta = ChildGoalState(
+            saldo: novo,
+            atual: estado.atual,
+            ultimaConcluida: estado.ultimaConcluida,
+          );
         }
-      }
-    } catch (e) {
-      debugLogDataLoad('Carregar saldo', e);
-      setState(() => _balanceLoadFailed = true);
+      });
+      unawaited(checkAndNotifyBalanceIncrease(novo));
     }
+
+    if (saldoMudou) {
+      // Dinheiro que entrou ou saiu por fora (ex.: os pais): avisa as outras
+      // abas. O listener desta tela recarrega saldo, meta e resgate.
+      _changes.avisar({ChildDataKind.saldo});
+    } else {
+      unawaited(_carregarSaldoEMeta());
+    }
+    // O mesmo UPDATE pode ter mudado XP e nível.
+    unawaited(_perfil.refresh());
   }
 
-  Future<void> _syncGoalWithBalance(String goalId) async {
+  void _assinarRealtime() {
     try {
       final supabase = Supabase.instance.client;
       final user = supabase.auth.currentUser;
       if (user == null) return;
 
-      // Buscar saldo do cofrinho
-      final childRow = await supabase
-          .from('children')
-          .select('balance')
-          .eq('id', user.id)
-          .maybeSingle();
-      final balance = (childRow?['balance'] as num?)?.toDouble() ?? 0.0;
+      PostgresChangeFilter doFilho(String coluna) => PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: coluna,
+            value: user.id,
+          );
 
-      // Buscar meta atual
-      final goalRow = await supabase
-          .from('goals')
-          .select('target_amount, status')
-          .eq('id', goalId)
-          .maybeSingle();
+      _balanceChannel = supabase
+          .channel('public:children:balance:${user.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'children',
+            filter: doFilho('id'),
+            callback: _aoMudarSaldoNoBanco,
+          )
+          .subscribe();
 
-      if (goalRow == null) return;
+      _customMissionsChannel = supabase
+          .channel('public:custom_missions:child_${user.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'custom_missions',
+            filter: doFilho('child_id'),
+            callback: (_) {
+              if (!mounted) return;
+              unawaited(showChildEventNotification(
+                id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+                title: 'Nova missão adicionada! 🎯',
+                body: 'Seu responsável criou uma missão para você.',
+              ));
+              _avisarMissoesEmLote();
+            },
+          )
+          .subscribe();
 
-      final target = (goalRow['target_amount'] as num).toDouble();
-      final status = goalRow['status'] as String;
+      // Sem notificação local aqui: a própria Home pede as 5 missões do dia
+      // (RPC das seções de baixo) e o aviso viraria ruído (PLANO 2.9).
+      _dailyMissionsChannel = supabase
+          .channel('public:daily_missions:child_${user.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'daily_missions',
+            filter: doFilho('child_id'),
+            callback: (_) {
+              if (!mounted) return;
+              _avisarMissoesEmLote();
+            },
+          )
+          .subscribe();
 
-      // Se já está concluída, não atualizar
-      if (status == 'completed') return;
+      _achievementsChannel = supabase
+          .channel('public:achievements:new')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'achievements',
+            callback: (_) {
+              if (!mounted) return;
+              unawaited(showChildEventNotification(
+                id: DateTime.now().millisecondsSinceEpoch ~/ 1000 + 2,
+                title: 'Nova conquista disponível! 🏆',
+                body: 'Seu responsável adicionou uma nova conquista.',
+              ));
+              _changes.avisar({ChildDataKind.conquistas});
+              unawaited(_carregarConquistas());
+            },
+          )
+          .subscribe();
 
-      final newAmount = balance.clamp(0.0, target);
-
-      // Atualizar current_amount para refletir o cofrinho
-      await supabase
-          .from('goals')
-          .update({'current_amount': newAmount})
-          .eq('id', goalId)
-          .eq('child_id', user.id);
-
-      // Se atingiu ou superou o alvo, marcar como concluída
-      if (balance >= target) {
-        await supabase
-            .from('goals')
-            .update({
-              'status': 'completed',
-              'current_amount': target,
-              'completed_at': DateTime.now().toIso8601String(),
-            })
-            .eq('id', goalId)
-            .eq('child_id', user.id);
-      }
-    } catch (e) {
-      debugLogDataLoad('Sincronizar meta com saldo', e);
+      _goalsChannel = supabase
+          .channel('public:goals:child_${user.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'goals',
+            filter: doFilho('child_id'),
+            callback: (_) {
+              if (!mounted) return;
+              unawaited(_carregarSaldoEMeta());
+              unawaited(showChildEventNotification(
+                id: DateTime.now().millisecondsSinceEpoch ~/ 1000 + 3,
+                title: 'Nova meta criada! 🚀',
+                body: 'Seu responsável adicionou uma nova meta.',
+              ));
+            },
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'goals',
+            filter: doFilho('child_id'),
+            callback: (_) {
+              if (!mounted) return;
+              unawaited(_carregarSaldoEMeta());
+            },
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.delete,
+            schema: 'public',
+            table: 'goals',
+            filter: doFilho('child_id'),
+            callback: (_) {
+              if (!mounted) return;
+              unawaited(_carregarSaldoEMeta());
+            },
+          )
+          .subscribe();
+    } catch (e, st) {
+      debugLogDataLoad('Erro ao assinar realtime', e, st);
     }
   }
 
-  Future<void> _loadGoal() async {
-    try {
-      final supabase = Supabase.instance.client;
-      final user = supabase.auth.currentUser;
+  // ── Resgate ("Retirar minha parte") ──
 
-      if (user == null) {
-        appLog('❌ Usuário não autenticado ao carregar meta');
-        setState(() {
-          hasActiveGoal = false;
-        });
-        return;
-      }
+  bool get _hasRealSiblings => _realSiblings.isNotEmpty;
 
-      final goalData = await supabase
-          .from('goals')
-          .select('*')
-          .eq('child_id', user.id)
-          .eq('status', 'ongoing')
-          .maybeSingle();
-
-      if (goalData != null) {
-        // Sincronizar meta com cofrinho antes de exibir
-        await _syncGoalWithBalance(goalData['id'] as String);
-
-        // Recarregar meta atualizada
-        final updatedGoal = await supabase
-            .from('goals')
-            .select('*')
-            .eq('id', goalData['id'] as String)
-            .maybeSingle();
-
-        if (updatedGoal != null) {
-          setState(() {
-            goalName = updatedGoal['name'] as String;
-            goalEmoji = updatedGoal['emoji'] as String? ?? '🎯';
-            savingsGoal = (updatedGoal['target_amount'] as num).toDouble();
-            final current = (updatedGoal['current_amount'] as num).toDouble();
-            goalCurrentAmount = current > savingsGoal ? savingsGoal : current;
-            hasActiveGoal = true;
-          });
-        } else {
-          setState(() {
-            goalName = goalData['name'] as String;
-            goalEmoji = goalData['emoji'] as String? ?? '🎯';
-            savingsGoal = (goalData['target_amount'] as num).toDouble();
-            final current = (goalData['current_amount'] as num).toDouble();
-            goalCurrentAmount = current > savingsGoal ? savingsGoal : current;
-            hasActiveGoal = true;
-          });
-        }
-      } else {
-        // Se não há meta em andamento, mostrar a última meta concluída
-        final lastCompleted = await supabase
-            .from('goals')
-            .select('*')
-            .eq('child_id', user.id)
-            .eq('status', 'completed')
-            .order('completed_at', ascending: false)
-            .limit(1)
-            .maybeSingle();
-
-        if (lastCompleted != null) {
-          final target = (lastCompleted['target_amount'] as num).toDouble();
-          setState(() {
-            goalName = lastCompleted['name'] as String;
-            goalEmoji = lastCompleted['emoji'] as String? ?? '🎯';
-            savingsGoal = target;
-            goalCurrentAmount = target; // meta concluída nunca excede o alvo
-            hasActiveGoal = true; // Exibir cartão com status de concluída
-          });
-        } else {
-          setState(() {
-            hasActiveGoal = false;
-            goalName = '';
-            goalEmoji = '🎯';
-            savingsGoal = 0.0;
-            goalCurrentAmount = 0.0;
-          });
-        }
-      }
-    } catch (e) {
-      debugLogDataLoad('Carregar meta na homepage', e);
-      setState(() {
-        hasActiveGoal = false;
-      });
-    }
+  double get _currentWeightedScore {
+    final score = _pontosDeMissao.toDouble() + (_conquistasConcluidas * 5.0);
+    return score <= 0 ? 1.0 : score;
   }
 
-  void _nextTip() {
-    setState(() {
-      currentTipIndex = (currentTipIndex + 1) % educationalTips.length;
-    });
+  List<double> get _otherSiblingsScores =>
+      List<double>.filled(_realSiblings.length, 1.0);
+
+  List<String> get _otherSiblingsNames => _realSiblings
+      .map((s) => (s['nome'] as String?)?.trim())
+      .whereType<String>()
+      .where((n) => n.isNotEmpty)
+      .toList();
+
+  /// A mesma conta da `ClaimShareScreen._computeYourShare`, com as mesmas
+  /// pontuações que esta tela passa para ela.
+  double get _minhaParte {
+    final meu = _currentWeightedScore;
+    final scores = [meu, ..._otherSiblingsScores];
+    final total = scores.fold<double>(0, (a, b) => a + (b < 0 ? 0 : b));
+    if (total <= 0) return 0;
+    final ratio = (meu <= 0 ? 0 : meu) / total;
+    final cents = (_activeDistributionAmount * 100).round();
+    return (cents * ratio).floor() / 100.0;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isSmallScreen = screenHeight < 700;
-
-    final theme = Theme.of(context);
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: _isLoading
-            ? const ChildHomeSkeleton()
-            : BrandedRefreshIndicator(
-                onRefresh: _refreshData,
-                color: theme.colorScheme.primary,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
-                  ),
-                  child: Column(
-                    children: [
-                      HomeHeader(
-                        userName: userName,
-                        isSmallScreen: isSmallScreen,
-                        onAvatarTap: _openProfile,
-                      )
-                          .animate()
-                          .fadeIn(duration: 220.ms)
-                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      HomeBalanceCard(
-                        isSmallScreen: isSmallScreen,
-                        balanceLoadFailed: _balanceLoadFailed,
-                        currentBalance: currentBalance,
-                        weekIncomeTotal: _weekIncomeTotal,
-                        onRetry: () => _loadBalance(),
-                      )
-                          .animate()
-                          .fadeIn(delay: 80.ms, duration: 260.ms)
-                          .slideY(begin: 0.03, end: 0, curve: Curves.easeOut),
-                      (hasActiveGoal
-                              ? HomeSavingsGoalCard(
-                                  isSmallScreen: isSmallScreen,
-                                  savingsGoal: savingsGoal,
-                                  goalCurrentAmount: goalCurrentAmount,
-                                  goalName: goalName,
-                                  goalEmoji: goalEmoji,
-                                  currentBalance: currentBalance,
-                                  balanceLoadFailed: _balanceLoadFailed,
-                                )
-                              : HomeEmptyGoalCard(
-                                  isSmallScreen: isSmallScreen,
-                                  onTap: _onEmptyGoalCardTap,
-                                ))
-                          .animate()
-                          .fadeIn(delay: 140.ms, duration: 260.ms)
-                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      HomeQuickActions(
-                        isSmallScreen: isSmallScreen,
-                        claimShareSubtitle: _claimShareSubtitle,
-                        onDailyMissionsTap: _openDailyMissions,
-                        onNewGoalTap: _onNewGoalTap,
-                        onRequestMoneyTap: _openRequestMoney,
-                        onClaimShareTap: _onClaimShareTap,
-                      )
-                          .animate()
-                          .fadeIn(delay: 200.ms, duration: 260.ms)
-                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      HomeEducationSection(
-                        isSmallScreen: isSmallScreen,
-                        educationalTips: educationalTips,
-                        currentTipIndex: currentTipIndex,
-                        onNextTip: _nextTip,
-                      )
-                          .animate()
-                          .fadeIn(delay: 260.ms, duration: 260.ms)
-                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      HomeAchievementsSection(
-                        isSmallScreen: isSmallScreen,
-                        achievements: achievements,
-                      )
-                          .animate()
-                          .fadeIn(delay: 320.ms, duration: 260.ms)
-                          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      const Gap(24),
-                    ],
-                  ),
-                ),
-              ),
-      ),
-    );
-  }
-
-  void _openProfile() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const ProfilePage(),
-      ),
-    );
-  }
-
-  Future<void> _onEmptyGoalCardTap() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const NewGoalScreen()),
-    );
-
-    if (result != null) {
-      // Recarregar meta do banco após criar nova meta
-      await _loadGoal();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Nova meta criada! 🎯',
-              style: LummyFonts.body(fontWeight: FontWeight.w500),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
-            ),
-          ),
-        );
-      }
-    }
-  }
-
-  void _openDailyMissions() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const DailyMissionsScreen(),
-      ),
-    );
-  }
-
-  Future<void> _onNewGoalTap() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const NewGoalScreen(),
-      ),
-    );
-
-    if (result != null) {
-      // Recarregar meta do banco após criar nova meta
-      await _loadGoal();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Nova meta criada! 🎯',
-              style: LummyFonts.body(
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            backgroundColor: LummyColors.violet500,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-      }
-    }
-  }
-
-  void _openRequestMoney() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const RequestMoneyScreen(),
-      ),
-    );
-  }
+  /// Há valor para retirar: irmãos reais, distribuição ativa com valor e a
+  /// criança ainda não retirou.
+  bool get _podeRetirar =>
+      _hasRealSiblings &&
+      _activeDistributionId != null &&
+      _activeDistributionAmount > 0 &&
+      !_alreadyClaimedCurrentDistribution &&
+      _minhaParte > 0;
 
   Future<void> _onClaimShareTap() async {
     if (_isClaimContextLoading) return;
     if (!_hasRealSiblings) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Não há irmãos cadastrados pelo mesmo responsável.',
-          ),
-        ),
+      LummyFeedback.info(
+        context,
+        'Não há irmãos cadastrados pelo mesmo responsável.',
       );
       return;
     }
-    if (_activeDistributionId == null ||
-        _activeDistributionAmount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Sem valor ativo para resgate no momento.',
-          ),
-        ),
-      );
+    final distributionId = _activeDistributionId;
+    if (distributionId == null || _activeDistributionAmount <= 0) {
+      LummyFeedback.info(context, 'Sem valor ativo para resgate no momento.');
       return;
     }
     if (_alreadyClaimedCurrentDistribution) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Você já retirou sua parte desta distribuição.',
-          ),
-        ),
+      LummyFeedback.info(
+        context,
+        'Você já retirou sua parte desta distribuição.',
       );
       return;
     }
 
-    final result = await Navigator.push(
-      context,
+    final result = await Navigator.of(context).push<Object?>(
       MaterialPageRoute(
-        builder: (context) => ClaimShareScreen(
-          distributionId: _activeDistributionId!,
+        // Área da criança sempre clara (D12), também nesta tela empurrada.
+        builder: (context) => Theme(
+          data: AppTheme.lightTheme,
+          child: ClaimShareScreen(
+          distributionId: distributionId,
           childId: _currentChildId,
           totalAmount: _activeDistributionAmount,
           currentChildScore: _currentWeightedScore,
@@ -935,38 +595,145 @@ class _HomePageState extends State<HomePage> {
           otherChildrenNames: _otherSiblingsNames,
           currentChildName: _currentChildName,
         ),
+        ),
       ),
     );
+    if (!mounted) return;
     if (result is Map && result['claimed'] == true) {
-      final claimedAmount =
-          ((result['amount'] ?? 0.0) as double);
-      await _refreshData();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Você retirou R\$ ${claimedAmount.toStringAsFixed(2)}',
-            style: LummyFonts.body(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          backgroundColor: LummyColors.emerald500,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
+      final claimedAmount = (result['amount'] as num?)?.toDouble() ?? 0.0;
+      // A linha some na hora; o aviso recarrega saldo, meta e resgate.
+      setState(() => _alreadyClaimedCurrentDistribution = true);
+      _changes.avisar({ChildDataKind.saldo});
+      LummyFeedback.success(
+        context,
+        'Você retirou ${V1Format.brl(claimedAmount)}',
       );
     }
   }
 
-  String get _claimShareSubtitle => _isClaimContextLoading
-      ? 'Carregando distribuição...'
-      : (!_hasRealSiblings
-            ? 'Inativo: sem irmãos cadastrados'
-            : (_alreadyClaimedCurrentDistribution
-                  ? 'Você já retirou nesta distribuição'
-                  : (_activeDistributionId == null
-                        ? 'Sem distribuição ativa'
-                        : 'Resgate sua parte do valor do responsável')));
+  // ── Navegação ──
+
+  void _abrirNotificacoes() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const NotificationsScreen()),
+    );
+  }
+
+  void _abrirPedirDinheiro() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const RequestMoneyScreen()),
+    );
+  }
+
+  /// O painel grava e avisa `ChildDataChanges`; o listener recarrega.
+  void _anotarGasto() {
+    unawaited(showAnotarGastoSheet(context, saldoAtual: _saldo));
+  }
+
+  /// O fluxo grava a meta e avisa `ChildDataChanges`; o listener recarrega.
+  void _criarMeta() {
+    unawaited(abrirCriacaoDeMeta(context));
+  }
+
+  // ── Tela ──
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = ChildThemeColorController.of(context).tema;
+
+    return ColoredBox(
+      color: LummyColors.white,
+      child: SafeArea(
+        bottom: false,
+        child: _carregando
+            ? const ChildHomeSkeleton()
+            : BrandedRefreshIndicator(
+                onRefresh: _refreshData,
+                color: tema,
+                backgroundColor: LummyColors.white,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  child: _conteudo(context),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _conteudo(BuildContext context) {
+    final perfil = ChildProfileController.of(context);
+
+    // A entrada só toca quando o bloco é montado (primeira pintura depois do
+    // esqueleto). Nas recargas só os números mudam. A chave mantém o estado
+    // de cada bloco quando a linha "Retirar" entra ou sai da coluna.
+    Widget entrada(Widget child, int ordem) {
+      return child
+          .animate(key: ValueKey<int>(ordem), delay: (70 * ordem).ms)
+          .fadeIn(duration: 240.ms)
+          .slideY(begin: 0.02, end: 0, curve: Curves.easeOut);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        entrada(
+          HomeV1Header(
+            primeiroNome: perfil.primeiroNome,
+            streak: _streak,
+            onNotificacoesTap: _abrirNotificacoes,
+          ),
+          0,
+        ),
+        // Sem nível lido do banco, a barra some (D7).
+        if (perfil.nivelConhecido) ...[
+          const SizedBox(height: 16),
+          entrada(
+            HomeV1Level(
+              level: perfil.level,
+              xpNoNivel: perfil.xpNoNivel,
+              progresso: perfil.progressoNivel,
+            ),
+            1,
+          ),
+        ],
+        const SizedBox(height: 18),
+        entrada(
+          HomeV1PiggyCard(
+            saldo: _saldo,
+            estado: _estadoMeta,
+            onTentarDeNovo: () => unawaited(_carregarSaldoEMeta()),
+            onCriarMeta: _criarMeta,
+          ),
+          2,
+        ),
+        if (_podeRetirar) ...[
+          const SizedBox(height: 12),
+          HomeV1ClaimRow(
+            minhaParte: _minhaParte,
+            onRetirar: () => unawaited(_onClaimShareTap()),
+          ),
+        ],
+        const SizedBox(height: 22),
+        entrada(
+          HomeV1QuickActions(
+            onPedirDinheiro: _abrirPedirDinheiro,
+            onAnotarGasto: _anotarGasto,
+            onNovaMeta: _criarMeta,
+          ),
+          3,
+        ),
+        // Sem `entrada`: as seções de baixo já animam a própria chegada.
+        HomeBottomSections(
+          key: const ValueKey<String>('home-secoes-de-baixo'),
+          refreshTick: _refreshTick,
+          streak: _streak,
+          onMissoesTalvezMudaram: _aoVoltarDasMissoes,
+        ),
+        SizedBox(height: ChildBottomNavMetrics.scrollBottomPadding(context)),
+      ],
+    );
+  }
 }

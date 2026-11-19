@@ -1,216 +1,174 @@
 import 'package:flutter/material.dart';
-import 'widgets.dart';
 
-class ChildHomeSkeleton extends StatefulWidget {
+import 'package:lummy/screens/child/widgets/v1/child_avatar.dart';
+
+import 'skeleton_loader.dart';
+
+/// Esqueleto da Home da criança enquanto a primeira carga não termina.
+///
+/// Segue o layout novo (`Main.dc.html`): cabeçalho com avatar 44 e saudação,
+/// barra de nível, cofrinho de 236 com raio 24, 3 ações de 56 com raio 18 e
+/// 3 linhas de missão. Mesmo padding da tela (`16 20 0`).
+///
+/// As cores vêm do `SkeletonLoader`; a área da criança é sempre clara
+/// (`Theme` claro forçado em `MainNavigation`).
+class ChildHomeSkeleton extends StatelessWidget {
   const ChildHomeSkeleton({super.key});
 
   @override
-  State<ChildHomeSkeleton> createState() => _ChildHomeSkeletonState();
-}
-
-class _ChildHomeSkeletonState extends State<ChildHomeSkeleton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _shimmerController;
-
-  @override
-  void initState() {
-    super.initState();
-    _shimmerController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _shimmerController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return SingleChildScrollView(
-      physics: const NeverScrollableScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header skeleton
-          _buildHeaderSkeleton(isDark),
-          const SizedBox(height: 20),
-          // Balance card skeleton
-          _buildBalanceCardSkeleton(isDark),
-          const SizedBox(height: 20),
-          // Goal card skeleton
-          _buildGoalCardSkeleton(isDark),
-          const SizedBox(height: 24),
-          // Quick actions skeleton
-          _buildQuickActionsSkeleton(isDark),
-          const SizedBox(height: 24),
-          // Education section skeleton
-          _buildEducationSkeleton(isDark),
-          const SizedBox(height: 24),
-          // Achievements skeleton
-          _buildAchievementsSkeleton(isDark),
-          const SizedBox(height: 40),
-        ],
-      ),
+    // O avatar de verdade fica por cima do osso do avatar: com rede lenta, a
+    // criança ainda abre o menu lateral (e consegue sair da conta).
+    return Stack(
+      children: [
+        _esqueleto(),
+        const Positioned(left: 20, top: 16, child: ChildAvatar(size: 44)),
+      ],
     );
   }
 
-  Widget _buildHeaderSkeleton(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          // Avatar
-          SkeletonLoader(
-            width: 48,
-            height: 48,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          const SizedBox(width: 12),
-          // Greeting text
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SkeletonText(width: 100, height: 14),
-                SizedBox(height: 6),
-                SkeletonText(width: 140, height: 20),
-              ],
-            ),
-          ),
-          // Notification icon
-          SkeletonLoader(
-            width: 44,
-            height: 44,
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBalanceCardSkeleton(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SkeletonLoader(
-        width: double.infinity,
-        height: 160,
-        borderRadius: BorderRadius.circular(24),
-      ),
-    );
-  }
-
-  Widget _buildGoalCardSkeleton(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SkeletonLoader(
-        width: double.infinity,
-        height: 120,
-        borderRadius: BorderRadius.circular(20),
-      ),
-    );
-  }
-
-  Widget _buildQuickActionsSkeleton(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SkeletonText(width: 180, height: 20),
-          const SizedBox(height: 16),
-          // First row
-          Row(
+  Widget _esqueleto() {
+    return Semantics(
+      label: 'Carregando',
+      child: ExcludeSemantics(
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                child: SkeletonLoader(
-                  width: double.infinity,
-                  height: 130,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: SkeletonLoader(
-                  width: double.infinity,
-                  height: 130,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
+              _cabecalho(),
+              const SizedBox(height: 16),
+              _nivel(),
+              const SizedBox(height: 18),
+              _bloco(altura: 236, raio: 24),
+              const SizedBox(height: 22),
+              _acoes(),
+              const SizedBox(height: 26),
+              _missoes(),
             ],
           ),
-          const SizedBox(height: 16),
-          // Second row
-          Row(
-            children: [
-              Expanded(
-                child: SkeletonLoader(
-                  width: double.infinity,
-                  height: 130,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: SkeletonLoader(
-                  width: double.infinity,
-                  height: 130,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildEducationSkeleton(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SkeletonText(width: 160, height: 20),
-          const SizedBox(height: 16),
-          SkeletonLoader(
-            width: double.infinity,
-            height: 100,
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ],
-      ),
+  Widget _bloco({required double altura, required double raio}) {
+    return SkeletonLoader(
+      width: double.infinity,
+      height: altura,
+      borderRadius: BorderRadius.circular(raio),
     );
   }
 
-  Widget _buildAchievementsSkeleton(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SkeletonText(width: 140, height: 20),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 100,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 4,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (_, _) => SkeletonLoader(
-                width: 80,
-                height: 100,
-                borderRadius: BorderRadius.circular(16),
+  Widget _cabecalho() {
+    return Row(
+      children: [
+        const SkeletonAvatar(size: 44),
+        const SizedBox(width: 12),
+        const Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: SkeletonText(width: 130, height: 22),
+          ),
+        ),
+        const SizedBox(width: 12),
+        SkeletonLoader(
+          width: 44,
+          height: 44,
+          borderRadius: BorderRadius.circular(22),
+        ),
+      ],
+    );
+  }
+
+  Widget _nivel() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SkeletonText(width: 56, height: 13),
+            SkeletonText(width: 96, height: 12),
+          ],
+        ),
+        const SizedBox(height: 7),
+        _bloco(altura: 8, raio: 4),
+      ],
+    );
+  }
+
+  Widget _acoes() {
+    Widget acao() {
+      return Expanded(
+        child: Column(
+          children: [
+            SkeletonLoader(
+              width: 56,
+              height: 56,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            const SizedBox(height: 8),
+            const SkeletonText(width: 72, height: 13),
+          ],
+        ),
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        acao(),
+        const SizedBox(width: 12),
+        acao(),
+        const SizedBox(width: 12),
+        acao(),
+      ],
+    );
+  }
+
+  Widget _missoes() {
+    Widget linha() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          children: [
+            SkeletonLoader(
+              width: 28,
+              height: 28,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SkeletonText(width: 180, height: 15),
               ),
             ),
-          ),
-        ],
-      ),
+            const SizedBox(width: 12),
+            SkeletonLoader(
+              width: 52,
+              height: 26,
+              borderRadius: BorderRadius.circular(13),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: SkeletonText(width: 150, height: 18),
+        ),
+        const SizedBox(height: 8),
+        linha(),
+        linha(),
+        linha(),
+      ],
     );
   }
 }

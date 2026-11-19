@@ -5,6 +5,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'core/services/connectivity_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/theme_provider.dart';
+import 'core/providers/child_data_changes.dart';
+import 'core/providers/child_profile_controller.dart';
+import 'core/providers/child_theme_color_controller.dart';
 import 'package:lummy/auth/bloc/auth_cubit.dart';
 import 'package:lummy/screens/app/splash_screen.dart';
 import 'package:lummy/shared/navigation/app_router.dart';
@@ -30,6 +33,11 @@ class LummyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ConnectivityService()),
+        // Área da criança (redesenho V1). Ficam na raiz para valer também
+        // dentro de painéis de baixo e diálogos. Carregados por MainNavigation.
+        ChangeNotifierProvider(create: (_) => ChildThemeColorController()),
+        ChangeNotifierProvider(create: (_) => ChildProfileController()),
+        ChangeNotifierProvider(create: (_) => ChildDataChanges()),
         BlocProvider(create: (context) => AuthCubit()),
       ],
       child: Consumer<ThemeProvider>(

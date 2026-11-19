@@ -1,20 +1,36 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
 
-import 'package:lummy/screens/child/add_expense_screen.dart';
-import 'package:lummy/screens/child/widgets/expenses/expenses_chart_card.dart';
-import 'package:lummy/screens/child/widgets/expenses/expenses_filters_section.dart';
-import 'package:lummy/screens/child/widgets/expenses/expenses_hero.dart';
-import 'package:lummy/screens/child/widgets/expenses/expenses_load_error.dart';
-import 'package:lummy/screens/child/widgets/expenses/expenses_section_header.dart';
-import 'package:lummy/screens/child/widgets/expenses/expenses_skeleton_loader.dart';
-import 'package:lummy/screens/child/widgets/expenses/expenses_total_card.dart';
-import 'package:lummy/screens/child/widgets/expenses/expenses_transactions_card.dart';
-import 'package:lummy/shared/widgets/widgets.dart';
-import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/providers/child_data_changes.dart';
+import 'package:lummy/core/providers/child_theme_color_controller.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/utils/network_errors.dart';
+import 'package:lummy/data/child/child_transactions_repository.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_load_error.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_skeleton_loader.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_v1_calc.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_v1_categories.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_v1_need_want.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_v1_recent.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_v1_summary.dart';
+import 'package:lummy/screens/child/widgets/sheets/money_sheets.dart';
+import 'package:lummy/screens/child/widgets/v1/v1.dart';
+import 'package:lummy/shared/widgets/branded_refresh_indicator.dart';
+import 'package:lummy/shared/widgets/lummy_feedback.dart';
 
+/// Aba Gastos da criança (redesenho V1; mockups `Gastos-mes.dc.html` e
+/// `Gastos-lista.dc.html`, que são a mesma tela no topo e rolada).
+///
+/// Uma lista rolável só: cabeçalho com avatar e "Anotar gasto", período,
+/// resumo com comparação mensal, "Onde foi seu dinheiro", "Precisava ou
+/// queria?" e "Últimos gastos" por dia.
+///
+/// Dados: uma consulta por carga (`listarGastos`) e o saldo (só como dica para
+/// o painel de anotar gasto). Todas as contas são locais, em `ExpensesCalc`.
+/// Sempre clara (DECISOES 12): não lê o tema do app.
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
 
@@ -23,503 +39,273 @@ class ExpensesScreen extends StatefulWidget {
 }
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
-  String selectedPeriod = 'Este mês';
-  String selectedCategory = 'Todas'; // 'Todas' ou id da categoria
-  bool _isLoading = true;
-  String? _loadError;
+  static const _mensagemErro =
+      'Não foi possível carregar seus gastos. Verifique a internet e tente de novo.';
 
-  final _supabase = Supabase.instance.client;
+  final _repo = ChildTransactionsRepository();
 
-  // Categorias base (devem bater com as ids usadas nas configurações do responsável)
-  // id: usado no banco; name: exibido na UI; color: usado em gráficos/listas
-  final List<Map<String, dynamic>> _baseCategories = [
-    {
-      'id': 'games',
-      'name': 'Jogos',
-      'color': LummyColors.violet500,
-    },
-    {
-      'id': 'food',
-      'name': 'Alimentação',
-      'color': LummyColors.amber500,
-    },
-    {
-      'id': 'education',
-      'name': 'Educação',
-      'color': LummyColors.blue500,
-    },
-    {
-      'id': 'clothes',
-      'name': 'Roupas',
-      'color': LummyColors.pink500,
-    },
-    {
-      'id': 'entertainment',
-      'name': 'Entretenimento',
-      'color': LummyColors.red500,
-    },
-    {
-      'id': 'toys',
-      'name': 'Brinquedos',
-      'color': LummyColors.emerald500,
-    },
-    {
-      'id': 'sports',
-      'name': 'Esportes',
-      'color': LummyColors.cyan500,
-    },
-    {
-      'id': 'other',
-      'name': 'Outros',
-      'color': LummyColors.slate500,
-    },
-  ];
+  late final ChildDataChanges _changes;
+  int _versaoGastos = 0;
+  int _versaoSaldo = 0;
 
-  // Categorias permitidas para este filho (filtradas de _baseCategories)
-  List<Map<String, dynamic>> _allowedCategories = [];
+  /// Primeira carga (ou nova tentativa depois de erro): mostra o esqueleto.
+  bool _carregando = true;
+  String? _erro;
 
-  // Transações carregadas do banco (apenas despesas)
-  // Cada item: { description, amount, categoryId, categoryName, color, date }
-  List<Map<String, dynamic>> _allTransactions = [];
-  List<Map<String, dynamic>> _visibleTransactions = [];
+  /// Já houve uma carga com sucesso (a tela tem o que mostrar).
+  bool _temDados = false;
 
-  // Totais para UI
-  double _totalSpent = 0.0;
-  double _currentBalance = 0.0;
-  Map<String, double> _categorySpending = {};
+  /// Todos os gastos carregados (cobrem os 3 períodos e o mês anterior).
+  List<ChildExpense> _gastos = const [];
+  bool _temNeedOrWant = false;
+
+  /// Dica de saldo para o painel de anotar gasto. Nulo = não deu para ler.
+  double? _saldo;
+
+  ExpensesPeriod _periodo = ExpensesPeriod.mes;
+
+  /// Categoria que filtra "Últimos gastos" (nulo = todas).
+  String? _categoriaId;
+
+  /// "Ver todos os gastos" já foi tocado.
+  bool _expandido = false;
+
+  /// Número da carga mais recente: resposta de carga antiga é descartada.
+  int _pedido = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _changes = context.read<ChildDataChanges>();
+    _versaoGastos = _changes.versao(ChildDataKind.gastos);
+    _versaoSaldo = _changes.versao(ChildDataKind.saldo);
+    _changes.addListener(_aoMudarDados);
+    _carregar();
   }
 
-  Future<void> _loadData() async {
-    setState(() {
-      _isLoading = true;
-      _loadError = null;
-    });
+  @override
+  void dispose() {
+    _changes.removeListener(_aoMudarDados);
+    super.dispose();
+  }
 
+  /// Alguém gravou um gasto ou mexeu no saldo (ex.: o painel de anotar gasto,
+  /// aberto daqui ou da Home): recarrega sem esqueleto, mantendo a rolagem.
+  void _aoMudarDados() {
+    final gastos = _changes.versao(ChildDataKind.gastos);
+    final saldo = _changes.versao(ChildDataKind.saldo);
+    if (gastos == _versaoGastos && saldo == _versaoSaldo) return;
+    _versaoGastos = gastos;
+    _versaoSaldo = saldo;
+    _carregar(silencioso: true);
+  }
+
+  /// O saldo é só uma dica para o painel: falha aqui não derruba a tela.
+  Future<double?> _lerSaldo() async {
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) {
-        setState(() {
-          _isLoading = false;
-          _loadError = 'Sessão não encontrada. Entre de novo no app.';
-        });
-        return;
-      }
-
-      final childId = user.id;
-
-      // 1) Carregar configurações do filho (categorias permitidas + saldo)
-      final childRow = await _supabase
-          .from('children')
-          .select('allowed_categories, balance')
-          .eq('id', childId)
-          .maybeSingle();
-
-      final rawAllowed =
-          (childRow?['allowed_categories'] as List<dynamic>?) ?? [];
-      final allowedIds =
-          rawAllowed.map((e) => e.toString()).toList(growable: false);
-
-      _currentBalance =
-          (childRow?['balance'] as num?)?.toDouble() ?? _currentBalance;
-
-      // Se não houver categorias configuradas, permite todas as base
-      if (allowedIds.isEmpty) {
-        _allowedCategories = List<Map<String, dynamic>>.from(_baseCategories);
-      } else {
-        _allowedCategories = _baseCategories
-            .where((c) => allowedIds.contains(c['id'] as String))
-            .toList();
-
-        if (_allowedCategories.isEmpty) {
-          _allowedCategories =
-              List<Map<String, dynamic>>.from(_baseCategories);
-        }
-      }
-
-      // 2) Carregar transações de despesa do banco
-      final rows = await _supabase
-          .from('transactions')
-          .select('description, amount, category, date')
-          .eq('child_id', childId)
-          .eq('type', 'expense')
-          .order('date', ascending: false);
-
-      _allTransactions = rows.map<Map<String, dynamic>>((row) {
-        final catId = (row['category'] ?? 'other').toString();
-        final categoryConfig = _baseCategories.firstWhere(
-          (c) => c['id'] == catId,
-          orElse: () => {
-            'id': catId,
-            'name': catId,
-            'color': LummyColors.slate500,
-          },
-        );
-
-        final dateRaw = row['date'];
-        final date = dateRaw is String
-            ? DateTime.tryParse(dateRaw) ?? DateTime.now()
-            : (dateRaw is DateTime ? dateRaw : DateTime.now());
-
-        return {
-          'description': (row['description'] ?? '') as String,
-          'amount': (row['amount'] as num?)?.toDouble() ?? 0.0,
-          'categoryId': categoryConfig['id'] as String,
-          'categoryName': categoryConfig['name'] as String,
-          'color': categoryConfig['color'] as Color,
-          'date': date,
-        };
-      }).toList();
-
-      _applyFilters();
-
-      setState(() {
-        _isLoading = false;
-        _loadError = null;
-      });
+      return (await _repo.carregarContexto()).saldo;
     } catch (e, st) {
-      appLog('❌ expenses_screen _loadData: $e\n$st');
-      setState(() {
-        _isLoading = false;
-        _loadError =
-            'Não foi possível carregar seus gastos. Verifique a internet e tente de novo.';
-      });
+      debugLogDataLoad('Gastos (saldo)', e, st);
+      return null;
     }
   }
 
-  Future<void> _refreshData() async {
-    await _loadData();
-  }
+  /// Carrega os gastos. [silencioso] não mostra o esqueleto e, em caso de
+  /// falha, mantém o que já está na tela. Devolve true se carregou.
+  Future<bool> _carregar({bool silencioso = false}) async {
+    final pedido = ++_pedido;
+    if (!silencioso && mounted && (!_carregando || _erro != null)) {
+      setState(() {
+        _carregando = true;
+        _erro = null;
+      });
+    }
 
-  /// Retorna true se salvou com sucesso; false se saldo insuficiente ou erro.
-  Future<bool> _saveTransactionToDatabase(
-    Map<String, dynamic> data,
-  ) async {
     try {
-      final user = _supabase.auth.currentUser;
-      if (user == null) return false;
-
-      final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
-      if (amount <= 0) return false;
-
-      final type = (data['type'] ?? 'expense').toString();
-      final categoryId = (data['categoryId'] ?? 'other').toString();
-      final description =
-          (data['description'] as String?)?.trim() ?? 'Transação';
-
-      final status = type == 'expense' ? 'pending' : 'approved';
-
-      if (type == 'expense' && status == 'pending') {
-        final childRow = await _supabase
-            .from('children')
-            .select('balance')
-            .eq('id', user.id)
-            .maybeSingle();
-        final balance = (childRow?['balance'] as num?)?.toDouble() ?? 0.0;
-        if (balance < amount) return false;
-        // Descontar primeiro; se o insert falhar, devolvemos o valor
-        await _deductChildBalance(user.id, amount);
-      }
-
-      await _supabase.from('transactions').insert({
-        'child_id': user.id,
-        'amount': amount,
-        'type': type,
-        'description': description,
-        'category': categoryId,
-        'status': status,
-        'date': DateTime.now().toIso8601String(),
+      final saldoFuturo = _lerSaldo();
+      final resultado = await _repo.listarGastos(
+        desde: ExpensesCalc.inicioDaConsulta(DateTime.now()),
+      );
+      final saldo = await saldoFuturo;
+      if (!mounted || pedido != _pedido) return false;
+      setState(() {
+        _gastos = resultado.gastos;
+        _temNeedOrWant = resultado.temNeedOrWant;
+        _saldo = saldo ?? _saldo;
+        _temDados = true;
+        _carregando = false;
+        _erro = null;
       });
       return true;
-    } catch (_) {
-      // Rollback: se era despesa pendente, já descontamos — devolver o valor
-      final user = _supabase.auth.currentUser;
-      final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
-      final type = (data['type'] ?? 'expense').toString();
-      final status = type == 'expense' ? 'pending' : 'approved';
-      if (user != null && amount > 0 && type == 'expense' && status == 'pending') {
-        try {
-          await _creditChildBalance(user.id, amount);
-        } catch (_) {}
-      }
+    } catch (e, st) {
+      debugLogDataLoad('Gastos', e, st);
+      if (!mounted || pedido != _pedido) return false;
+      setState(() {
+        _carregando = false;
+        // Com dados na tela, a falha de uma recarga não apaga o que já há.
+        _erro = _temDados ? null : _mensagemErro;
+      });
       return false;
     }
   }
 
-  Future<void> _deductChildBalance(String childId, double amount) async {
-    if (childId.isEmpty || amount <= 0) return;
-    final row = await _supabase
-        .from('children')
-        .select('balance')
-        .eq('id', childId)
-        .maybeSingle();
-    final current = (row?['balance'] as num?)?.toDouble() ?? 0.0;
-    final updated = double.parse((current - amount).toStringAsFixed(2));
-    await _supabase
-        .from('children')
-        .update({'balance': updated})
-        .eq('id', childId);
+  Future<void> _aoPuxar() async {
+    final ok = await _carregar(silencioso: true);
+    if (!mounted || ok) return;
+    LummyFeedback.error(context, 'Não foi possível atualizar. Tente de novo.');
   }
 
-  Future<void> _creditChildBalance(String childId, double amount) async {
-    if (childId.isEmpty || amount <= 0) return;
-    final row = await _supabase
-        .from('children')
-        .select('balance')
-        .eq('id', childId)
-        .maybeSingle();
-    final current = (row?['balance'] as num?)?.toDouble() ?? 0.0;
-    final updated = double.parse((current + amount).toStringAsFixed(2));
-    await _supabase
-        .from('children')
-        .update({'balance': updated})
-        .eq('id', childId);
+  void _abrirAnotarGasto() {
+    // Ao gravar, o painel avisa `ChildDataChanges` e a tela recarrega sozinha.
+    unawaited(showAnotarGastoSheet(context, saldoAtual: _saldo));
   }
 
-  void _applyFilters() {
-    final now = DateTime.now();
-    DateTime? startDate;
-
-    switch (selectedPeriod) {
-      case 'Este mês':
-        startDate = DateTime(now.year, now.month, 1);
-        break;
-      case 'Última semana':
-        startDate = now.subtract(const Duration(days: 7));
-        break;
-      case 'Últimos 3 meses':
-        startDate = now.subtract(const Duration(days: 90));
-        break;
-    }
-
-    Iterable<Map<String, dynamic>> filtered = _allTransactions;
-
-    if (startDate != null) {
-      filtered = filtered.where(
-        (t) => (t['date'] as DateTime).isAfter(startDate!),
-      );
-    }
-
-    if (selectedCategory != 'Todas') {
-      filtered = filtered.where(
-        (t) => t['categoryId'] == selectedCategory,
-      );
-    }
-
-    final list = filtered.toList();
-    _visibleTransactions = list;
-
-    _totalSpent = 0.0;
-    _categorySpending = {};
-
-    for (final t in list) {
-      final amount = (t['amount'] as num).toDouble();
-      _totalSpent += amount;
-
-      final catId = t['categoryId'] as String;
-      _categorySpending[catId] = (_categorySpending[catId] ?? 0.0) + amount;
-    }
+  void _trocarPeriodo(ExpensesPeriod periodo) {
+    if (periodo == _periodo) return;
+    setState(() {
+      _periodo = periodo;
+      _expandido = false;
+      // O filtro só continua se a categoria tiver gasto no período novo.
+      final resumo = ExpensesCalc.resumir(_gastos, periodo, DateTime.now());
+      if (!_temCategoria(resumo, _categoriaId)) _categoriaId = null;
+    });
   }
+
+  void _tocarCategoria(String id) {
+    setState(() {
+      _categoriaId = _categoriaId == id ? null : id;
+      _expandido = false;
+    });
+  }
+
+  static bool _temCategoria(ExpensesSummary resumo, String? id) =>
+      id != null && resumo.categorias.any((c) => c.categoria.id == id);
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final topPadding = MediaQuery.of(context).padding.top;
-    final isSmallScreen = MediaQuery.of(context).size.height < 700;
-
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: const SafeArea(child: ExpensesSkeletonLoader()),
+    final Widget corpo;
+    if (_carregando && !_temDados) {
+      corpo = const ExpensesSkeletonLoader();
+    } else if (_erro != null) {
+      corpo = Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+            child: _cabecalho(),
+          ),
+          Expanded(
+            child: ExpensesLoadError(message: _erro!, onRetry: _carregar),
+          ),
+        ],
       );
+    } else {
+      corpo = _conteudo(context);
     }
 
-    if (_loadError != null) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SafeArea(
-          child: ExpensesLoadError(
-            message: _loadError!,
-            onRetry: _loadData,
-          ),
-        ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: BrandedRefreshIndicator(
-          onRefresh: _refreshData,
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            slivers: [
-              SliverToBoxAdapter(
-                child: ExpensesHero(
-                  isSmallScreen: isSmallScreen,
-                  isDark: isDark,
-                  topPadding: topPadding,
-                  selectedPeriod: selectedPeriod,
-                  transactionCount: _visibleTransactions.length,
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ExpensesTotalCard(
-                    isSmallScreen: isSmallScreen,
-                    currentBalance: _currentBalance,
-                    totalSpent: _totalSpent,
-                    selectedPeriod: selectedPeriod,
-                    selectedCategory: selectedCategory,
-                  ),
-                )
-                    .animate()
-                    .fadeIn(duration: 350.ms)
-                    .slideY(begin: 0.06, end: 0, curve: Curves.easeOutCubic),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              SliverToBoxAdapter(
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: ExpensesSectionHeader(
-                    title: 'Gastos por Categoria',
-                    icon: Icons.pie_chart_rounded,
-                    accentColor: LummyColors.amber500,
-                  ),
-                )
-                    .animate()
-                    .fadeIn(delay: 80.ms, duration: 300.ms)
-                    .slideX(begin: -0.03, end: 0, curve: Curves.easeOut),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ExpensesChartCard(
-                    categorySpending: _categorySpending,
-                    baseCategories: _baseCategories,
-                  ),
-                )
-                    .animate()
-                    .fadeIn(delay: 120.ms, duration: 320.ms)
-                    .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ExpensesSectionHeader(
-                    title: 'Filtros',
-                    icon: Icons.tune_rounded,
-                    accentColor: Theme.of(context).colorScheme.primary,
-                  ),
-                )
-                    .animate()
-                    .fadeIn(delay: 160.ms, duration: 300.ms)
-                    .slideX(begin: -0.03, end: 0, curve: Curves.easeOut),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ExpensesFiltersSection(
-                    selectedPeriod: selectedPeriod,
-                    selectedCategory: selectedCategory,
-                    allowedCategories: _allowedCategories,
-                    onPeriodSelected: (period) => setState(() {
-                      selectedPeriod = period;
-                      _applyFilters();
-                    }),
-                    onCategorySelected: (id) => setState(() {
-                      selectedCategory = id;
-                      _applyFilters();
-                    }),
-                  ),
-                )
-                    .animate()
-                    .fadeIn(delay: 200.ms, duration: 320.ms)
-                    .slideY(begin: 0.04, end: 0, curve: Curves.easeOutCubic),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              SliverToBoxAdapter(
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: ExpensesSectionHeader(
-                    title: 'Transações Recentes',
-                    icon: Icons.receipt_long_rounded,
-                    accentColor: LummyColors.emerald500,
-                  ),
-                )
-                    .animate()
-                    .fadeIn(delay: 240.ms, duration: 300.ms)
-                    .slideX(begin: -0.03, end: 0, curve: Curves.easeOut),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ExpensesTransactionsCard(
-                    visibleTransactions: _visibleTransactions,
-                  ),
-                )
-                    .animate()
-                    .fadeIn(delay: 280.ms, duration: 320.ms)
-                    .slideY(begin: 0.04, end: 0, curve: Curves.easeOutCubic),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 100)),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'fab_expenses',
-        onPressed: () async {
-          if (_allowedCategories.isEmpty) return;
-
-          final result = await Navigator.push<Map<String, dynamic>>(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  AddExpenseScreen(expenseCategories: _allowedCategories),
-            ),
-          );
-
-          if (result != null && mounted) {
-            final ok = await _saveTransactionToDatabase(result);
-            if (!mounted) return;
-            await _loadData();
-            if (!ok && context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Saldo insuficiente ou erro ao registrar. Tente novamente.',
-                    style: LummyFonts.body(),
-                  ),
-                  backgroundColor: LummyColors.red500,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            }
-          }
-        },
-        backgroundColor: LummyColors.amber500,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded, size: 24),
-        label: Text(
-          'Registrar gasto',
-          style: LummyFonts.body(fontWeight: FontWeight.w700, fontSize: 15),
-        ),
-        elevation: 4,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    return ColoredBox(
+      color: LummyColors.white,
+      child: SafeArea(bottom: false, child: corpo),
     );
+  }
+
+  Widget _cabecalho() {
+    return ChildTabHeader(
+      title: 'Gastos',
+      trailing: LummyPillButton(
+        rotulo: 'Anotar gasto',
+        glyph: LummyGlyphs.shoppingBag,
+        onTap: _abrirAnotarGasto,
+      ),
+    );
+  }
+
+  Widget _conteudo(BuildContext context) {
+    final tema = ChildThemeColorController.of(context).tema;
+    final agora = DateTime.now();
+    final resumo = ExpensesCalc.resumir(_gastos, _periodo, agora);
+    // Depois de uma recarga a categoria filtrada pode ter sumido do período.
+    final filtro = _temCategoria(resumo, _categoriaId) ? _categoriaId : null;
+    final recentes = ExpensesCalc.filtrarPorCategoria(resumo.gastos, filtro);
+    final needWant = _temNeedOrWant ? resumo.needWant : null;
+
+    return BrandedRefreshIndicator(
+      onRefresh: _aoPuxar,
+      color: tema,
+      backgroundColor: LummyColors.white,
+      // Coluna inteira montada (e não lista preguiçosa): as seções guardam o
+      // estado e a animação de entrada não repete ao rolar de volta.
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        padding: EdgeInsets.fromLTRB(
+          20,
+          16,
+          20,
+          ChildBottomNavMetrics.scrollBottomPadding(context),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _entrada(0, _cabecalho()),
+            const SizedBox(height: 14),
+            _entrada(
+              1,
+              LummySegmented<ExpensesPeriod>(
+                semanticLabel: 'Período',
+                opcoes: [
+                  for (final p in ExpensesPeriod.values) LummySegment(p, p.rotulo),
+                ],
+                selecionado: _periodo,
+                onChanged: _trocarPeriodo,
+              ),
+            ),
+            const SizedBox(height: 22),
+            _entrada(2, ExpensesV1Summary(resumo: resumo, agora: agora)),
+            const SizedBox(height: 28),
+            _entrada(
+              3,
+              ExpensesV1Categories(
+                categorias: resumo.categorias,
+                selecionadaId: filtro,
+                onTap: _tocarCategoria,
+              ),
+            ),
+            // Sem a migration, ou sem gasto classificado no período: a seção
+            // inteira fica escondida (DECISOES 7 e 11).
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              alignment: Alignment.topCenter,
+              child: needWant == null
+                  ? const SizedBox(width: double.infinity)
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 26),
+                      child: _entrada(4, ExpensesV1NeedWant(dados: needWant)),
+                    ),
+            ),
+            const SizedBox(height: 26),
+            _entrada(
+              5,
+              ExpensesV1Recent(
+                gastos: recentes,
+                expandido: _expandido,
+                agora: agora,
+                onVerTodos: () => setState(() => _expandido = true),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Entrada da primeira carga: aparece e sobe de leve, escalonado por seção.
+  /// A animação roda uma vez, quando a seção é montada.
+  Widget _entrada(int ordem, Widget child) {
+    return child
+        .animate(delay: (40 * ordem).ms)
+        .fadeIn(duration: 240.ms, curve: Curves.easeOut)
+        .slideY(begin: 0.02, end: 0, duration: 240.ms, curve: Curves.easeOutCubic);
   }
 }

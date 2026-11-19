@@ -13,6 +13,9 @@ dependencies:
     sdk: flutter
   flutter_svg: ^2.0.7
   iconsax_flutter: ^1.0.1
+  # Ícones Lucide do redesenho infantil (VINGADORES). Os desenhos usados nas
+  # telas novas ficam em lib/screens/child/widgets/v1/lummy_glyphs.dart.
+  lucide_icons_flutter: ^4.0.3
   google_fonts: ^8.0.2
   image_picker: ^1.0.4
   flutter_bloc: ^9.1.1
@@ -43,3 +46,5 @@ flutter:
   uses-material-design: true
   assets:
     - dark.png
+    # Astronauta mascote (cofrinho, dica do Lummy). Copiado do mockup aprovado.
+    - assets/images/astronauta.svg

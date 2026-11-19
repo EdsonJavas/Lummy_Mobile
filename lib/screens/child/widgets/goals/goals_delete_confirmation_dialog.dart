@@ -59,7 +59,7 @@ class GoalsDeleteConfirmationDialog extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Excluir Meta',
+              'Desistir da meta',
               style: LummyFonts.body(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -80,7 +80,7 @@ class GoalsDeleteConfirmationDialog extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    'Tem certeza que deseja excluir',
+                    'Tem certeza que quer desistir de',
                     textAlign: TextAlign.center,
                     style: LummyFonts.body(
                       fontSize: 14,
@@ -162,7 +162,7 @@ class GoalsDeleteConfirmationDialog extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Excluir',
+                        'Desistir',
                         style: LummyFonts.body(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,

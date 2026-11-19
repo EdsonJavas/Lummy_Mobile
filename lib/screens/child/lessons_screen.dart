@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/child/widgets/v1/child_avatar.dart';
+import 'package:lummy/screens/child/widgets/v1/child_bottom_nav.dart';
 
 class LessonItem {
   final String id;
@@ -71,6 +73,10 @@ final List<LessonItem> _allLessons = [
     watched: true,
   ),
 ];
+
+/// Catálogo de aulas, só leitura (usado pela Home no cartão de aula rápida;
+/// adicionado pelo arquiteto do redesenho V1).
+List<LessonItem> get lessonsCatalog => List.unmodifiable(_allLessons);
 
 const Color _accent = LummyColors.violet500;
 const Color _accentDark = LummyColors.violet600;
@@ -282,7 +288,12 @@ class _LessonsScreenState extends State<LessonsScreen> {
 
           _sectionTitle('Por tema', isDark),
           _buildThemesRow(isDark),
-          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          // Fim da rolagem: o último item passa acima da cápsula do menu.
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: ChildBottomNavMetrics.scrollBottomPadding(context),
+            ),
+          ),
         ],
       ),
     );
@@ -317,13 +328,15 @@ class _LessonsScreenState extends State<LessonsScreen> {
         children: [
           Row(
             children: [
+              // Avatar da criança (D6): o toque abre o menu lateral. O aro
+              // branco destaca o círculo do tema sobre o degradê violeta.
               Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
+                padding: const EdgeInsets.all(2),
+                decoration: const BoxDecoration(
+                  color: LummyColors.white,
+                  shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.school_rounded, color: Colors.white, size: 28),
+                child: const ChildAvatar(size: 40),
               ),
               const SizedBox(width: 16),
               Expanded(

@@ -1,12 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lummy/core/theme/design_tokens.dart';
-import 'package:lummy/shared/widgets/widgets.dart';
-import 'home_page.dart';
-import 'expenses_screen.dart';
-import 'lessons_screen.dart';
-import 'goals_screen.dart';
+import 'package:provider/provider.dart';
 
+import 'package:lummy/core/providers/child_profile_controller.dart';
+import 'package:lummy/core/providers/child_theme_color_controller.dart';
+import 'package:lummy/core/theme/app_theme.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/child/widgets/drawer/child_drawer.dart';
+import 'package:lummy/screens/child/widgets/v1/child_bottom_nav.dart';
+import 'package:lummy/screens/child/widgets/v1/child_shell_scope.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+
+import 'expenses_screen.dart';
+import 'goals_screen.dart';
+import 'home_page.dart';
+import 'lessons_screen.dart';
+
+/// Casca da área da criança (redesenho V1).
+///
+/// - As 4 abas continuam num `IndexedStack` (D15): todas montam no primeiro
+///   build e guardam o estado ao trocar de aba.
+/// - Menu de baixo em cápsula + degradê branco (C-1), por cima do conteúdo.
+/// - Menu lateral novo (`ChildDrawer`), aberto pelo avatar de qualquer aba via
+///   `ChildShellScope.read(context)?.openDrawer()`.
+/// - Tema SEMPRE claro aqui dentro, inclusive no menu lateral e nos painéis de
+///   baixo abertos daqui (D12). Telas empurradas por `Navigator.push` (Perfil,
+///   Missões etc.) seguem o tema do app (pendência registrada no PLANO).
+/// - Carrega a cor do tema e o perfil da criança ao abrir.
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
@@ -15,20 +35,62 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 0;
+  /// Tema claro calculado uma vez (o getter cria um ThemeData novo a cada
+  /// chamada, o que reconstruiria a casca inteira a cada troca de aba).
+  static final ThemeData _temaClaro = AppTheme.lightTheme;
+
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _currentIndex = ChildTabs.inicio;
   DateTime? _lastBackPress;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const ExpensesScreen(),
-    const GoalsScreen(),
-    const LessonsScreen(), // Usando a nova LessonsScreen ao invés do placeholder
+  final List<Widget> _pages = const [
+    HomePage(),
+    ExpensesScreen(),
+    GoalsScreen(),
+    LessonsScreen(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<ChildThemeColorController>().loadForCurrentUser();
+      context.read<ChildProfileController>().loadForCurrentUser();
+    });
+  }
+
+  bool get _drawerAberto => _scaffoldKey.currentState?.isDrawerOpen ?? false;
+
+  void _abrirMenu() => _scaffoldKey.currentState?.openDrawer();
+
+  void _fecharMenu() {
+    if (_drawerAberto) _scaffoldKey.currentState?.closeDrawer();
+  }
+
+  void _irParaAba(int index) {
+    _fecharMenu();
+    if (index == _currentIndex) return;
+    setState(() => _currentIndex = index);
+  }
+
+  void _depoisDeFecharMenu(void Function(BuildContext shellContext) acao) {
+    _fecharMenu();
+    // O contexto do Scaffold fica abaixo do Theme claro e continua montado.
+    final ctx = _scaffoldKey.currentContext ?? context;
+    acao(ctx);
+  }
+
   Future<bool> _onWillPop() async {
+    // Menu lateral aberto: o voltar só fecha o menu.
+    if (_drawerAberto) {
+      _fecharMenu();
+      return false;
+    }
+
     // Se não estiver na primeira aba, volta para ela
-    if (_currentIndex != 0) {
-      setState(() => _currentIndex = 0);
+    if (_currentIndex != ChildTabs.inicio) {
+      setState(() => _currentIndex = ChildTabs.inicio);
       return false;
     }
 
@@ -41,14 +103,23 @@ class _MainNavigationState extends State<MainNavigation> {
         SnackBar(
           content: Text(
             'Pressione voltar novamente para sair',
-            style: LummyFonts.body(),
+            style: LummyFonts.body(color: LummyColors.white),
           ),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
+          // Acima da cápsula do menu de baixo.
+          margin: const EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            16 +
+                ChildBottomNavMetrics.capsuleBottom +
+                ChildBottomNavMetrics.capsuleHeight,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor ?? LummyColors.slate800,
+          backgroundColor: LummyColors.ink900,
         ),
       );
       return false;
@@ -61,65 +132,64 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        final shouldPop = await _onWillPop();
-        if (shouldPop && context.mounted) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: Scaffold(
-        body: ConnectivityBanner(
-          child: IndexedStack(index: _currentIndex, children: _pages),
-        ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
+    final inset = MediaQuery.viewPaddingOf(context).bottom;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      // Fundo branco: ícones escuros nas barras do sistema, mesmo no modo
+      // escuro (o .dark puro deixaria a barra de navegação preta).
+      value: SystemUiOverlayStyle.dark.copyWith(
+        systemNavigationBarColor: LummyColors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+      child: Theme(
+        data: _temaClaro,
+        // Avisos flutuantes aparecem acima da cápsula, não por cima dela.
+        child: LummyFeedbackInset(
+          bottom: ChildBottomNavMetrics.capsuleBottom +
+              ChildBottomNavMetrics.capsuleHeight,
+          child: ChildShellScope(
+          currentTab: _currentIndex,
+          openDrawer: _abrirMenu,
+          closeDrawer: _fecharMenu,
+          goToTab: _irParaAba,
+          afterDrawerClosed: _depoisDeFecharMenu,
+          child: PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (didPop, result) async {
+              if (didPop) return;
+              final shouldPop = await _onWillPop();
+              if (shouldPop && context.mounted) {
+                Navigator.of(context).pop();
+              }
+            },
+            child: Scaffold(
+              key: _scaffoldKey,
+              backgroundColor: LummyColors.white,
+              resizeToAvoidBottomInset: false,
+              drawer: const ChildDrawer(),
+              drawerScrimColor: LummyColors.scrimInk,
+              // O menu abre pelo avatar (mockup), não arrastando da borda.
+              drawerEnableOpenDragGesture: false,
+              body: Stack(
                 children: [
-                  Expanded(
-                    child: _buildNavItem(
-                      0,
-                      Iconsax.home_1,
-                      'Início',
-                      LummyColors.brandBlue,
+                  Positioned.fill(
+                    child: ConnectivityBanner(
+                      child: IndexedStack(index: _currentIndex, children: _pages),
                     ),
                   ),
-                  Expanded(
-                    child: _buildNavItem(
-                      1,
-                      Iconsax.receipt_2,
-                      'Gastos',
-                      LummyColors.orange,
-                    ),
+                  const Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: ChildBottomFade(),
                   ),
-                  Expanded(
-                    child: _buildNavItem(
-                      2,
-                      Iconsax.flag_2,
-                      'Metas',
-                      LummyColors.purple,
-                    ),
-                  ),
-                  Expanded(
-                    child: _buildNavItem(
-                      3,
-                      Iconsax.teacher,
-                      'Aprender',
-                      LummyColors.green,
+                  Positioned(
+                    left: ChildBottomNavMetrics.capsuleSide,
+                    right: ChildBottomNavMetrics.capsuleSide,
+                    bottom: ChildBottomNavMetrics.capsuleBottom + inset,
+                    child: ChildBottomNavCapsule(
+                      currentIndex: _currentIndex,
+                      onTap: _irParaAba,
                     ),
                   ),
                 ],
@@ -127,136 +197,6 @@ class _MainNavigationState extends State<MainNavigation> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label, Color color) {
-    final isSelected = _currentIndex == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                color: isSelected ? color : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: isSelected
-                    ? Colors.white
-                    : Theme.of(context).textTheme.bodyMedium?.color,
-                size: 24,
-              ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: LummyFonts.body(
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected
-                    ? color
-                    : Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Páginas temporárias simplificadas
-class TransactionsPage extends StatelessWidget {
-  const TransactionsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: LummyColors.slate50,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Meus Gastos',
-                style: LummyFonts.body(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: LummyColors.slate800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Acompanhe onde você gasta seu dinheiro',
-                style: LummyFonts.body(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: LummyColors.slate500,
-                ),
-              ),
-              const SizedBox(height: 40),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: LummyColors.red500.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Iconsax.receipt_2,
-                          color: LummyColors.red500,
-                          size: 50,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Em Desenvolvimento',
-                        style: LummyFonts.body(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: LummyColors.slate800,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Esta tela estará disponível em breve!',
-                        textAlign: TextAlign.center,
-                        style: LummyFonts.body(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: LummyColors.slate500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

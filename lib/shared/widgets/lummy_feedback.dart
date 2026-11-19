@@ -71,7 +71,12 @@ class LummyFeedback {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          margin: const EdgeInsets.all(16),
+          margin: EdgeInsets.fromLTRB(
+            16,
+            16,
+            16,
+            16 + LummyFeedbackInset.of(context),
+          ),
           duration: duration,
           elevation: 6,
         ),
@@ -157,4 +162,24 @@ class _LoadingScrim extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Espaço extra embaixo dos avisos flutuantes de [LummyFeedback], para não
+/// cobrirem um menu que flutua no fim da tela (a cápsula da área da criança).
+class LummyFeedbackInset extends InheritedWidget {
+  const LummyFeedbackInset({
+    super.key,
+    required this.bottom,
+    required super.child,
+  });
+
+  /// Altura ocupada pelo menu flutuante, a partir do fim da área útil.
+  final double bottom;
+
+  static double of(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<LummyFeedbackInset>()?.bottom ?? 0;
+
+  @override
+  bool updateShouldNotify(LummyFeedbackInset oldWidget) =>
+      oldWidget.bottom != bottom;
 }

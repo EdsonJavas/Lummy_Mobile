@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
 import 'package:lummy/screens/child/widgets/profile/profile_setting_item.dart';
+import 'package:lummy/screens/child/widgets/profile/profile_theme_color_item.dart';
 import 'package:lummy/screens/child/widgets/profile/profile_theme_setting_item.dart';
 
 /// Seção "Configurações" do perfil.
@@ -73,6 +74,7 @@ class ProfileSettingsSection extends StatelessWidget {
             onTap: onNotificationsTap,
           ),
           const ProfileThemeSettingItem(),
+          const ProfileThemeColorItem(),
           ProfileSettingItem(
             icon: Icons.help_rounded,
             title: 'Ajuda',

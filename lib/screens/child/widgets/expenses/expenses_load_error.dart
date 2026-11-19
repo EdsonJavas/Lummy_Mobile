@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+
+import 'package:lummy/core/providers/child_theme_color_controller.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 /// Estado de erro ao carregar os gastos, com botão para tentar de novo.
+///
+/// Visual do redesenho V1, sempre claro (DECISOES 12): quadrado neutro com o
+/// ícone da aba, mensagem em tinta e pílula na cor do tema (tentar de novo não
+/// mexe em dinheiro, então não é laranja).
 class ExpensesLoadError extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -15,41 +21,34 @@ class ExpensesLoadError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tema = ChildThemeColorController.of(context).tema;
+
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          32,
+          24,
+          32,
+          ChildBottomNavMetrics.scrollBottomPadding(context),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.cloud_off_rounded,
+            const NeutralIconTile(
+              glyph: LummyGlyphs.receipt,
               size: 56,
-              color: isDark ? LummyColors.slate500 : LummyColors.slate400,
+              radius: 18,
+              iconSize: 26,
+              iconColor: LummyColors.ink500,
             ),
-            const Gap(20),
+            const SizedBox(height: 20),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: LummyFonts.body(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                height: 1.45,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
+              style: LummyText.poppins(size: 15, weight: FontWeight.w500, height: 1.45),
             ),
-            const Gap(28),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded),
-              label: Text(
-                'Tentar de novo',
-                style: LummyFonts.body(fontWeight: FontWeight.w600),
-              ),
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              ),
-            ),
+            const SizedBox(height: 24),
+            LummyPillButton(rotulo: 'Tentar de novo', cor: tema, onTap: onRetry),
           ],
         ),
       ),

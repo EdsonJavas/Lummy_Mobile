@@ -107,6 +107,41 @@ abstract final class LummyColors {
   static const brandOrangeMid = Color(0xFFFF7A28);
   static const brandOrangeDeep = Color(0xFFFF5722);
 
+  // ── Redesenho infantil V1 (mockup aprovado; ver DECISOES 14) ──
+  // Cor do tema: as 3 opções que a criança escolhe. Em tela, NUNCA use estas
+  // constantes direto: leia `ChildThemeColorController.tema`, que segue a
+  // escolha salva. Estas existem para o controller e para as bolinhas de cor.
+  static const themeLummy = Color(0xFF235DC7); // Azul Lummy (padrão)
+  static const themeIndigo = Color(0xFF4B4FD6); // Índigo
+  static const themePetrol = Color(0xFF0F6E8C); // Azul-petróleo ("Petróleo")
+
+  // Papéis fixos. Laranja do dinheiro = `orange600` (#EA580C), que já existia.
+  static const brandGreen = Color(0xFF12A150); // guardar e progredir
+  static const brandGreenBright = Color(0xFF2BD46F); // barra da meta no escuro
+  static const brandGold = Color(0xFFF5B000); // XP e prêmios
+  static const ink900 = Color(0xFF0B1533); // tinta (texto principal)
+  static const ink600 = Color(0xFF5B6478); // texto de apoio
+  static const ink500 = Color(0xFF6B7385); // ícone apagado
+  static const ink300 = Color(0xFFB4BACA); // borda do círculo de missão pendente
+  static const ink200 = Color(0xFFC5CAD6); // tracejados e parada futura
+  static const ink100 = Color(0xFFD5D9E2); // alça do painel de baixo
+  static const surface100 = Color(0xFFF2F4F7); // superfície neutra
+  static const line100 = Color(0xFFEEF0F4); // linhas e trilhos
+  static const chartInk = Color(0xFF2B3654); // gráficos e números neutros
+  static const starGold = Color(0xFFFFD34D); // estrelinhas do cartão espacial
+  static const danger700 = Color(0xFFB42318); // "Desistir da meta"
+
+  /// Véu atrás do painel de baixo e do menu lateral: rgba(11,21,51,0.50)
+  /// (sobre branco dá exatamente o #858A99 do mockup).
+  static const scrimInk = Color(0x800B1533);
+
+  // Branco com transparência (rgba(255,255,255,a) do mockup).
+  static const white12 = Color(0x1FFFFFFF);
+  static const white22 = Color(0x38FFFFFF);
+  static const white28 = Color(0x47FFFFFF);
+  static const white55 = Color(0x8CFFFFFF);
+  static const white75 = Color(0xBFFFFFFF);
+
   // ── Destaques avulsos ──
   static const gold = Color(0xFFFFD700);
   static const orangeWeb = Color(0xFFFFA500);
@@ -190,4 +225,52 @@ abstract final class LummyRadius {
   static const lg = 16.0;
   static const xl = 20.0;
   static const full = 100.0;
+}
+
+/// Sombras do redesenho infantil V1, convertidas do CSS do mockup.
+///
+/// Conversão: `blurRadius = 0,866 × (blur_css − 1)`, que reproduz o desfoque
+/// do navegador (sigma = blur/2) no Flutter (sigma = blurRadius × 0,577 + 0,5).
+abstract final class LummyShadows {
+  /// `0 6px 14px rgba(234,88,12,0.28)`: botões laranja (56 e pílula 44).
+  static const orange = [
+    BoxShadow(color: Color(0x47EA580C), offset: Offset(0, 6), blurRadius: 11.26),
+  ];
+
+  /// `0 10px 22px rgba(234,88,12,0.28)`: botão largo "Salvar gasto".
+  static const orangeStrong = [
+    BoxShadow(color: Color(0x47EA580C), offset: Offset(0, 10), blurRadius: 18.19),
+  ];
+
+  /// `0 6px 14px rgba(18,161,80,0.26)`: botão verde "Nova meta".
+  static const green = [
+    BoxShadow(color: Color(0x4212A150), offset: Offset(0, 6), blurRadius: 11.26),
+  ];
+
+  /// `0 6px 14px rgba(11,21,51,0.16)`: quadrado do "Querer ou precisar?".
+  static const ink = [
+    BoxShadow(color: Color(0x290B1533), offset: Offset(0, 6), blurRadius: 11.26),
+  ];
+
+  /// `0 12px 28px rgba(11,21,51,0.20)`: cápsula do menu de baixo.
+  static const capsule = [
+    BoxShadow(color: Color(0x330B1533), offset: Offset(0, 12), blurRadius: 23.38),
+  ];
+
+  /// `0 2px 6px rgba(11,21,51,0.10)`: item ativo do segmentado.
+  static const segment = [
+    BoxShadow(color: Color(0x1A0B1533), offset: Offset(0, 2), blurRadius: 4.33),
+  ];
+
+  /// `12px 0 32px rgba(11,21,51,0.18)`: menu lateral.
+  static const drawer = [
+    BoxShadow(color: Color(0x2E0B1533), offset: Offset(12, 0), blurRadius: 26.85),
+  ];
+
+  /// Anel da bolinha de cor escolhida: `0 0 0 3px #FFF, 0 0 0 5px <cor>`.
+  /// A ordem importa: a sombra de cima (branca) é a última da lista.
+  static List<BoxShadow> swatchRing(Color color) => [
+        BoxShadow(color: color, spreadRadius: 5),
+        const BoxShadow(color: Color(0xFFFFFFFF), spreadRadius: 3),
+      ];
 }

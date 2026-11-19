@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/constants/app_constants.dart';
-import 'package:lummy/screens/auth/login_screen.dart';
-import 'package:lummy/core/providers/theme_provider.dart';
 import 'package:lummy/screens/child/edit_profile_screen.dart';
+import 'package:lummy/screens/child/flows/child_logout_flow.dart';
 import 'package:lummy/screens/child/notifications_screen.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
-import 'package:lummy/application/app_facade.dart';
-import 'package:lummy/di/locator.dart';
-import 'package:lummy/domain/repositories/auth_repository.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
 import 'package:lummy/screens/child/widgets/profile/profile_achievements_section.dart';
@@ -359,74 +354,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _onLogoutTap() async {
-    // Mostrar diálogo de confirmação
-    final shouldLogout = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Sair da conta?',
-          style: LummyFonts.body(fontWeight: FontWeight.w600),
-        ),
-        content: Text(
-          'Tem certeza que deseja sair? Você precisará fazer login novamente.',
-          style: LummyFonts.body(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancelar',
-              style: LummyFonts.body(
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
-              'Sair',
-              style: LummyFonts.body(
-                color: LummyColors.red500,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldLogout == true) {
-      try {
-        final authRepo = locator<AuthRepository>();
-        await authRepo.logout();
-        await locator<BiometricAuthService>().clearCachedUser();
-
-
-        // Navegar para tela de login
-        if (!mounted) return;
-        context.read<ThemeProvider>().setPreLoginLightOnly(true);
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
-          (route) => false,
-        );
-      } catch (e) {
-        appLog('❌ Erro ao fazer logout: $e');
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Erro ao fazer logout: $e',
-              style: LummyFonts.body(),
-            ),
-            backgroundColor: LummyColors.red500,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-      }
-    }
-  }
+  /// Mesmo fluxo do menu lateral: confirma, sai e zera a cor e o perfil da
+  /// criança.
+  Future<void> _onLogoutTap() => sairDaContaCrianca(context);
 }
