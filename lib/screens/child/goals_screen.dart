@@ -3,7 +3,16 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/models/goal.dart';
 import 'package:lummy/screens/child/new_goal_screen.dart';
-import 'package:lummy/shared/widgets/money_text_field.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_add_goal_fab.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_add_progress_dialog.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_celebration_banner.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_delete_confirmation_dialog.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_empty_hint.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_featured_goal_card.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_goal_card.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_hero.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_section_header.dart';
+import 'package:lummy/screens/child/widgets/goals/goals_skeleton_loader.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/utils/ensure_child_record.dart';
 import 'package:lummy/core/utils/app_log.dart';
@@ -480,7 +489,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     final topPadding = MediaQuery.of(context).padding.top;
 
     final Widget bodyContent = _isLoading
-        ? _buildSkeletonLoader()
+        ? const GoalsSkeletonLoader()
         : BrandedRefreshIndicator(
             onRefresh: _loadGoals,
             child: CustomScrollView(
@@ -490,11 +499,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
               slivers: [
                 // Hero: gradiente + título + stats
                 SliverToBoxAdapter(
-                  child: _buildGoalsHero(
-                    context,
-                    isSmallScreen,
-                    isDark,
-                    topPadding,
+                  child: GoalsHero(
+                    isSmallScreen: isSmallScreen,
+                    isDark: isDark,
+                    topPadding: topPadding,
                     ongoingCount: goal != null ? 1 : 0,
                     completedCount: completedGoals.length,
                   ),
@@ -502,7 +510,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 const SliverToBoxAdapter(child: SizedBox(height: 24)),
                 if (goal != null) ...[
                   SliverToBoxAdapter(
-                    child: _buildFeaturedGoalCard(goal, isSmallScreen)
+                    child: GoalsFeaturedGoalCard(
+                      goal: goal,
+                      isSmallScreen: isSmallScreen,
+                      onAddProgress: () => _showAddProgressDialog(goal),
+                      onMarkCompleted: () => _markGoalAsCompleted(goal),
+                      onDelete: () => _showDeleteConfirmation(goal),
+                    )
                         .animate()
                         .fadeIn(duration: 400.ms)
                         .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic),
@@ -514,7 +528,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: _buildCelebrationBanner(isSmallScreen)
+                        child: GoalsCelebrationBanner(isSmallScreen: isSmallScreen)
                             .animate()
                             .fadeIn(duration: 400.ms)
                             .slideY(begin: 0.04, end: 0, curve: Curves.easeOutCubic),
@@ -526,7 +540,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
-                        child: _buildSubtleEmptyHint(isSmallScreen),
+                        child: GoalsSubtleEmptyHint(isSmallScreen: isSmallScreen),
                       ),
                     ),
                   ],
@@ -536,10 +550,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: _buildSectionHeader(
-                        goal == null ? 'Todas Concluídas' : 'Concluídas',
-                        completedGoals.length,
-                        isSmallScreen,
+                      child: GoalsSectionHeader(
+                        title: goal == null ? 'Todas Concluídas' : 'Concluídas',
+                        count: completedGoals.length,
+                        isSmallScreen: isSmallScreen,
                       )
                           .animate()
                           .fadeIn(delay: 100.ms, duration: 300.ms)
@@ -555,7 +569,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           final g = completedGoals[index];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 14),
-                            child: _buildGoalCard(g, isSmallScreen)
+                            child: GoalsGoalCard(goal: g, isSmallScreen: isSmallScreen)
                               .animate()
                               .fadeIn(
                                 delay: (120 + index * 60).ms,
@@ -585,966 +599,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
       body: SafeArea(child: bodyContent),
       floatingActionButton: _isLoading
           ? null
-          : _buildFloatingAddGoalButton(context, isSmallScreen),
+          : GoalsAddGoalFab(isSmallScreen: isSmallScreen, onPressed: _addNewGoal),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  Widget _buildGoalsHero(
-    BuildContext context,
-    bool isSmallScreen,
-    bool isDark,
-    double topPadding, {
-    required int ongoingCount,
-    required int completedCount,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, topPadding + 12, 20, 28),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  LummyColors.violet800,
-                  LummyColors.violet600,
-                  LummyColors.indigo500,
-                ]
-              : [
-                  LummyColors.violet500,
-                  LummyColors.violet600,
-                  LummyColors.indigo500,
-                ],
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: LummyColors.violet600.withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.flag_rounded,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Minhas Metas',
-                      style: LummyFonts.body(
-                        fontSize: isSmallScreen ? 24 : 28,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Transforme sonhos em realidade',
-                      style: LummyFonts.body(
-                        fontSize: isSmallScreen ? 13 : 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              _buildHeroStatChip(
-                Icons.trending_up_rounded,
-                '$ongoingCount em andamento',
-                isSmallScreen,
-              ),
-              const SizedBox(width: 10),
-              _buildHeroStatChip(
-                Icons.celebration_rounded,
-                '$completedCount concluídas',
-                isSmallScreen,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeroStatChip(
-    IconData icon,
-    String label,
-    bool isSmallScreen,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: isSmallScreen ? 16 : 18),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: LummyFonts.body(
-              fontSize: isSmallScreen ? 11 : 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeaturedGoalCard(Goal goal, bool isSmallScreen) {
-    final primaryColor = goal.status == GoalStatus.completed
-        ? LummyColors.emerald500
-        : LummyColors.violet500;
-    final progress = goal.progress.clamp(0.0, 1.0);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: EdgeInsets.all(isSmallScreen ? 20 : 24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: primaryColor.withValues(alpha: isDark ? 0.25 : 0.4),
-            width: isDark ? 1.5 : 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withValues(alpha: isDark ? 0.15 : 0.2),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.12),
-              blurRadius: isDark ? 12 : 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: isSmallScreen ? 72 : 88,
-                  height: isSmallScreen ? 72 : 88,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: isSmallScreen ? 72 : 88,
-                        height: isSmallScreen ? 72 : 88,
-                        child: CircularProgressIndicator(
-                          value: progress,
-                          strokeWidth: 6,
-                          backgroundColor: primaryColor.withValues(alpha: 0.15),
-                          valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: primaryColor.withValues(alpha: 0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          goal.emoji,
-                          style: TextStyle(
-                            fontSize: isSmallScreen ? 28 : 34,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: primaryColor.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          goal.status == GoalStatus.completed
-                              ? 'Concluída'
-                              : 'Em andamento',
-                          style: LummyFonts.body(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        goal.name,
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 18 : 20,
-                          fontWeight: FontWeight.w800,
-                          color: Theme.of(context).textTheme.titleLarge?.color,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        '${(progress * 100).toInt()}% • ${_formatCurrency(goal.currentAmount)} / ${_formatCurrency(goal.targetAmount)}',
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 12 : 13,
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 10,
-                backgroundColor: primaryColor.withValues(alpha: 0.15),
-                valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
-              ),
-            ),
-            if (goal.status != GoalStatus.completed) ...[
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCardActionButton(
-                      context,
-                      Icons.add_circle_rounded,
-                      'Adicionar economia',
-                      primaryColor,
-                      onTap: () => _showAddProgressDialog(goal),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildCardActionButton(
-                      context,
-                      Icons.check_circle_outline_rounded,
-                      'Marcar concluída',
-                      LummyColors.emerald500,
-                      onTap: () => _markGoalAsCompleted(goal),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _buildCardActionButton(
-                context,
-                Icons.delete_outline_rounded,
-                'Remover meta',
-                LummyColors.red500,
-                onTap: () => _showDeleteConfirmation(goal),
-                fullWidth: true,
-              ),
-            ],
-            if (goal.status == GoalStatus.completed &&
-                goal.completedDate != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: LummyColors.emerald500.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: LummyColors.emerald500.withValues(alpha: 0.25),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.celebration_rounded,
-                      color: LummyColors.emerald500,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Concluída em ${_formatDate(goal.completedDate!)}',
-                      style: LummyFonts.body(
-                        fontSize: isSmallScreen ? 12 : 14,
-                        fontWeight: FontWeight.w600,
-                        color: LummyColors.emerald500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  bool get isDark => Theme.of(context).brightness == Brightness.dark;
-
-  Widget _buildCardActionButton(
-    BuildContext context,
-    IconData icon,
-    String label,
-    Color color, {
-    VoidCallback? onTap,
-    bool fullWidth = false,
-  }) {
-    return Material(
-      color: color.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
-          child: Row(
-            mainAxisAlignment:
-                fullWidth ? MainAxisAlignment.center : MainAxisAlignment.start,
-            mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  label,
-                  style: LummyFonts.body(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _formatCurrency(double value) {
-    return 'R\$ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
-  }
-
-  Widget _buildFloatingAddGoalButton(BuildContext context, bool isSmallScreen) {
-    return FloatingActionButton.extended(
-      heroTag: 'fab_goals',
-      onPressed: _addNewGoal,
-      backgroundColor: LummyColors.violet500,
-      foregroundColor: Colors.white,
-      icon: const Icon(Icons.add_rounded, size: 24),
-      label: Text(
-        'Nova meta',
-        style: LummyFonts.body(
-          fontSize: isSmallScreen ? 14 : 15,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      elevation: 4,
-    );
-  }
-
-  Widget _buildSectionHeader(String title, int count, bool isSmallScreen) {
-    final bool isCompleted = title == 'Concluídas';
-    final Color headerColor = isCompleted
-        ? LummyColors.emerald500
-        : LummyColors.violet500;
-    final IconData headerIcon = isCompleted ? Icons.check_circle : Icons.flag;
-
-    final bool dark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: dark
-              ? [headerColor.withValues(alpha: 0.05), headerColor.withValues(alpha: 0.02)]
-              : [headerColor.withValues(alpha: 0.12), headerColor.withValues(alpha: 0.06)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: headerColor.withValues(alpha: dark ? 0.1 : 0.25),
-          width: dark ? 1 : 1.5,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: headerColor.withValues(alpha: dark ? 0.1 : 0.18),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              headerIcon,
-              color: headerColor,
-              size: isSmallScreen ? 20 : 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: LummyFonts.body(
-              fontSize: isSmallScreen ? 18 : 20,
-              fontWeight: FontWeight.w700,
-              color: Theme.of(context).textTheme.titleLarge?.color,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  headerColor.withValues(alpha: 0.2),
-                  headerColor.withValues(alpha: 0.1),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: headerColor.withValues(alpha: 0.3), width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: headerColor.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.tag, size: 14, color: headerColor),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    count.toString(),
-                    style: LummyFonts.body(
-                      fontSize: isSmallScreen ? 12 : 14,
-                      fontWeight: FontWeight.w700,
-                      color: headerColor,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGoalCard(Goal goal, bool isSmallScreen) {
-    // Define colors based on goal status and progress
-    final Color primaryColor = goal.status == GoalStatus.completed
-        ? LummyColors.emerald500 // Green for completed
-        : LummyColors.violet500; // Purple for ongoing
-
-    final Color secondaryColor = goal.status == GoalStatus.completed
-        ? LummyColors.emerald600
-        : LummyColors.violet600;
-
-    final bool dark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: goal.status == GoalStatus.completed
-              ? primaryColor.withValues(alpha: dark ? 0.2 : 0.35)
-              : primaryColor.withValues(alpha: dark ? 0.15 : 0.3),
-          width: dark ? 1.5 : 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withValues(alpha: dark ? 0.1 : 0.15),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: dark ? 0.03 : 0.08),
-            blurRadius: dark ? 8 : 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header with enhanced styling
-          Row(
-            children: [
-              // Enhanced emoji container with solid color
-              Container(
-                width: isSmallScreen ? 52 : 60,
-                height: isSmallScreen ? 52 : 60,
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: primaryColor.withValues(alpha: 0.2),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: primaryColor.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    goal.emoji,
-                    style: TextStyle(fontSize: isSmallScreen ? 26 : 30),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            goal.name,
-                            style: LummyFonts.body(
-                              fontSize: isSmallScreen ? 16 : 18,
-                              fontWeight: FontWeight.w700,
-                              color: Theme.of(
-                                context,
-                              ).textTheme.titleLarge?.color,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            softWrap: false,
-                          ),
-                        ),
-                        // Status badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: goal.status == GoalStatus.completed
-                                ? LummyColors.emerald500.withValues(alpha: 0.1)
-                                : LummyColors.violet500.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: goal.status == GoalStatus.completed
-                                  ? LummyColors.emerald500.withValues(alpha: 0.3)
-                                  : LummyColors.violet500.withValues(alpha: 0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                goal.status == GoalStatus.completed
-                                    ? Icons.check_circle
-                                    : Icons.access_time,
-                                size: 12,
-                                color: primaryColor,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                goal.status == GoalStatus.completed
-                                    ? 'Concluída'
-                                    : 'Em Andamento',
-                                style: LummyFonts.body(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: primaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (goal.description.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        goal.description,
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 12 : 14,
-                          fontWeight: FontWeight.w400,
-                          color: LummyColors.slate500,
-                          height: 1.3,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: true,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              const SizedBox.shrink(),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Progress Bar - visible track + centered percentage
-          SizedBox(
-            height: 16,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Track
-                Container(
-                  height: 16,
-                  decoration: BoxDecoration(
-                    color: LummyColors.slate200,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: LummyColors.gray300,
-                      width: 1,
-                    ),
-                  ),
-                ),
-                // Fill
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: FractionallySizedBox(
-                    widthFactor: goal.progress.clamp(0.0, 1.0),
-                    child: Container(
-                      height: 16,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [primaryColor, secondaryColor],
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: primaryColor.withValues(alpha: 0.25),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Centered label over the bar
-                IgnorePointer(
-                  ignoring: true,
-                  child: Text(
-                    '${(goal.progress * 100).toInt()}%',
-                    style: LummyFonts.body(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: goal.progress > 0.5 ? Colors.white : primaryColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Enhanced Progress Text with better layout
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: primaryColor.withValues(alpha: 0.1),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Progresso',
-                        style: LummyFonts.body(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: LummyColors.slate500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${(goal.progress * 100).toInt()}% concluído',
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.w600,
-                          color: primaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 40,
-                  width: 1,
-                  color: primaryColor.withValues(alpha: 0.2),
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Valor',
-                        style: LummyFonts.body(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: LummyColors.slate500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'R\$ ${goal.currentAmount.toStringAsFixed(2)}',
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: FontWeight.w700,
-                          color: LummyColors.slate800,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
-                      ),
-                      Text(
-                        '/ R\$ ${goal.targetAmount.toStringAsFixed(2)}',
-                        style: LummyFonts.body(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: LummyColors.slate500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Enhanced Completion status
-          if (goal.status == GoalStatus.completed &&
-              goal.completedDate != null) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: LummyColors.emerald500.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: LummyColors.emerald500.withValues(alpha: 0.2),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.celebration,
-                    color: LummyColors.emerald500,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Flexible(
-                    child: Text(
-                      '🎉 Concluída em ${_formatDate(goal.completedDate!)}',
-                      style: LummyFonts.body(
-                        fontSize: isSmallScreen ? 12 : 14,
-                        fontWeight: FontWeight.w600,
-                        color: LummyColors.emerald500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCelebrationBanner(bool isSmallScreen) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: dark
-              ? [LummyColors.emerald900, LummyColors.emerald500.withValues(alpha: 0.25)]
-              : [LummyColors.emerald500, LummyColors.emerald600],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: LummyColors.emerald500.withValues(alpha: dark ? 0.15 : 0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 52, height: 52,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            alignment: Alignment.center,
-            child: const Text('🏆', style: TextStyle(fontSize: 28)),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Parabéns!',
-                  style: LummyFonts.body(
-                    fontSize: isSmallScreen ? 17 : 19,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  'Crie uma nova meta para continuar evoluindo!',
-                  style: LummyFonts.body(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.85),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubtleEmptyHint(bool isSmallScreen) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 56, height: 56,
-          decoration: BoxDecoration(
-            color: dark
-                ? LummyColors.violet500.withValues(alpha: 0.12)
-                : LummyColors.violet500.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          alignment: Alignment.center,
-          child: Icon(
-            Icons.flag_rounded,
-            size: 28,
-            color: dark ? LummyColors.violet600 : LummyColors.violet500,
-          ),
-        ),
-        const SizedBox(height: 14),
-        Text(
-          'Nenhuma meta criada ainda',
-          style: LummyFonts.body(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: dark ? LummyColors.slate400 : LummyColors.slate500,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Toque no botão abaixo para começar',
-          style: LummyFonts.body(
-            fontSize: 12,
-            color: dark ? LummyColors.slate500 : LummyColors.slate400,
-          ),
-        ),
-      ],
     );
   }
 
@@ -1555,173 +611,47 @@ class _GoalsScreenState extends State<GoalsScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Colors.white, LummyColors.slate50],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: LummyColors.slate200, width: 1),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header with icon
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [LummyColors.emerald500, LummyColors.emerald600],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+        builder: (context, setState) => GoalsAddProgressDialog(
+          goal: goal,
+          controller: controller,
+          onAmountChanged: (value) {
+            setState(() {
+              currentAmount = value;
+            });
+          },
+          onCancel: () => Navigator.pop(context),
+          onConfirm: () {
+            if (currentAmount != null && currentAmount! > 0) {
+              _updateGoalProgress(goal, currentAmount!);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
                     children: [
-                      Icon(Icons.add_circle, color: Colors.white, size: 24),
-                      SizedBox(width: 8),
-                      Text('💰', style: TextStyle(fontSize: 20)),
+                      const Icon(
+                        Icons.celebration,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Progresso adicionado! 💰',
+                        style: LummyFonts.body(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Adicionar Progresso',
-                  style: LummyFonts.body(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: LummyColors.slate800,
+                  backgroundColor: LummyColors.emerald500,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  duration: const Duration(seconds: 3),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Quanto você economizou para "${goal.name}"?',
-                  textAlign: TextAlign.center,
-                  style: LummyFonts.body(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: LummyColors.slate500,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                MoneyTextField(
-                  controller: controller,
-                  onChanged: (value) {
-                    setState(() {
-                      currentAmount = value;
-                    });
-                  },
-                  isSmallScreen: false,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          'Cancelar',
-                          style: LummyFonts.body(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: LummyColors.slate500,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [LummyColors.emerald500, LummyColors.emerald600],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: LummyColors.emerald500.withValues(alpha: 0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (currentAmount != null && currentAmount! > 0) {
-                              _updateGoalProgress(goal, currentAmount!);
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.celebration,
-                                        color: Colors.white,
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'Progresso adicionado! 💰',
-                                        style: LummyFonts.body(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  backgroundColor: LummyColors.emerald500,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  duration: const Duration(seconds: 3),
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            'Adicionar',
-                            style: LummyFonts.body(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+              );
+            }
+          },
         ),
       ),
     );
@@ -1730,246 +660,14 @@ class _GoalsScreenState extends State<GoalsScreen> {
   void _showDeleteConfirmation(Goal goal) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.white, LummyColors.slate50],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: LummyColors.slate200, width: 1),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Warning icon
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [LummyColors.red500, LummyColors.red600],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                    SizedBox(width: 8),
-                    Text('⚠️', style: TextStyle(fontSize: 20)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Excluir Meta',
-                style: LummyFonts.body(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: LummyColors.slate800,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: LummyColors.red500.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: LummyColors.red500.withValues(alpha: 0.2),
-                    width: 1,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'Tem certeza que deseja excluir',
-                      textAlign: TextAlign.center,
-                      style: LummyFonts.body(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: LummyColors.slate500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '"${goal.name}"',
-                      textAlign: TextAlign.center,
-                      style: LummyFonts.body(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: LummyColors.slate800,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Esta ação não pode ser desfeita.',
-                      textAlign: TextAlign.center,
-                      style: LummyFonts.body(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: LummyColors.red500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'Cancelar',
-                        style: LummyFonts.body(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: LummyColors.slate500,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [LummyColors.red500, LummyColors.red600],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: LummyColors.red500.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _deleteGoal(goal);
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          'Excluir',
-                          style: LummyFonts.body(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+      builder: (context) => GoalsDeleteConfirmationDialog(
+        goal: goal,
+        onCancel: () => Navigator.pop(context),
+        onConfirm: () {
+          _deleteGoal(goal);
+          Navigator.pop(context);
+        },
       ),
     );
-  }
-
-  Widget _buildSkeletonLoader() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header skeleton
-          Container(
-            height: 32,
-            width: 150,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          const SizedBox(height: 24),
-          // Current goal skeleton
-          Container(
-            height: 200,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          const SizedBox(height: 24),
-          // Completed goals title skeleton
-          Container(
-            height: 24,
-            width: 120,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Completed goals list skeleton
-          ...List.generate(
-            3,
-            (index) => Padding(
-              padding: EdgeInsets.only(bottom: index == 2 ? 0 : 16),
-              child: Container(
-                height: 100,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date).inDays;
-
-    if (difference == 0) {
-      return 'hoje';
-    } else if (difference == 1) {
-      return 'ontem';
-    } else if (difference < 7) {
-      return '$difference dias atrás';
-    } else if (difference < 30) {
-      final weeks = (difference / 7).floor();
-      return '$weeks semana${weeks > 1 ? 's' : ''} atrás';
-    } else {
-      final months = (difference / 30).floor();
-      return '$months mês${months > 1 ? 'es' : ''} atrás';
-    }
   }
 }

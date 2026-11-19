@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,6 +13,20 @@ import 'package:lummy/services/family_service.dart';
 import 'package:lummy/core/theme/app_theme.dart';
 import 'package:lummy/core/providers/theme_provider.dart';
 import 'package:lummy/screens/auth/register_screen.dart';
+import 'package:lummy/screens/auth/widgets/login/login_astronaut_illustration.dart';
+import 'package:lummy/screens/auth/widgets/login/login_biometric_button.dart';
+import 'package:lummy/screens/auth/widgets/login/login_biometric_setup_dialog.dart';
+import 'package:lummy/screens/auth/widgets/login/login_different_account_dialog.dart';
+import 'package:lummy/screens/auth/widgets/login/login_email_field.dart';
+import 'package:lummy/screens/auth/widgets/login/login_forgot_password_dialog.dart';
+import 'package:lummy/screens/auth/widgets/login/login_forgot_password_link.dart';
+import 'package:lummy/screens/auth/widgets/login/login_form_panel.dart';
+import 'package:lummy/screens/auth/widgets/login/login_logo_header.dart';
+import 'package:lummy/screens/auth/widgets/login/login_offline_card.dart';
+import 'package:lummy/screens/auth/widgets/login/login_password_field.dart';
+import 'package:lummy/screens/auth/widgets/login/login_register_prompt.dart';
+import 'package:lummy/screens/auth/widgets/login/login_submit_button.dart';
+import 'package:lummy/screens/auth/widgets/login/login_title.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
 
@@ -70,156 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final shouldEnable = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardTheme.color,
-            borderRadius: BorderRadius.circular(28),
-            border: Theme.of(context).brightness == Brightness.dark
-                ? Border.all(color: LummyColors.slate600, width: 1)
-                : null,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 30,
-                offset: const Offset(0, 15),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Ícone de biometria
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: Theme.of(context).brightness == Brightness.dark
-                        ? [
-                            LummyColors.blue500.withValues(alpha: 0.2),
-                            LummyColors.violet500.withValues(alpha: 0.1),
-                          ]
-                        : [
-                            LummyColors.blue800.withValues(alpha: 0.1),
-                            LummyColors.violet500.withValues(alpha: 0.05),
-                          ],
-                  ),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? LummyColors.blue500.withValues(alpha: 0.3)
-                        : LummyColors.blue800.withValues(alpha: 0.2),
-                    width: 2,
-                  ),
-                ),
-                child: Icon(
-                  Icons.fingerprint,
-                  size: 64,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? LummyColors.blue500
-                      : LummyColors.blue800,
-                ),
-              ),
-              const SizedBox(height: 24),
-              // Título
-              ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  colors: Theme.of(context).brightness == Brightness.dark
-                      ? [LummyColors.blue500, LummyColors.violet500]
-                      : [LummyColors.slate800, LummyColors.slate800],
-                ).createShader(bounds),
-                child: Text(
-                  'Ativar Biometria?',
-                  style: LummyFonts.body(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Descrição
-              Text(
-                'Salve sua digital para fazer login de forma rápida e segura nos próximos acessos!',
-                style: LummyFonts.body(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 28),
-              // Botões
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).brightness == Brightness.dark
-                            ? LummyColors.slate700
-                            : LummyColors.slate100,
-                        foregroundColor: Theme.of(context).brightness == Brightness.dark
-                            ? LummyColors.slate200
-                            : Theme.of(context).textTheme.bodyMedium?.color,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? LummyColors.slate600
-                                : LummyColors.slate200,
-                            width: 1,
-                          ),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Agora Não',
-                        style: LummyFonts.body(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: LummyColors.blue500,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'Ativar',
-                        style: LummyFonts.body(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (context) => const LoginBiometricSetupDialog(),
     );
 
     if (shouldEnable == true) {
@@ -240,100 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: Container(
-          padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardTheme.color,
-            borderRadius: BorderRadius.circular(24),
-            border: Theme.of(context).brightness == Brightness.dark
-                ? Border.all(color: LummyColors.slate600, width: 1)
-                : null,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.12),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.fingerprint,
-                size: 56,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Outra conta',
-                style: LummyFonts.body(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).textTheme.titleLarge?.color,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Você entrou com uma conta diferente da última. Deseja usar digital para esta conta daqui pra frente?',
-                style: LummyFonts.body(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                  height: 1.45,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Text(
-                        'Não',
-                        style: LummyFonts.body(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: Text(
-                        'Sim, usar digital',
-                        style: LummyFonts.body(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: (context) => const LoginDifferentAccountDialog(),
     );
   }
 
@@ -403,136 +174,43 @@ class _LoginScreenState extends State<LoginScreen> {
     final sent = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? LummyColors.slate800
-            : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: LummyColors.brandBlue.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.lock_reset_rounded, color: LummyColors.brandBlue, size: 24),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Recuperar senha',
-                style: LummyFonts.body(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : LummyColors.slate800,
+      builder: (context) => LoginForgotPasswordDialog(
+        formKey: formKey,
+        emailController: emailController,
+        onSubmit: () async {
+          if (!formKey.currentState!.validate()) return;
+          final email = emailController.text.trim();
+          try {
+            await Supabase.instance.client.auth.resetPasswordForEmail(email);
+            if (context.mounted) Navigator.of(context).pop(true);
+          } on AuthException catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    e.message.contains('rate limit') ? 'Muitas tentativas. Tente novamente em alguns minutos.' : e.message,
+                    style: LummyFonts.body(fontSize: 14),
+                  ),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
                 ),
-              ),
-            ),
-          ],
-        ),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Digite seu e-mail e enviaremos um link para redefinir sua senha.',
-                style: LummyFonts.body(
-                  fontSize: 14,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? LummyColors.slate400
-                      : LummyColors.slate500,
+              );
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Erro ao enviar. Verifique sua conexão.',
+                    style: LummyFonts.body(fontSize: 14),
+                  ),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                autofocus: true,
-                style: LummyFonts.body(
-                  fontSize: 15,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Seu e-mail',
-                  hintStyle: LummyFonts.body(fontSize: 14),
-                  prefixIcon: const Icon(Icons.email_outlined, size: 20),
-                  filled: true,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Insira seu e-mail';
-                  }
-                  if (!RegExp(r'^[\w-\.]+@[\w-]+\.[\w-]{2,4}$').hasMatch(value)) {
-                    return 'E-mail inválido';
-                  }
-                  return null;
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancelar',
-              style: LummyFonts.body(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? LummyColors.slate400
-                    : LummyColors.slate500,
-              ),
-            ),
-          ),
-          FilledButton(
-            onPressed: () async {
-              if (!formKey.currentState!.validate()) return;
-              final email = emailController.text.trim();
-              try {
-                await Supabase.instance.client.auth.resetPasswordForEmail(email);
-                if (context.mounted) Navigator.of(context).pop(true);
-              } on AuthException catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        e.message.contains('rate limit') ? 'Muitas tentativas. Tente novamente em alguns minutos.' : e.message,
-                        style: LummyFonts.body(fontSize: 14),
-                      ),
-                      backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Erro ao enviar. Verifique sua conexão.',
-                        style: LummyFonts.body(fontSize: 14),
-                      ),
-                      backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: LummyColors.brandBlue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: Text('Enviar', style: LummyFonts.body(fontWeight: FontWeight.w600)),
-          ),
-        ],
+              );
+            }
+          }
+        },
       ),
     );
 
@@ -804,6 +482,10 @@ class _LoginScreenState extends State<LoginScreen> {
     final isVerySmallScreen = screenHeight < 650;
     final isSmallScreen = screenHeight < 700;
 
+    // Tema lido com o context da tela, ou seja, ACIMA do wrapper
+    // Theme(AppTheme.lightTheme) abaixo (mesmo valor que o build usava antes).
+    final theme = Theme.of(context);
+
     // Tela de login sempre em tema claro (não aplica dark mode)
     return Theme(
       data: AppTheme.lightTheme,
@@ -830,65 +512,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
 
               // Logo no topo - usando Google Fonts
-              SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 24.0,
-                    top: isVerySmallScreen ? 10 : 20, // Reduzido de 30
-                  ),
-                  child: Row(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Lu',
-                              style: LummyFonts.logo(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'm',
-                              style: LummyFonts.logo(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.orange,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'm',
-                              style: LummyFonts.logo(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: Theme.of(context).brightness == Brightness.dark
-                                    ? LummyColors.blue400
-                                    : LummyColors.brandNavy,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'y',
-                              style: LummyFonts.logo(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              LoginLogoHeader(
+                isVerySmallScreen: isVerySmallScreen,
+                theme: theme,
               ),
 
               // Astronauta - totalmente responsivo
@@ -898,35 +524,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     : screenHeight * 0.10,
                 left: screenWidth * 0.15,
                 right: screenWidth * 0.05,
-                child: Center(
-                  child: SvgPicture.network(
-                    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
-                    height: isVerySmallScreen
-                        ? 250
-                        : (isSmallScreen ? 300 : 380), // Mais responsivo
-                    fit: BoxFit.contain,
-                    placeholderBuilder: (context) => Container(
-                      height: isVerySmallScreen
-                          ? 250
-                          : (isSmallScreen ? 300 : 380),
-                      width: isVerySmallScreen
-                          ? 250
-                          : (isSmallScreen ? 300 : 380),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          isVerySmallScreen ? 125 : (isSmallScreen ? 150 : 190),
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.person,
-                        size: isVerySmallScreen
-                            ? 100
-                            : (isSmallScreen ? 120 : 180),
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                child: LoginAstronautIllustration(
+                  isVerySmallScreen: isVerySmallScreen,
+                  isSmallScreen: isSmallScreen,
                 ),
               ),
 
@@ -935,409 +535,113 @@ class _LoginScreenState extends State<LoginScreen> {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                child: ClipPath(
-                  clipper: FormTopClipper(),
-                  child: Container(
-                    constraints: BoxConstraints(
-                      minHeight: isVerySmallScreen
-                          ? screenHeight * 0.55
-                          : screenHeight * 0.5,
-                      maxHeight: isVerySmallScreen
-                          ? screenHeight * 0.75
-                          : screenHeight * 0.7,
-                    ),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardTheme.color,
-                      border: Theme.of(context).brightness == Brightness.dark
-                          ? Border.all(color: LummyColors.slate600)
-                          : null,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, -5),
+                child: LoginFormPanel(
+                  isVerySmallScreen: isVerySmallScreen,
+                  screenHeight: screenHeight,
+                  keyboardHeight: keyboardHeight,
+                  theme: theme,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: isVerySmallScreen
+                              ? 20
+                              : (isSmallScreen ? 30 : 50),
+                        ), // Responsivo
+                        // Título "Faça Login" - "og" em laranja e azul como Lummy
+                        LoginTitle(
+                          isVerySmallScreen: isVerySmallScreen,
+                          theme: theme,
                         ),
+
+                        SizedBox(
+                          height: isVerySmallScreen ? 12 : 16,
+                        ), // Responsivo
+                        // Botão de Login com Biometria
+                        if (_biometricAvailable &&
+                            _biometricEnabled &&
+                            _cachedUserId != null)
+                          LoginBiometricButton(
+                            isVerySmallScreen: isVerySmallScreen,
+                            onPressed: _authenticateWithBiometrics,
+                          ),
+
+                        // Campo Email estilizado
+                        LoginEmailField(
+                          controller: _emailController,
+                          isFocused: _emailFocused,
+                          onFocusChange: (hasFocus) {
+                            setState(() {
+                              _emailFocused = hasFocus;
+                            });
+                          },
+                          isVerySmallScreen: isVerySmallScreen,
+                          theme: theme,
+                        ),
+
+                        SizedBox(
+                          height: isVerySmallScreen ? 12 : 16,
+                        ), // Responsivo
+                        // Campo Senha estilizado
+                        LoginPasswordField(
+                          controller: _passwordController,
+                          isPasswordVisible: _isPasswordVisible,
+                          isFocused: _passwordFocused,
+                          onFocusChange: (hasFocus) {
+                            setState(() {
+                              _passwordFocused = hasFocus;
+                            });
+                          },
+                          onToggleVisibility: () {
+                            setState(() {
+                              _isPasswordVisible =
+                                  !_isPasswordVisible;
+                            });
+                          },
+                          isVerySmallScreen: isVerySmallScreen,
+                          theme: theme,
+                        ),
+
+                        LoginForgotPasswordLink(
+                          isVerySmallScreen: isVerySmallScreen,
+                          onPressed: _isLoading ? null : _showForgotPasswordDialog,
+                        ),
+
+                        SizedBox(
+                          height: isVerySmallScreen ? 16 : 20,
+                        ), // Responsivo
+                        // Botão de Login
+                        LoginSubmitButton(
+                          isLoading: _isLoading,
+                          isVerySmallScreen: isVerySmallScreen,
+                          onPressed: _handleLogin,
+                        ),
+
+                        SizedBox(
+                          height: isVerySmallScreen ? 16 : 20,
+                        ), // Responsivo
+                        // Link para Registrar
+                        LoginRegisterPrompt(
+                          isVerySmallScreen: isVerySmallScreen,
+                          theme: theme,
+                          onRegisterTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const RegisterScreen(),
+                              ),
+                            );
+                          },
+                        ),
+
+                        SizedBox(
+                          height: isVerySmallScreen ? 15 : 20,
+                        ), // Responsivo
                       ],
-                    ),
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.only(
-                        left: isVerySmallScreen
-                            ? 20.0
-                            : 24.0, // Menos padding em telas pequenas
-                        right: isVerySmallScreen ? 20.0 : 24.0,
-                        top: isVerySmallScreen ? 20.0 : 24.0,
-                        bottom:
-                            (isVerySmallScreen ? 20.0 : 24.0) + keyboardHeight,
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: isVerySmallScreen
-                                  ? 20
-                                  : (isSmallScreen ? 30 : 50),
-                            ), // Responsivo
-                            // Título "Faça Login" - "og" em laranja e azul como Lummy
-                            RichText(
-                              text: TextSpan(
-                                style: LummyFonts.body(
-                                  fontSize: isVerySmallScreen ? 24 : 28,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).brightness == Brightness.dark
-                                      ? Colors.white
-                                      : LummyColors.slate800,
-                                ),
-                                children: [
-                                  const TextSpan(text: 'Faça L'),
-                                  TextSpan(
-                                    text: 'o',
-                                    style: LummyFonts.body(
-                                      fontSize: isVerySmallScreen ? 24 : 28,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.orange,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'g',
-                                    style: LummyFonts.body(
-                                      fontSize: isVerySmallScreen ? 24 : 28,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).brightness == Brightness.dark
-                                          ? LummyColors.blue400
-                                          : LummyColors.brandNavy,
-                                    ),
-                                  ),
-                                  const TextSpan(text: 'in'),
-                                ],
-                              ),
-                            ),
-
-                            SizedBox(
-                              height: isVerySmallScreen ? 12 : 16,
-                            ), // Responsivo
-                            // Botão de Login com Biometria
-                            if (_biometricAvailable &&
-                                _biometricEnabled &&
-                                _cachedUserId != null)
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  bottom: isVerySmallScreen ? 16 : 20,
-                                ),
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  child: OutlinedButton.icon(
-                                    onPressed: _authenticateWithBiometrics,
-                                    icon: const Icon(
-                                      Icons.fingerprint,
-                                      color: LummyColors.brandBlue,
-                                    ),
-                                    label: Text(
-                                      'Entrar com Digital',
-                                      style: LummyFonts.body(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: LummyColors.brandBlue,
-                                      ),
-                                    ),
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(
-                                        color: LummyColors.brandBlue,
-                                        width: 2,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                            // Campo Email estilizado
-                            Focus(
-                              onFocusChange: (hasFocus) {
-                                setState(() {
-                                  _emailFocused = hasFocus;
-                                });
-                              },
-                              child: TextFormField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                style: LummyFonts.body(
-                                  fontSize: isVerySmallScreen
-                                      ? 14
-                                      : 16, // Responsivo
-                                  color: Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge?.color,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'Seu E-mail',
-                                  hintStyle: LummyFonts.body(
-                                    color: Theme.of(
-                                      context,
-                                    ).inputDecorationTheme.hintStyle?.color,
-                                    fontSize: isVerySmallScreen ? 14 : 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.email_outlined,
-                                    color: _emailFocused
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).iconTheme.color,
-                                    size: isVerySmallScreen
-                                        ? 20
-                                        : 22, // Responsivo
-                                  ),
-                                  filled: true,
-                                  fillColor: Theme.of(
-                                    context,
-                                  ).inputDecorationTheme.fillColor,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: isVerySmallScreen ? 16 : 20,
-                                    vertical: isVerySmallScreen ? 14 : 18,
-                                  ),
-                                  errorStyle: LummyFonts.body(
-                                    fontSize: isVerySmallScreen ? 10 : 12,
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Por favor, insira seu e-mail';
-                                  }
-                                  if (!RegExp(
-                                    r'^[\w-\.]+@[\w-]+\.[\w-]{2,4}$',
-                                  ).hasMatch(value)) {
-                                    return 'Por favor, insira um e-mail válido';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-
-                            SizedBox(
-                              height: isVerySmallScreen ? 12 : 16,
-                            ), // Responsivo
-                            // Campo Senha estilizado
-                            Focus(
-                              onFocusChange: (hasFocus) {
-                                setState(() {
-                                  _passwordFocused = hasFocus;
-                                });
-                              },
-                              child: TextFormField(
-                                controller: _passwordController,
-                                obscureText: !_isPasswordVisible,
-                                style: LummyFonts.body(
-                                  fontSize: isVerySmallScreen ? 14 : 16,
-                                  color: Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge?.color,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'Sua Senha',
-                                  hintStyle: LummyFonts.body(
-                                    color: Theme.of(
-                                      context,
-                                    ).inputDecorationTheme.hintStyle?.color,
-                                    fontSize: isVerySmallScreen ? 14 : 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.lock_outline,
-                                    color: _passwordFocused
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).iconTheme.color,
-                                    size: isVerySmallScreen ? 20 : 22,
-                                  ),
-                                  filled: true,
-                                  fillColor: Theme.of(
-                                    context,
-                                  ).inputDecorationTheme.fillColor,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: isVerySmallScreen ? 16 : 20,
-                                    vertical: isVerySmallScreen ? 14 : 18,
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _isPasswordVisible
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      color: _passwordFocused
-                                          ? Theme.of(
-                                              context,
-                                            ).colorScheme.primary
-                                          : Theme.of(context).iconTheme.color,
-                                      size: isVerySmallScreen ? 20 : 22,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isPasswordVisible =
-                                            !_isPasswordVisible;
-                                      });
-                                    },
-                                  ),
-                                  errorStyle: LummyFonts.body(
-                                    fontSize: isVerySmallScreen ? 10 : 12,
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Por favor, insira sua senha';
-                                  }
-                                  if (value.length < 6) {
-                                    return 'A senha deve ter pelo menos 6 caracteres';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: _isLoading ? null : _showForgotPasswordDialog,
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: Text(
-                                  'Esqueci minha senha',
-                                  style: LummyFonts.body(
-                                    fontSize: isVerySmallScreen ? 12 : 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: LummyColors.brandBlue,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(
-                              height: isVerySmallScreen ? 16 : 20,
-                            ), // Responsivo
-                            // Botão de Login
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    LummyColors.brandOrange,
-                                    LummyColors.brandOrangeDeep,
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                  isVerySmallScreen ? 25 : 28,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFFFF8C42,
-                                    ).withValues(alpha: 0.3),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: ElevatedButton(
-                                onPressed: _isLoading ? null : _handleLogin,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      isVerySmallScreen ? 25 : 28,
-                                    ),
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  child: _isLoading
-                                      ? SizedBox(
-                                          height: isVerySmallScreen ? 18 : 20,
-                                          width: isVerySmallScreen ? 18 : 20,
-                                          child:
-                                              const CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                      Color
-                                                    >(Colors.white),
-                                              ),
-                                        )
-                                      : Text(
-                                          'Entrar',
-                                          style: LummyFonts.body(
-                                            fontSize: isVerySmallScreen
-                                                ? 16
-                                                : 18,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ),
-
-                            SizedBox(
-                              height: isVerySmallScreen ? 16 : 20,
-                            ), // Responsivo
-                            // Link para Registrar
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Não tem uma conta?',
-                                  style: LummyFonts.body(
-                                    fontSize: isVerySmallScreen ? 12 : 14,
-                                    color: Theme.of(context).brightness == Brightness.dark
-                                        ? LummyColors.slate300
-                                        : Theme.of(context).textTheme.bodyMedium?.color,
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const RegisterScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'Registre-se',
-                                    style: LummyFonts.body(
-                                      fontSize: isVerySmallScreen ? 12 : 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            SizedBox(
-                              height: isVerySmallScreen ? 15 : 20,
-                            ), // Responsivo
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 ),
@@ -1356,7 +660,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       clipBehavior: Clip.hardEdge,
                       child: connectivity.isOnline
                           ? const SizedBox(width: double.infinity, height: 0)
-                          : _LoginOfflineCard(
+                          : LoginOfflineCard(
                               onRetry: () => connectivity.recheck(),
                               compact: isVerySmallScreen,
                             ),
@@ -1370,255 +674,5 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       ),
     );
-  }
-}
-
-/// Faixa no topo do login quando não há internet (alinhada ao visual Lummy).
-class _LoginOfflineCard extends StatelessWidget {
-  final VoidCallback onRetry;
-  final bool compact;
-
-  const _LoginOfflineCard({
-    required this.onRetry,
-    required this.compact,
-  });
-
-  static const _accent = LummyColors.orange600;
-  static const _accentSoft = LummyColors.orange50;
-  static const _title = LummyColors.slate800;
-  static const _subtitle = LummyColors.slate500;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      elevation: 0,
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          horizontal: compact ? 12 : 14,
-          vertical: compact ? 10 : 12,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.96),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: _accent.withValues(alpha: 0.35),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.14),
-              blurRadius: 18,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final narrow = constraints.maxWidth < 340;
-            final iconBox = Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: _accentSoft,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.wifi_off_rounded,
-                color: _accent,
-                size: 22,
-              ),
-            );
-
-            final titleStyle = LummyFonts.body(
-              fontSize: compact ? 13 : 14,
-              fontWeight: FontWeight.w700,
-              height: 1.2,
-              color: _title,
-            );
-            final bodyStyle = LummyFonts.body(
-              fontSize: compact ? 11.5 : 12,
-              fontWeight: FontWeight.w500,
-              height: 1.3,
-              color: _subtitle,
-            );
-            final actionStyle = LummyFonts.body(
-              fontSize: compact ? 12 : 13,
-              fontWeight: FontWeight.w600,
-              color: LummyColors.brandBlue,
-            );
-
-            final textBlock = Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Sem conexão com a internet', style: titleStyle),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Você precisa estar online para entrar ou criar conta.',
-                    style: bodyStyle,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            );
-
-            final retry = TextButton(
-              onPressed: onRetry,
-              style: TextButton.styleFrom(
-                foregroundColor: LummyColors.brandBlue,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                minimumSize: const Size(48, 40),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text('TENTAR NOVAMENTE', style: actionStyle),
-            );
-
-            if (narrow) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      iconBox,
-                      const SizedBox(width: 10),
-                      textBlock,
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: retry,
-                  ),
-                ],
-              );
-            }
-
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                iconBox,
-                const SizedBox(width: 12),
-                textBlock,
-                retry,
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-// Classe personalizada para criar a curva na parte superior do formulário
-class FormTopClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-
-    // Começar do canto inferior esquerdo
-    path.moveTo(0, size.height);
-
-    // Linha para o canto inferior direito
-    path.lineTo(size.width, size.height);
-
-    // Linha para o canto superior direito (mas um pouco abaixo para criar a curva)
-    path.lineTo(size.width, 60);
-
-    // Criar uma curva suave na parte superior
-    path.quadraticBezierTo(
-      size.width * 0.75,
-      20, // Ponto de controle
-      size.width * 0.5,
-      20, // Ponto médio
-    );
-
-    path.quadraticBezierTo(
-      size.width * 0.25,
-      20, // Ponto de controle
-      0,
-      60, // Ponto final
-    );
-
-    // Fechar o caminho
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-// Painter para o ícone pequeno de digital
-class FingerprintIconPainter extends CustomPainter {
-  final Color color;
-
-  FingerprintIconPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width * 0.35;
-
-    // Desenhar linhas simples da digital
-    final lines = [
-      // Linha superior
-      _createArcPath(center, radius * 0.3, -0.3, 0.6),
-      // Linha do meio
-      _createArcPath(center, radius * 0.5, -0.2, 0.4),
-      // Linha inferior
-      _createArcPath(center, radius * 0.7, -0.1, 0.2),
-    ];
-
-    for (final line in lines) {
-      canvas.drawPath(line, paint);
-    }
-
-    // Pontos da digital
-    final dotPaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final dots = [
-      Offset(center.dx - radius * 0.2, center.dy - radius * 0.1),
-      Offset(center.dx + radius * 0.15, center.dy - radius * 0.2),
-      Offset(center.dx - radius * 0.1, center.dy + radius * 0.1),
-      Offset(center.dx + radius * 0.2, center.dy + radius * 0.05),
-    ];
-
-    for (final dot in dots) {
-      canvas.drawCircle(dot, 0.8, dotPaint);
-    }
-  }
-
-  Path _createArcPath(
-    Offset center,
-    double radius,
-    double startAngle,
-    double sweepAngle,
-  ) {
-    final path = Path();
-    path.addArc(
-      Rect.fromCircle(center: center, radius: radius),
-      startAngle,
-      sweepAngle,
-    );
-    return path;
-  }
-
-  @override
-  bool shouldRepaint(FingerprintIconPainter oldDelegate) {
-    return oldDelegate.color != color;
   }
 }

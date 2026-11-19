@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy/screens/child/add_expense_screen.dart';
-import 'package:lummy/core/constants/app_constants.dart';
-import 'package:lummy/core/utils/formatters.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_chart_card.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_filters_section.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_hero.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_load_error.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_section_header.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_skeleton_loader.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_total_card.dart';
+import 'package:lummy/screens/child/widgets/expenses/expenses_transactions_card.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
@@ -330,7 +334,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SafeArea(child: _buildSkeletonLoader()),
+        body: const SafeArea(child: ExpensesSkeletonLoader()),
       );
     }
 
@@ -338,43 +342,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.cloud_off_rounded,
-                    size: 56,
-                    color: isDark ? LummyColors.slate500 : LummyColors.slate400,
-                  ),
-                  const Gap(20),
-                  Text(
-                    _loadError!,
-                    textAlign: TextAlign.center,
-                    style: LummyFonts.body(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      height: 1.45,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                    ),
-                  ),
-                  const Gap(28),
-                  FilledButton.icon(
-                    onPressed: _loadData,
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: Text(
-                      'Tentar de novo',
-                      style: LummyFonts.body(fontWeight: FontWeight.w600),
-                    ),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          child: ExpensesLoadError(
+            message: _loadError!,
+            onRetry: _loadData,
           ),
         ),
       );
@@ -391,18 +361,25 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             ),
             slivers: [
               SliverToBoxAdapter(
-                child: _buildExpensesHero(
-                  context,
-                  isSmallScreen,
-                  isDark,
-                  topPadding,
+                child: ExpensesHero(
+                  isSmallScreen: isSmallScreen,
+                  isDark: isDark,
+                  topPadding: topPadding,
+                  selectedPeriod: selectedPeriod,
+                  transactionCount: _visibleTransactions.length,
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildTotalCard(context, isSmallScreen),
+                  child: ExpensesTotalCard(
+                    isSmallScreen: isSmallScreen,
+                    currentBalance: _currentBalance,
+                    totalSpent: _totalSpent,
+                    selectedPeriod: selectedPeriod,
+                    selectedCategory: selectedCategory,
+                  ),
                 )
                     .animate()
                     .fadeIn(duration: 350.ms)
@@ -410,13 +387,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildSectionHeader(
-                    context,
-                    'Gastos por Categoria',
-                    Icons.pie_chart_rounded,
-                    LummyColors.amber500,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: ExpensesSectionHeader(
+                    title: 'Gastos por Categoria',
+                    icon: Icons.pie_chart_rounded,
+                    accentColor: LummyColors.amber500,
                   ),
                 )
                     .animate()
@@ -427,7 +403,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildChartCard(context),
+                  child: ExpensesChartCard(
+                    categorySpending: _categorySpending,
+                    baseCategories: _baseCategories,
+                  ),
                 )
                     .animate()
                     .fadeIn(delay: 120.ms, duration: 320.ms)
@@ -437,11 +416,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildSectionHeader(
-                    context,
-                    'Filtros',
-                    Icons.tune_rounded,
-                    Theme.of(context).colorScheme.primary,
+                  child: ExpensesSectionHeader(
+                    title: 'Filtros',
+                    icon: Icons.tune_rounded,
+                    accentColor: Theme.of(context).colorScheme.primary,
                   ),
                 )
                     .animate()
@@ -452,7 +430,19 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildFiltersSection(context),
+                  child: ExpensesFiltersSection(
+                    selectedPeriod: selectedPeriod,
+                    selectedCategory: selectedCategory,
+                    allowedCategories: _allowedCategories,
+                    onPeriodSelected: (period) => setState(() {
+                      selectedPeriod = period;
+                      _applyFilters();
+                    }),
+                    onCategorySelected: (id) => setState(() {
+                      selectedCategory = id;
+                      _applyFilters();
+                    }),
+                  ),
                 )
                     .animate()
                     .fadeIn(delay: 200.ms, duration: 320.ms)
@@ -460,13 +450,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildSectionHeader(
-                    context,
-                    'Transações Recentes',
-                    Icons.receipt_long_rounded,
-                    LummyColors.emerald500,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: ExpensesSectionHeader(
+                    title: 'Transações Recentes',
+                    icon: Icons.receipt_long_rounded,
+                    accentColor: LummyColors.emerald500,
                   ),
                 )
                     .animate()
@@ -477,7 +466,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildTransactionsCard(context),
+                  child: ExpensesTransactionsCard(
+                    visibleTransactions: _visibleTransactions,
+                  ),
                 )
                     .animate()
                     .fadeIn(delay: 280.ms, duration: 320.ms)
@@ -529,852 +520,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         elevation: 4,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  Widget _buildExpensesHero(
-    BuildContext context,
-    bool isSmallScreen,
-    bool isDark,
-    double topPadding,
-  ) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, topPadding + 12, 20, 28),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  LummyColors.amber700,
-                  LummyColors.amber600,
-                  LummyColors.amber500,
-                ]
-              : [
-                  LummyColors.amber500,
-                  LummyColors.amber600,
-                  LummyColors.amber700,
-                ],
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: LummyColors.amber600.withValues(alpha: 0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.shopping_cart_rounded,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Meus Gastos',
-                      style: LummyFonts.body(
-                        fontSize: isSmallScreen ? 24 : 28,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Acompanhe onde você gastou',
-                      style: LummyFonts.body(
-                        fontSize: isSmallScreen ? 13 : 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.95),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              _buildHeroStatChip(
-                Icons.calendar_today_rounded,
-                selectedPeriod,
-                isSmallScreen,
-              ),
-              const SizedBox(width: 10),
-              _buildHeroStatChip(
-                Icons.receipt_rounded,
-                '${_visibleTransactions.length} transações',
-                isSmallScreen,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeroStatChip(
-    IconData icon,
-    String label,
-    bool isSmallScreen,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.22),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.35),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: isSmallScreen ? 16 : 18),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: LummyFonts.body(
-              fontSize: isSmallScreen ? 11 : 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(
-    BuildContext context,
-    String title,
-    IconData icon,
-    Color accentColor,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: isDark
-            ? accentColor.withValues(alpha: 0.08)
-            : accentColor.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark
-              ? accentColor.withValues(alpha: 0.2)
-              : accentColor.withValues(alpha: 0.35),
-          width: isDark ? 1 : 1.5,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: accentColor, size: 22),
-          const SizedBox(width: 10),
-          Text(
-            title,
-            style: LummyFonts.body(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: Theme.of(context).textTheme.titleLarge?.color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTotalCard(BuildContext context, bool isSmallScreen) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final totalGasto = _totalSpent;
-    final muted = theme.textTheme.bodySmall?.color?.withValues(alpha: 0.9) ??
-        (isDark ? LummyColors.slate400 : LummyColors.slate500);
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: isSmallScreen ? 18 : 22,
-        vertical: isSmallScreen ? 18 : 22,
-      ),
-      decoration: BoxDecoration(
-        color: theme.cardTheme.color ?? theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark
-              ? theme.dividerColor
-              : LummyColors.slate300,
-          width: isDark ? 1 : 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.1),
-            blurRadius: isDark ? 12 : 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Saldo no cofrinho',
-            style: LummyFonts.body(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: theme.textTheme.bodyMedium?.color,
-            ),
-          ),
-          const Gap(6),
-          Text(
-            AppFormatters.formatCurrency(_currentBalance),
-            style: LummyFonts.body(
-              fontSize: isSmallScreen ? 26 : 28,
-              fontWeight: FontWeight.w800,
-              color: LummyColors.emerald500,
-              letterSpacing: -0.6,
-            ),
-          ),
-          const Gap(4),
-          Text(
-            'Dinheiro disponível agora (atualizado quando você recebe ou gasta).',
-            style: LummyFonts.body(
-              fontSize: 11,
-              fontWeight: FontWeight.w400,
-              height: 1.35,
-              color: muted,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Divider(height: 1, color: theme.dividerColor),
-          ),
-          Text(
-            'Gasto no período',
-            style: LummyFonts.body(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: theme.textTheme.bodyMedium?.color,
-            ),
-          ),
-          const Gap(6),
-          Text(
-            '− ${AppFormatters.formatCurrency(totalGasto)}',
-            style: LummyFonts.body(
-              fontSize: isSmallScreen ? 18 : 20,
-              fontWeight: FontWeight.w700,
-              color: LummyColors.red500,
-              letterSpacing: -0.4,
-            ),
-          ),
-          const Gap(4),
-          Text(
-            'Soma só das despesas com os filtros atuais ($selectedPeriod${selectedCategory != 'Todas' ? ', categoria selecionada' : ''}).',
-            style: LummyFonts.body(
-              fontSize: 11,
-              fontWeight: FontWeight.w400,
-              height: 1.35,
-              color: muted,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChartCard(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final hasData = _categorySpending.isNotEmpty;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppConstants.spacingLarge),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? Theme.of(context).dividerColor : LummyColors.slate300,
-          width: isDark ? 1 : 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.1),
-            blurRadius: isDark ? 14 : 18,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: hasData
-          ? Row(
-              children: [
-                SizedBox(
-                  width: 140,
-                  height: 140,
-                  child: PieChart(
-                    PieChartData(
-                      startDegreeOffset: -90,
-                      sectionsSpace: 2,
-                      centerSpaceRadius: 48,
-                      borderData: FlBorderData(show: false),
-                      sections: _buildPieSections(),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ..._categorySpending.entries.map((entry) {
-                        final catId = entry.key;
-                        final amount = entry.value;
-                        final config = _baseCategories.firstWhere(
-                          (c) => c['id'] == catId,
-                          orElse: () => {
-                            'id': catId,
-                            'name': catId,
-                            'color': LummyColors.slate500,
-                          },
-                        );
-                        return _buildLegendItem(
-                          config['name'] as String,
-                          config['color'] as Color,
-                          AppFormatters.formatCurrency(amount),
-                        );
-                      }),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          : Padding(
-              padding: const EdgeInsets.symmetric(vertical: 28),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 48, height: 48,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? LummyColors.violet500.withValues(alpha: 0.1)
-                          : LummyColors.violet500.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.pie_chart_outline_rounded,
-                      size: 24,
-                      color: isDark ? LummyColors.violet600 : LummyColors.violet500,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Nenhum gasto neste período',
-                    style: LummyFonts.body(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? LummyColors.slate400 : LummyColors.slate500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Registre um gasto para visualizar o gráfico',
-                    style: LummyFonts.body(
-                      fontSize: 11,
-                      color: isDark ? LummyColors.slate500 : LummyColors.slate400,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-    );
-  }
-
-  Widget _buildFiltersSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Período',
-          style: LummyFonts.body(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).textTheme.bodyMedium?.color,
-          ),
-        ),
-        const Gap(8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildFilterChip(
-                'Este mês',
-                selectedPeriod == 'Este mês',
-                () => setState(() {
-                  selectedPeriod = 'Este mês';
-                  _applyFilters();
-                }),
-              ),
-              const SizedBox(width: 8),
-              _buildFilterChip(
-                'Última semana',
-                selectedPeriod == 'Última semana',
-                () => setState(() {
-                  selectedPeriod = 'Última semana';
-                  _applyFilters();
-                }),
-              ),
-              const SizedBox(width: 8),
-              _buildFilterChip(
-                'Últimos 3 meses',
-                selectedPeriod == 'Últimos 3 meses',
-                () => setState(() {
-                  selectedPeriod = 'Últimos 3 meses';
-                  _applyFilters();
-                }),
-              ),
-            ],
-          ),
-        ),
-        const Gap(18),
-        Text(
-          'Categoria',
-          style: LummyFonts.body(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).textTheme.bodyMedium?.color,
-          ),
-        ),
-        const Gap(8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildFilterChip(
-                'Todas',
-                selectedCategory == 'Todas',
-                () => setState(() {
-                  selectedCategory = 'Todas';
-                  _applyFilters();
-                }),
-              ),
-              const SizedBox(width: 8),
-              ..._allowedCategories.map((category) {
-                final id = category['id'] as String;
-                final name = category['name'] as String;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: _buildFilterChip(
-                    name,
-                    selectedCategory == id,
-                    () => setState(() {
-                      selectedCategory = id;
-                      _applyFilters();
-                    }),
-                  ),
-                );
-              }),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTransactionsCard(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? Theme.of(context).dividerColor : LummyColors.slate300,
-          width: isDark ? 1 : 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.1),
-            blurRadius: isDark ? 12 : 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: _visibleTransactions.isEmpty
-          ? Padding(
-              padding: const EdgeInsets.symmetric(vertical: 28),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 48, height: 48,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? LummyColors.red500.withValues(alpha: 0.1)
-                          : LummyColors.red500.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      Icons.receipt_long_outlined,
-                      size: 24,
-                      color: isDark ? LummyColors.red400 : LummyColors.red500,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Nenhuma transação recente',
-                    style: LummyFonts.body(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? LummyColors.slate400 : LummyColors.slate500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Suas movimentações aparecerão aqui',
-                    style: LummyFonts.body(
-                      fontSize: 11,
-                      color: isDark ? LummyColors.slate500 : LummyColors.slate400,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ...List.generate(
-                  _visibleTransactions.length,
-                  (i) => _buildTransactionItem(
-                    _visibleTransactions[i]['description'] as String,
-                    _visibleTransactions[i]['categoryName'] as String,
-                    AppFormatters.formatCurrency(
-                      (_visibleTransactions[i]['amount'] as num).toDouble(),
-                    ),
-                    _visibleTransactions[i]['color'] as Color,
-                    i,
-                  ),
-                ),
-              ],
-            ),
-    );
-  }
-
-  Widget _buildLegendItem(String label, Color color, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              label,
-              style: LummyFonts.body(
-                fontSize: 14,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              softWrap: false,
-            ),
-          ),
-          Flexible(
-            child: Text(
-              value,
-              style: LummyFonts.body(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).textTheme.titleMedium?.color,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.right,
-              softWrap: false,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.circular(AppConstants.radiusFull),
-          border: Border.all(
-            color: isSelected
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).dividerColor
-                    : LummyColors.slate300,
-            width: Theme.of(context).brightness == Brightness.dark ? 1.5 : 2,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(
-                      alpha: Theme.of(context).brightness == Brightness.dark ? 0.05 : 0.08,
-                    ),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-        ),
-        child: Text(
-          label,
-          style: LummyFonts.body(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: isSelected
-                ? Colors.white
-                : Theme.of(context).textTheme.bodyMedium?.color,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTransactionItem(
-    String title,
-    String category,
-    String amount,
-    Color categoryColor,
-    int index,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: categoryColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              _getCategoryIcon(category),
-              color: categoryColor,
-              size: 20,
-            ),
-          ),
-          const Gap(14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: LummyFonts.body(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Theme.of(context).textTheme.titleMedium?.color,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
-                ),
-                Text(
-                  category,
-                  style: LummyFonts.body(
-                    fontSize: 12,
-                    color: Theme.of(context).textTheme.bodySmall?.color,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
-                ),
-              ],
-            ),
-          ),
-          Flexible(
-            child: Text(
-              '− $amount',
-              style: LummyFonts.body(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: LummyColors.red500,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.right,
-              softWrap: false,
-            ),
-          ),
-        ],
-      ),
-    )
-        .animate()
-        .fadeIn(delay: (100 + index * 60).ms, duration: 280.ms)
-        .slideX(begin: 0.03, end: 0, curve: Curves.easeOut);
-  }
-
-  List<PieChartSectionData> _buildPieSections() {
-    if (_categorySpending.isEmpty) {
-      return [
-        PieChartSectionData(
-          color: LummyColors.gray200,
-          value: 1,
-          title: '',
-          radius: 32,
-        ),
-      ];
-    }
-
-    final total = _categorySpending.values.fold<double>(
-      0.0,
-      (prev, v) => prev + v,
-    );
-
-    if (total == 0) {
-      return [
-        PieChartSectionData(
-          color: LummyColors.gray200,
-          value: 1,
-          title: '',
-          radius: 32,
-        ),
-      ];
-    }
-
-    return _categorySpending.entries.map((entry) {
-      final catId = entry.key;
-      final amount = entry.value;
-      final ratio = amount / total;
-
-      final config = _baseCategories.firstWhere(
-        (c) => c['id'] == catId,
-        orElse: () => {
-          'id': catId,
-          'name': catId,
-          'color': LummyColors.slate500,
-        },
-      );
-
-      return PieChartSectionData(
-        color: config['color'] as Color,
-        value: ratio * 100,
-        title: '',
-        radius: 32,
-      );
-    }).toList();
-  }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case 'Alimentação':
-        return Icons.restaurant;
-      case 'Transporte':
-        return Icons.directions_bus;
-      case 'Jogos e Brinquedos':
-        return Icons.sports_esports;
-      case 'Metas':
-        return Icons.savings;
-      default:
-        return Icons.category;
-    }
-  }
-
-  Widget _buildSkeletonLoader() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header skeleton
-          const SkeletonText(width: 150, height: 32),
-          const SizedBox(height: 8),
-          const SkeletonText(width: 200, height: 16),
-          const SizedBox(height: 24),
-          // Total card skeleton
-          SkeletonLoader(
-            width: double.infinity,
-            height: 120,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          const SizedBox(height: 24),
-          // Chart skeleton
-          SkeletonLoader(
-            width: double.infinity,
-            height: 250,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          const SizedBox(height: 24),
-          // Categories skeleton
-          const SkeletonText(width: 120, height: 20),
-          const SizedBox(height: 16),
-          ...List.generate(
-            5,
-            (index) => Padding(
-              padding: EdgeInsets.only(bottom: index == 4 ? 0 : 12),
-              child: Row(
-                children: [
-                  SkeletonLoader(
-                    width: 48,
-                    height: 48,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SkeletonText(width: 120, height: 16),
-                        SizedBox(height: 4),
-                        SkeletonText(width: 80, height: 12),
-                      ],
-                    ),
-                  ),
-                  const SkeletonText(width: 60, height: 16),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
