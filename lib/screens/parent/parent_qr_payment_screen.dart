@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy_login/core/utils/formatters.dart';
 import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 /// Confirmação de envio ao filho após leitura do QR Code — identidade visual Lummy.
 class ParentQRPaymentScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
     });
 
     if (kDebugMode) {
-      debugPrint(
+      appLog(
         '📱 [QR Payment] Carregando: childId=${widget.childId}, amount=${widget.amount}, requestId=${widget.requestTransactionId}',
       );
     }
@@ -61,7 +62,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
       final supabase = Supabase.instance.client;
       final currentUser = supabase.auth.currentUser;
       if (currentUser == null) {
-        if (kDebugMode) debugPrint('📱 [QR Payment] Usuário não logado');
+        if (kDebugMode) appLog('📱 [QR Payment] Usuário não logado');
         setState(() {
           _isLoading = false;
           _error = 'Faça login para continuar';
@@ -69,7 +70,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
         return;
       }
 
-      if (kDebugMode) debugPrint('📱 [QR Payment] currentUser.id=${currentUser.id}');
+      if (kDebugMode) appLog('📱 [QR Payment] currentUser.id=${currentUser.id}');
 
       final childRow = await supabase
           .from('children')
@@ -79,7 +80,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
 
       if (childRow == null) {
         if (kDebugMode) {
-          debugPrint('📱 [QR Payment] Filho não encontrado para childId=${widget.childId}');
+          appLog('📱 [QR Payment] Filho não encontrado para childId=${widget.childId}');
         }
         setState(() {
           _isLoading = false;
@@ -93,7 +94,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
       final responsavelIdTrimmed = responsavelId?.trim();
       final currentUserId = currentUser.id.trim();
       if (kDebugMode) {
-        debugPrint(
+        appLog(
           '📱 [QR Payment] responsavel_id=$responsavelIdTrimmed | currentUser.id=$currentUserId | match=${responsavelIdTrimmed == currentUserId}',
         );
       }
@@ -127,9 +128,9 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
           _isLoading = false;
         });
       }
-      if (kDebugMode) debugPrint('📱 [QR Payment] OK: autorizado para $_childName');
+      if (kDebugMode) appLog('📱 [QR Payment] OK: autorizado para $_childName');
     } catch (e, st) {
-      if (kDebugMode) debugPrint('📱 [QR Payment] Erro: $e\n$st');
+      if (kDebugMode) appLog('📱 [QR Payment] Erro: $e\n$st');
       if (mounted) {
         setState(() {
           _isLoading = false;

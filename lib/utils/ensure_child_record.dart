@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter/foundation.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 /// Utility class to ensure a child record exists in the children table
 class EnsureChildRecord {
@@ -12,7 +12,7 @@ class EnsureChildRecord {
       final user = supabase.auth.currentUser;
 
       if (user == null) {
-        debugPrint('❌ Usuário não autenticado');
+        appLog('❌ Usuário não autenticado');
         return false;
       }
 
@@ -24,11 +24,10 @@ class EnsureChildRecord {
           .maybeSingle();
 
       if (existingRecord != null) {
-        debugPrint('✅ Registro do usuário já existe na tabela children');
         return true;
       }
 
-      debugPrint(
+      appLog(
         '⚠️ Registro não encontrado na tabela children. Tentando criar...',
       );
 
@@ -37,7 +36,7 @@ class EnsureChildRecord {
       final parentId = metadata['parent_id'] as String?;
 
       if (parentId == null || parentId.isEmpty) {
-        debugPrint('❌ parent_id não encontrado nos metadados do usuário');
+        appLog('❌ parent_id não encontrado nos metadados do usuário');
         return false;
       }
 
@@ -49,7 +48,7 @@ class EnsureChildRecord {
           .maybeSingle();
 
       if (parentExists == null) {
-        debugPrint('❌ Responsável não encontrado na tabela responsaveis');
+        appLog('❌ Responsável não encontrado na tabela responsaveis');
         return false;
       }
 
@@ -98,14 +97,13 @@ class EnsureChildRecord {
         'created_at': DateTime.now().toIso8601String(),
       });
 
-      debugPrint('✅ Registro criado com sucesso na tabela children');
       return true;
     } catch (e) {
-      debugPrint('❌ Erro ao garantir registro na tabela children: $e');
+      appLog('❌ Erro ao garantir registro na tabela children: $e');
       if (e is PostgrestException) {
-        debugPrint('   Código: ${e.code}');
-        debugPrint('   Mensagem: ${e.message}');
-        debugPrint('   Detalhes: ${e.details}');
+        appLog('   Código: ${e.code}');
+        appLog('   Mensagem: ${e.message}');
+        appLog('   Detalhes: ${e.details}');
       }
       return false;
     }

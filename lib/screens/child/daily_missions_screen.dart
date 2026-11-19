@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/utils/ensure_child_record.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class DailyMissionsScreen extends StatefulWidget {
   const DailyMissionsScreen({super.key});
@@ -77,7 +78,6 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
         );
       }
 
-      debugPrint('📅 Carregando missões diárias para usuário: ${user.id}');
 
       // Chamar função para selecionar/buscar missões do dia
       final today = DateTime.now().toIso8601String().split(
@@ -89,7 +89,6 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
         params: {'p_child_id': user.id, 'p_selected_date': today},
       );
 
-      debugPrint('✅ Resultado da função: $result');
 
       if (result != null && result.isNotEmpty) {
         // Buscar status de conclusão das missões
@@ -144,15 +143,14 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
           earnedPoints = earnedPointsToday;
         });
 
-        debugPrint('✅ ${missions.length} missões carregadas');
       } else {
         // Se não retornou missões, pode ser que a função não exista ainda
         // Tentar buscar diretamente
-        debugPrint('⚠️ Função não retornou missões, tentando busca direta...');
+        appLog('⚠️ Função não retornou missões, tentando busca direta...');
         await _loadMissionsDirectly(user.id, today);
       }
     } catch (e) {
-      debugPrint('❌ Erro ao carregar missões: $e');
+      appLog('❌ Erro ao carregar missões: $e');
       setState(() {
         _errorMessage = 'Erro ao carregar missões: $e';
         missions = [];
@@ -236,7 +234,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
         await _selectRandomMissions(userId, today);
       }
     } catch (e) {
-      debugPrint('❌ Erro ao carregar missões diretamente: $e');
+      appLog('❌ Erro ao carregar missões diretamente: $e');
       rethrow;
     }
   }
@@ -273,7 +271,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
       // Recarregar missões
       await _loadMissionsDirectly(userId, today);
     } catch (e) {
-      debugPrint('❌ Erro ao selecionar missões aleatórias: $e');
+      appLog('❌ Erro ao selecionar missões aleatórias: $e');
       rethrow;
     }
   }
@@ -319,12 +317,6 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
             .single();
 
         final pointsEarned = result['points_earned'] as int;
-        final newTotalPoints = result['new_total_points'] as int;
-        final newLevel = result['new_level'] as int;
-
-        debugPrint(
-          '✅ Missão concluída! Pontos: $pointsEarned, Total: $newTotalPoints, Nível: $newLevel',
-        );
 
         // Atualizar estado local
         setState(() {
@@ -338,11 +330,11 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
         _showCompletionDialog(missionId, pointsEarned);
       } catch (e) {
         // Se a função não existir, atualizar manualmente
-        debugPrint('⚠️ Função não disponível, atualizando manualmente: $e');
+        appLog('⚠️ Função não disponível, atualizando manualmente: $e');
         await _completeMissionManually(missionId, user.id, today);
       }
     } catch (e) {
-      debugPrint('❌ Erro ao completar missão: $e');
+      appLog('❌ Erro ao completar missão: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -414,9 +406,6 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
           })
           .eq('id', userId);
 
-      debugPrint(
-        '✅ Missão concluída! Pontos: $points, Total: $newPoints, Nível: $newLevel',
-      );
 
       // Atualizar estado local
       setState(() {
@@ -429,7 +418,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
       // Mostrar diálogo de sucesso
       _showCompletionDialog(missionId, points);
     } catch (e) {
-      debugPrint('❌ Erro ao completar missão manualmente: $e');
+      appLog('❌ Erro ao completar missão manualmente: $e');
       rethrow;
     }
   }

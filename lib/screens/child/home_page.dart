@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
@@ -15,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lummy_login/utils/child_money_notification.dart';
 import 'package:lummy_login/screens/child/profile_page.dart';
 import 'package:lummy_login/screens/child/daily_missions_screen.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -506,7 +506,6 @@ class _HomePageState extends State<HomePage> {
       String? name;
 
       if (user != null) {
-        debugPrint('🔍 Buscando nome para usuário: ${user.id}');
 
         // 1) Buscar na tabela children pelo id do usuário autenticado
         try {
@@ -516,15 +515,11 @@ class _HomePageState extends State<HomePage> {
               .eq('id', user.id)
               .maybeSingle();
 
-          debugPrint(
-            '📊 Resultado da busca em children: ${childRow != null ? "encontrado" : "não encontrado"}',
-          );
 
           if (childRow != null && childRow['nome'] != null) {
             name = childRow['nome'] as String?;
-            debugPrint('✅ Nome encontrado na tabela children: $name');
           } else {
-            debugPrint(
+            appLog(
               '⚠️ Nome não encontrado na tabela children, tentando fallbacks...',
             );
           }
@@ -532,11 +527,11 @@ class _HomePageState extends State<HomePage> {
           if (isNetworkFailure(e)) {
             debugLogDataLoad('Busca nome em children', e);
           } else {
-            debugPrint('❌ Erro ao buscar na tabela children: $e');
+            appLog('❌ Erro ao buscar na tabela children: $e');
             if (e is PostgrestException) {
-              debugPrint('   Código: ${e.code}');
-              debugPrint('   Mensagem: ${e.message}');
-              debugPrint('   Detalhes: ${e.details}');
+              appLog('   Código: ${e.code}');
+              appLog('   Mensagem: ${e.message}');
+              appLog('   Detalhes: ${e.details}');
             }
           }
         }
@@ -548,7 +543,7 @@ class _HomePageState extends State<HomePage> {
               (meta['name'] ?? meta['full_name'] ?? meta['username'])
                   as String?;
           if (name != null) {
-            debugPrint('✅ Nome encontrado no metadata: $name');
+            appLog('✅ Nome encontrado no metadata: $name');
           }
         }
 
@@ -556,24 +551,23 @@ class _HomePageState extends State<HomePage> {
         if (name == null || name.trim().isEmpty) {
           name = user.email?.split('@').first;
           if (name != null) {
-            debugPrint('✅ Usando prefixo do email: $name');
+            appLog('✅ Usando prefixo do email: $name');
           }
         }
       } else {
-        debugPrint('⚠️ Nenhum usuário autenticado');
+        appLog('⚠️ Nenhum usuário autenticado');
       }
 
       // 4) Fallback: valor salvo localmente (se existir)
       if (name == null || name.trim().isEmpty) {
         name = (await SharedPreferences.getInstance()).getString('user_name');
         if (name != null) {
-          debugPrint('✅ Nome encontrado no SharedPreferences: $name');
+          appLog('✅ Nome encontrado no SharedPreferences: $name');
         }
       }
 
       setState(() {
         userName = (name?.trim().isNotEmpty == true) ? name!.trim() : 'Usuário';
-        debugPrint('👤 Nome final definido: $userName');
       });
     } catch (e, stackTrace) {
       debugLogDataLoad('Erro ao carregar nome do usuário', e, stackTrace);
@@ -847,7 +841,7 @@ class _HomePageState extends State<HomePage> {
       final user = supabase.auth.currentUser;
 
       if (user == null) {
-        debugPrint('❌ Usuário não autenticado ao carregar meta');
+        appLog('❌ Usuário não autenticado ao carregar meta');
         setState(() {
           hasActiveGoal = false;
         });
@@ -881,7 +875,6 @@ class _HomePageState extends State<HomePage> {
             goalCurrentAmount = current > savingsGoal ? savingsGoal : current;
             hasActiveGoal = true;
           });
-          debugPrint('✅ Meta carregada e sincronizada na homepage: $goalName');
         } else {
           setState(() {
             goalName = goalData['name'] as String;
@@ -891,7 +884,6 @@ class _HomePageState extends State<HomePage> {
             goalCurrentAmount = current > savingsGoal ? savingsGoal : current;
             hasActiveGoal = true;
           });
-          debugPrint('✅ Meta carregada na homepage: $goalName');
         }
       } else {
         // Se não há meta em andamento, mostrar a última meta concluída
@@ -913,9 +905,6 @@ class _HomePageState extends State<HomePage> {
             goalCurrentAmount = target; // meta concluída nunca excede o alvo
             hasActiveGoal = true; // Exibir cartão com status de concluída
           });
-          debugPrint(
-            'ℹ️ Exibindo última meta concluída na homepage: $goalName',
-          );
         } else {
           setState(() {
             hasActiveGoal = false;
@@ -924,7 +913,6 @@ class _HomePageState extends State<HomePage> {
             savingsGoal = 0.0;
             goalCurrentAmount = 0.0;
           });
-          debugPrint('ℹ️ Nenhuma meta encontrada para exibir na homepage');
         }
       }
     } catch (e) {

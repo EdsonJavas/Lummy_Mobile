@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy_login/domain/entities/user_entity.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ChildAchievementsScreen extends StatefulWidget {
   final ChildEntity child;
@@ -56,7 +57,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
 
       _unlockedAchievements = List<Map<String, dynamic>>.from(unlockedData);
     } catch (e) {
-      debugPrint('Erro ao carregar conquistas: $e');
+      appLog('Erro ao carregar conquistas: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -1024,7 +1025,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
         LummyFeedback.success(context, 'Conquista "$name" criada!');
       }
     } catch (e) {
-      debugPrint('Erro ao criar conquista: $e');
+      appLog('Erro ao criar conquista: $e');
       if (mounted) {
         LummyFeedback.error(context, 'Erro ao criar conquista');
       }

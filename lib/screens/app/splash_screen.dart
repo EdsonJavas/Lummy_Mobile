@@ -12,6 +12,7 @@ import 'package:lummy_login/screens/auth/login_screen.dart';
 import 'package:lummy_login/screens/child/main_navigation.dart';
 import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
 import 'package:lummy_login/screens/app/onboarding_screen.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -124,14 +125,13 @@ class _SplashScreenState extends State<SplashScreen>
       await bio.isBiometricEnabled();
       await bio.readCachedUserId();
     } catch (e) {
-      debugPrint('⚠️ Prep login: $e');
+      appLog('⚠️ Prep login: $e');
     }
   }
 
   Future<void> _bootstrap() async {
     try {
       setState(() => _loadingText = 'Conectando');
-      debugPrint('🔧 Inicializando Supabase...');
       await Supabase.initialize(
         url: SupabaseConfig.url,
         anonKey: SupabaseConfig.anonKey,
@@ -173,7 +173,7 @@ class _SplashScreenState extends State<SplashScreen>
             }
           }
         } catch (e) {
-          debugPrint('⚠️ Erro ao decidir próxima tela: $e');
+          appLog('⚠️ Erro ao decidir próxima tela: $e');
         }
       }
 
@@ -206,8 +206,8 @@ class _SplashScreenState extends State<SplashScreen>
         ),
       );
     } catch (e, stackTrace) {
-      debugPrint('❌ Erro ao inicializar: $e');
-      debugPrint('   Stack: $stackTrace');
+      appLog('❌ Erro ao inicializar: $e');
+      appLog('   Stack: $stackTrace');
       try {
         setupLocator();
       } catch (_) {}

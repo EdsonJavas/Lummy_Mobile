@@ -7,6 +7,7 @@ import '../../../../domain/entities/transaction_entity.dart';
 import '../../../../domain/entities/notification_entity.dart';
 import '../../../../utils/parent_notification_service.dart';
 import 'parent_dashboard_state.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ParentDashboardCubit extends Cubit<ParentDashboardState> {
   ParentDashboardCubit() : super(const ParentDashboardState());
@@ -81,7 +82,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         ),
       );
     } catch (e) {
-      debugPrint('❌ Erro ao carregar dashboard: $e');
+      appLog('❌ Erro ao carregar dashboard: $e');
       emit(state.copyWith(isLoading: false, error: e.toString()));
     }
   }
@@ -109,7 +110,6 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
           .eq('responsavel_id', parentId);
 
       if (response.isEmpty) {
-        debugPrint('ℹ️ Nenhum filho encontrado para o responsável $parentId');
         return [];
       }
 
@@ -132,7 +132,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         );
       }).toList();
     } catch (e) {
-      debugPrint('❌ Erro ao buscar filhos: $e');
+      appLog('❌ Erro ao buscar filhos: $e');
       return [];
     }
   }
@@ -207,7 +207,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       if (balance <= 0) return _kTestBalance;
       return balance;
     } catch (e) {
-      debugPrint('⚠️ Erro ao buscar saldo do responsável: $e');
+      appLog('⚠️ Erro ao buscar saldo do responsável: $e');
       return state.walletBalance > 0 ? state.walletBalance : _kTestBalance;
     }
   }
@@ -297,7 +297,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       await refresh();
       return true;
     } catch (e) {
-      debugPrint('❌ Erro ao aprovar transação: $e');
+      appLog('❌ Erro ao aprovar transação: $e');
       emit(state.copyWith(error: 'Erro ao aprovar transação: ${e.toString()}'));
       return false;
     }
@@ -346,7 +346,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       await refresh();
       return true;
     } catch (e) {
-      debugPrint('❌ Erro ao rejeitar transação: $e');
+      appLog('❌ Erro ao rejeitar transação: $e');
       emit(state.copyWith(error: 'Erro ao rejeitar transação: ${e.toString()}'));
       return false;
     }
@@ -411,7 +411,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       await refresh();
       return true;
     } catch (e) {
-      debugPrint('❌ Erro ao transferir dinheiro: $e');
+      appLog('❌ Erro ao transferir dinheiro: $e');
       emit(state.copyWith(error: 'Erro ao transferir dinheiro: ${e.toString()}'));
       return false;
     }
@@ -461,7 +461,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       await refresh();
       return true;
     } catch (e) {
-      debugPrint('❌ Erro ao criar distribuição: $e');
+      appLog('❌ Erro ao criar distribuição: $e');
       emit(state.copyWith(error: 'Erro ao criar distribuição: ${e.toString()}'));
       return false;
     }
@@ -497,7 +497,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         emit(state.copyWith(children: updatedChildren));
       }
     } catch (e) {
-      debugPrint('❌ Erro ao configurar mesada: $e');
+      appLog('❌ Erro ao configurar mesada: $e');
       emit(state.copyWith(error: 'Erro ao configurar mesada: ${e.toString()}'));
     }
   }
@@ -523,7 +523,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       //     .update({'is_read': true})
       //     .eq('id', notificationId);
     } catch (e) {
-      debugPrint('❌ Erro ao marcar notificação como lida: $e');
+      appLog('❌ Erro ao marcar notificação como lida: $e');
     }
   }
 
@@ -579,7 +579,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         );
       }).toList();
     } catch (e) {
-      debugPrint('❌ Erro ao buscar transações pendentes: $e');
+      appLog('❌ Erro ao buscar transações pendentes: $e');
       return [];
     }
   }
@@ -671,7 +671,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
 
       return spendingMap;
     } catch (e) {
-      debugPrint('❌ Erro ao calcular gastos: $e');
+      appLog('❌ Erro ao calcular gastos: $e');
       return {};
     }
   }
@@ -750,7 +750,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
       }).toList()
         ..sort((a, b) => a.month.compareTo(b.month));
     } catch (e) {
-      debugPrint('❌ Erro ao buscar tendência mensal: $e');
+      appLog('❌ Erro ao buscar tendência mensal: $e');
       return [];
     }
   }
@@ -822,7 +822,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
         );
       }).toList();
     } catch (e) {
-      debugPrint('❌ Erro ao buscar breakdown de categorias: $e');
+      appLog('❌ Erro ao buscar breakdown de categorias: $e');
       return [];
     }
   }
@@ -871,7 +871,7 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
 
       return summaries;
     } catch (e) {
-      debugPrint('❌ Erro ao buscar resumo de metas: $e');
+      appLog('❌ Erro ao buscar resumo de metas: $e');
       return [];
     }
   }

@@ -9,6 +9,7 @@ import 'package:lummy_login/screens/child/add_expense_screen.dart';
 import 'package:lummy_login/core/constants/app_constants.dart';
 import 'package:lummy_login/core/utils/formatters.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -177,7 +178,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         _loadError = null;
       });
     } catch (e, st) {
-      debugPrint('❌ expenses_screen _loadData: $e\n$st');
+      appLog('❌ expenses_screen _loadData: $e\n$st');
       setState(() {
         _isLoading = false;
         _loadError =

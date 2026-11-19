@@ -15,6 +15,7 @@ import 'package:lummy_login/services/family_service.dart';
 import 'package:lummy_login/core/theme/app_theme.dart';
 import 'package:lummy_login/core/providers/theme_provider.dart';
 import 'package:lummy_login/screens/auth/register_screen.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -340,14 +341,12 @@ class _LoginScreenState extends State<LoginScreen> {
     final familyService = locator<FamilyService>();
 
     try {
-      debugPrint('🚀 Navegando para perfil do usuário: $userId');
       
       final profile = await familyService.fetchUserProfile(userId);
 
       if (!mounted) return;
 
       if (profile is ParentEntity) {
-        debugPrint('✅ Navegando para dashboard do responsável: ${profile.name}');
         if (!mounted) return;
         context.read<ThemeProvider>().setPreLoginLightOnly(false);
         Navigator.pushReplacement(
@@ -360,7 +359,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else if (profile is ChildEntity) {
-        debugPrint('✅ Navegando para dashboard da criança: ${profile.name}');
         if (!mounted) return;
         context.read<ThemeProvider>().setPreLoginLightOnly(false);
         Navigator.pushReplacement(
@@ -368,7 +366,7 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => const MainNavigation()),
         );
       } else {
-        debugPrint('⚠️ Perfil não encontrado para o usuário: $userId');
+        appLog('⚠️ Perfil não encontrado para o usuário: $userId');
         _showLoginError(
           'Não encontramos o perfil desta conta.\n\n'
           'Se você ainda não terminou o cadastro, conclua-o e tente de novo. '
@@ -376,8 +374,8 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e, stackTrace) {
-      debugPrint('❌ Erro ao navegar para perfil: $e');
-      debugPrint('   Stack trace: $stackTrace');
+      appLog('❌ Erro ao navegar para perfil: $e');
+      appLog('   Stack trace: $stackTrace');
       if (!mounted) return;
       _showLoginError(
         'Não foi possível carregar as informações do usuário.\n\n'
@@ -639,7 +637,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await _navigateAccordingToProfile(userId);
       } else {
         final errorMsg = result.error?.message ?? 'Erro desconhecido ao fazer login';
-        debugPrint('❌ Erro no login: $errorMsg');
+        appLog('❌ Erro no login: $errorMsg');
         _showLoginError(errorMsg);
       }
     }
@@ -764,7 +762,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }
     } catch (e) {
-      debugPrint('Erro na autenticação biométrica: $e');
+      appLog('Erro na autenticação biométrica: $e');
       if (!mounted) return;
 
       // Em caso de erro, desabilitar biometria para evitar loops

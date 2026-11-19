@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy_login/domain/entities/user_entity.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ChildSettingsScreen extends StatefulWidget {
   final ChildEntity child;
@@ -930,7 +931,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
         Navigator.pop(context);
       }
     } catch (e) {
-      debugPrint('Erro ao salvar configurações: $e');
+      appLog('Erro ao salvar configurações: $e');
       if (mounted) {
         LummyFeedback.error(context, 'Erro ao salvar configurações');
       }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -51,13 +52,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final user = supabase.auth.currentUser;
 
       if (user == null) {
-        debugPrint('❌ Usuário não autenticado');
+        appLog('❌ Usuário não autenticado');
         if (!mounted) return;
         Navigator.pop(context);
         return;
       }
 
-      debugPrint('🔍 Carregando dados do perfil para usuário: ${user.id}');
 
       // Buscar dados na tabela children
       final childData = await supabase
@@ -67,7 +67,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           .maybeSingle();
 
       if (childData != null) {
-        debugPrint('✅ Dados encontrados: $childData');
 
         setState(() {
           _nameController.text = childData['nome'] ?? '';
@@ -81,7 +80,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _originalEmail = childData['email'] ?? '';
         });
       } else {
-        debugPrint('⚠️ Dados não encontrados na tabela children');
+        appLog('⚠️ Dados não encontrados na tabela children');
         // Usar dados do auth como fallback
         setState(() {
           _nameController.text = user.userMetadata?['name'] ?? '';
@@ -90,7 +89,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         });
       }
     } catch (e) {
-      debugPrint('❌ Erro ao carregar dados do perfil: $e');
+      appLog('❌ Erro ao carregar dados do perfil: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -216,7 +215,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         throw Exception('Usuário não autenticado');
       }
 
-      debugPrint('💾 Salvando alterações do perfil...');
 
       // Preparar dados para atualização
       final updatedData = <String, dynamic>{
@@ -235,19 +233,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       // Atualizar na tabela children
       await supabase.from('children').update(updatedData).eq('id', user.id);
 
-      debugPrint('✅ Dados atualizados na tabela children');
 
       // Se o email foi alterado, atualizar também no auth.users
       if (_originalEmail != null &&
           _emailController.text.trim() != _originalEmail) {
-        debugPrint('📧 Email alterado, atualizando no auth.users...');
         try {
           await supabase.auth.updateUser(
             UserAttributes(email: _emailController.text.trim()),
           );
-          debugPrint('✅ Email atualizado no auth.users');
         } catch (e) {
-          debugPrint('⚠️ Erro ao atualizar email no auth: $e');
+          appLog('⚠️ Erro ao atualizar email no auth: $e');
           // Não falhar a operação se apenas o email não for atualizado
         }
       }
@@ -277,7 +272,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         true,
       ); // Retornar true indica que houve atualização
     } catch (e) {
-      debugPrint('❌ Erro ao salvar perfil: $e');
+      appLog('❌ Erro ao salvar perfil: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

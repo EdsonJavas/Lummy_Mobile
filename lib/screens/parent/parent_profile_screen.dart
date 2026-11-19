@@ -8,6 +8,7 @@ import 'package:lummy_login/models/responsavel_model.dart';
 import 'package:lummy_login/screens/parent/parent_subscription_screen.dart';
 import 'package:lummy_login/screens/parent/parent_edit_profile_screen.dart';
 import 'package:lummy_login/screens/parent/parent_change_password_screen.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ParentProfileScreen extends StatefulWidget {
   const ParentProfileScreen({super.key});
@@ -119,10 +120,10 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           totalChildrenBalance = totalBalance;
         });
       } catch (e) {
-        debugPrint('Erro ao buscar crianças: $e');
+        appLog('Erro ao buscar crianças: $e');
       }
     } catch (e) {
-      debugPrint('Erro ao carregar dados: $e');
+      appLog('Erro ao carregar dados: $e');
       final user = Supabase.instance.client.auth.currentUser;
       if (mounted && user != null) {
         final meta = user.userMetadata ?? {};

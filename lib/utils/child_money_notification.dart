@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 const _prefKeyLastBalance = 'child_last_known_balance';
 
@@ -70,7 +70,7 @@ Future<void> checkAndNotifyBalanceIncrease(double newBalance) async {
     }
     await prefs.setDouble(_prefKeyLastBalance, newBalance);
   } catch (e) {
-    debugPrint('Erro ao verificar/notificar saldo: $e');
+    appLog('Erro ao verificar/notificar saldo: $e');
   }
 }
 
@@ -102,6 +102,6 @@ Future<void> showChildEventNotification({
       notificationDetails: details,
     );
   } catch (e) {
-    debugPrint('Erro ao exibir notificação: $e');
+    appLog('Erro ao exibir notificação: $e');
   }
 }

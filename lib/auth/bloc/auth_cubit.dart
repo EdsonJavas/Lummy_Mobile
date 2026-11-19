@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 import 'package:lummy_login/domain/entities/user_entity.dart';
 import 'package:lummy_login/auth/bloc/auth_state.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
@@ -220,7 +220,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       return null;
     } catch (e) {
-      debugPrint('Erro ao buscar dados do usuário: $e');
+      appLog('Erro ao buscar dados do usuário: $e');
       return null;
     }
   }
@@ -236,7 +236,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       return await _fetchUserData(authUser.id);
     } catch (e) {
-      debugPrint('Erro ao buscar dados do usuário por email: $e');
+      appLog('Erro ao buscar dados do usuário por email: $e');
       return null;
     }
   }

@@ -8,6 +8,7 @@ import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/screens/parent/child_missions_manager_screen.dart';
 import 'package:lummy_login/screens/parent/child_achievements_screen.dart';
 import 'package:lummy_login/screens/parent/child_settings_screen.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ChildControlPanelScreen extends StatefulWidget {
   final ChildEntity child;
@@ -121,11 +122,11 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
 
         _goals = List<Map<String, dynamic>>.from(goalsData);
       } catch (e) {
-        debugPrint('Erro ao carregar metas: $e');
+        appLog('Erro ao carregar metas: $e');
         _goals = [];
       }
     } catch (e) {
-      debugPrint('Erro ao carregar dados do filho: $e');
+      appLog('Erro ao carregar dados do filho: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

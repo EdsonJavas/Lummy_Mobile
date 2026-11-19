@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy_login/core/result.dart';
 import 'package:lummy_login/domain/repositories/auth_repository.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class SupabaseAuthRepository implements AuthRepository {
   final SupabaseClient _supabase;
@@ -17,51 +17,45 @@ class SupabaseAuthRepository implements AuthRepository {
     required String password,
   }) async {
     try {
-      debugPrint('🔐 Tentando fazer login com email: ${email.trim()}');
       
-      debugPrint('🚀 Chamando signInWithPassword...');
       final response = await _supabase.auth.signInWithPassword(
         email: email.trim(),
         password: password,
       ).timeout(
         const Duration(seconds: 30),
         onTimeout: () {
-          debugPrint('⏱️ Timeout após 30 segundos');
           throw TimeoutException('Tempo de conexão esgotado ao fazer login');
         },
       );
       
-      debugPrint('📥 Resposta recebida do Supabase');
 
       if (response.user == null) {
-        debugPrint('❌ Login falhou: usuário é null');
+        appLog('❌ Login falhou: usuário é null');
         return const FailureResult<String>(
           Failure('Falha ao fazer login. Tente novamente.'),
         );
       }
 
-      debugPrint('✅ Login bem-sucedido! User ID: ${response.user!.id}');
-      debugPrint('📧 Email do usuário: ${response.user!.email}');
       
       return Success<String>(response.user!.id);
     } on AuthException catch (e) {
-      debugPrint('❌ Erro de autenticação: ${e.message}');
-      debugPrint('   Código: ${e.statusCode}');
+      appLog('❌ Erro de autenticação: ${e.message}');
+      appLog('   Código: ${e.statusCode}');
       return FailureResult<String>(Failure(_getErrorMessage(e.message)));
     } on TimeoutException catch (e) {
-      debugPrint('❌ Timeout ao fazer login: $e');
+      appLog('❌ Timeout ao fazer login: $e');
       return const FailureResult<String>(
         Failure('Tempo de conexão esgotado.\n\n'
             'O servidor demorou muito para responder.\n'
             'Verifique sua conexão com a internet e tente novamente.'),
       );
     } on SocketException catch (e) {
-      debugPrint('❌ Erro de socket ao fazer login: $e');
-      debugPrint('   Tipo: ${e.runtimeType}');
-      debugPrint('   Message: ${e.message}');
-      debugPrint('   OSError: ${e.osError}');
-      debugPrint('   Address: ${e.address}');
-      debugPrint('   Port: ${e.port}');
+      appLog('❌ Erro de socket ao fazer login: $e');
+      appLog('   Tipo: ${e.runtimeType}');
+      appLog('   Message: ${e.message}');
+      appLog('   OSError: ${e.osError}');
+      appLog('   Address: ${e.address}');
+      appLog('   Port: ${e.port}');
       
       String errorMsg = 'Erro de conexão com o servidor.\n\n';
       if (e.message.contains('Failed host lookup') || 
@@ -82,9 +76,9 @@ class SupabaseAuthRepository implements AuthRepository {
       
       return FailureResult<String>(Failure(errorMsg));
     } catch (e, stackTrace) {
-      debugPrint('❌ Erro inesperado ao fazer login: $e');
-      debugPrint('   Tipo: ${e.runtimeType}');
-      debugPrint('   Stack trace: $stackTrace');
+      appLog('❌ Erro inesperado ao fazer login: $e');
+      appLog('   Tipo: ${e.runtimeType}');
+      appLog('   Stack trace: $stackTrace');
       
       // Tratar erros de conexão especificamente
       final errorMessage = _getConnectionErrorMessage(e);
@@ -98,7 +92,7 @@ class SupabaseAuthRepository implements AuthRepository {
       await _supabase.auth.signOut();
     } catch (e) {
       // Log error but don't throw
-      print('Erro ao fazer logout: $e');
+      appLog('Erro ao fazer logout: $e');
     }
   }
 

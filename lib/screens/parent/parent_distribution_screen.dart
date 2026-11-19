@@ -14,6 +14,7 @@ import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_s
 import 'package:lummy_login/features/parent/presentation/widgets/allowance_distribution_card.dart';
 import 'package:lummy_login/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
 import 'package:lummy_login/screens/parent/parent_qr_payment_screen.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ParentDistributionScreen extends StatefulWidget {
   const ParentDistributionScreen({super.key});
@@ -818,7 +819,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
       final validAmount = amount;
       final validChildId = childId?.isNotEmpty == true ? childId : null;
       if (kDebugMode) {
-        debugPrint('📱 [QR] Parse: childId=$validChildId, amount=$validAmount, requestId=$requestTransactionId');
+        appLog('📱 [QR] Parse: childId=$validChildId, amount=$validAmount, requestId=$requestTransactionId');
       }
       if (validAmount != null && validAmount > 0 &&
           validChildId != null && validChildId.isNotEmpty) {
@@ -841,7 +842,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         _showQRInvalidSnackBar(context);
       }
     } catch (e, st) {
-      debugPrint('❌ QR parse/process error: $e\n$st');
+      appLog('❌ QR parse/process error: $e\n$st');
       _showQRInvalidSnackBar(context);
     }
   }

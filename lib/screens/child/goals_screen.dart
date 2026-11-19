@@ -7,6 +7,7 @@ import 'package:lummy_login/screens/child/new_goal_screen.dart';
 import 'package:lummy_login/shared/widgets/money_text_field.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/utils/ensure_child_record.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
@@ -36,7 +37,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
       final user = supabase.auth.currentUser;
 
       if (user == null) {
-        debugPrint('❌ Usuário não autenticado');
+        appLog('❌ Usuário não autenticado');
         setState(() {
           _isLoading = false;
         });
@@ -56,7 +57,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      debugPrint('❌ Erro ao carregar metas: $e');
+      appLog('❌ Erro ao carregar metas: $e');
       setState(() {
         _isLoading = false;
       });
@@ -108,7 +109,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
       // Recarregar metas para refletir mudanças
       await _loadCurrentGoal();
     } catch (e) {
-      debugPrint('⚠️ Erro ao sincronizar meta com balance: $e');
+      appLog('⚠️ Erro ao sincronizar meta com balance: $e');
     }
   }
 
@@ -144,15 +145,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
             description: goalData['description'] as String? ?? '',
           );
         });
-        debugPrint('✅ Meta atual carregada: ${currentGoal?.name}');
       } else {
         setState(() {
           currentGoal = null;
         });
-        debugPrint('ℹ️ Nenhuma meta em andamento encontrada');
       }
     } catch (e) {
-      debugPrint('❌ Erro ao carregar meta atual: $e');
+      appLog('❌ Erro ao carregar meta atual: $e');
       setState(() {
         currentGoal = null;
       });
@@ -191,15 +190,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
             );
           }).toList();
         });
-        debugPrint('✅ ${completedGoals.length} metas concluídas carregadas');
       } else {
         setState(() {
           completedGoals = [];
         });
-        debugPrint('ℹ️ Nenhuma meta concluída encontrada');
       }
     } catch (e) {
-      debugPrint('❌ Erro ao carregar metas concluídas: $e');
+      appLog('❌ Erro ao carregar metas concluídas: $e');
       setState(() {
         completedGoals = [];
       });
@@ -302,7 +299,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           ),
         );
       } catch (e) {
-        debugPrint('❌ Erro ao criar meta: $e');
+        appLog('❌ Erro ao criar meta: $e');
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -356,7 +353,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ),
       );
     } catch (e) {
-      debugPrint('❌ Erro ao atualizar progresso: $e');
+      appLog('❌ Erro ao atualizar progresso: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -408,7 +405,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ),
       );
     } catch (e) {
-      debugPrint('❌ Erro ao completar meta: $e');
+      appLog('❌ Erro ao completar meta: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -456,7 +453,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ),
       );
     } catch (e) {
-      debugPrint('❌ Erro ao deletar meta: $e');
+      appLog('❌ Erro ao deletar meta: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

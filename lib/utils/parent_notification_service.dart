@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 final FlutterLocalNotificationsPlugin _plugin =
     FlutterLocalNotificationsPlugin();
@@ -69,7 +69,7 @@ Future<void> showParentNotification({
       notificationDetails: details,
     );
   } catch (e) {
-    debugPrint('Erro ao exibir notificação parent: $e');
+    appLog('Erro ao exibir notificação parent: $e');
   }
 }
 

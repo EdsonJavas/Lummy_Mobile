@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:lummy_login/core/result.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/domain/usecases/login_use_case.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class BiometricAuthService {
   final LocalAuthentication _localAuth;
@@ -78,7 +78,6 @@ class BiometricAuthService {
 
   Future<bool> authenticate({String reason = 'Confirmar para entrar'}) async {
     try {
-      debugPrint('Iniciando autenticação biométrica...');
 
       final isSupported = await _localAuth.isDeviceSupported();
       if (!isSupported) return false;
@@ -92,7 +91,7 @@ class BiometricAuthService {
       );
       return didAuth;
     } catch (e) {
-      debugPrint('Erro na autenticação biométrica: $e');
+      appLog('Erro na autenticação biométrica: $e');
       return false;
     }
   }
@@ -105,7 +104,6 @@ class BiometricAuthService {
     try {
       final supported = await _localAuth.isDeviceSupported();
       if (!supported) {
-        debugPrint('Dispositivo sem autenticação local');
         return false;
       }
 
@@ -117,7 +115,7 @@ class BiometricAuthService {
         biometricOnly: biometricOnly,
       );
     } catch (e, st) {
-      debugPrint('Erro em authenticateSensitiveAction: $e\n$st');
+      appLog('Erro em authenticateSensitiveAction: $e\n$st');
       return false;
     }
   }

@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy_login/domain/entities/user_entity.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ChildMissionsManagerScreen extends StatefulWidget {
   final ChildEntity child;
@@ -77,7 +78,7 @@ class _ChildMissionsManagerScreenState
 
       _customMissions = List<Map<String, dynamic>>.from(customMissionsData);
     } catch (e) {
-      debugPrint('Erro ao carregar missões: $e');
+      appLog('Erro ao carregar missões: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -911,7 +912,7 @@ class _ChildMissionsManagerScreenState
       _loadMissions();
       if (mounted) LummyFeedback.success(context, 'Missão criada!');
     } catch (e) {
-      debugPrint('Erro ao criar missão: $e');
+      appLog('Erro ao criar missão: $e');
       if (mounted) LummyFeedback.error(context, 'Erro ao criar missão.');
     }
   }
@@ -923,7 +924,7 @@ class _ChildMissionsManagerScreenState
       _loadMissions();
       if (mounted) LummyFeedback.success(context, 'Missão removida!');
     } catch (e) {
-      debugPrint('Erro ao deletar missão: $e');
+      appLog('Erro ao deletar missão: $e');
       if (mounted) LummyFeedback.error(context, 'Erro ao remover missão.');
     }
   }
@@ -962,7 +963,7 @@ class _ChildMissionsManagerScreenState
       _loadMissions();
       if (mounted) LummyFeedback.success(context, 'Missão atribuída!');
     } catch (e) {
-      debugPrint('Erro ao atribuir missão: $e');
+      appLog('Erro ao atribuir missão: $e');
       if (mounted) LummyFeedback.error(context, 'Erro ao atribuir missão.');
     }
   }

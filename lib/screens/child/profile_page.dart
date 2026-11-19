@@ -13,6 +13,7 @@ import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:lummy_login/application/app_facade.dart';
 import 'package:lummy_login/di/locator.dart';
 import 'package:lummy_login/domain/repositories/auth_repository.dart';
+import 'package:lummy_login/core/utils/app_log.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -44,7 +45,6 @@ class _ProfilePageState extends State<ProfilePage> {
       final user = supabase.auth.currentUser;
 
       if (user != null) {
-        debugPrint('🔍 Buscando nome do usuário no perfil: ${user.id}');
 
         // Buscar na tabela children
         try {
@@ -58,11 +58,10 @@ class _ProfilePageState extends State<ProfilePage> {
             setState(() {
               userName = childRow['nome'] as String;
             });
-            debugPrint('✅ Nome encontrado na tabela children: $userName');
             return;
           }
         } catch (e) {
-          debugPrint('❌ Erro ao buscar na tabela children: $e');
+          appLog('❌ Erro ao buscar na tabela children: $e');
         }
 
         // Fallback: metadata do usuário
@@ -90,7 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
         userName = 'Usuário';
       });
     } catch (e) {
-      debugPrint('❌ Erro ao carregar nome do usuário: $e');
+      appLog('❌ Erro ao carregar nome do usuário: $e');
       setState(() {
         userName = 'Usuário';
       });
@@ -107,14 +106,13 @@ class _ProfilePageState extends State<ProfilePage> {
       final user = supabase.auth.currentUser;
 
       if (user == null) {
-        debugPrint('❌ Usuário não autenticado ao carregar stats');
+        appLog('❌ Usuário não autenticado ao carregar stats');
         setState(() {
           _isLoadingStats = false;
         });
         return;
       }
 
-      debugPrint('📊 Carregando estatísticas do usuário: ${user.id}');
 
       // 1. Buscar pontos e nível da tabela children
       try {
@@ -132,9 +130,6 @@ class _ProfilePageState extends State<ProfilePage> {
             userLevel = (childData['level'] as int?) ?? 1;
             totalSaved = (childData['balance'] as num?)?.toDouble() ?? 0.0;
           });
-          debugPrint(
-            '✅ Pontos: $totalPoints, Nível: $userLevel, Saldo: $totalSaved',
-          );
         } else {
           // Se não encontrar dados, buscar apenas balance e inicializar resto
           final balanceData = await supabase
@@ -148,13 +143,13 @@ class _ProfilePageState extends State<ProfilePage> {
             userLevel = 1;
             totalSaved = (balanceData?['balance'] as num?)?.toDouble() ?? 0.0;
           });
-          debugPrint(
+          appLog(
             '⚠️ Dados não encontrados, inicializando com valores padrão',
           );
         }
       } catch (e) {
         // Se der erro (provavelmente colunas não existem), buscar apenas balance
-        debugPrint(
+        appLog(
           '⚠️ Erro ao buscar pontos/nível (colunas podem não existir): $e',
         );
         try {
@@ -170,7 +165,7 @@ class _ProfilePageState extends State<ProfilePage> {
             totalSaved = (balanceData?['balance'] as num?)?.toDouble() ?? 0.0;
           });
         } catch (e2) {
-          debugPrint('❌ Erro ao buscar balance: $e2');
+          appLog('❌ Erro ao buscar balance: $e2');
           setState(() {
             totalPoints = 0;
             userLevel = 1;
@@ -191,15 +186,13 @@ class _ProfilePageState extends State<ProfilePage> {
           setState(() {
             achievements = List<Map<String, dynamic>>.from(achievementsData);
           });
-          debugPrint('✅ ${achievements.length} conquistas encontradas');
         } else {
           setState(() {
             achievements = [];
           });
-          debugPrint('ℹ️ Nenhuma conquista encontrada');
         }
       } catch (e) {
-        debugPrint('⚠️ Erro ao buscar conquistas: $e');
+        appLog('⚠️ Erro ao buscar conquistas: $e');
         setState(() {
           achievements = [];
         });
@@ -216,15 +209,14 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           completedGoals = completedGoalsData.length;
         });
-        debugPrint('✅ $completedGoals metas completadas encontradas');
       } catch (e) {
-        debugPrint('⚠️ Erro ao buscar metas completadas: $e');
+        appLog('⚠️ Erro ao buscar metas completadas: $e');
         setState(() {
           completedGoals = 0;
         });
       }
     } catch (e) {
-      debugPrint('❌ Erro ao carregar estatísticas: $e');
+      appLog('❌ Erro ao carregar estatísticas: $e');
     } finally {
       setState(() {
         _isLoadingStats = false;
@@ -1168,7 +1160,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   await authRepo.logout();
                   await locator<BiometricAuthService>().clearCachedUser();
 
-                  debugPrint('✅ Logout realizado com sucesso');
 
                   // Navegar para tela de login
                   if (!mounted) return;
@@ -1178,7 +1169,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     (route) => false,
                   );
                 } catch (e) {
-                  debugPrint('❌ Erro ao fazer logout: $e');
+                  appLog('❌ Erro ao fazer logout: $e');
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
