@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 enum ButtonType { primary, secondary, outline, text }
 
@@ -64,12 +64,12 @@ class CustomButton extends StatelessWidget {
 
     switch (type) {
       case ButtonType.primary:
-        backgroundColor = customColor ?? const Color(AppConstants.accentOrange);
+        backgroundColor = customColor ?? LummyColors.brandOrange;
         foregroundColor = Colors.white;
         borderSide = BorderSide.none;
         boxShadow = [
           BoxShadow(
-            color: (customColor ?? const Color(AppConstants.accentOrange))
+            color: (customColor ?? LummyColors.brandOrange)
                 .withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
@@ -77,12 +77,12 @@ class CustomButton extends StatelessWidget {
         ];
         break;
       case ButtonType.secondary:
-        backgroundColor = customColor ?? const Color(AppConstants.primaryBlue);
+        backgroundColor = customColor ?? LummyColors.brandBlue;
         foregroundColor = Colors.white;
         borderSide = BorderSide.none;
         boxShadow = [
           BoxShadow(
-            color: (customColor ?? const Color(AppConstants.primaryBlue))
+            color: (customColor ?? LummyColors.brandBlue)
                 .withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
@@ -91,16 +91,16 @@ class CustomButton extends StatelessWidget {
         break;
       case ButtonType.outline:
         backgroundColor = Colors.transparent;
-        foregroundColor = customColor ?? const Color(AppConstants.primaryBlue);
+        foregroundColor = customColor ?? LummyColors.brandBlue;
         borderSide = BorderSide(
-          color: customColor ?? const Color(AppConstants.primaryBlue),
+          color: customColor ?? LummyColors.brandBlue,
           width: 2,
         );
         boxShadow = null;
         break;
       case ButtonType.text:
         backgroundColor = Colors.transparent;
-        foregroundColor = customColor ?? const Color(AppConstants.primaryBlue);
+        foregroundColor = customColor ?? LummyColors.brandBlue;
         borderSide = BorderSide.none;
         boxShadow = null;
         break;
@@ -156,7 +156,7 @@ class CustomButton extends StatelessWidget {
                   Flexible(
                     child: Text(
                       text,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: fontSize,
                         fontWeight: FontWeight.w600,
                       ),

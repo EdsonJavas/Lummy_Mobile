@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentEditProfileScreen extends StatefulWidget {
   final String parentId;
@@ -32,7 +32,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
   String? _avatarUrl;
   bool _isUploadingAvatar = false;
 
-  static const _purple = Color(0xFF8B5CF6);
+  static const _purple = LummyColors.violet500;
 
   @override
   void initState() {
@@ -78,10 +78,10 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
               children: [
                 const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
                 const SizedBox(width: 10),
-                Text('Foto atualizada!', style: GoogleFonts.poppins(fontSize: 14)),
+                Text('Foto atualizada!', style: LummyFonts.body(fontSize: 14)),
               ],
             ),
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: LummyColors.emerald500,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -93,7 +93,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
           SnackBar(
             content: Text(
               'Erro ao enviar foto. Verifique se o bucket "avatars" existe no Supabase.',
-              style: GoogleFonts.poppins(fontSize: 13),
+              style: LummyFonts.body(fontSize: 13),
             ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
@@ -138,11 +138,11 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Perfil atualizado com sucesso.',
-                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+                style: LummyFonts.body(fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],
           ),
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: LummyColors.emerald500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
@@ -155,7 +155,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
         SnackBar(
           content: Text(
             e.message.contains('already') ? 'Este e-mail já está em uso.' : e.message,
-            style: GoogleFonts.poppins(fontSize: 14),
+            style: LummyFonts.body(fontSize: 14),
           ),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
@@ -168,7 +168,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
         SnackBar(
           content: Text(
             'Erro ao salvar. Tente novamente.',
-            style: GoogleFonts.poppins(fontSize: 14),
+            style: LummyFonts.body(fontSize: 14),
           ),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
@@ -182,23 +182,23 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? LummyColors.darkMaterial : LummyColors.slate50,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
           onPressed: () => Navigator.of(context).pop(false),
         ),
         title: Text(
           'Editar perfil',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
         ),
       ),
@@ -265,9 +265,9 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
               const SizedBox(height: 24),
               Text(
                 'Altere seu nome e e-mail. O e-mail é usado para login.',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                 ),
               ),
               const SizedBox(height: 24),
@@ -282,11 +282,11 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(
-                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                      color: isDark ? LummyColors.slate700 : LummyColors.slate200,
                     ),
                   ),
                 ),
-                style: GoogleFonts.poppins(fontSize: 15),
+                style: LummyFonts.body(fontSize: 15),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Insira seu nome';
                   if (v.trim().length < 2) return 'Nome muito curto';
@@ -306,11 +306,11 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(
-                      color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                      color: isDark ? LummyColors.slate700 : LummyColors.slate200,
                     ),
                   ),
                 ),
-                style: GoogleFonts.poppins(fontSize: 15),
+                style: LummyFonts.body(fontSize: 15),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Insira seu e-mail';
                   if (!RegExp(r'^[\w-\.]+@[\w-]+\.[\w-]{2,4}$').hasMatch(v.trim())) {
@@ -341,7 +341,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
                         )
                       : Text(
                           'Salvar alterações',
-                          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: LummyFonts.body(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                 ),
               ),

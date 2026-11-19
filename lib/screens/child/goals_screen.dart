@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/models/goal.dart';
 import 'package:lummy/screens/child/new_goal_screen.dart';
@@ -8,6 +7,7 @@ import 'package:lummy/shared/widgets/money_text_field.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/utils/ensure_child_record.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
@@ -211,9 +211,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         SnackBar(
           content: Text(
             'Você já tem uma meta em andamento! Complete ou remova a meta atual antes de criar uma nova.',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           duration: const Duration(seconds: 4),
@@ -258,9 +258,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
             SnackBar(
               content: Text(
                 'Você já tem uma meta em andamento!',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                style: LummyFonts.body(fontWeight: FontWeight.w500),
               ),
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: LummyColors.red500,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -289,9 +289,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
           SnackBar(
             content: Text(
               'Nova meta criada! 🎯',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              style: LummyFonts.body(fontWeight: FontWeight.w500),
             ),
-            backgroundColor: const Color(0xFF8B5CF6),
+            backgroundColor: LummyColors.violet500,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -305,9 +305,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
           SnackBar(
             content: Text(
               'Erro ao criar meta: $e',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              style: LummyFonts.body(fontWeight: FontWeight.w500),
             ),
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: LummyColors.red500,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -345,9 +345,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         SnackBar(
           content: Text(
             'Progresso adicionado! 💰',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: LummyColors.emerald500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -359,9 +359,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         SnackBar(
           content: Text(
             'Erro ao atualizar progresso: $e',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -397,9 +397,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         SnackBar(
           content: Text(
             'Meta concluída! 🎉',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: LummyColors.emerald500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -411,9 +411,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         SnackBar(
           content: Text(
             'Erro ao completar meta: $e',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -445,9 +445,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         SnackBar(
           content: Text(
             'Meta removida',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -459,9 +459,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
         SnackBar(
           content: Text(
             'Erro ao remover meta: $e',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -607,14 +607,14 @@ class _GoalsScreenState extends State<GoalsScreen> {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFF5B21B6),
-                  const Color(0xFF7C3AED),
-                  const Color(0xFF6366F1),
+                  LummyColors.violet800,
+                  LummyColors.violet600,
+                  LummyColors.indigo500,
                 ]
               : [
-                  const Color(0xFF8B5CF6),
-                  const Color(0xFF7C3AED),
-                  const Color(0xFF6366F1),
+                  LummyColors.violet500,
+                  LummyColors.violet600,
+                  LummyColors.indigo500,
                 ],
         ),
         borderRadius: const BorderRadius.only(
@@ -623,7 +623,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7C3AED).withValues(alpha: 0.35),
+            color: LummyColors.violet600.withValues(alpha: 0.35),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -653,7 +653,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   children: [
                     Text(
                       'Minhas Metas',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 24 : 28,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -663,7 +663,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     const SizedBox(height: 4),
                     Text(
                       'Transforme sonhos em realidade',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 13 : 15,
                         fontWeight: FontWeight.w500,
                         color: Colors.white.withValues(alpha: 0.9),
@@ -717,7 +717,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           const SizedBox(width: 6),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 11 : 12,
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -730,8 +730,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
   Widget _buildFeaturedGoalCard(Goal goal, bool isSmallScreen) {
     final primaryColor = goal.status == GoalStatus.completed
-        ? const Color(0xFF10B981)
-        : const Color(0xFF8B5CF6);
+        ? LummyColors.emerald500
+        : LummyColors.violet500;
     final progress = goal.progress.clamp(0.0, 1.0);
 
     return Padding(
@@ -819,7 +819,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           goal.status == GoalStatus.completed
                               ? 'Concluída'
                               : 'Em andamento',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: primaryColor,
@@ -829,7 +829,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       const SizedBox(height: 8),
                       Text(
                         goal.name,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 18 : 20,
                           fontWeight: FontWeight.w800,
                           color: Theme.of(context).textTheme.titleLarge?.color,
@@ -840,7 +840,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       const SizedBox(height: 6),
                       Text(
                         '${(progress * 100).toInt()}% • ${_formatCurrency(goal.currentAmount)} / ${_formatCurrency(goal.targetAmount)}',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 12 : 13,
                           fontWeight: FontWeight.w500,
                           color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -882,7 +882,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       context,
                       Icons.check_circle_outline_rounded,
                       'Marcar concluída',
-                      const Color(0xFF10B981),
+                      LummyColors.emerald500,
                       onTap: () => _markGoalAsCompleted(goal),
                     ),
                   ),
@@ -893,7 +893,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 context,
                 Icons.delete_outline_rounded,
                 'Remover meta',
-                const Color(0xFFEF4444),
+                LummyColors.red500,
                 onTap: () => _showDeleteConfirmation(goal),
                 fullWidth: true,
               ),
@@ -904,10 +904,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                  color: LummyColors.emerald500.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.25),
+                    color: LummyColors.emerald500.withValues(alpha: 0.25),
                     width: 1,
                   ),
                 ),
@@ -916,16 +916,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   children: [
                     const Icon(
                       Icons.celebration_rounded,
-                      color: Color(0xFF10B981),
+                      color: LummyColors.emerald500,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Concluída em ${_formatDate(goal.completedDate!)}',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 12 : 14,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF10B981),
+                        color: LummyColors.emerald500,
                       ),
                     ),
                   ],
@@ -966,7 +966,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               Flexible(
                 child: Text(
                   label,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: color,
@@ -990,12 +990,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return FloatingActionButton.extended(
       heroTag: 'fab_goals',
       onPressed: _addNewGoal,
-      backgroundColor: const Color(0xFF8B5CF6),
+      backgroundColor: LummyColors.violet500,
       foregroundColor: Colors.white,
       icon: const Icon(Icons.add_rounded, size: 24),
       label: Text(
         'Nova meta',
-        style: GoogleFonts.poppins(
+        style: LummyFonts.body(
           fontSize: isSmallScreen ? 14 : 15,
           fontWeight: FontWeight.w700,
         ),
@@ -1007,8 +1007,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
   Widget _buildSectionHeader(String title, int count, bool isSmallScreen) {
     final bool isCompleted = title == 'Concluídas';
     final Color headerColor = isCompleted
-        ? const Color(0xFF10B981)
-        : const Color(0xFF8B5CF6);
+        ? LummyColors.emerald500
+        : LummyColors.violet500;
     final IconData headerIcon = isCompleted ? Icons.check_circle : Icons.flag;
 
     final bool dark = Theme.of(context).brightness == Brightness.dark;
@@ -1045,7 +1045,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           const SizedBox(width: 12),
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 18 : 20,
               fontWeight: FontWeight.w700,
               color: Theme.of(context).textTheme.titleLarge?.color,
@@ -1083,7 +1083,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 Flexible(
                   child: Text(
                     count.toString(),
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: isSmallScreen ? 12 : 14,
                       fontWeight: FontWeight.w700,
                       color: headerColor,
@@ -1103,12 +1103,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
   Widget _buildGoalCard(Goal goal, bool isSmallScreen) {
     // Define colors based on goal status and progress
     final Color primaryColor = goal.status == GoalStatus.completed
-        ? const Color(0xFF10B981) // Green for completed
-        : const Color(0xFF8B5CF6); // Purple for ongoing
+        ? LummyColors.emerald500 // Green for completed
+        : LummyColors.violet500; // Purple for ongoing
 
     final Color secondaryColor = goal.status == GoalStatus.completed
-        ? const Color(0xFF059669)
-        : const Color(0xFF7C3AED);
+        ? LummyColors.emerald600
+        : LummyColors.violet600;
 
     final bool dark = Theme.of(context).brightness == Brightness.dark;
     return Container(
@@ -1178,7 +1178,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         Expanded(
                           child: Text(
                             goal.name,
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: isSmallScreen ? 16 : 18,
                               fontWeight: FontWeight.w700,
                               color: Theme.of(
@@ -1198,13 +1198,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: goal.status == GoalStatus.completed
-                                ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                                : const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+                                ? LummyColors.emerald500.withValues(alpha: 0.1)
+                                : LummyColors.violet500.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: goal.status == GoalStatus.completed
-                                  ? const Color(0xFF10B981).withValues(alpha: 0.3)
-                                  : const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                                  ? LummyColors.emerald500.withValues(alpha: 0.3)
+                                  : LummyColors.violet500.withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -1223,7 +1223,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                 goal.status == GoalStatus.completed
                                     ? 'Concluída'
                                     : 'Em Andamento',
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
                                   color: primaryColor,
@@ -1238,10 +1238,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       const SizedBox(height: 4),
                       Text(
                         goal.description,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 12 : 14,
                           fontWeight: FontWeight.w400,
-                          color: const Color(0xFF64748B),
+                          color: LummyColors.slate500,
                           height: 1.3,
                         ),
                         maxLines: 2,
@@ -1267,10 +1267,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 Container(
                   height: 16,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE2E8F0),
+                    color: LummyColors.slate200,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFFD1D5DB),
+                      color: LummyColors.gray300,
                       width: 1,
                     ),
                   ),
@@ -1305,7 +1305,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   ignoring: true,
                   child: Text(
                     '${(goal.progress * 100).toInt()}%',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: goal.progress > 0.5 ? Colors.white : primaryColor,
@@ -1337,16 +1337,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     children: [
                       Text(
                         'Progresso',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF64748B),
+                          color: LummyColors.slate500,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         '${(goal.progress * 100).toInt()}% concluído',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 14 : 16,
                           fontWeight: FontWeight.w600,
                           color: primaryColor,
@@ -1367,19 +1367,19 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     children: [
                       Text(
                         'Valor',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF64748B),
+                          color: LummyColors.slate500,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         'R\$ ${goal.currentAmount.toStringAsFixed(2)}',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 14 : 16,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1E293B),
+                          color: LummyColors.slate800,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1387,10 +1387,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       ),
                       Text(
                         '/ R\$ ${goal.targetAmount.toStringAsFixed(2)}',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF64748B),
+                          color: LummyColors.slate500,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1410,10 +1410,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                color: LummyColors.emerald500.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                  color: LummyColors.emerald500.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -1421,17 +1421,17 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 children: [
                   const Icon(
                     Icons.celebration,
-                    color: Color(0xFF10B981),
+                    color: LummyColors.emerald500,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Flexible(
                     child: Text(
                       '🎉 Concluída em ${_formatDate(goal.completedDate!)}',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 12 : 14,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF10B981),
+                        color: LummyColors.emerald500,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1456,13 +1456,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: dark
-              ? [const Color(0xFF064E3B), const Color(0xFF10B981).withValues(alpha: 0.25)]
-              : [const Color(0xFF10B981), const Color(0xFF059669)],
+              ? [LummyColors.emerald900, LummyColors.emerald500.withValues(alpha: 0.25)]
+              : [LummyColors.emerald500, LummyColors.emerald600],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF10B981).withValues(alpha: dark ? 0.15 : 0.3),
+            color: LummyColors.emerald500.withValues(alpha: dark ? 0.15 : 0.3),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -1486,7 +1486,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               children: [
                 Text(
                   'Parabéns!',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 17 : 19,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -1494,7 +1494,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 ),
                 Text(
                   'Crie uma nova meta para continuar evoluindo!',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 13,
                     color: Colors.white.withValues(alpha: 0.85),
                   ),
@@ -1516,32 +1516,32 @@ class _GoalsScreenState extends State<GoalsScreen> {
           width: 56, height: 56,
           decoration: BoxDecoration(
             color: dark
-                ? const Color(0xFF8B5CF6).withValues(alpha: 0.12)
-                : const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+                ? LummyColors.violet500.withValues(alpha: 0.12)
+                : LummyColors.violet500.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(16),
           ),
           alignment: Alignment.center,
           child: Icon(
             Icons.flag_rounded,
             size: 28,
-            color: dark ? const Color(0xFF7C3AED) : const Color(0xFF8B5CF6),
+            color: dark ? LummyColors.violet600 : LummyColors.violet500,
           ),
         ),
         const SizedBox(height: 14),
         Text(
           'Nenhuma meta criada ainda',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            color: dark ? LummyColors.slate400 : LummyColors.slate500,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           'Toque no botão abaixo para começar',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 12,
-            color: dark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            color: dark ? LummyColors.slate500 : LummyColors.slate400,
           ),
         ),
       ],
@@ -1565,10 +1565,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.white, Color(0xFFF8FAFC)],
+                colors: [Colors.white, LummyColors.slate50],
               ),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+              border: Border.all(color: LummyColors.slate200, width: 1),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1580,7 +1580,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFF10B981), Color(0xFF059669)],
+                      colors: [LummyColors.emerald500, LummyColors.emerald600],
                     ),
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -1596,20 +1596,20 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 const SizedBox(height: 20),
                 Text(
                   'Adicionar Progresso',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF1E293B),
+                    color: LummyColors.slate800,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Quanto você economizou para "${goal.name}"?',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF64748B),
+                    color: LummyColors.slate500,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -1639,10 +1639,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         ),
                         child: Text(
                           'Cancelar',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF64748B),
+                            color: LummyColors.slate500,
                           ),
                         ),
                       ),
@@ -1654,12 +1654,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           gradient: const LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [Color(0xFF10B981), Color(0xFF059669)],
+                            colors: [LummyColors.emerald500, LummyColors.emerald600],
                           ),
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                              color: LummyColors.emerald500.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 3),
                             ),
@@ -1682,13 +1682,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                       const SizedBox(width: 8),
                                       Text(
                                         'Progresso adicionado! 💰',
-                                        style: GoogleFonts.poppins(
+                                        style: LummyFonts.body(
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  backgroundColor: const Color(0xFF10B981),
+                                  backgroundColor: LummyColors.emerald500,
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -1708,7 +1708,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           ),
                           child: Text(
                             'Adicionar',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
@@ -1738,10 +1738,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.white, Color(0xFFF8FAFC)],
+              colors: [Colors.white, LummyColors.slate50],
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+            border: Border.all(color: LummyColors.slate200, width: 1),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1753,7 +1753,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+                    colors: [LummyColors.red500, LummyColors.red600],
                   ),
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -1773,20 +1773,20 @@ class _GoalsScreenState extends State<GoalsScreen> {
               const SizedBox(height: 20),
               Text(
                 'Excluir Meta',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1E293B),
+                  color: LummyColors.slate800,
                 ),
               ),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEF4444).withValues(alpha: 0.05),
+                  color: LummyColors.red500.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.2),
+                    color: LummyColors.red500.withValues(alpha: 0.2),
                     width: 1,
                   ),
                 ),
@@ -1795,30 +1795,30 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     Text(
                       'Tem certeza que deseja excluir',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: const Color(0xFF64748B),
+                        color: LummyColors.slate500,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '"${goal.name}"',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF1E293B),
+                        color: LummyColors.slate800,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Esta ação não pode ser desfeita.',
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
-                        color: const Color(0xFFEF4444),
+                        color: LummyColors.red500,
                       ),
                     ),
                   ],
@@ -1838,10 +1838,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       ),
                       child: Text(
                         'Cancelar',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF64748B),
+                          color: LummyColors.slate500,
                         ),
                       ),
                     ),
@@ -1853,12 +1853,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+                          colors: [LummyColors.red500, LummyColors.red600],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFEF4444).withValues(alpha: 0.3),
+                            color: LummyColors.red500.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -1879,7 +1879,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         ),
                         child: Text(
                           'Excluir',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,

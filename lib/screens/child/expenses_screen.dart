@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy/screens/child/add_expense_screen.dart';
@@ -10,6 +9,7 @@ import 'package:lummy/core/constants/app_constants.dart';
 import 'package:lummy/core/utils/formatters.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -32,42 +32,42 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     {
       'id': 'games',
       'name': 'Jogos',
-      'color': const Color(0xFF8B5CF6),
+      'color': LummyColors.violet500,
     },
     {
       'id': 'food',
       'name': 'Alimentação',
-      'color': const Color(0xFFF59E0B),
+      'color': LummyColors.amber500,
     },
     {
       'id': 'education',
       'name': 'Educação',
-      'color': const Color(0xFF3B82F6),
+      'color': LummyColors.blue500,
     },
     {
       'id': 'clothes',
       'name': 'Roupas',
-      'color': const Color(0xFFEC4899),
+      'color': LummyColors.pink500,
     },
     {
       'id': 'entertainment',
       'name': 'Entretenimento',
-      'color': const Color(0xFFEF4444),
+      'color': LummyColors.red500,
     },
     {
       'id': 'toys',
       'name': 'Brinquedos',
-      'color': const Color(0xFF10B981),
+      'color': LummyColors.emerald500,
     },
     {
       'id': 'sports',
       'name': 'Esportes',
-      'color': const Color(0xFF06B6D4),
+      'color': LummyColors.cyan500,
     },
     {
       'id': 'other',
       'name': 'Outros',
-      'color': const Color(0xFF64748B),
+      'color': LummyColors.slate500,
     },
   ];
 
@@ -152,7 +152,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           orElse: () => {
             'id': catId,
             'name': catId,
-            'color': const Color(0xFF64748B),
+            'color': LummyColors.slate500,
           },
         );
 
@@ -347,13 +347,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   Icon(
                     Icons.cloud_off_rounded,
                     size: 56,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                    color: isDark ? LummyColors.slate500 : LummyColors.slate400,
                   ),
                   const Gap(20),
                   Text(
                     _loadError!,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       height: 1.45,
@@ -366,7 +366,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     icon: const Icon(Icons.refresh_rounded),
                     label: Text(
                       'Tentar de novo',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                      style: LummyFonts.body(fontWeight: FontWeight.w600),
                     ),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -416,7 +416,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     context,
                     'Gastos por Categoria',
                     Icons.pie_chart_rounded,
-                    const Color(0xFFF59E0B),
+                    LummyColors.amber500,
                   ),
                 )
                     .animate()
@@ -466,7 +466,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     context,
                     'Transações Recentes',
                     Icons.receipt_long_rounded,
-                    const Color(0xFF10B981),
+                    LummyColors.emerald500,
                   ),
                 )
                     .animate()
@@ -510,21 +510,21 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 SnackBar(
                   content: Text(
                     'Saldo insuficiente ou erro ao registrar. Tente novamente.',
-                    style: GoogleFonts.poppins(),
+                    style: LummyFonts.body(),
                   ),
-                  backgroundColor: const Color(0xFFEF4444),
+                  backgroundColor: LummyColors.red500,
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             }
           }
         },
-        backgroundColor: const Color(0xFFF59E0B),
+        backgroundColor: LummyColors.amber500,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded, size: 24),
         label: Text(
           'Registrar gasto',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 15),
+          style: LummyFonts.body(fontWeight: FontWeight.w700, fontSize: 15),
         ),
         elevation: 4,
       ),
@@ -547,14 +547,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFFB45309),
-                  const Color(0xFFD97706),
-                  const Color(0xFFF59E0B),
+                  LummyColors.amber700,
+                  LummyColors.amber600,
+                  LummyColors.amber500,
                 ]
               : [
-                  const Color(0xFFF59E0B),
-                  const Color(0xFFD97706),
-                  const Color(0xFFB45309),
+                  LummyColors.amber500,
+                  LummyColors.amber600,
+                  LummyColors.amber700,
                 ],
         ),
         borderRadius: const BorderRadius.only(
@@ -563,7 +563,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFD97706).withValues(alpha: 0.4),
+            color: LummyColors.amber600.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -593,7 +593,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   children: [
                     Text(
                       'Meus Gastos',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 24 : 28,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -603,7 +603,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     const SizedBox(height: 4),
                     Text(
                       'Acompanhe onde você gastou',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 13 : 15,
                         fontWeight: FontWeight.w500,
                         color: Colors.white.withValues(alpha: 0.95),
@@ -657,7 +657,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           const SizedBox(width: 6),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 11 : 12,
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -695,7 +695,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           const SizedBox(width: 10),
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 17,
               fontWeight: FontWeight.w700,
               color: Theme.of(context).textTheme.titleLarge?.color,
@@ -711,7 +711,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final totalGasto = _totalSpent;
     final muted = theme.textTheme.bodySmall?.color?.withValues(alpha: 0.9) ??
-        (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B));
+        (isDark ? LummyColors.slate400 : LummyColors.slate500);
 
     return Container(
       width: double.infinity,
@@ -725,7 +725,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         border: Border.all(
           color: isDark
               ? theme.dividerColor
-              : const Color(0xFFCBD5E1),
+              : LummyColors.slate300,
           width: isDark ? 1 : 1.5,
         ),
         boxShadow: [
@@ -741,7 +741,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         children: [
           Text(
             'Saldo no cofrinho',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: theme.textTheme.bodyMedium?.color,
@@ -750,17 +750,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           const Gap(6),
           Text(
             AppFormatters.formatCurrency(_currentBalance),
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 26 : 28,
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF10B981),
+              color: LummyColors.emerald500,
               letterSpacing: -0.6,
             ),
           ),
           const Gap(4),
           Text(
             'Dinheiro disponível agora (atualizado quando você recebe ou gasta).',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 11,
               fontWeight: FontWeight.w400,
               height: 1.35,
@@ -773,7 +773,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ),
           Text(
             'Gasto no período',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: theme.textTheme.bodyMedium?.color,
@@ -782,17 +782,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           const Gap(6),
           Text(
             '− ${AppFormatters.formatCurrency(totalGasto)}',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 18 : 20,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFFEF4444),
+              color: LummyColors.red500,
               letterSpacing: -0.4,
             ),
           ),
           const Gap(4),
           Text(
             'Soma só das despesas com os filtros atuais ($selectedPeriod${selectedCategory != 'Todas' ? ', categoria selecionada' : ''}).',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 11,
               fontWeight: FontWeight.w400,
               height: 1.35,
@@ -815,7 +815,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Theme.of(context).dividerColor : const Color(0xFFCBD5E1),
+          color: isDark ? Theme.of(context).dividerColor : LummyColors.slate300,
           width: isDark ? 1 : 1.5,
         ),
         boxShadow: [
@@ -855,7 +855,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           orElse: () => {
                             'id': catId,
                             'name': catId,
-                            'color': const Color(0xFF64748B),
+                            'color': LummyColors.slate500,
                           },
                         );
                         return _buildLegendItem(
@@ -878,32 +878,32 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     width: 48, height: 48,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
-                          : const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+                          ? LummyColors.violet500.withValues(alpha: 0.1)
+                          : LummyColors.violet500.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     alignment: Alignment.center,
                     child: Icon(
                       Icons.pie_chart_outline_rounded,
                       size: 24,
-                      color: isDark ? const Color(0xFF7C3AED) : const Color(0xFF8B5CF6),
+                      color: isDark ? LummyColors.violet600 : LummyColors.violet500,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     'Nenhum gasto neste período',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Registre um gasto para visualizar o gráfico',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 11,
-                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      color: isDark ? LummyColors.slate500 : LummyColors.slate400,
                     ),
                   ),
                 ],
@@ -918,7 +918,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       children: [
         Text(
           'Período',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -961,7 +961,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         const Gap(18),
         Text(
           'Categoria',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -1012,7 +1012,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Theme.of(context).dividerColor : const Color(0xFFCBD5E1),
+          color: isDark ? Theme.of(context).dividerColor : LummyColors.slate300,
           width: isDark ? 1 : 1.5,
         ),
         boxShadow: [
@@ -1033,32 +1033,32 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     width: 48, height: 48,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFFEF4444).withValues(alpha: 0.1)
-                          : const Color(0xFFEF4444).withValues(alpha: 0.08),
+                          ? LummyColors.red500.withValues(alpha: 0.1)
+                          : LummyColors.red500.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     alignment: Alignment.center,
                     child: Icon(
                       Icons.receipt_long_outlined,
                       size: 24,
-                      color: isDark ? const Color(0xFFF87171) : const Color(0xFFEF4444),
+                      color: isDark ? LummyColors.red400 : LummyColors.red500,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     'Nenhuma transação recente',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Suas movimentações aparecerão aqui',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 11,
-                      color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      color: isDark ? LummyColors.slate500 : LummyColors.slate400,
                     ),
                   ),
                 ],
@@ -1098,7 +1098,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Expanded(
             child: Text(
               label,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 14,
                 color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
@@ -1110,7 +1110,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Flexible(
             child: Text(
               value,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).textTheme.titleMedium?.color,
@@ -1142,7 +1142,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 ? Theme.of(context).colorScheme.primary
                 : Theme.of(context).brightness == Brightness.dark
                     ? Theme.of(context).dividerColor
-                    : const Color(0xFFCBD5E1),
+                    : LummyColors.slate300,
             width: Theme.of(context).brightness == Brightness.dark ? 1.5 : 2,
           ),
           boxShadow: isSelected
@@ -1165,7 +1165,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         ),
         child: Text(
           label,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: isSelected
@@ -1208,7 +1208,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: Theme.of(context).textTheme.titleMedium?.color,
@@ -1219,7 +1219,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 ),
                 Text(
                   category,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 12,
                     color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
@@ -1233,10 +1233,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Flexible(
             child: Text(
               '− $amount',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFFEF4444),
+                color: LummyColors.red500,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -1256,7 +1256,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     if (_categorySpending.isEmpty) {
       return [
         PieChartSectionData(
-          color: const Color(0xFFE5E7EB),
+          color: LummyColors.gray200,
           value: 1,
           title: '',
           radius: 32,
@@ -1272,7 +1272,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     if (total == 0) {
       return [
         PieChartSectionData(
-          color: const Color(0xFFE5E7EB),
+          color: LummyColors.gray200,
           value: 1,
           title: '',
           radius: 32,
@@ -1290,7 +1290,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         orElse: () => {
           'id': catId,
           'name': catId,
-          'color': const Color(0xFF64748B),
+          'color': LummyColors.slate500,
         },
       );
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class BrandedRefreshIndicator extends StatelessWidget {
   final Future<void> Function() onRefresh;
@@ -17,9 +18,9 @@ class BrandedRefreshIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final defaultColor = color ?? const Color(0xFF3B82F6);
+    final defaultColor = color ?? LummyColors.blue500;
     final defaultBackground =
-        backgroundColor ?? (isDark ? const Color(0xFF1E293B) : Colors.white);
+        backgroundColor ?? (isDark ? LummyColors.slate800 : Colors.white);
 
     return RefreshIndicator(
       color: defaultColor,

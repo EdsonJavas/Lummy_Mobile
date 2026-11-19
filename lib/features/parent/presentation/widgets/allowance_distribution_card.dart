@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../application/app_facade.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../di/locator.dart';
 import '../../../../domain/entities/user_entity.dart';
 import '../../../../shared/widgets/lummy_feedback.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class AllowanceDistributionCard extends StatefulWidget {
   final double availableBalance;
@@ -32,11 +32,11 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
   bool _isProcessing = false;
 
   // Cores consistentes com o app
-  static const _orange = Color(0xFFF59E0B);
-  static const _amber = Color(0xFFD97706);
-  static const _green = Color(0xFF10B981);
-  static const _blue = Color(0xFF3B82F6);
-  static const _purple = Color(0xFF8B5CF6);
+  static const _orange = LummyColors.amber500;
+  static const _amber = LummyColors.amber600;
+  static const _green = LummyColors.emerald500;
+  static const _blue = LummyColors.blue500;
+  static const _purple = LummyColors.violet500;
 
   @override
   void dispose() {
@@ -57,12 +57,12 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF334155), Color(0xFF1E293B)]
+              ? const [LummyColors.slate700, LummyColors.slate800]
               : [Colors.white, _orange.withValues(alpha: 0.03)],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF475569) : _orange.withValues(alpha: 0.12),
+          color: isDark ? LummyColors.slate600 : _orange.withValues(alpha: 0.12),
           width: 1.2,
         ),
         boxShadow: [
@@ -100,21 +100,21 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                   children: [
                     Text(
                       'Distribuir Recursos',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 16 : 18,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        color: isDark ? Colors.white : LummyColors.slate800,
                       ),
                     ),
                     Text(
                       widget.children.length > 1
                           ? 'Envie para todos ou individualmente'
                           : 'Distribuição igual requer 2+ filhos',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.slate400
+                            : LummyColors.slate500,
                       ),
                     ),
                   ],
@@ -144,16 +144,16 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                 const SizedBox(width: 8),
                 Text(
                   'Disponível: ',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 13,
                     color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
+                        ? LummyColors.slate400
+                        : LummyColors.slate500,
                   ),
                 ),
                 Text(
                   AppFormatters.formatCurrency(widget.availableBalance),
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: _orange,
@@ -167,12 +167,12 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
           // Campo de valor
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+              color: isDark ? LummyColors.slate800 : LummyColors.slate50,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark
-                    ? const Color(0xFF475569)
-                    : const Color(0xFFE2E8F0),
+                    ? LummyColors.slate600
+                    : LummyColors.slate200,
               ),
             ),
             child: TextField(
@@ -184,18 +184,18 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9,\.]')),
               ],
               onChanged: (_) => setState(() {}),
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                color: isDark ? Colors.white : LummyColors.slate800,
               ),
               decoration: InputDecoration(
                 hintText: 'Digite o valor (Ex: 150,00)',
-                hintStyle: GoogleFonts.poppins(
+                hintStyle: LummyFonts.body(
                   fontSize: 15,
                   color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF94A3B8),
+                      ? LummyColors.slate400
+                      : LummyColors.slate400,
                 ),
                 prefixIcon: const Icon(
                   Icons.attach_money_rounded,
@@ -349,22 +349,22 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                       color: isEnabled
                           ? Colors.white
                           : (isDark
-                                ? const Color(0xFF64748B)
-                                : const Color(0xFF94A3B8)),
+                                ? LummyColors.slate500
+                                : LummyColors.slate400),
                       size: 18,
                     ),
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
                         label,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: isEnabled
                               ? Colors.white
                               : (isDark
-                                    ? const Color(0xFF64748B)
-                                    : const Color(0xFF94A3B8)),
+                                    ? LummyColors.slate500
+                                    : LummyColors.slate400),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -416,14 +416,14 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? const [Color(0xFF334155), Color(0xFF1E293B)]
-                  : const [Colors.white, Color(0xFFFFFBF5)],
+                  ? const [LummyColors.slate700, LummyColors.slate800]
+                  : const [Colors.white, LummyColors.cream],
             ),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             border: Border.all(
               color: isDark
-                  ? const Color(0xFF475569)
-                  : const Color(0xFFF1F5F9),
+                  ? LummyColors.slate600
+                  : LummyColors.slate100,
             ),
           ),
           padding: EdgeInsets.only(
@@ -445,8 +445,8 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                     height: 4,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF64748B)
-                          : const Color(0xFFCBD5E1),
+                          ? LummyColors.slate500
+                          : LummyColors.slate300,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -473,12 +473,12 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                     Expanded(
                       child: Text(
                         'Depósito Individual',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: isDark
                               ? Colors.white
-                              : const Color(0xFF1E293B),
+                              : LummyColors.slate800,
                         ),
                       ),
                     ),
@@ -487,8 +487,8 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                       icon: Icon(
                         Icons.close_rounded,
                         color: isDark
-                            ? const Color(0xFFCBD5E1)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.slate300
+                            : LummyColors.slate500,
                       ),
                     ),
                   ],
@@ -498,13 +498,13 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                 Container(
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
+                        ? LummyColors.slate800
+                        : LummyColors.slate50,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF475569)
-                          : const Color(0xFFE2E8F0),
+                          ? LummyColors.slate600
+                          : LummyColors.slate200,
                     ),
                   ),
                   child: DropdownButtonFormField<String>(
@@ -526,12 +526,12 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                       ),
                     ),
                     dropdownColor: isDark
-                        ? const Color(0xFF1E293B)
+                        ? LummyColors.slate800
                         : Colors.white,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: isDark ? Colors.white : LummyColors.slate800,
                     ),
                     items: widget.children
                         .map(
@@ -553,13 +553,13 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                 Container(
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
+                        ? LummyColors.slate800
+                        : LummyColors.slate50,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF475569)
-                          : const Color(0xFFE2E8F0),
+                          ? LummyColors.slate600
+                          : LummyColors.slate200,
                     ),
                   ),
                   child: TextFormField(
@@ -570,18 +570,18 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                     inputFormatters: [
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9,\.]')),
                     ],
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: isDark ? Colors.white : LummyColors.slate800,
                     ),
                     decoration: InputDecoration(
                       hintText: 'Ex.: 50,00',
-                      hintStyle: GoogleFonts.poppins(
+                      hintStyle: LummyFonts.body(
                         fontSize: 15,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF94A3B8),
+                            ? LummyColors.slate400
+                            : LummyColors.slate400,
                       ),
                       prefixIcon: const Icon(
                         Icons.attach_money_rounded,
@@ -619,7 +619,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                   height: 54,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [_green, Color(0xFF059669)],
+                      colors: [_green, LummyColors.emerald600],
                     ),
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
@@ -670,7 +670,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                         const SizedBox(width: 10),
                         Text(
                           'Confirmar Depósito',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),

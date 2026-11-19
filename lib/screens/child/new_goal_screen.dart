@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy/shared/widgets/money_text_field.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class NewGoalScreen extends StatefulWidget {
   const NewGoalScreen({super.key});
@@ -17,10 +17,10 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   double? _currentAmount;
   String _selectedEmoji = '🚲';
 
-  static const _purple = Color(0xFF8B5CF6);
-  static const _purpleDark = Color(0xFF6D28D9);
+  static const _purple = LummyColors.violet500;
+  static const _purpleDark = LummyColors.violet700;
   // ignore: unused_field
-  static const _green = Color(0xFF10B981);
+  static const _green = LummyColors.emerald500;
 
   final List<String> _goalEmojis = [
     '🚲', '🎮', '📱', '👟', '🎸', '📚', '🏀', '🎨',
@@ -41,7 +41,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? LummyColors.slate900 : LummyColors.slate50,
       body: Column(
         children: [
           _buildHeader(isDark, topPadding),
@@ -85,7 +85,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF1E1B4B), _purple.withValues(alpha: 0.5)]
+              ? [LummyColors.indigo950, _purple.withValues(alpha: 0.5)]
               : [_purple, _purpleDark],
         ),
         borderRadius: const BorderRadius.only(
@@ -122,7 +122,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
               const SizedBox(width: 16),
               Text(
                 'Nova Meta',
-                style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white),
+                style: LummyFonts.body(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white),
               ),
             ],
           ),
@@ -153,7 +153,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                     children: [
                       Text(
                         hasName ? _nameController.text : 'Nome da meta',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           color: Colors.white.withValues(alpha: hasName ? 1.0 : 0.5),
@@ -164,7 +164,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                       const SizedBox(height: 4),
                       Text(
                         hasAmount ? 'R\$ ${_currentAmount!.toStringAsFixed(2)}' : 'R\$ 0,00',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
                           color: Colors.white.withValues(alpha: hasAmount ? 1.0 : 0.4),
@@ -192,10 +192,10 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? LummyColors.slate800 : Colors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              color: isDark ? LummyColors.slate700 : LummyColors.slate200,
             ),
             boxShadow: [
               BoxShadow(
@@ -251,14 +251,14 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
         TextFormField(
           controller: _nameController,
           onChanged: (_) => setState(() {}),
-          style: GoogleFonts.poppins(
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+          style: LummyFonts.body(
+            color: isDark ? Colors.white : LummyColors.slate800,
             fontSize: 15, fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             hintText: 'Ex: Bicicleta Nova',
-            hintStyle: GoogleFonts.poppins(
-              color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1), fontSize: 14,
+            hintStyle: LummyFonts.body(
+              color: isDark ? LummyColors.slate600 : LummyColors.slate300, fontSize: 14,
             ),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 14, right: 8),
@@ -266,14 +266,14 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
             ),
             prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
             filled: true,
-            fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            fillColor: isDark ? LummyColors.slate800 : Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+              borderSide: BorderSide(color: isDark ? LummyColors.slate700 : LummyColors.slate200),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -296,7 +296,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
         const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? LummyColors.slate800 : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: _purple.withValues(alpha: 0.2)),
             boxShadow: [
@@ -333,22 +333,22 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    color: isDark ? LummyColors.slate800 : Colors.white,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: _currentAmount == val.toDouble()
                           ? _purple
-                          : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                          : (isDark ? LummyColors.slate700 : LummyColors.slate200),
                       width: _currentAmount == val.toDouble() ? 2 : 1,
                     ),
                   ),
                   child: Text(
                     'R\$ $val',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 12, fontWeight: FontWeight.w600,
                       color: _currentAmount == val.toDouble()
                           ? _purple
-                          : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                          : (isDark ? LummyColors.slate400 : LummyColors.slate500),
                     ),
                   ),
                 ),
@@ -388,7 +388,7 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
               const SizedBox(width: 10),
               Text(
                 'Criar Meta',
-                style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
+                style: LummyFonts.body(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
               ),
             ],
           ),
@@ -402,9 +402,9 @@ class _NewGoalScreenState extends State<NewGoalScreen> {
   Widget _sectionLabel(String text, bool isDark) {
     return Text(
       text,
-      style: GoogleFonts.poppins(
+      style: LummyFonts.body(
         fontSize: 15, fontWeight: FontWeight.w600,
-        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+        color: isDark ? LummyColors.slate300 : LummyColors.slate700,
       ),
     );
   }

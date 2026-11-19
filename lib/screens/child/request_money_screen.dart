@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/shared/widgets/money_text_field.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class RequestMoneyScreen extends StatefulWidget {
   const RequestMoneyScreen({super.key});
@@ -164,14 +164,14 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
       SnackBar(
         content: Text(
           message,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontWeight: FontWeight.w500,
             color: Colors.white,
           ),
         ),
         backgroundColor: isError
-            ? const Color(0xFFEF4444)
-            : const Color(0xFF10B981),
+            ? LummyColors.red500
+            : LummyColors.emerald500,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
@@ -268,8 +268,8 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF2D3748)
-                    : const Color(0xFFE2E8F0),
+                    ? LummyColors.steel700
+                    : LummyColors.slate200,
                 width: 1,
               ),
             ),
@@ -287,11 +287,11 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             children: [
               ShaderMask(
                 shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Color(0xFF1E40AF), Color(0xFF8B5CF6)],
+                  colors: [LummyColors.blue800, LummyColors.violet500],
                 ).createShader(bounds),
                 child: Text(
                   'Pedir Dinheiro',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 24 : 28,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -301,7 +301,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
               const SizedBox(height: 4),
               Text(
                 'Peça dinheiro ao seu responsável de forma fácil',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w400,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -322,8 +322,8 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF2D3748)
-              : const Color(0xFFE2E8F0),
+              ? LummyColors.steel700
+              : LummyColors.slate200,
           width: 1,
         ),
         boxShadow: [
@@ -343,7 +343,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF10B981), Color(0xFF059669)],
+                    colors: [LummyColors.emerald500, LummyColors.emerald600],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -360,7 +360,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                   children: [
                     Text(
                       'Quanto você precisa?',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 16 : 18,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).textTheme.titleLarge?.color,
@@ -369,7 +369,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                     const SizedBox(height: 4),
                     Text(
                       'Digite o valor que você quer pedir',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 12 : 14,
                         fontWeight: FontWeight.w400,
                         color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -403,8 +403,8 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF2D3748)
-              : const Color(0xFFE2E8F0),
+              ? LummyColors.steel700
+              : LummyColors.slate200,
           width: 1,
         ),
         boxShadow: [
@@ -423,12 +423,12 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                  color: LummyColors.blue500.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.chat_bubble_outline_rounded,
-                  color: Color(0xFF3B82F6),
+                  color: LummyColors.blue500,
                   size: 24,
                 ),
               ),
@@ -439,7 +439,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                   children: [
                     Text(
                       'Por que você precisa?',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 16 : 18,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).textTheme.titleLarge?.color,
@@ -448,7 +448,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                     const SizedBox(height: 4),
                     Text(
                       'Explique o motivo para seus pais',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 12 : 14,
                         fontWeight: FontWeight.w400,
                         color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -466,7 +466,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             minLines: 2,
             decoration: InputDecoration(
               hintText: 'Ex: Para comprar material escolar para a aula de arte...',
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: LummyFonts.body(
                 fontSize: isSmallScreen ? 13 : 14,
                 color: Theme.of(context).textTheme.bodySmall?.color,
               ),
@@ -478,12 +478,12 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide(
                   color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0),
+                      ? LummyColors.slate700
+                      : LummyColors.slate200,
                 ),
               ),
             ),
-            style: GoogleFonts.poppins(fontSize: isSmallScreen ? 14 : 15),
+            style: LummyFonts.body(fontSize: isSmallScreen ? 14 : 15),
           ),
         ],
       ),
@@ -507,14 +507,14 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             : const Icon(Icons.qr_code_2_rounded, size: 24),
         label: Text(
           _isGenerating ? 'Gerando...' : 'Gerar QR Code',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: isSmallScreen ? 16 : 18,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF8B5CF6),
+          backgroundColor: LummyColors.violet500,
           foregroundColor: Colors.white,
           padding: EdgeInsets.symmetric(
             vertical: isSmallScreen ? 16 : 20,
@@ -540,12 +540,12 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED), Color(0xFF6D28D9)],
+            colors: [LummyColors.violet500, LummyColors.violet600, LummyColors.violet700],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
+              color: LummyColors.violet500.withValues(alpha: 0.4),
               blurRadius: 24,
               offset: const Offset(0, 10),
               spreadRadius: -4,
@@ -579,7 +579,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                     children: [
                       Text(
                         'QR Code Gerado',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 18 : 20,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -588,7 +588,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                       const SizedBox(height: 4),
                       Text(
                         'Mostre este código para seu responsável',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 14 : 16,
                           fontWeight: FontWeight.w400,
                           color: Colors.white.withValues(alpha: 0.9),
@@ -620,11 +620,11 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 backgroundColor: Colors.white,
                 eyeStyle: const QrEyeStyle(
                   eyeShape: QrEyeShape.square,
-                  color: Color(0xFF1E293B),
+                  color: LummyColors.slate800,
                 ),
                 dataModuleStyle: const QrDataModuleStyle(
                   dataModuleShape: QrDataModuleShape.square,
-                  color: Color(0xFF1E293B),
+                  color: LummyColors.slate800,
                 ),
                 errorCorrectionLevel: QrErrorCorrectLevel.M,
               ),
@@ -634,7 +634,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
               _currentAmount != null
                   ? 'R\$ ${_currentAmount!.toStringAsFixed(2).replaceAll('.', ',')}'
                   : 'R\$ 0,00',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: isSmallScreen ? 24 : 28,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -643,7 +643,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             const SizedBox(height: 8),
             Text(
               'Valor solicitado',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: isSmallScreen ? 14 : 16,
                 fontWeight: FontWeight.w500,
                 color: Colors.white.withValues(alpha: 0.8),
@@ -663,8 +663,8 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF2D3748)
-              : const Color(0xFFE2E8F0),
+              ? LummyColors.steel700
+              : LummyColors.slate200,
           width: 1,
         ),
       ),
@@ -675,13 +675,13 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             children: [
               const Icon(
                 Icons.link_rounded,
-                color: Color(0xFF3B82F6),
+                color: LummyColors.blue500,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'Link para Compartilhar',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).textTheme.titleMedium?.color,
@@ -694,13 +694,13 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF1E293B).withValues(alpha: 0.5)
-                  : const Color(0xFFF8FAFC),
+                  ? LummyColors.slate800.withValues(alpha: 0.5)
+                  : LummyColors.slate50,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF334155)
-                    : const Color(0xFFE2E8F0),
+                    ? LummyColors.slate700
+                    : LummyColors.slate200,
                 width: 1,
               ),
             ),
@@ -709,7 +709,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 Expanded(
                   child: SelectableText(
                     _generatedLink,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: isSmallScreen ? 12 : 14,
                       fontWeight: FontWeight.w500,
                       color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -722,12 +722,12 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                      color: LummyColors.blue500.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.copy_rounded,
-                      color: Color(0xFF3B82F6),
+                      color: LummyColors.blue500,
                       size: 18,
                     ),
                   ),
@@ -738,7 +738,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
           const SizedBox(height: 12),
           Text(
             'Toque no botão para copiar o link ou selecione o texto',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 11 : 12,
               fontWeight: FontWeight.w400,
               color: Theme.of(context).textTheme.bodySmall?.color,
@@ -778,8 +778,8 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF2D3748)
-              : const Color(0xFFE2E8F0),
+              ? LummyColors.steel700
+              : LummyColors.slate200,
           width: 1,
         ),
       ),
@@ -790,13 +790,13 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             children: [
               const Icon(
                 Icons.lightbulb_outline_rounded,
-                color: Color(0xFFFF8C42),
+                color: LummyColors.brandOrange,
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'Dicas para Pedir Dinheiro',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 16 : 18,
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).textTheme.titleLarge?.color,
@@ -814,7 +814,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF8C42).withValues(alpha: 0.1),
+                      color: LummyColors.brandOrange.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -829,7 +829,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                       children: [
                         Text(
                           tip['title']!,
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: isSmallScreen ? 14 : 16,
                             fontWeight: FontWeight.w600,
                             color: Theme.of(
@@ -840,7 +840,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                         const SizedBox(height: 4),
                         Text(
                           tip['content']!,
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: isSmallScreen ? 12 : 14,
                             fontWeight: FontWeight.w400,
                             color: Theme.of(

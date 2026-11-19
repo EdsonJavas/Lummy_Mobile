@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class LessonItem {
   final String id;
@@ -72,9 +72,9 @@ final List<LessonItem> _allLessons = [
   ),
 ];
 
-const Color _accent = Color(0xFF8B5CF6);
-const Color _accentDark = Color(0xFF7C3AED);
-const Color _green = Color(0xFF10B981);
+const Color _accent = LummyColors.violet500;
+const Color _accentDark = LummyColors.violet600;
+const Color _green = LummyColors.emerald500;
 
 class LessonsScreen extends StatefulWidget {
   const LessonsScreen({super.key});
@@ -123,7 +123,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
       builder: (_) => Container(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? LummyColors.slate800 : Colors.white,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
@@ -135,7 +135,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
             Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                color: isDark ? LummyColors.slate600 : LummyColors.slate300,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -183,13 +183,13 @@ class _LessonsScreenState extends State<LessonsScreen> {
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
           child: Row(
             children: [
-              Icon(icon, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), size: 22),
+              Icon(icon, color: isDark ? LummyColors.slate400 : LummyColors.slate500, size: 22),
               const SizedBox(width: 16),
               Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 15, fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
             ],
@@ -203,16 +203,16 @@ class _LessonsScreenState extends State<LessonsScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        backgroundColor: isDark ? LummyColors.slate800 : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(lesson.title, style: GoogleFonts.poppins(fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : const Color(0xFF1E293B))),
-        content: Text(lesson.description, style: GoogleFonts.poppins(fontSize: 14,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B))),
+        title: Text(lesson.title, style: LummyFonts.body(fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : LummyColors.slate800)),
+        content: Text(lesson.description, style: LummyFonts.body(fontSize: 14,
+            color: isDark ? LummyColors.slate400 : LummyColors.slate500)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Fechar', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: _accent)),
+            child: Text('Fechar', style: LummyFonts.body(fontWeight: FontWeight.w600, color: _accent)),
           ),
         ],
       ),
@@ -225,7 +225,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? LummyColors.slate900 : LummyColors.slate50,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -298,8 +298,8 @@ class _LessonsScreenState extends State<LessonsScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF5B21B6), _accentDark, const Color(0xFF6366F1)]
-              : [_accent, _accentDark, const Color(0xFF6366F1)],
+              ? [LummyColors.violet800, _accentDark, LummyColors.indigo500]
+              : [_accent, _accentDark, LummyColors.indigo500],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(28),
@@ -330,11 +330,11 @@ class _LessonsScreenState extends State<LessonsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Aprender', style: GoogleFonts.poppins(
+                    Text('Aprender', style: LummyFonts.body(
                       fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.5,
                     )),
                     const SizedBox(height: 2),
-                    Text('Educação financeira para você', style: GoogleFonts.poppins(
+                    Text('Educação financeira para você', style: LummyFonts.body(
                       fontSize: 13, fontWeight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.85),
                     )),
                   ],
@@ -372,7 +372,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
         children: [
           Icon(icon, color: Colors.white, size: 16),
           const SizedBox(width: 6),
-          Text(label, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
+          Text(label, style: LummyFonts.body(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white)),
         ],
       ),
     );
@@ -391,7 +391,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
             onTap: () => _openVideo(lesson.youtubeUrl),
             child: Container(
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                color: isDark ? LummyColors.slate800 : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: _accent.withValues(alpha: isDark ? 0.15 : 0.1)),
                 boxShadow: [
@@ -416,7 +416,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                           fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => Container(
                         width: double.infinity, height: 180,
-                            color: isDark ? const Color(0xFF2D2D44) : const Color(0xFFE2E8F0),
+                            color: isDark ? LummyColors.darkNavyHigh : LummyColors.slate200,
                             child: Icon(Icons.play_circle_rounded, color: _accent.withValues(alpha: 0.4), size: 56),
                           ),
                         ),
@@ -439,7 +439,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                         decoration: BoxDecoration(
                           color: _accent, borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(lesson.duration, style: GoogleFonts.poppins(
+                        child: Text(lesson.duration, style: LummyFonts.body(
                           fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white,
                         )),
                       )),
@@ -449,7 +449,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                           gradient: const LinearGradient(colors: [_accent, _accentDark]),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('Em destaque', style: GoogleFonts.poppins(
+                        child: Text('Em destaque', style: LummyFonts.body(
                           fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white,
                         )),
                       )),
@@ -466,17 +466,17 @@ class _LessonsScreenState extends State<LessonsScreen> {
                             children: [
                               Text(
                                 lesson.title,
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: 16, fontWeight: FontWeight.w700,
-                                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                  color: isDark ? Colors.white : LummyColors.slate800,
                                 ),
                                 maxLines: 1, overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 lesson.description,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                style: LummyFonts.body(
+                                  fontSize: 13, color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                                 ),
                                 maxLines: 1, overflow: TextOverflow.ellipsis,
                               ),
@@ -512,7 +512,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
               child: Icon(
                 isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
                 size: 20,
-                color: isSaved ? _accent : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
+                color: isSaved ? _accent : (isDark ? LummyColors.slate500 : LummyColors.slate400),
               ),
             ),
           ),
@@ -526,7 +526,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
               padding: const EdgeInsets.all(6),
               child: Icon(
                 Icons.more_vert_rounded, size: 20,
-                color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                color: isDark ? LummyColors.slate500 : LummyColors.slate400,
               ),
             ),
           ),
@@ -543,9 +543,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 10),
         child: Text(
           title,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 18, fontWeight: FontWeight.w700,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
         ),
       ),
@@ -556,10 +556,10 @@ class _LessonsScreenState extends State<LessonsScreen> {
 
   Widget _buildThemesRow(bool isDark) {
     final themes = [
-      ('Dinheiro', Icons.payments_rounded, const Color(0xFF10B981)),
-      ('Mesada', Icons.savings_rounded, const Color(0xFFF59E0B)),
+      ('Dinheiro', Icons.payments_rounded, LummyColors.emerald500),
+      ('Mesada', Icons.savings_rounded, LummyColors.amber500),
       ('Metas', Icons.flag_rounded, _accent),
-      ('Gastos', Icons.shopping_bag_rounded, const Color(0xFFEF4444)),
+      ('Gastos', Icons.shopping_bag_rounded, LummyColors.red500),
     ];
     return SliverToBoxAdapter(
       child: SizedBox(
@@ -580,7 +580,7 @@ class _LessonsScreenState extends State<LessonsScreen> {
                   child: Container(
                     width: 90,
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      color: isDark ? LummyColors.slate800 : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.15)),
                       boxShadow: [
@@ -604,9 +604,9 @@ class _LessonsScreenState extends State<LessonsScreen> {
                         const SizedBox(height: 8),
                         Text(
                           label,
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 11, fontWeight: FontWeight.w600,
-                            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+                            color: isDark ? LummyColors.slate300 : LummyColors.slate700,
                           ),
                           maxLines: 1, overflow: TextOverflow.ellipsis,
                         ),
@@ -650,7 +650,7 @@ class _VideoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placeholderBg = isDark ? const Color(0xFF2D2D44) : const Color(0xFFE2E8F0);
+    final placeholderBg = isDark ? LummyColors.darkNavyHigh : LummyColors.slate200;
 
     return Material(
       color: Colors.transparent,
@@ -660,12 +660,12 @@ class _VideoCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? LummyColors.slate800 : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isWatched
                   ? _green.withValues(alpha: isDark ? 0.15 : 0.1)
-                  : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+                  : (isDark ? LummyColors.slate800 : LummyColors.slate100),
             ),
             boxShadow: [
               BoxShadow(
@@ -702,7 +702,7 @@ class _VideoCard extends StatelessWidget {
                       color: Colors.black.withValues(alpha: 0.75),
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: Text(lesson.duration, style: GoogleFonts.poppins(
+                    child: Text(lesson.duration, style: LummyFonts.body(
                       fontSize: 10, fontWeight: FontWeight.w600, color: Colors.white,
                     )),
                   )),
@@ -724,17 +724,17 @@ class _VideoCard extends StatelessWidget {
                   children: [
                     Text(
                       lesson.title,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14, fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        color: isDark ? Colors.white : LummyColors.slate800,
                       ),
                       maxLines: 1, overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       lesson.description,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                      style: LummyFonts.body(
+                        fontSize: 12, color: isDark ? LummyColors.slate500 : LummyColors.slate400,
                       ),
                       maxLines: 2, overflow: TextOverflow.ellipsis,
                     ),
@@ -754,14 +754,14 @@ class _VideoCard extends StatelessWidget {
                                   Icon(
                                     isWatchLater ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
                                     size: 15,
-                                    color: isWatchLater ? _accent : (isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1)),
+                                    color: isWatchLater ? _accent : (isDark ? LummyColors.slate600 : LummyColors.slate300),
                                   ),
                                   const SizedBox(width: 3),
                                   Text(
                                     isWatchLater ? 'Salva' : 'Salvar',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       fontSize: 10, fontWeight: FontWeight.w600,
-                                      color: isWatchLater ? _accent : (isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1)),
+                                      color: isWatchLater ? _accent : (isDark ? LummyColors.slate600 : LummyColors.slate300),
                                     ),
                                   ),
                                 ],
@@ -777,7 +777,7 @@ class _VideoCard extends StatelessWidget {
                             onTap: onMore,
                             child: const Padding(
                               padding: EdgeInsets.all(2),
-                              child: Icon(Icons.more_horiz_rounded, size: 18, color: Color(0xFF94A3B8)),
+                              child: Icon(Icons.more_horiz_rounded, size: 18, color: LummyColors.slate400),
                             ),
                           ),
                         ),

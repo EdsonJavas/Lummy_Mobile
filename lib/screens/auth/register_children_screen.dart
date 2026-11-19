@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy/core/constants/app_constants.dart';
 import 'package:lummy/models/responsavel_model.dart';
 import 'package:lummy/screens/parent/parent_subscription_screen.dart';
 import 'package:lummy/di/locator.dart';
 import 'package:lummy/services/family_service.dart';
 import 'package:lummy/domain/repositories/auth_repository.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class RegisterChildrenScreen extends StatefulWidget {
   final Responsavel responsavel;
@@ -32,12 +32,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
   final _ageController = TextEditingController();
 
   // Cores vibrantes - consistentes com o app
-  static const _blue = Color(0xFF3B82F6);
-  static const _purple = Color(0xFF8B5CF6);
-  static const _orange = Color(0xFFF59E0B);
-  static const _green = Color(0xFF10B981);
-  static const _pink = Color(0xFFEC4899);
-  static const _red = Color(0xFFEF4444);
+  static const _blue = LummyColors.blue500;
+  static const _purple = LummyColors.violet500;
+  static const _orange = LummyColors.amber500;
+  static const _green = LummyColors.emerald500;
+  static const _pink = LummyColors.pink500;
+  static const _red = LummyColors.red500;
 
   String _selectedGender = '';
   bool _isPasswordVisible = false;
@@ -125,7 +125,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             ),
             title: Text(
               'Limite do Lummy For You',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
               ),
@@ -133,14 +133,14 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             content: Text(
               'Este plano inclui até ${AppConstants.lummyForYouMaxChildren} dependentes. '
               'Para cadastrar mais filhos, o indicado é o Lummy Pro, com dependentes ilimitados.',
-              style: GoogleFonts.poppins(fontSize: 14, height: 1.4),
+              style: LummyFonts.body(fontSize: 14, height: 1.4),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
                 child: Text(
                   'Entendi',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontWeight: FontWeight.w600,
                     color: _purple,
                   ),
@@ -161,7 +161,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 ),
                 child: Text(
                   'Ver planos',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  style: LummyFonts.body(fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -311,7 +311,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       SnackBar(
         content: Text(
           message,
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+          style: LummyFonts.body(fontWeight: FontWeight.w500),
         ),
         backgroundColor: color,
         behavior: SnackBarBehavior.floating,
@@ -328,8 +328,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+          ? LummyColors.darkMaterial
+          : LummyColors.slate50,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -344,8 +344,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF121212)
-                      : const Color(0xFFF8FAFC),
+                      ? LummyColors.darkMaterial
+                      : LummyColors.slate50,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(32),
                     topRight: Radius.circular(32),
@@ -542,8 +542,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF1E3A5F), Color(0xFF312E81), Color(0xFF4C1D95)]
-              : const [Color(0xFF3B82F6), Color(0xFF8B5CF6), Color(0xFF6366F1)],
+              ? const [LummyColors.navyMuted, LummyColors.indigo900, LummyColors.violet900]
+              : const [LummyColors.blue500, LummyColors.violet500, LummyColors.indigo500],
         ),
       ),
       child: Column(
@@ -572,7 +572,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                   children: [
                     TextSpan(
                       text: 'Lu',
-                      style: GoogleFonts.paytoneOne(
+                      style: LummyFonts.logo(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -580,7 +580,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                     ),
                     TextSpan(
                       text: 'm',
-                      style: GoogleFonts.paytoneOne(
+                      style: LummyFonts.logo(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
                         color: Colors.orange,
@@ -588,15 +588,15 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                     ),
                     TextSpan(
                       text: 'm',
-                      style: GoogleFonts.paytoneOne(
+                      style: LummyFonts.logo(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF003092),
+                        color: LummyColors.brandNavy,
                       ),
                     ),
                     TextSpan(
                       text: 'y',
-                      style: GoogleFonts.paytoneOne(
+                      style: LummyFonts.logo(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -658,7 +658,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           ).createShader(bounds),
           child: Text(
             'Cadastrar Criança',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: Colors.white,
@@ -668,9 +668,9 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         const SizedBox(height: 8),
         Text(
           'Preencha os dados para criar a conta',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 15,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            color: isDark ? LummyColors.slate400 : LummyColors.slate500,
           ),
         ),
       ],
@@ -683,10 +683,10 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       children: [
         Text(
           'Sexo da criança',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
         ),
         const SizedBox(height: 12),
@@ -741,12 +741,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
               : null,
           color: isSelected
               ? null
-              : (isDark ? const Color(0xFF121212) : Colors.white),
+              : (isDark ? LummyColors.darkMaterial : Colors.white),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
                 ? color
-                : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                : (isDark ? LummyColors.slate700 : LummyColors.slate200),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
@@ -785,12 +785,12 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             const SizedBox(height: 12),
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: isSelected
                     ? Colors.white
-                    : (isDark ? Colors.white : const Color(0xFF1E293B)),
+                    : (isDark ? Colors.white : LummyColors.slate800),
               ),
             ),
           ],
@@ -818,19 +818,19 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF121212) : Colors.white,
+            color: isDark ? LummyColors.darkMaterial : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              color: isDark ? LummyColors.slate700 : LummyColors.slate200,
             ),
             boxShadow: [
               BoxShadow(
@@ -846,18 +846,18 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             inputFormatters: inputFormatters,
             obscureText: obscureText,
             textCapitalization: textCapitalization,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
+              color: isDark ? Colors.white : LummyColors.slate800,
             ),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: LummyFonts.body(
                 fontSize: 14,
                 color: isDark
-                    ? const Color(0xFF64748B)
-                    : const Color(0xFF94A3B8),
+                    ? LummyColors.slate500
+                    : LummyColors.slate400,
               ),
               prefixIcon: Container(
                 margin: const EdgeInsets.all(12),
@@ -874,7 +874,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 horizontal: 16,
                 vertical: 16,
               ),
-              errorStyle: GoogleFonts.poppins(fontSize: 11, color: _red),
+              errorStyle: LummyFonts.body(fontSize: 11, color: _red),
             ),
             validator: validator,
           ),
@@ -888,7 +888,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
       width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [_purple, Color(0xFF7C3AED)]),
+        gradient: const LinearGradient(colors: [_purple, LummyColors.violet600]),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -925,7 +925,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                   const SizedBox(width: 10),
                   Text(
                     'Cadastrar Criança',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -945,7 +945,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         icon: const Icon(Icons.add_circle_outline_rounded, color: _blue),
         label: Text(
           'Adicionar outra criança',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             color: _blue,
             fontSize: 15,
             fontWeight: FontWeight.w600,

@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 /// An animated overlay that celebrates a reward/achievement.
 /// Shows confetti-like particles + title/subtitle + bounce animation.
@@ -16,7 +16,7 @@ class RewardCelebration extends StatefulWidget {
     required this.title,
     required this.subtitle,
     this.icon = Icons.emoji_events_rounded,
-    this.color = const Color(0xFFF59E0B),
+    this.color = LummyColors.amber500,
     this.onDismiss,
   });
 
@@ -25,7 +25,7 @@ class RewardCelebration extends StatefulWidget {
     required String title,
     required String subtitle,
     IconData icon = Icons.emoji_events_rounded,
-    Color color = const Color(0xFFF59E0B),
+    Color color = LummyColors.amber500,
   }) {
     return showGeneralDialog(
       context: context,
@@ -90,7 +90,7 @@ class _RewardCelebrationState extends State<RewardCelebration>
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF1E1E2E)
+                  ? LummyColors.darkNavySurface
                   : Colors.white,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
@@ -146,7 +146,7 @@ class _RewardCelebrationState extends State<RewardCelebration>
                 Text(
                   widget.title,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: widget.color,
@@ -156,10 +156,10 @@ class _RewardCelebrationState extends State<RewardCelebration>
                 Text(
                   widget.subtitle,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF64748B),
+                    color: LummyColors.slate500,
                     height: 1.4,
                   ),
                 ),
@@ -179,7 +179,7 @@ class _RewardCelebrationState extends State<RewardCelebration>
                     ),
                     child: Text(
                       'Incrível!',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

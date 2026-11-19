@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/constants/app_constants.dart';
@@ -14,6 +13,7 @@ import 'package:lummy/application/app_facade.dart';
 import 'package:lummy/di/locator.dart';
 import 'package:lummy/domain/repositories/auth_repository.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -425,7 +425,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.topCenter,
-                                colors: [Color(0xFF87CEEB), Color(0xFF4CAF50)],
+                                colors: [LummyColors.skyWeb, LummyColors.materialGreen],
                               ),
                             ),
                           ),
@@ -461,7 +461,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Center(
               child: Text(
                 'Seu Perfil',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -510,7 +510,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF8C42),
+                    color: LummyColors.brandOrange,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 3),
                     boxShadow: [
@@ -535,7 +535,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           )
                         : Text(
                             userLevel.toString(),
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 24,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
@@ -551,7 +551,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         const Icon(
                           Icons.star,
-                          color: Color(0xFFFF8C42),
+                          color: LummyColors.brandOrange,
                           size: 16,
                         ),
                         const SizedBox(width: 4),
@@ -568,7 +568,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               )
                             : Text(
                                 totalPoints.toString(),
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
@@ -578,7 +578,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Text(
                       'PONTOS TOTAIS',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.white.withValues(alpha: 0.9),
@@ -597,7 +597,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 Text(
                   userName,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -633,7 +633,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: Text(
                     userRole,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -656,14 +656,14 @@ class _ProfilePageState extends State<ProfilePage> {
           shaderCallback: (bounds) => LinearGradient(
             colors: Theme.of(context).brightness == Brightness.dark
                 ? [
-                    const Color(0xFF10B981),
-                    const Color(0xFF8B5CF6),
+                    LummyColors.emerald500,
+                    LummyColors.violet500,
                   ] // Verde → Roxo como no site
-                : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                : [LummyColors.slate800, LummyColors.slate800],
           ).createShader(bounds),
           child: Text(
             'Minhas Conquistas',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -678,7 +678,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 'Metas Concluídas',
                 completedGoals.toString(),
                 Icons.flag_rounded,
-                const Color(0xFF8B5CF6),
+                LummyColors.violet500,
               ),
             ),
             const SizedBox(width: 16),
@@ -687,7 +687,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 'Total Economizado',
                 'R\$ ${totalSaved.toStringAsFixed(0)}',
                 Icons.savings_rounded,
-                const Color(0xFF10B981),
+                LummyColors.emerald500,
               ),
             ),
           ],
@@ -730,7 +730,7 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(height: 12),
           Text(
             value,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: color,
@@ -740,7 +740,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -781,14 +781,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   shaderCallback: (bounds) => LinearGradient(
                     colors: Theme.of(context).brightness == Brightness.dark
                         ? [
-                            const Color(0xFFFF8C42),
-                            const Color(0xFFEF4444),
+                            LummyColors.brandOrange,
+                            LummyColors.red500,
                           ] // Laranja → Vermelho como no site
-                        : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                        : [LummyColors.slate800, LummyColors.slate800],
                   ).createShader(bounds),
                   child: Text(
                     'Medalhas Conquistadas',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -805,12 +805,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFF8C42), Color(0xFFFF7A28)],
+                    colors: [LummyColors.brandOrange, LummyColors.brandOrangeMid],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFF8C42).withValues(alpha: 0.3),
+                      color: LummyColors.brandOrange.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -879,7 +879,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                         Text(
                           '$completedCount/$totalCount',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -916,7 +916,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(height: 12),
                         Text(
                           'Nenhuma conquista ainda',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Theme.of(
@@ -927,7 +927,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(height: 4),
                         Text(
                           'Complete missões para desbloquear conquistas!',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 14,
                             color: Theme.of(
                               context,
@@ -980,14 +980,14 @@ class _ProfilePageState extends State<ProfilePage> {
           height: 60,
           decoration: BoxDecoration(
             color: isUnlocked
-                ? const Color(0xFFFF8C42).withValues(alpha: 0.1)
+                ? LummyColors.brandOrange.withValues(alpha: 0.1)
                 : Theme.of(context).brightness == Brightness.dark
                 ? Theme.of(context).colorScheme.surfaceContainerHighest
-                : const Color(0xFFF1F5F9),
+                : LummyColors.slate100,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isUnlocked
-                  ? const Color(0xFFFF8C42).withValues(alpha: 0.3)
+                  ? LummyColors.brandOrange.withValues(alpha: 0.3)
                   : Theme.of(context).dividerColor,
               width: 2,
             ),
@@ -1006,7 +1006,7 @@ class _ProfilePageState extends State<ProfilePage> {
         Text(
           label,
           textAlign: TextAlign.center,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 12,
             fontWeight: FontWeight.w500,
             color: isUnlocked
@@ -1042,14 +1042,14 @@ class _ProfilePageState extends State<ProfilePage> {
             shaderCallback: (bounds) => LinearGradient(
               colors: Theme.of(context).brightness == Brightness.dark
                   ? [
-                      const Color(0xFF3B82F6),
-                      const Color(0xFF10B981),
+                      LummyColors.blue500,
+                      LummyColors.emerald500,
                     ] // Azul → Verde como no site
-                  : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                  : [LummyColors.slate800, LummyColors.slate800],
             ).createShader(bounds),
             child: Text(
               'Configurações',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -1061,7 +1061,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Icons.edit_rounded,
             'Editar Perfil',
             'Altere suas informações pessoais',
-            const Color(0xFF1E40AF),
+            LummyColors.blue800,
             onTap: () async {
               final result = await Navigator.push(
                 context,
@@ -1079,7 +1079,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Icons.notifications_rounded,
             'Notificações',
             'Gerencie suas notificações',
-            const Color(0xFF8B5CF6),
+            LummyColors.violet500,
             onTap: () {
               Navigator.push(
                 context,
@@ -1094,16 +1094,16 @@ class _ProfilePageState extends State<ProfilePage> {
             Icons.help_rounded,
             'Ajuda',
             'Tire suas dúvidas',
-            const Color(0xFF10B981),
+            LummyColors.emerald500,
             onTap: () {
               // TODO: Implementar tela de ajuda
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
                     'Tela de ajuda em desenvolvimento 🚧',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                    style: LummyFonts.body(fontWeight: FontWeight.w500),
                   ),
-                  backgroundColor: const Color(0xFF10B981),
+                  backgroundColor: LummyColors.emerald500,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -1116,7 +1116,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Icons.logout_rounded,
             'Sair',
             'Desconectar da conta',
-            const Color(0xFFEF4444),
+            LummyColors.red500,
             onTap: () async {
               // Mostrar diálogo de confirmação
               final shouldLogout = await showDialog<bool>(
@@ -1124,18 +1124,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 builder: (context) => AlertDialog(
                   title: Text(
                     'Sair da conta?',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    style: LummyFonts.body(fontWeight: FontWeight.w600),
                   ),
                   content: Text(
                     'Tem certeza que deseja sair? Você precisará fazer login novamente.',
-                    style: GoogleFonts.poppins(),
+                    style: LummyFonts.body(),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(false),
                       child: Text(
                         'Cancelar',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           color: Theme.of(context).textTheme.bodyMedium?.color,
                         ),
                       ),
@@ -1144,8 +1144,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: () => Navigator.of(context).pop(true),
                       child: Text(
                         'Sair',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFFEF4444),
+                        style: LummyFonts.body(
+                          color: LummyColors.red500,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1175,9 +1175,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     SnackBar(
                       content: Text(
                         'Erro ao fazer logout: $e',
-                        style: GoogleFonts.poppins(),
+                        style: LummyFonts.body(),
                       ),
-                      backgroundColor: const Color(0xFFEF4444),
+                      backgroundColor: LummyColors.red500,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -1229,7 +1229,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).textTheme.titleMedium?.color,
@@ -1238,7 +1238,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -1273,19 +1273,19 @@ class _ProfilePageState extends State<ProfilePage> {
               end: Alignment.bottomRight,
               colors: isDark
                   ? [
-                      const Color(0xFF8B5CF6), // Roxo
-                      const Color(0xFF7C3AED), // Roxo mais escuro
+                      LummyColors.violet500, // Roxo
+                      LummyColors.violet600, // Roxo mais escuro
                     ]
                   : [
-                      const Color(0xFF3B82F6), // Azul vibrante
-                      const Color(0xFF8B5CF6), // Roxo vibrante
+                      LummyColors.blue500, // Azul vibrante
+                      LummyColors.violet500, // Roxo vibrante
                     ],
             ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color:
-                    (isDark ? const Color(0xFF8B5CF6) : const Color(0xFF3B82F6))
+                    (isDark ? LummyColors.violet500 : LummyColors.blue500)
                         .withValues(alpha: 0.35),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
@@ -1313,7 +1313,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Text(
                       'Tema do App',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -1321,7 +1321,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Text(
                       isDark ? 'Modo escuro' : 'Modo claro',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         color: Colors.white.withValues(alpha: 0.8),
                       ),

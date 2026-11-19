@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentNotificationsScreen extends StatefulWidget {
   const ParentNotificationsScreen({super.key});
@@ -89,10 +89,10 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC);
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final sectionBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final bg = isDark ? LummyColors.darkMaterial : LummyColors.slate50;
+    final titleColor = isDark ? Colors.white : LummyColors.slate900;
+    final sectionBg = isDark ? LummyColors.slate800 : Colors.white;
+    final borderColor = isDark ? LummyColors.slate700 : LummyColors.slate200;
 
     if (_isLoading) {
       return Scaffold(
@@ -102,7 +102,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
           backgroundColor: Colors.transparent,
           title: Text(
             'Notificações',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: titleColor,
@@ -121,7 +121,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
         backgroundColor: Colors.transparent,
         title: Text(
           'Notificações',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: titleColor,
@@ -147,12 +147,12 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                      color: LummyColors.violet500.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.notifications_active_rounded,
-                      color: Color(0xFF8B5CF6),
+                      color: LummyColors.violet500,
                       size: 24,
                     ),
                   ),
@@ -163,7 +163,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
                       children: [
                         Text(
                           'Notificações in-app',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: titleColor,
@@ -171,10 +171,10 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
                         ),
                         Text(
                           'Avisos dentro do app',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
-                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                           ),
                         ),
                       ],
@@ -183,8 +183,8 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
                   Switch(
                     value: _notificationsEnabled,
                     onChanged: _setEnabled,
-                    activeTrackColor: const Color(0xFF8B5CF6).withValues(alpha: 0.5),
-                    activeThumbColor: const Color(0xFF8B5CF6),
+                    activeTrackColor: LummyColors.violet500.withValues(alpha: 0.5),
+                    activeThumbColor: LummyColors.violet500,
                   ),
                 ],
               ),
@@ -192,7 +192,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
             const SizedBox(height: 24),
             Text(
               'Tipos de notificações',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: titleColor,
@@ -203,7 +203,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
               icon: Icons.verified_user_rounded,
               title: 'Aprovações pendentes',
               subtitle: 'Quando um filho pede dinheiro ou faz gasto que exige aprovação',
-              color: const Color(0xFF10B981),
+              color: LummyColors.emerald500,
               value: _approvalsNotifications,
               onChanged: _notificationsEnabled ? _setApprovals : null,
               isDark: isDark,
@@ -215,7 +215,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
               icon: Icons.receipt_long_rounded,
               title: 'Novos gastos',
               subtitle: 'Quando um filho registra um gasto',
-              color: const Color(0xFFF59E0B),
+              color: LummyColors.amber500,
               value: _expensesNotifications,
               onChanged: _notificationsEnabled ? _setExpenses : null,
               isDark: isDark,
@@ -227,7 +227,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
               icon: Icons.flag_rounded,
               title: 'Metas',
               subtitle: 'Progresso e conquistas de metas dos filhos',
-              color: const Color(0xFF8B5CF6),
+              color: LummyColors.violet500,
               value: _goalsNotifications,
               onChanged: _notificationsEnabled ? _setGoals : null,
               isDark: isDark,
@@ -239,7 +239,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
               icon: Icons.payments_rounded,
               title: 'Transferências',
               subtitle: 'Confirmação de envio de dinheiro',
-              color: const Color(0xFF3B82F6),
+              color: LummyColors.blue500,
               value: _transfersNotifications,
               onChanged: _notificationsEnabled ? _setTransfers : null,
               isDark: isDark,
@@ -284,7 +284,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
             ),
             child: Icon(
               icon,
-              color: enabled ? color : const Color(0xFF94A3B8),
+              color: enabled ? color : LummyColors.slate400,
               size: 20,
             ),
           ),
@@ -295,21 +295,21 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: enabled
-                        ? (isDark ? Colors.white : const Color(0xFF1E293B))
-                        : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                        ? (isDark ? Colors.white : LummyColors.slate800)
+                        : (isDark ? LummyColors.slate400 : LummyColors.slate500),
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                   ),
                 ),
               ],

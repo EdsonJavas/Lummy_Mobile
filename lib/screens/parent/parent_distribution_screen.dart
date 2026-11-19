@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'package:lummy/application/app_facade.dart';
@@ -15,6 +14,7 @@ import 'package:lummy/features/parent/presentation/widgets/allowance_distributio
 import 'package:lummy/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
 import 'package:lummy/screens/parent/parent_qr_payment_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentDistributionScreen extends StatefulWidget {
   const ParentDistributionScreen({super.key});
@@ -26,10 +26,10 @@ class ParentDistributionScreen extends StatefulWidget {
 
 class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
   // Paleta de cores - laranja vibrante
-  static const _orange = Color(0xFFF59E0B);
-  static const _amber = Color(0xFFD97706);
-  static const _blue = Color(0xFF3B82F6);
-  static const _purple = Color(0xFF8B5CF6);
+  static const _orange = LummyColors.amber500;
+  static const _amber = LummyColors.amber600;
+  static const _blue = LummyColors.blue500;
+  static const _purple = LummyColors.violet500;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +37,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+          ? LummyColors.darkMaterial
+          : LummyColors.slate50,
       body: BrandedRefreshIndicator(
         onRefresh: () => context.read<ParentDashboardCubit>().refresh(),
         color: _orange,
@@ -82,23 +82,23 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                             const SizedBox(height: 24),
                             Text(
                               'Sem filhos cadastrados',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: isDark
                                     ? Colors.white
-                                    : const Color(0xFF1E293B),
+                                    : LummyColors.slate800,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Cadastre pelo menos um filho para poder enviar dinheiro.',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 14,
                                 color: isDark
-                                    ? const Color(0xFF94A3B8)
-                                    : const Color(0xFF64748B),
+                                    ? LummyColors.slate400
+                                    : LummyColors.slate500,
                               ),
                             ),
                           ],
@@ -151,8 +151,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF422006), Color(0xFF78350F), Color(0xFF92400E)]
-              : const [Color(0xFFF59E0B), Color(0xFFD97706), Color(0xFFB45309)],
+              ? const [LummyColors.yellow950, LummyColors.amber900, LummyColors.amber800]
+              : const [LummyColors.amber500, LummyColors.amber600, LummyColors.amber700],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
@@ -190,7 +190,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   children: [
                     Text(
                       'Enviar Dinheiro',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -198,7 +198,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     ),
                     Text(
                       'Distribua recursos para seus filhos',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Colors.white.withValues(alpha: 0.85),
@@ -242,7 +242,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     const SizedBox(width: 12),
                     Text(
                       'Saldo Disponível para Envio',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Colors.white.withValues(alpha: 0.9),
@@ -256,7 +256,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     AppFormatters.formatCurrency(state.walletBalance),
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 36,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -284,7 +284,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF1E293B), const Color(0xFF312E81)]
+              ? [LummyColors.slate800, LummyColors.indigo900]
               : [_blue.withValues(alpha: 0.1), _purple.withValues(alpha: 0.1)],
         ),
         borderRadius: BorderRadius.circular(24),
@@ -323,19 +323,19 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   children: [
                     Text(
                       'Escanear QR Code',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        color: isDark ? Colors.white : LummyColors.slate800,
                       ),
                     ),
                     Text(
                       'Seu filho pediu dinheiro? Escaneie!',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.slate400
+                            : LummyColors.slate500,
                       ),
                     ),
                   ],
@@ -380,7 +380,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                           const SizedBox(width: 8),
                           Text(
                             'Escanear',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -426,7 +426,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                               'Digitar código',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: _purple,
@@ -459,7 +459,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
       builder: (sheetContext) => Container(
         height: MediaQuery.of(sheetContext).size.height * 0.85,
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? LummyColors.slate800 : Colors.white,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(32),
             topRight: Radius.circular(32),
@@ -472,7 +472,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF64748B) : Colors.black12,
+                color: isDark ? LummyColors.slate500 : Colors.black12,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -499,21 +499,21 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                       children: [
                         Text(
                           'Escanear QR Code',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF1E293B),
+                                : LummyColors.slate800,
                           ),
                         ),
                         Text(
                           'Aponte a câmera para o QR Code',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 13,
                             color: isDark
-                                ? const Color(0xFFCBD5E1)
-                                : const Color(0xFF64748B),
+                                ? LummyColors.slate300
+                                : LummyColors.slate500,
                           ),
                         ),
                       ],
@@ -523,7 +523,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     onPressed: () => Navigator.pop(sheetContext),
                     icon: Icon(
                       Icons.close_rounded,
-                      color: isDark ? const Color(0xFFCBD5E1) : Colors.black45,
+                      color: isDark ? LummyColors.slate300 : Colors.black45,
                     ),
                   ),
                 ],
@@ -558,11 +558,11 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               child: Text(
                 'Posicione o QR Code dentro da área de leitura',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
                   color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
+                      ? LummyColors.slate400
+                      : LummyColors.slate500,
                 ),
               ),
             ),
@@ -593,8 +593,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? const [Color(0xFF334155), Color(0xFF1E293B)]
-                  : const [Colors.white, Color(0xFFF8FAFC)],
+                  ? const [LummyColors.slate700, LummyColors.slate800]
+                  : const [Colors.white, LummyColors.slate50],
             ),
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(32),
@@ -602,8 +602,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
             ),
             border: Border.all(
               color: isDark
-                  ? const Color(0xFF475569)
-                  : const Color(0xFFE2E8F0),
+                  ? LummyColors.slate600
+                  : LummyColors.slate200,
             ),
           ),
           child: Column(
@@ -613,7 +613,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF64748B) : Colors.black12,
+                  color: isDark ? LummyColors.slate500 : Colors.black12,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -635,48 +635,48 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               const SizedBox(height: 16),
               Text(
                 'Digite o código',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Cole o código que seu filho compartilhou',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
                   color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
+                      ? LummyColors.slate400
+                      : LummyColors.slate500,
                 ),
               ),
               const SizedBox(height: 24),
               TextField(
                 controller: controller,
                 autofocus: true,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 16,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
                 decoration: InputDecoration(
                   hintText: 'Ex: LUMMY-ABC123',
-                  hintStyle: GoogleFonts.poppins(
+                  hintStyle: LummyFonts.body(
                     color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF94A3B8),
+                        ? LummyColors.slate400
+                        : LummyColors.slate400,
                   ),
                   filled: true,
                   fillColor: isDark
-                      ? const Color(0xFF1E293B)
-                      : const Color(0xFFF1F5F9),
+                      ? LummyColors.slate800
+                      : LummyColors.slate100,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide(
                       color: isDark
-                          ? const Color(0xFF475569)
-                          : const Color(0xFFE2E8F0),
+                          ? LummyColors.slate600
+                          : LummyColors.slate200,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
@@ -686,8 +686,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   prefixIcon: Icon(
                     Icons.code_rounded,
                     color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF94A3B8),
+                        ? LummyColors.slate400
+                        : LummyColors.slate400,
                   ),
                   prefixIconConstraints: const BoxConstraints(
                     minWidth: 44,
@@ -745,7 +745,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                       child: Center(
                         child: Text(
                           'Processar código',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -852,9 +852,9 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
       SnackBar(
         content: Text(
           'Código inválido. Use o QR Code gerado pelo app do filho.',
-          style: GoogleFonts.poppins(),
+          style: LummyFonts.body(),
         ),
-        backgroundColor: const Color(0xFFEF4444),
+        backgroundColor: LummyColors.red500,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -875,12 +875,12 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF334155), Color(0xFF1E293B)]
-              : const [Colors.white, Color(0xFFFFFBF5)],
+              ? const [LummyColors.slate700, LummyColors.slate800]
+              : const [Colors.white, LummyColors.cream],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF475569) : _orange.withValues(alpha: 0.14),
+          color: isDark ? LummyColors.slate600 : _orange.withValues(alpha: 0.14),
           width: 1.2,
         ),
         boxShadow: [
@@ -917,19 +917,19 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   children: [
                   Text(
                     'Envio Rápido',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: isDark ? Colors.white : LummyColors.slate800,
                     ),
                   ),
                   Text(
                     'Selecione um valor pré-definido',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 13.5,
                       color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                          ? LummyColors.slate400
+                          : LummyColors.slate500,
                     ),
                   ),
                   ],
@@ -1026,7 +1026,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
             children: [
               Text(
                 AppFormatters.formatCurrency(amount),
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 19,
                   fontWeight: FontWeight.w700,
                   color: color,
@@ -1035,12 +1035,12 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               const SizedBox(height: 4),
               Text(
                 'Enviar',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
+                      ? LummyColors.slate400
+                      : LummyColors.slate500,
                 ),
               ),
             ],
@@ -1107,7 +1107,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         return Container(
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? LummyColors.slate800 : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -1116,10 +1116,10 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
             children: [
               Text(
                 'Envio rápido ${AppFormatters.formatCurrency(amount)}',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
               const SizedBox(height: 12),

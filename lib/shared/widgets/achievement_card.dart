@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../domain/entities/achievement_entity.dart';
 import 'custom_card.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class AchievementCard extends StatelessWidget {
   final AchievementEntity achievement;
@@ -33,7 +33,7 @@ class AchievementCard extends StatelessWidget {
       onTap: onTap,
       style: CardStyle.filled,
       color: achievement.isCompleted
-          ? const Color(AppConstants.successGreen).withValues(alpha: 0.05)
+          ? LummyColors.emerald500.withValues(alpha: 0.05)
           : null,
       padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
       child: Row(
@@ -43,13 +43,13 @@ class AchievementCard extends StatelessWidget {
             height: isSmallScreen ? 40 : 48,
             decoration: BoxDecoration(
               color: achievement.isCompleted
-                  ? const Color(AppConstants.successGreen).withValues(alpha: 0.1)
-                  : const Color(AppConstants.backgroundGray),
+                  ? LummyColors.emerald500.withValues(alpha: 0.1)
+                  : LummyColors.offWhite,
               borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
               border: Border.all(
                 color: achievement.isCompleted
-                    ? const Color(AppConstants.successGreen).withValues(alpha: 0.3)
-                    : const Color(AppConstants.borderLight),
+                    ? LummyColors.emerald500.withValues(alpha: 0.3)
+                    : LummyColors.slate200,
                 width: 1,
               ),
             ),
@@ -67,12 +67,12 @@ class AchievementCard extends StatelessWidget {
               children: [
                 Text(
                   achievement.title,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.w600,
                     color: achievement.isCompleted
-                        ? const Color(AppConstants.textPrimary)
-                        : const Color(AppConstants.textSecondary),
+                        ? LummyColors.slate800
+                        : LummyColors.slate500,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -80,10 +80,10 @@ class AchievementCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   achievement.description,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 12 : 14,
                     fontWeight: FontWeight.w400,
-                    color: const Color(AppConstants.textSecondary),
+                    color: LummyColors.slate500,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -95,7 +95,7 @@ class AchievementCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(4),
               decoration: const BoxDecoration(
-                color: Color(AppConstants.successGreen),
+                color: LummyColors.emerald500,
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.check, color: Colors.white, size: 16),
@@ -110,7 +110,7 @@ class AchievementCard extends StatelessWidget {
       onTap: onTap,
       style: CardStyle.filled,
       color: achievement.isCompleted
-          ? const Color(AppConstants.successGreen).withValues(alpha: 0.05)
+          ? LummyColors.emerald500.withValues(alpha: 0.05)
           : null,
       padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
       child: Column(
@@ -121,13 +121,13 @@ class AchievementCard extends StatelessWidget {
             height: isSmallScreen ? 60 : 80,
             decoration: BoxDecoration(
               color: achievement.isCompleted
-                  ? const Color(AppConstants.successGreen).withValues(alpha: 0.1)
-                  : const Color(AppConstants.backgroundGray),
+                  ? LummyColors.emerald500.withValues(alpha: 0.1)
+                  : LummyColors.offWhite,
               borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
               border: Border.all(
                 color: achievement.isCompleted
-                    ? const Color(AppConstants.successGreen).withValues(alpha: 0.3)
-                    : const Color(AppConstants.borderLight),
+                    ? LummyColors.emerald500.withValues(alpha: 0.3)
+                    : LummyColors.slate200,
                 width: 2,
               ),
             ),
@@ -143,12 +143,12 @@ class AchievementCard extends StatelessWidget {
           Text(
             achievement.title,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 16 : 18,
               fontWeight: FontWeight.w700,
               color: achievement.isCompleted
-                  ? const Color(AppConstants.textPrimary)
-                  : const Color(AppConstants.textSecondary),
+                  ? LummyColors.slate800
+                  : LummyColors.slate500,
             ),
           ),
           const SizedBox(height: AppConstants.spacingSmall),
@@ -156,10 +156,10 @@ class AchievementCard extends StatelessWidget {
           Text(
             achievement.description,
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 13 : 14,
               fontWeight: FontWeight.w400,
-              color: const Color(AppConstants.textSecondary),
+              color: LummyColors.slate500,
             ),
           ),
           // Pontos
@@ -168,7 +168,7 @@ class AchievementCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(AppConstants.accentOrange).withValues(alpha: 0.1),
+                color: LummyColors.brandOrange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppConstants.radiusFull),
               ),
               child: Row(
@@ -177,15 +177,15 @@ class AchievementCard extends StatelessWidget {
                   const Icon(
                     Icons.star,
                     size: 16,
-                    color: Color(AppConstants.accentOrange),
+                    color: LummyColors.brandOrange,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     '${achievement.points} pontos',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: const Color(AppConstants.accentOrange),
+                      color: LummyColors.brandOrange,
                     ),
                   ),
                 ],
@@ -198,7 +198,7 @@ class AchievementCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(AppConstants.successGreen),
+                color: LummyColors.emerald500,
                 borderRadius: BorderRadius.circular(AppConstants.radiusFull),
               ),
               child: Row(
@@ -208,7 +208,7 @@ class AchievementCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     'Conquistado!',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,

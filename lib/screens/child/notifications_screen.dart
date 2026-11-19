@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -25,7 +25,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         centerTitle: true,
         title: Text(
           'Notificações',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -67,12 +67,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+                          color: LummyColors.violet500.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
                           Icons.notifications_active,
-                          color: Color(0xFF8B5CF6),
+                          color: LummyColors.violet500,
                           size: 24,
                         ),
                       ),
@@ -83,7 +83,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           children: [
                             Text(
                               'Notificações Gerais',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Theme.of(
@@ -93,7 +93,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             ),
                             Text(
                               'Ativar ou desativar todas',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                                 color: Theme.of(
@@ -117,7 +117,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             }
                           });
                         },
-                        activeThumbColor: const Color(0xFF8B5CF6),
+                        activeThumbColor: LummyColors.violet500,
                       ),
                     ],
                   ),
@@ -129,12 +129,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ShaderMask(
               shaderCallback: (bounds) => LinearGradient(
                 colors: Theme.of(context).brightness == Brightness.dark
-                    ? [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)]
-                    : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                    ? [LummyColors.violet500, LummyColors.blue500]
+                    : [LummyColors.slate800, LummyColors.slate800],
               ).createShader(bounds),
               child: Text(
                 'Tipos de Notificações',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -146,7 +146,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               icon: Icons.flag_outlined,
               title: 'Metas',
               subtitle: 'Avisos sobre progresso das metas',
-              color: const Color(0xFF3B82F6),
+              color: LummyColors.blue500,
               value: _goalsNotifications,
               onChanged: _notificationsEnabled
                   ? (value) {
@@ -161,7 +161,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               icon: Icons.emoji_events_outlined,
               title: 'Conquistas',
               subtitle: 'Quando você ganhar uma medalha',
-              color: const Color(0xFFF59E0B),
+              color: LummyColors.amber500,
               value: _achievementsNotifications,
               onChanged: _notificationsEnabled
                   ? (value) {
@@ -176,7 +176,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               icon: Icons.lightbulb_outline,
               title: 'Dicas Diárias',
               subtitle: 'Receba dicas de educação financeira',
-              color: const Color(0xFF8B5CF6),
+              color: LummyColors.violet500,
               value: _tipsNotifications,
               onChanged: _notificationsEnabled
                   ? (value) {
@@ -191,7 +191,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               icon: Icons.family_restroom,
               title: 'Mensagens dos Pais',
               subtitle: 'Avisos e mensagens importantes',
-              color: const Color(0xFF10B981),
+              color: LummyColors.emerald500,
               value: _parentMessagesNotifications,
               onChanged: _notificationsEnabled
                   ? (value) {
@@ -227,7 +227,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ? color.withValues(alpha: 0.2)
               : Theme.of(context).brightness == Brightness.dark
               ? Theme.of(context).dividerColor
-              : const Color(0xFFE2E8F0),
+              : LummyColors.slate200,
           width: 1,
         ),
         boxShadow: [
@@ -248,7 +248,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             child: Icon(
               icon,
-              color: isEnabled ? color : const Color(0xFF94A3B8),
+              color: isEnabled ? color : LummyColors.slate400,
               size: 20,
             ),
           ),
@@ -259,7 +259,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: isEnabled
@@ -270,7 +270,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: Theme.of(context).textTheme.bodyMedium?.color,

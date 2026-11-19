@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy/core/constants/app_constants.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentSubscriptionScreen extends StatefulWidget {
   const ParentSubscriptionScreen({super.key});
@@ -28,17 +28,17 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subtitleColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final titleColor = isDark ? Colors.white : LummyColors.slate900;
+    final subtitleColor = isDark ? LummyColors.slate400 : LummyColors.slate500;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? LummyColors.darkMaterial : LummyColors.slate50,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: Text(
           'Assinatura',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: titleColor,
@@ -56,12 +56,12 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                  color: LummyColors.violet500.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.card_membership_rounded,
-                  color: Color(0xFF8B5CF6),
+                  color: LummyColors.violet500,
                   size: 22,
                 ),
               ),
@@ -69,7 +69,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
               Expanded(
                 child: Text(
                   'Escolha o plano ideal para sua família',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     color: titleColor,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -83,7 +83,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
           const SizedBox(height: 8),
           Text(
             'Altere quando quiser. Cancele sem multa.',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               color: subtitleColor,
               fontSize: 13,
               fontWeight: FontWeight.w400,
@@ -100,7 +100,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
               'Todas as funcionalidades de controle',
               'Missões, aprovações e gestão completa',
             ],
-            gradient: const [Color(0xFF7C3AED), Color(0xFF3B82F6)],
+            gradient: const [LummyColors.violet600, LummyColors.blue500],
             isDark: isDark,
           ),
           const SizedBox(height: 16),
@@ -110,7 +110,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
             badge: 'Seu plano atual',
             priceLabel: '${_formatPrice(_forYouPrice)}/mês',
             features: _lummyForYouFeatures,
-            gradient: const [Color(0xFFF59E0B), Color(0xFFFB7185)],
+            gradient: const [LummyColors.amber500, LummyColors.rose400],
             isDark: isDark,
             footer: _buildChildrenSelector(isDark, titleColor, subtitleColor),
           ),
@@ -118,10 +118,10 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)).withValues(alpha: 0.8),
+              color: (isDark ? LummyColors.slate800 : LummyColors.slate100).withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                color: isDark ? LummyColors.slate700 : LummyColors.slate200,
               ),
             ),
             child: Row(
@@ -130,13 +130,13 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                 const Icon(
                   Icons.lightbulb_outline_rounded,
                   size: 18,
-                  color: Color(0xFFF59E0B),
+                  color: LummyColors.amber500,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Lummy For You inclui até ${AppConstants.lummyForYouMaxChildren} filhos. Do 4º em diante, o Lummy Pro é o plano certo.',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       color: subtitleColor,
                       fontSize: 12,
                       height: 1.4,
@@ -160,13 +160,13 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFF59E0B).withValues(alpha: isDark ? 0.2 : 0.12),
-            const Color(0xFFFB7185).withValues(alpha: isDark ? 0.12 : 0.06),
+            LummyColors.amber500.withValues(alpha: isDark ? 0.2 : 0.12),
+            LummyColors.rose400.withValues(alpha: isDark ? 0.12 : 0.06),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFF59E0B).withValues(alpha: isDark ? 0.35 : 0.25),
+          color: LummyColors.amber500.withValues(alpha: isDark ? 0.35 : 0.25),
         ),
       ),
       child: Row(
@@ -174,12 +174,12 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
+              color: LummyColors.amber500.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.check_circle_rounded,
-              color: Color(0xFFF59E0B),
+              color: LummyColors.amber500,
               size: 24,
             ),
           ),
@@ -191,7 +191,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
               children: [
                 Text(
                   'Seu plano atual',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: subtitleColor,
@@ -205,7 +205,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Lummy For You · ${_formatPrice(_forYouPrice)}/mês',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: titleColor,
@@ -226,10 +226,10 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
       margin: const EdgeInsets.only(top: 14),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+        color: isDark ? LummyColors.slate800 : LummyColors.slate50,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          color: isDark ? LummyColors.slate700 : LummyColors.slate200,
         ),
       ),
       child: Column(
@@ -237,7 +237,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
         children: [
           Text(
             'Quantidade de filhos: $_childrenCount',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               color: titleColor,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -245,9 +245,9 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: const Color(0xFFF59E0B),
-              inactiveTrackColor: const Color(0xFFF59E0B).withValues(alpha: 0.2),
-              thumbColor: const Color(0xFFF59E0B),
+              activeTrackColor: LummyColors.amber500,
+              inactiveTrackColor: LummyColors.amber500.withValues(alpha: 0.2),
+              thumbColor: LummyColors.amber500,
             ),
             child: Slider(
               value: _childrenCount.toDouble(),
@@ -262,7 +262,7 @@ class _ParentSubscriptionScreenState extends State<ParentSubscriptionScreen> {
           ),
           Text(
             'Plano For You: no máximo ${AppConstants.lummyForYouMaxChildren} filhos. Base R\$ 19,90 + R\$ 9,90 por filho.',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               color: subtitleColor,
               fontSize: 11,
             ),
@@ -324,10 +324,10 @@ class _PlanCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     title,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: isDark ? Colors.white : LummyColors.slate800,
                     ),
                     maxLines: 1,
                   ),
@@ -345,10 +345,10 @@ class _PlanCard extends StatelessWidget {
                     ),
                     child: Text(
                       badge,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        color: isDark ? Colors.white : LummyColors.slate800,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -361,9 +361,9 @@ class _PlanCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 13,
-              color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF475569),
+              color: isDark ? LummyColors.slate200 : LummyColors.slate600,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -374,10 +374,10 @@ class _PlanCard extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               priceLabel,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                color: isDark ? Colors.white : LummyColors.slate800,
               ),
               maxLines: 1,
             ),
@@ -392,16 +392,16 @@ class _PlanCard extends StatelessWidget {
                   const Icon(
                     Icons.check_circle_rounded,
                     size: 18,
-                    color: Color(0xFF10B981),
+                    color: LummyColors.emerald500,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       feature,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         height: 1.35,
-                        color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF475569),
+                        color: isDark ? LummyColors.slate200 : LummyColors.slate600,
                       ),
                     ),
                   ),

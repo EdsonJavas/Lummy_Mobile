@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/constants/app_constants.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
@@ -9,6 +8,7 @@ import 'package:lummy/screens/parent/parent_subscription_screen.dart';
 import 'package:lummy/screens/parent/parent_edit_profile_screen.dart';
 import 'package:lummy/screens/parent/parent_change_password_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentProfileScreen extends StatefulWidget {
   const ParentProfileScreen({super.key});
@@ -32,11 +32,11 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
       'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png';
 
   // Paleta de cores vibrantes
-  static const _blue = Color(0xFF3B82F6);
-  static const _purple = Color(0xFF8B5CF6);
-  static const _green = Color(0xFF10B981);
-  static const _orange = Color(0xFFF59E0B);
-  static const _pink = Color(0xFFEC4899);
+  static const _blue = LummyColors.blue500;
+  static const _purple = LummyColors.violet500;
+  static const _green = LummyColors.emerald500;
+  static const _orange = LummyColors.amber500;
+  static const _pink = LummyColors.pink500;
 
   @override
   void initState() {
@@ -151,8 +151,8 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     if (_isLoadingStats) {
       return Scaffold(
         backgroundColor: isDark
-            ? const Color(0xFF121212)
-            : const Color(0xFFF8FAFC),
+            ? LummyColors.darkMaterial
+            : LummyColors.slate50,
         body: const Center(child: BrandedLoader(label: 'Carregando perfil...')),
       );
     }
@@ -162,8 +162,8 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+          ? LummyColors.darkMaterial
+          : LummyColors.slate50,
       body: BrandedRefreshIndicator(
         onRefresh: _refreshData,
         color: _purple,
@@ -212,8 +212,8 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF1E1B4B), Color(0xFF312E81), Color(0xFF4C1D95)]
-              : const [Color(0xFF7C3AED), Color(0xFF8B5CF6), Color(0xFFA78BFA)],
+              ? const [LummyColors.indigo950, LummyColors.indigo900, LummyColors.violet900]
+              : const [LummyColors.violet600, LummyColors.violet500, LummyColors.violet400],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
@@ -276,7 +276,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                     const Expanded(child: SizedBox()),
                     Text(
                       'Meu Perfil',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -354,7 +354,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               userName,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
@@ -373,7 +373,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                               Flexible(
                                 child: Text(
                                   userEmail,
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 13,
                                     color: Colors.white.withValues(alpha: 0.85),
                                   ),
@@ -404,7 +404,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                                 const SizedBox(width: 4),
                                 Text(
                                   'Responsável',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
@@ -490,7 +490,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           fit: BoxFit.scaleDown,
           child: Text(
             value,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: Colors.white,
@@ -499,7 +499,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
         ),
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 10,
             fontWeight: FontWeight.w500,
             color: Colors.white.withValues(alpha: 0.8),
@@ -513,7 +513,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF121212) : Colors.white,
+        color: isDark ? LummyColors.darkMaterial : Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -543,10 +543,10 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Resumo da Família',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
             ],
@@ -618,20 +618,20 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           fit: BoxFit.scaleDown,
           child: Text(
             value,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
+              color: isDark ? Colors.white : LummyColors.slate800,
             ),
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            color: isDark ? LummyColors.slate400 : LummyColors.slate500,
           ),
         ),
       ],
@@ -651,7 +651,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [_purple, Color(0xFF7C3AED)],
+              colors: [_purple, LummyColors.violet600],
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
@@ -683,7 +683,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                   children: [
                     Text(
                       'Adicionar Filho',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -692,7 +692,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                     const SizedBox(height: 4),
                     Text(
                       'Cadastre um novo dependente',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         color: Colors.white.withValues(alpha: 0.85),
@@ -750,10 +750,10 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Ações Rápidas',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
             ],
@@ -802,7 +802,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF121212) : Colors.white,
+            color: isDark ? LummyColors.darkMaterial : Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: color.withValues(alpha: isDark ? 0.3 : 0.2)),
           ),
@@ -813,10 +813,10 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               const SizedBox(width: 8),
               Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
             ],
@@ -876,30 +876,30 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                   children: [
                     Text(
                       'Plano atual',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.slate400
+                            : LummyColors.slate500,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Lummy For You',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        color: isDark ? Colors.white : LummyColors.slate800,
                       ),
                     ),
                     Text(
                       'Até ${AppConstants.lummyForYouMaxChildren} filhos · proporcional',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.slate400
+                            : LummyColors.slate500,
                       ),
                     ),
                   ],
@@ -909,8 +909,8 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                 Icons.arrow_forward_ios_rounded,
                 size: 16,
                 color: isDark
-                    ? const Color(0xFF94A3B8)
-                    : const Color(0xFF64748B),
+                    ? LummyColors.slate400
+                    : LummyColors.slate500,
               ),
             ],
           ),
@@ -927,7 +927,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF121212) : Colors.white,
+        color: isDark ? LummyColors.darkMaterial : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -953,10 +953,10 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 'Sua conta',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
             ],
@@ -989,7 +989,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
+        Icon(icon, size: 18, color: isDark ? LummyColors.slate500 : LummyColors.slate400),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -997,19 +997,19 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             children: [
               Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
             ],
@@ -1059,7 +1059,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             const SizedBox(width: 12),
             Text(
               'Em desenvolvimento',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              style: LummyFonts.body(fontWeight: FontWeight.w600),
             ),
           ],
         ),

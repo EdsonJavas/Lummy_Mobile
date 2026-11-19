@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy/core/constants/app_constants.dart';
 import 'package:lummy/core/utils/formatters.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
@@ -10,6 +9,7 @@ import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_state.d
 import 'package:lummy/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
 import 'package:lummy/screens/parent/parent_profile_screen.dart';
 import 'package:lummy/screens/parent/parent_insights_screen.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentDashboardScreen extends StatefulWidget {
   final String parentId;
@@ -36,12 +36,12 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   bool _balanceVisible = true;
 
   // Paleta de cores vibrantes - consistente com versão infantil
-  static const _primaryBlue = Color(0xFF3B82F6);
-  static const _deepBlue = Color(0xFF1E40AF);
-  static const _purple = Color(0xFF8B5CF6);
-  static const _orange = Color(0xFFF59E0B);
-  static const _green = Color(0xFF10B981);
-  static const _red = Color(0xFFEF4444);
+  static const _primaryBlue = LummyColors.blue500;
+  static const _deepBlue = LummyColors.blue800;
+  static const _purple = LummyColors.violet500;
+  static const _orange = LummyColors.amber500;
+  static const _green = LummyColors.emerald500;
+  static const _red = LummyColors.red500;
 
   // Extrai o primeiro nome do usuário
   String _getFirstName(String? fullName) {
@@ -171,7 +171,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 if (state.isLoading)
                   Positioned.fill(
                     child: Container(
-                      color: (isDark ? const Color(0xFF121212) : Colors.white)
+                      color: (isDark ? LummyColors.darkMaterial : Colors.white)
                           .withValues(alpha: 0.85),
                       child: const Center(
                         child: BrandedLoader(
@@ -204,8 +204,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF1E1B4B), Color(0xFF312E81), Color(0xFF4C1D95)]
-              : const [Color(0xFF7C3AED), Color(0xFF8B5CF6), Color(0xFFA78BFA)],
+              ? const [LummyColors.indigo950, LummyColors.indigo900, LummyColors.violet900]
+              : const [LummyColors.violet600, LummyColors.violet500, LummyColors.violet400],
         ),
       ),
       child: Stack(
@@ -275,7 +275,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 children: [
                                   Text(
                                     'Olá, ',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       fontSize: 26,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
@@ -283,11 +283,11 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                   ),
                                   ShaderMask(
                                     shaderCallback: (bounds) => const LinearGradient(
-                                      colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
+                                      colors: [LummyColors.amber400, LummyColors.amber500],
                                     ).createShader(bounds),
                                     child: Text(
                                       _getFirstName(state.parentName),
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: 26,
                                         fontWeight: FontWeight.w700,
                                         color: Colors.white,
@@ -300,7 +300,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             const SizedBox(height: 6),
                             Text(
                               'Gerencie as finanças da família',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.white.withValues(alpha: 0.85),
@@ -395,7 +395,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     Expanded(
                       child: Text(
                         'Saldo da Família (Responsável)',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                           color: Colors.white.withValues(alpha: 0.9),
@@ -415,7 +415,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       ),
                       child: Text(
                         'Disponível',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: Colors.white.withValues(alpha: 0.9),
@@ -439,7 +439,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           balanceVisible
                               ? AppFormatters.formatCurrency(state.walletBalance)
                               : 'R\$ •••••••',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 38,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -471,7 +471,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Diminui ao enviar para os filhos',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
                     color: Colors.white.withValues(alpha: 0.85),
@@ -507,7 +507,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           ).createShader(bounds),
           child: Text(
             title,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 22,
               fontWeight: FontWeight.w700,
               color: Colors.white,
@@ -518,10 +518,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B),
+              color: isDark ? LummyColors.slate300 : LummyColors.slate500,
             ),
           ),
         ],
@@ -535,19 +535,19 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
     bool isDark,
   ) {
     final titleColor =
-        isDark ? Colors.white : const Color(0xFF0F172A);
+        isDark ? Colors.white : LummyColors.slate900;
     final subtitleColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final cardBg = isDark ? const Color(0xFF1A1A2E) : Colors.white;
+        isDark ? LummyColors.slate400 : LummyColors.slate500;
+    final cardBg = isDark ? LummyColors.darkNavy : Colors.white;
     final borderColor =
-        isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0);
+        isDark ? LummyColors.darkSurfaceHigh : LummyColors.slate200;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Metas dos filhos',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: titleColor,
@@ -587,7 +587,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     children: [
                       Text(
                         summary.childName,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: titleColor,
@@ -612,7 +612,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           const SizedBox(width: 8),
                           Text(
                             '${(progress * 100).toInt()}%',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: _green,
@@ -623,7 +623,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                       const SizedBox(height: 2),
                       Text(
                         '${summary.completedGoals}/${summary.totalGoals} metas concluídas',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 11,
                           color: subtitleColor,
                         ),
@@ -687,7 +687,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 ),
                 child: const Icon(
                   Icons.insights_rounded,
-                  color: Color(0xFF8B5CF6),
+                  color: LummyColors.violet500,
                   size: 24,
                 ),
               ),
@@ -698,20 +698,20 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   children: [
                     Text(
                       'Insights e Desempenho',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        color: isDark ? Colors.white : LummyColors.slate800,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'Gráficos detalhados de receitas e gastos',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.slate400
+                            : LummyColors.slate500,
                       ),
                     ),
                   ],
@@ -750,7 +750,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [_purple, Color(0xFF7C3AED)],
+                  colors: [_purple, LummyColors.violet600],
                 ),
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
@@ -788,7 +788,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 icon: const Icon(Icons.trending_up_rounded, size: 20),
                 label: Text(
                   'Ver Insights Completos',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                   ),
@@ -978,11 +978,11 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
   Widget _buildActionCard(_QuickActionData data, bool isDark) {
     final darkTop = Color.alphaBlend(
       data.color.withAlpha(34),
-      const Color(0xFF1E293B),
+      LummyColors.slate800,
     );
     final darkBorder = Color.alphaBlend(
       data.color.withAlpha(56),
-      const Color(0xFF334155),
+      LummyColors.slate700,
     );
 
     return GestureDetector(
@@ -995,7 +995,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDark
-                ? [darkTop, const Color(0xFF1E293B)]
+                ? [darkTop, LummyColors.slate800]
                 : [Colors.white, data.color.withValues(alpha: 0.03)],
           ),
           borderRadius: BorderRadius.circular(20),
@@ -1051,7 +1051,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     ),
                     child: Text(
                       data.badgeCount.toString(),
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -1064,21 +1064,21 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             const SizedBox(height: 18),
             Text(
               data.title,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
+                color: isDark ? LummyColors.slate50 : LummyColors.slate800,
               ),
             ),
             const SizedBox(height: 6),
             Text(
               data.subtitle,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: isDark
-                    ? const Color(0xFFCBD5E1)
-                    : const Color(0xFF64748B),
+                    ? LummyColors.slate300
+                    : LummyColors.slate500,
                 height: 1.25,
               ),
               maxLines: 2,
@@ -1138,10 +1138,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         height: 56,
                         decoration: BoxDecoration(
                           color: child.gender == Gender.male
-                              ? const Color(
-                                  AppConstants.primaryBlue,
-                                ).withValues(alpha: 0.1)
-                              : const Color(AppConstants.pink).withValues(alpha: 0.1),
+                              ? LummyColors.brandBlue.withValues(alpha: 0.1)
+                              : LummyColors.pink500.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppConstants.radiusMedium,
                           ),
@@ -1149,8 +1147,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         child: Icon(
                           Icons.person,
                           color: child.gender == Gender.male
-                              ? const Color(AppConstants.primaryBlue)
-                              : const Color(AppConstants.pink),
+                              ? LummyColors.brandBlue
+                              : LummyColors.pink500,
                           size: 28,
                         ),
                       ),
@@ -1161,7 +1159,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           children: [
                             Text(
                               child.name,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -1172,7 +1170,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                               children: [
                                 Text(
                                   '${child.age} anos',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
                                     color: Theme.of(
@@ -1195,12 +1193,10 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 Flexible(
                                   child: Text(
                                     'Saldo: ${AppFormatters.formatCurrency(child.balance)}',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
-                                      color: const Color(
-                                        AppConstants.successGreen,
-                                      ),
+                                      color: LummyColors.emerald500,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -1215,7 +1211,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         children: [
                           Text(
                             'Gastos',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 11,
                               fontWeight: FontWeight.w400,
                               color: Theme.of(
@@ -1225,7 +1221,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           ),
                           Text(
                             AppFormatters.formatCurrency(spending),
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -1279,7 +1275,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 },
                 child: Text(
                   'Ver todas',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.primary,
@@ -1306,7 +1302,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Transação aprovada!'),
-                      backgroundColor: Color(AppConstants.successGreen),
+                      backgroundColor: LummyColors.emerald500,
                     ),
                   );
                 },
@@ -1315,7 +1311,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Transação rejeitada!'),
-                      backgroundColor: Color(AppConstants.errorRed),
+                      backgroundColor: LummyColors.red500,
                     ),
                   );
                 },
@@ -1353,7 +1349,7 @@ class _CompactInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final badgeRing =
-        isDark ? const Color(0xFF0F172A) : Colors.white;
+        isDark ? LummyColors.slate900 : Colors.white;
 
     return Semantics(
       container: true,
@@ -1422,12 +1418,12 @@ class _CompactInfoCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                          ? LummyColors.slate400
+                          : LummyColors.slate500,
                     ),
                   ),
                 ),
@@ -1439,7 +1435,7 @@ class _CompactInfoCard extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 value,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                   color: color,
@@ -1450,7 +1446,7 @@ class _CompactInfoCard extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 subtitle!,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                   color: color,
@@ -1544,12 +1540,12 @@ class _OverviewStatCard extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       data.title,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.slate400
+                            : LummyColors.slate500,
                       ),
                     ),
                   ),
@@ -1562,7 +1558,7 @@ class _OverviewStatCard extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 data.value,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: c,
@@ -1576,12 +1572,12 @@ class _OverviewStatCard extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   data.subtitle!,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 10,
                     fontWeight: FontWeight.w400,
                     color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
+                        ? LummyColors.slate400
+                        : LummyColors.slate500,
                   ),
                 ),
               ),
@@ -1672,12 +1668,12 @@ class _InsightPreviewChip extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                          ? LummyColors.slate400
+                          : LummyColors.slate500,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1685,7 +1681,7 @@ class _InsightPreviewChip extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     value,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: color,

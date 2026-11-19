@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/constants/app_constants.dart';
 import 'package:lummy/core/utils/network_errors.dart';
@@ -15,6 +14,7 @@ import 'package:lummy/utils/child_money_notification.dart';
 import 'package:lummy/screens/child/profile_page.dart';
 import 'package:lummy/screens/child/daily_missions_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -1004,7 +1004,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       'Olá, ',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 24 : 28,
                         fontWeight: FontWeight.w600,
                         color: theme.textTheme.bodyLarge?.color,
@@ -1015,12 +1015,12 @@ class _HomePageState extends State<HomePage> {
                         shaderCallback: (bounds) => LinearGradient(
                           colors: [
                             primary,
-                            const Color(AppConstants.purple),
+                            LummyColors.violet500,
                           ],
                         ).createShader(bounds),
                         child: Text(
                           userName,
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: isSmallScreen ? 24 : 28,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -1034,7 +1034,7 @@ class _HomePageState extends State<HomePage> {
                 const Gap(4),
                 Text(
                   'Como estão suas finanças hoje?',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.w400,
                     color: theme.textTheme.bodyMedium?.color,
@@ -1080,12 +1080,12 @@ class _HomePageState extends State<HomePage> {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF1E40AF), Color(0xFF1E3A8A)],
+              colors: [LummyColors.blue800, LummyColors.blue900],
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF1E40AF).withValues(alpha: 0.35),
+                color: LummyColors.blue800.withValues(alpha: 0.35),
                 blurRadius: 24,
                 offset: const Offset(0, 10),
               ),
@@ -1099,7 +1099,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     'Meu Cofrinho',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: isSmallScreen ? 17 : 19,
                       fontWeight: FontWeight.w600,
                       color: Colors.white.withValues(alpha: 0.95),
@@ -1123,7 +1123,7 @@ class _HomePageState extends State<HomePage> {
                 _balanceLoadFailed
                     ? '—'
                     : 'R\$ ${currentBalance.toStringAsFixed(2)}',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 38 : 44,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -1133,7 +1133,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 8),
                 Text(
                   'Não foi possível carregar o saldo. Toque aqui para tentar de novo.',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: Colors.white.withValues(alpha: 0.9),
@@ -1148,20 +1148,20 @@ class _HomePageState extends State<HomePage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withValues(alpha: 0.25),
+                          color: LummyColors.emerald500.withValues(alpha: 0.25),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.trending_up, color: Color(0xFF10B981), size: 16),
+                            const Icon(Icons.trending_up, color: LummyColors.emerald500, size: 16),
                             const SizedBox(width: 6),
                             Text(
                               '+${AppFormatters.formatCurrency(_weekIncomeTotal)}',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF10B981),
+                                color: LummyColors.emerald500,
                               ),
                             ),
                           ],
@@ -1171,7 +1171,7 @@ class _HomePageState extends State<HomePage> {
                       Expanded(
                         child: Text(
                           'entradas nos últimos 7 dias',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                             color: Colors.white.withValues(alpha: 0.88),
@@ -1183,7 +1183,7 @@ class _HomePageState extends State<HomePage> {
                 else
                   Text(
                     'Nenhuma entrada registrada nos últimos 7 dias',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: Colors.white.withValues(alpha: 0.85),
@@ -1215,8 +1215,8 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(AppConstants.radiusXLarge),
         border: Border.all(
           color: theme.brightness == Brightness.dark
-              ? const Color(0xFF475569)
-              : const Color(AppConstants.borderLight),
+              ? LummyColors.slate600
+              : LummyColors.slate200,
           width: 1,
         ),
         boxShadow: [
@@ -1238,8 +1238,8 @@ class _HomePageState extends State<HomePage> {
                   gradient: LinearGradient(
                     colors: isCompleted
                         ? [
-                            const Color(AppConstants.successGreen).withValues(alpha: 0.15),
-                            const Color(AppConstants.successGreen).withValues(alpha: 0.05),
+                            LummyColors.emerald500.withValues(alpha: 0.15),
+                            LummyColors.emerald500.withValues(alpha: 0.05),
                           ]
                         : [
                             theme.colorScheme.primary.withValues(alpha: 0.15),
@@ -1260,7 +1260,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       goalName,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 17 : 19,
                         fontWeight: FontWeight.w600,
                         color: theme.textTheme.titleLarge?.color,
@@ -1277,17 +1277,17 @@ class _HomePageState extends State<HomePage> {
                       ),
                       decoration: BoxDecoration(
                         color: isCompleted
-                            ? const Color(AppConstants.successGreen).withValues(alpha: 0.12)
+                            ? LummyColors.emerald500.withValues(alpha: 0.12)
                             : theme.colorScheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         isCompleted ? 'Meta concluída' : 'Em progresso',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                           color: isCompleted
-                              ? const Color(AppConstants.successGreen)
+                              ? LummyColors.emerald500
                               : theme.colorScheme.primary,
                         ),
                       ),
@@ -1302,17 +1302,17 @@ class _HomePageState extends State<HomePage> {
                 ),
                 decoration: BoxDecoration(
                   color: isCompleted
-                      ? const Color(AppConstants.successGreen).withValues(alpha: 0.12)
+                      ? LummyColors.emerald500.withValues(alpha: 0.12)
                       : theme.colorScheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '$progressPercent%',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.w700,
                     color: isCompleted
-                        ? const Color(AppConstants.successGreen)
+                        ? LummyColors.emerald500
                         : theme.colorScheme.primary,
                   ),
                 ),
@@ -1327,15 +1327,15 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     'R\$ ${contributed.toStringAsFixed(2)}',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF10B981),
+                      color: LummyColors.emerald500,
                     ),
                   ),
                   Text(
                     'R\$ ${savingsGoal.toStringAsFixed(2)}',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: theme.textTheme.bodySmall?.color,
@@ -1350,8 +1350,8 @@ class _HomePageState extends State<HomePage> {
                     height: 10,
                     decoration: BoxDecoration(
                       color: theme.brightness == Brightness.dark
-                          ? const Color(0xFF475569)
-                          : const Color(AppConstants.borderLight),
+                          ? LummyColors.slate600
+                          : LummyColors.slate200,
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
@@ -1363,8 +1363,8 @@ class _HomePageState extends State<HomePage> {
                         gradient: LinearGradient(
                           colors: isCompleted
                               ? [
-                                  const Color(AppConstants.successGreen),
-                                  const Color(0xFF059669),
+                                  LummyColors.emerald500,
+                                  LummyColors.emerald600,
                                 ]
                               : [
                                   theme.colorScheme.primary,
@@ -1375,7 +1375,7 @@ class _HomePageState extends State<HomePage> {
                         boxShadow: [
                           BoxShadow(
                             color: (isCompleted
-                                    ? const Color(AppConstants.successGreen)
+                                    ? LummyColors.emerald500
                                     : theme.colorScheme.primary)
                                 .withValues(alpha: 0.3),
                             blurRadius: 6,
@@ -1397,13 +1397,13 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: theme.brightness == Brightness.dark
-                        ? const Color(0xFF1E293B)
-                        : const Color(AppConstants.backgroundGray),
+                        ? LummyColors.slate800
+                        : LummyColors.offWhite,
                     borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     border: Border.all(
                       color: theme.brightness == Brightness.dark
-                          ? const Color(0xFF475569)
-                          : const Color(AppConstants.borderLight),
+                          ? LummyColors.slate600
+                          : LummyColors.slate200,
                       width: 1,
                     ),
                   ),
@@ -1415,17 +1415,17 @@ class _HomePageState extends State<HomePage> {
                           const Icon(
                             Icons.savings_outlined,
                             size: 16,
-                            color: Color(AppConstants.successGreen),
+                            color: LummyColors.emerald500,
                           ),
                           const Gap(6),
                           Expanded(
                             child: Text(
                               'Economizado',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: theme.brightness == Brightness.dark
-                                    ? const Color(0xFF94A3B8)
+                                    ? LummyColors.slate400
                                     : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -1438,7 +1438,7 @@ class _HomePageState extends State<HomePage> {
                         _balanceLoadFailed
                             ? '—'
                             : 'R\$ ${currentBalance.toStringAsFixed(2)}',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 16 : 18,
                           fontWeight: FontWeight.w700,
                           color: theme.textTheme.titleLarge?.color,
@@ -1454,13 +1454,13 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: theme.brightness == Brightness.dark
-                        ? const Color(0xFF1E293B)
-                        : const Color(AppConstants.backgroundGray),
+                        ? LummyColors.slate800
+                        : LummyColors.offWhite,
                     borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                     border: Border.all(
                       color: theme.brightness == Brightness.dark
-                          ? const Color(0xFF475569)
-                          : const Color(AppConstants.borderLight),
+                          ? LummyColors.slate600
+                          : LummyColors.slate200,
                       width: 1,
                     ),
                   ),
@@ -1475,18 +1475,18 @@ class _HomePageState extends State<HomePage> {
                                 : Icons.check_circle_outline_rounded,
                             size: 16,
                             color: remaining > 0
-                                ? const Color(AppConstants.warningOrange)
-                                : const Color(AppConstants.successGreen),
+                                ? LummyColors.materialOrange
+                                : LummyColors.emerald500,
                           ),
                           const Gap(6),
                           Expanded(
                             child: Text(
                               remaining > 0 ? 'Falta' : 'Excedente',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: theme.brightness == Brightness.dark
-                                    ? const Color(0xFF94A3B8)
+                                    ? LummyColors.slate400
                                     : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -1497,7 +1497,7 @@ class _HomePageState extends State<HomePage> {
                       const Gap(8),
                       Text(
                         'R\$ ${remaining.abs().toStringAsFixed(2)}',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 16 : 18,
                           fontWeight: FontWeight.w700,
                           color: theme.textTheme.titleLarge?.color,
@@ -1531,7 +1531,7 @@ class _HomePageState extends State<HomePage> {
               SnackBar(
                 content: Text(
                   'Nova meta criada! 🎯',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                  style: LummyFonts.body(fontWeight: FontWeight.w500),
                 ),
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 behavior: SnackBarBehavior.floating,
@@ -1554,8 +1554,8 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(AppConstants.radiusXLarge),
               border: Border.all(
                 color: theme.brightness == Brightness.dark
-                    ? const Color(0xFF475569)
-                    : const Color(AppConstants.borderLight),
+                    ? LummyColors.slate600
+                    : LummyColors.slate200,
                 width: 1,
               ),
               boxShadow: [
@@ -1576,8 +1576,8 @@ class _HomePageState extends State<HomePage> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            const Color(AppConstants.purple).withValues(alpha: 0.15),
-                            const Color(AppConstants.purple).withValues(alpha: 0.05),
+                            LummyColors.violet500.withValues(alpha: 0.15),
+                            LummyColors.violet500.withValues(alpha: 0.05),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
@@ -1594,11 +1594,11 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Text(
                             'Sem metas ainda',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: isSmallScreen ? 17 : 19,
                               fontWeight: FontWeight.w600,
                               color: theme.brightness == Brightness.dark
-                                  ? const Color(0xFFCBD5E1)
+                                  ? LummyColors.slate300
                                   : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.6),
                               height: 1.2,
                             ),
@@ -1612,15 +1612,15 @@ class _HomePageState extends State<HomePage> {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(AppConstants.purple).withValues(alpha: 0.12),
+                              color: LummyColors.violet500.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               'Crie sua primeira meta',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
-                                color: const Color(AppConstants.purple),
+                                color: LummyColors.violet500,
                               ),
                             ),
                           ),
@@ -1633,15 +1633,15 @@ class _HomePageState extends State<HomePage> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(AppConstants.purple).withValues(alpha: 0.12),
+                        color: LummyColors.violet500.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         '0%',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 16 : 18,
                           fontWeight: FontWeight.w700,
-                          color: const Color(AppConstants.purple).withValues(alpha: 0.7),
+                          color: LummyColors.violet500.withValues(alpha: 0.7),
                         ),
                       ),
                     ),
@@ -1655,21 +1655,21 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           'R\$ 0,00',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: theme.brightness == Brightness.dark
-                                ? const Color(0xFF94A3B8)
+                                ? LummyColors.slate400
                                 : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                           ),
                         ),
                         Text(
                           'R\$ 0,00',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: theme.brightness == Brightness.dark
-                                ? const Color(0xFF94A3B8)
+                                ? LummyColors.slate400
                                 : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                           ),
                         ),
@@ -1682,8 +1682,8 @@ class _HomePageState extends State<HomePage> {
                           height: 10,
                           decoration: BoxDecoration(
                             color: theme.brightness == Brightness.dark
-                                ? const Color(0xFF475569)
-                                : const Color(AppConstants.borderLight),
+                                ? LummyColors.slate600
+                                : LummyColors.slate200,
                             borderRadius: BorderRadius.circular(5),
                           ),
                         ),
@@ -1693,7 +1693,7 @@ class _HomePageState extends State<HomePage> {
                             height: 10,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+                                colors: [LummyColors.violet500, LummyColors.violet600],
                               ),
                               borderRadius: BorderRadius.circular(5),
                             ),
@@ -1711,13 +1711,13 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: theme.brightness == Brightness.dark
-                              ? const Color(0xFF1E293B)
-                              : const Color(AppConstants.backgroundGray),
+                              ? LummyColors.slate800
+                              : LummyColors.offWhite,
                           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                           border: Border.all(
                             color: theme.brightness == Brightness.dark
-                                ? const Color(0xFF475569)
-                                : const Color(AppConstants.borderLight),
+                                ? LummyColors.slate600
+                                : LummyColors.slate200,
                             width: 1,
                           ),
                         ),
@@ -1730,18 +1730,18 @@ class _HomePageState extends State<HomePage> {
                                   Icons.savings_outlined,
                                   size: 16,
                                   color: theme.brightness == Brightness.dark
-                                      ? const Color(0xFF94A3B8)
+                                      ? LummyColors.slate400
                                       : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                 ),
                                 const Gap(6),
                                 Expanded(
                                   child: Text(
                                     'Economizado',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w500,
                                       color: theme.brightness == Brightness.dark
-                                          ? const Color(0xFF94A3B8)
+                                          ? LummyColors.slate400
                                           : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                     ),
                                     maxLines: 1,
@@ -1753,11 +1753,11 @@ class _HomePageState extends State<HomePage> {
                             const Gap(8),
                             Text(
                               'R\$ 0,00',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: isSmallScreen ? 16 : 18,
                                 fontWeight: FontWeight.w700,
                                 color: theme.brightness == Brightness.dark
-                                    ? const Color(0xFFCBD5E1)
+                                    ? LummyColors.slate300
                                     : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
                               ),
                             ),
@@ -1771,13 +1771,13 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: theme.brightness == Brightness.dark
-                              ? const Color(0xFF1E293B)
-                              : const Color(AppConstants.backgroundGray),
+                              ? LummyColors.slate800
+                              : LummyColors.offWhite,
                           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
                           border: Border.all(
                             color: theme.brightness == Brightness.dark
-                                ? const Color(0xFF475569)
-                                : const Color(AppConstants.borderLight),
+                                ? LummyColors.slate600
+                                : LummyColors.slate200,
                             width: 1,
                           ),
                         ),
@@ -1790,18 +1790,18 @@ class _HomePageState extends State<HomePage> {
                                   Icons.trending_up_rounded,
                                   size: 16,
                                   color: theme.brightness == Brightness.dark
-                                      ? const Color(0xFF94A3B8)
+                                      ? LummyColors.slate400
                                       : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                 ),
                                 const Gap(6),
                                 Expanded(
                                   child: Text(
                                     'Falta',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w500,
                                       color: theme.brightness == Brightness.dark
-                                          ? const Color(0xFF94A3B8)
+                                          ? LummyColors.slate400
                                           : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
                                     ),
                                     maxLines: 1,
@@ -1813,11 +1813,11 @@ class _HomePageState extends State<HomePage> {
                             const Gap(8),
                             Text(
                               'R\$ 0,00',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: isSmallScreen ? 16 : 18,
                                 fontWeight: FontWeight.w700,
                                 color: theme.brightness == Brightness.dark
-                                    ? const Color(0xFFCBD5E1)
+                                    ? LummyColors.slate300
                                     : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
                               ),
                             ),
@@ -1847,14 +1847,14 @@ class _HomePageState extends State<HomePage> {
             shaderCallback: (bounds) => LinearGradient(
               colors: Theme.of(context).brightness == Brightness.dark
                   ? [
-                      const Color(0xFF3B82F6),
-                      const Color(0xFF8B5CF6),
+                      LummyColors.blue500,
+                      LummyColors.violet500,
                     ] // Azul → Roxo como no site
-                  : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                  : [LummyColors.slate800, LummyColors.slate800],
             ).createShader(bounds),
             child: Text(
               'O que você quer fazer?',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: isSmallScreen ? 18 : 20,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -1880,7 +1880,7 @@ class _HomePageState extends State<HomePage> {
                         'Missões Diárias',
                         'Complete desafios e ganhe pontos',
                         Icons.emoji_events_outlined,
-                        const Color(0xFFF59E0B),
+                        LummyColors.amber500,
                         isSmallScreen,
                       ),
                     ),
@@ -1905,11 +1905,11 @@ class _HomePageState extends State<HomePage> {
                               SnackBar(
                                 content: Text(
                                   'Nova meta criada! 🎯',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                backgroundColor: const Color(0xFF8B5CF6),
+                                backgroundColor: LummyColors.violet500,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
@@ -1923,7 +1923,7 @@ class _HomePageState extends State<HomePage> {
                         'Nova Meta',
                         'Defina um novo objetivo',
                         Icons.flag_outlined,
-                        const Color(0xFF8B5CF6),
+                        LummyColors.violet500,
                         isSmallScreen,
                       ),
                     ),
@@ -1947,7 +1947,7 @@ class _HomePageState extends State<HomePage> {
                         'Pedir Dinheiro',
                         'Peça dinheiro ao responsável',
                         Icons.request_quote_rounded,
-                        const Color(0xFF10B981),
+                        LummyColors.emerald500,
                         isSmallScreen,
                       ),
                     ),
@@ -2012,11 +2012,11 @@ class _HomePageState extends State<HomePage> {
                             SnackBar(
                               content: Text(
                                 'Você retirou R\$ ${claimedAmount.toStringAsFixed(2)}',
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              backgroundColor: const Color(0xFF10B981),
+                              backgroundColor: LummyColors.emerald500,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -2037,7 +2037,7 @@ class _HomePageState extends State<HomePage> {
                                               ? 'Sem distribuição ativa'
                                               : 'Resgate sua parte do valor do responsável'))),
                         Icons.payments_rounded,
-                        const Color(0xFF10B981),
+                        LummyColors.emerald500,
                         isSmallScreen,
                       ),
                     ),
@@ -2065,8 +2065,8 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF475569)
-              : const Color(0xFFE2E8F0),
+              ? LummyColors.slate600
+              : LummyColors.slate200,
           width: 1,
         ),
         boxShadow: [
@@ -2092,7 +2092,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 16),
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w600,
               color: Theme.of(context).textTheme.titleMedium?.color,
@@ -2101,7 +2101,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 12 : 14,
               fontWeight: FontWeight.w400,
               color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -2124,14 +2124,14 @@ class _HomePageState extends State<HomePage> {
             shaderCallback: (bounds) => LinearGradient(
               colors: Theme.of(context).brightness == Brightness.dark
                   ? [
-                      const Color(0xFFFF8C42),
-                      const Color(0xFF10B981),
+                      LummyColors.brandOrange,
+                      LummyColors.emerald500,
                     ] // Laranja → Verde como no site
-                  : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                  : [LummyColors.slate800, LummyColors.slate800],
             ).createShader(bounds),
             child: Text(
               'Aprenda Brincando',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: isSmallScreen ? 18 : 20,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -2163,21 +2163,21 @@ class _HomePageState extends State<HomePage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF8B5CF6),
-                    Color(0xFF7C3AED),
-                    Color(0xFF6D28D9),
+                    LummyColors.violet500,
+                    LummyColors.violet600,
+                    LummyColors.violet700,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
+                    color: LummyColors.violet500.withValues(alpha: 0.4),
                     blurRadius: 24,
                     offset: const Offset(0, 10),
                     spreadRadius: -4,
                   ),
                   BoxShadow(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
+                    color: LummyColors.violet500.withValues(alpha: 0.2),
                     blurRadius: 40,
                     offset: const Offset(0, 20),
                   ),
@@ -2211,7 +2211,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               currentTip.category,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: isSmallScreen ? 15 : 17,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
@@ -2220,7 +2220,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Text(
                               'Dica ${currentTipIndex + 1} de ${educationalTips.length}',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white.withValues(alpha: 0.8),
@@ -2234,7 +2234,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 20),
                   Text(
                     currentTip.content,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: isSmallScreen ? 16 : 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -2256,21 +2256,21 @@ class _HomePageState extends State<HomePage> {
                       onPressed: _nextTip,
                       icon: const Icon(
                         Icons.arrow_forward_rounded,
-                        color: Color(0xFF8B5CF6),
+                        color: LummyColors.violet500,
                         size: 22,
                       ),
                       label: Text(
                         'Próxima Dica',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 15 : 16,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF8B5CF6),
+                          color: LummyColors.violet500,
                           letterSpacing: 0.5,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF8B5CF6),
+                        foregroundColor: LummyColors.violet500,
                         padding: EdgeInsets.symmetric(
                           vertical: isSmallScreen ? 14 : 16,
                         ),
@@ -2308,14 +2308,14 @@ class _HomePageState extends State<HomePage> {
                 shaderCallback: (bounds) => LinearGradient(
                   colors: Theme.of(context).brightness == Brightness.dark
                       ? [
-                          const Color(0xFF10B981),
-                          const Color(0xFF3B82F6),
+                          LummyColors.emerald500,
+                          LummyColors.blue500,
                         ] // Verde → Azul como no site
-                      : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                      : [LummyColors.slate800, LummyColors.slate800],
                 ).createShader(bounds),
                 child: Text(
                   'Suas Conquistas',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 18 : 20,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -2324,7 +2324,7 @@ class _HomePageState extends State<HomePage> {
               ),
               Text(
                 '$completedAchievements de ${achievements.length}',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w500,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -2340,8 +2340,8 @@ class _HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF475569)
-                    : const Color(0xFFE2E8F0),
+                    ? LummyColors.slate600
+                    : LummyColors.slate200,
                 width: 1,
               ),
               boxShadow: [
@@ -2390,17 +2390,17 @@ class _HomePageState extends State<HomePage> {
           height: isSmallScreen ? 48 : 56,
           decoration: BoxDecoration(
             color: isCompleted
-                ? const Color(0xFF10B981).withValues(alpha: 0.1)
+                ? LummyColors.emerald500.withValues(alpha: 0.1)
                 : Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF1E293B)
-                : const Color(0xFFF1F5F9),
+                ? LummyColors.slate800
+                : LummyColors.slate100,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isCompleted
-                  ? const Color(0xFF10B981).withValues(alpha: 0.3)
+                  ? LummyColors.emerald500.withValues(alpha: 0.3)
                   : Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFF475569)
-                      : const Color(0xFFE2E8F0),
+                      ? LummyColors.slate600
+                      : LummyColors.slate200,
               width: 1,
             ),
           ),
@@ -2418,7 +2418,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Text(
                 title,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 14 : 16,
                   fontWeight: FontWeight.w600,
                   color: isCompleted
@@ -2429,7 +2429,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 2),
               Text(
                 description,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 12 : 14,
                   fontWeight: FontWeight.w400,
                   color: Theme.of(context).textTheme.bodySmall?.color,
@@ -2443,7 +2443,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: const BoxDecoration(
-              color: Color(0xFF10B981),
+              color: LummyColors.emerald500,
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.check, color: Colors.white, size: 16),

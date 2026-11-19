@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_constants.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class AppTheme {
   AppTheme._();
@@ -10,81 +10,81 @@ class AppTheme {
       useMaterial3: true,
       materialTapTargetSize: MaterialTapTargetSize.padded,
       visualDensity: VisualDensity.standard,
-      scaffoldBackgroundColor: const Color(0xFFF1F5F9),
+      scaffoldBackgroundColor: LummyColors.slate100,
 
       // Color scheme
       colorScheme: const ColorScheme.light(
-        primary: Color(AppConstants.primaryBlue),
-        secondary: Color(AppConstants.accentOrange),
-        error: Color(AppConstants.errorRed),
-        surface: Color(AppConstants.backgroundWhite),
-        surfaceContainerHighest: Color(0xFFE2E8F0), // Hierarquia em modo claro
+        primary: LummyColors.brandBlue,
+        secondary: LummyColors.brandOrange,
+        error: LummyColors.red500,
+        surface: LummyColors.white,
+        surfaceContainerHighest: LummyColors.slate200, // Hierarquia em modo claro
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onError: Colors.white,
-        onSurface: Color(AppConstants.textPrimary),
-        outline: Color(AppConstants.borderLight),
+        onSurface: LummyColors.slate800,
+        outline: LummyColors.slate200,
       ),
 
       // Text theme
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.poppins(
+        displayLarge: LummyFonts.body(
           fontSize: 32,
           fontWeight: FontWeight.w700,
-          color: const Color(AppConstants.textPrimary),
+          color: LummyColors.slate800,
         ),
-        displayMedium: GoogleFonts.poppins(
+        displayMedium: LummyFonts.body(
           fontSize: 28,
           fontWeight: FontWeight.w600,
-          color: const Color(AppConstants.textPrimary),
+          color: LummyColors.slate800,
         ),
-        displaySmall: GoogleFonts.poppins(
+        displaySmall: LummyFonts.body(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          color: const Color(AppConstants.textPrimary),
+          color: LummyColors.slate800,
         ),
-        headlineMedium: GoogleFonts.poppins(
+        headlineMedium: LummyFonts.body(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: const Color(AppConstants.textPrimary),
+          color: LummyColors.slate800,
         ),
-        titleLarge: GoogleFonts.poppins(
+        titleLarge: LummyFonts.body(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: const Color(AppConstants.textPrimary),
+          color: LummyColors.slate800,
         ),
-        titleMedium: GoogleFonts.poppins(
+        titleMedium: LummyFonts.body(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: const Color(AppConstants.textPrimary),
+          color: LummyColors.slate800,
         ),
-        bodyLarge: GoogleFonts.poppins(
+        bodyLarge: LummyFonts.body(
           fontSize: 16,
           fontWeight: FontWeight.w400,
-          color: const Color(AppConstants.textPrimary),
+          color: LummyColors.slate800,
         ),
-        bodyMedium: GoogleFonts.poppins(
+        bodyMedium: LummyFonts.body(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: const Color(0xFF475569), // Contraste melhor que textSecondary
+          color: LummyColors.slate600, // Contraste melhor que textSecondary
         ),
-        bodySmall: GoogleFonts.poppins(
+        bodySmall: LummyFonts.body(
           fontSize: 12,
           fontWeight: FontWeight.w400,
-          color: const Color(0xFF64748B),
+          color: LummyColors.slate500,
         ),
       ),
 
       // Divider (modo claro)
       dividerTheme: const DividerThemeData(
-        color: Color(AppConstants.borderLight),
+        color: LummyColors.slate200,
         thickness: 1,
       ),
 
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(AppConstants.backgroundGray),
+        fillColor: LummyColors.offWhite,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           borderSide: BorderSide.none,
@@ -96,14 +96,14 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           borderSide: const BorderSide(
-            color: Color(AppConstants.primaryBlue),
+            color: LummyColors.brandBlue,
             width: 2,
           ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           borderSide: const BorderSide(
-            color: Color(AppConstants.errorRed),
+            color: LummyColors.red500,
             width: 2,
           ),
         ),
@@ -116,7 +116,7 @@ class AppTheme {
       // Elevated button theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(AppConstants.accentOrange),
+          backgroundColor: LummyColors.brandOrange,
           foregroundColor: Colors.white,
           minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(
@@ -132,7 +132,7 @@ class AppTheme {
 
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(AppConstants.primaryBlue),
+          backgroundColor: LummyColors.brandBlue,
           foregroundColor: Colors.white,
           minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(
@@ -147,13 +147,13 @@ class AppTheme {
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(AppConstants.primaryBlue),
+          foregroundColor: LummyColors.brandBlue,
           minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(
             horizontal: AppConstants.spacingLarge,
             vertical: AppConstants.spacingMedium,
           ),
-          side: const BorderSide(color: Color(AppConstants.borderLight)),
+          side: const BorderSide(color: LummyColors.slate200),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           ),
@@ -162,7 +162,7 @@ class AppTheme {
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: const Color(AppConstants.primaryBlue),
+          foregroundColor: LummyColors.brandBlue,
           minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(
             horizontal: AppConstants.spacingMedium,
@@ -176,22 +176,22 @@ class AppTheme {
 
       // Card theme
       cardTheme: CardThemeData(
-        color: const Color(AppConstants.backgroundWhite),
+        color: LummyColors.white,
         elevation: 0,
         shadowColor: Colors.black.withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
-          side: const BorderSide(color: Color(AppConstants.borderLight), width: 1),
+          side: const BorderSide(color: LummyColors.slate200, width: 1),
         ),
       ),
 
       // App bar theme
       appBarTheme: AppBarTheme(
-        backgroundColor: const Color(AppConstants.primaryBlue),
+        backgroundColor: LummyColors.brandBlue,
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: LummyFonts.body(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -200,23 +200,23 @@ class AppTheme {
 
       // Bottom navigation bar (light)
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(AppConstants.backgroundWhite),
-        selectedItemColor: Color(AppConstants.primaryBlue),
-        unselectedItemColor: Color(0xFF64748B),
+        backgroundColor: LummyColors.white,
+        selectedItemColor: LummyColors.brandBlue,
+        unselectedItemColor: LummyColors.slate500,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
 
       // Icon theme (light)
       iconTheme: const IconThemeData(
-        color: Color(AppConstants.textPrimary),
+        color: LummyColors.slate800,
         size: 24,
       ),
 
       // Snackbar (light)
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: const Color(AppConstants.textPrimary),
-        contentTextStyle: GoogleFonts.poppins(
+        backgroundColor: LummyColors.slate800,
+        contentTextStyle: LummyFonts.body(
           color: Colors.white,
           fontSize: 14,
         ),
@@ -234,108 +234,108 @@ class AppTheme {
       materialTapTargetSize: MaterialTapTargetSize.padded,
       visualDensity: VisualDensity.standard,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF121212),
+      scaffoldBackgroundColor: LummyColors.darkMaterial,
       // Color scheme - cores inspiradas no site Lummy
       colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF3B82F6), // Azul vibrante
-        secondary: Color(0xFFFF8C42), // Laranja vibrante
-        tertiary: Color(0xFF10B981), // Verde vibrante
-        error: Color(0xFFEF4444),
-        surface: Color(0xFF1E1E1E), // Surface cards - cinza neutro
-        surfaceContainerHighest: Color(0xFF262626), // Surface mais alto
+        primary: LummyColors.blue500, // Azul vibrante
+        secondary: LummyColors.brandOrange, // Laranja vibrante
+        tertiary: LummyColors.emerald500, // Verde vibrante
+        error: LummyColors.red500,
+        surface: LummyColors.darkSurface, // Surface cards - cinza neutro
+        surfaceContainerHighest: LummyColors.neutral800, // Surface mais alto
         onPrimary: Colors.white, // Texto branco em primary
         onSecondary: Colors.white, // Texto branco em secondary
         onError: Colors.white,
         onSurface: Colors.white, // Branco puro para textos
-        outline: Color(0xFF2D3748), // Bordas mais sutis
+        outline: LummyColors.steel700, // Bordas mais sutis
       ),
 
       // Text theme - textos brancos puros como no site
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.poppins(
+        displayLarge: LummyFonts.body(
           fontSize: 32,
           fontWeight: FontWeight.w700,
           color: Colors.white,
         ),
-        displayMedium: GoogleFonts.poppins(
+        displayMedium: LummyFonts.body(
           fontSize: 28,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        displaySmall: GoogleFonts.poppins(
+        displaySmall: LummyFonts.body(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        headlineMedium: GoogleFonts.poppins(
+        headlineMedium: LummyFonts.body(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        titleLarge: GoogleFonts.poppins(
+        titleLarge: LummyFonts.body(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        titleMedium: GoogleFonts.poppins(
+        titleMedium: LummyFonts.body(
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
-        bodyLarge: GoogleFonts.poppins(
+        bodyLarge: LummyFonts.body(
           fontSize: 16,
           fontWeight: FontWeight.w400,
           color: Colors.white,
         ),
-        bodyMedium: GoogleFonts.poppins(
+        bodyMedium: LummyFonts.body(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: const Color(0xFFE2E8F0), // Cinza claro para textos secundários
+          color: LummyColors.slate200, // Cinza claro para textos secundários
         ),
-        bodySmall: GoogleFonts.poppins(
+        bodySmall: LummyFonts.body(
           fontSize: 12,
           fontWeight: FontWeight.w400,
-          color: const Color(0xFFCBD5E1), // Cinza mais claro
+          color: LummyColors.slate300, // Cinza mais claro
         ),
       ),
 
       // Divider theme
       dividerTheme: const DividerThemeData(
-        color: Color(0xFF2D3748),
+        color: LummyColors.steel700,
         thickness: 1,
       ),
 
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF1E1E1E),
-        hintStyle: GoogleFonts.poppins(
-          color: const Color(0xFF718096),
+        fillColor: LummyColors.darkSurface,
+        hintStyle: LummyFonts.body(
+          color: LummyColors.steel500,
           fontSize: 14,
         ),
-        labelStyle: GoogleFonts.poppins(
-          color: const Color(0xFFA0AEC0),
+        labelStyle: LummyFonts.body(
+          color: LummyColors.steel400,
           fontSize: 14,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF2D3748), width: 1.5),
+          borderSide: const BorderSide(color: LummyColors.steel700, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF2D3748), width: 1.5),
+          borderSide: const BorderSide(color: LummyColors.steel700, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2),
+          borderSide: const BorderSide(color: LummyColors.blue500, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
+          borderSide: const BorderSide(color: LummyColors.red500, width: 2),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 2),
+          borderSide: const BorderSide(color: LummyColors.red500, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppConstants.spacingLarge,
@@ -346,7 +346,7 @@ class AppTheme {
       // Elevated button theme - laranja vibrante como no site
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFFF8C42), // Laranja vibrante
+          backgroundColor: LummyColors.brandOrange, // Laranja vibrante
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(
             horizontal: AppConstants.spacingLarge,
@@ -356,7 +356,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           ),
           elevation: 0,
-          textStyle: GoogleFonts.poppins(
+          textStyle: LummyFonts.body(
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -365,22 +365,22 @@ class AppTheme {
 
       // Card theme
       cardTheme: CardThemeData(
-        color: const Color(0xFF1E1E1E), // Cinza neutro
+        color: LummyColors.darkSurface, // Cinza neutro
         elevation: 0,
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
-          side: const BorderSide(color: Color(0xFF2D3748), width: 1),
+          side: const BorderSide(color: LummyColors.steel700, width: 1),
         ),
       ),
 
       // App bar theme
       appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFF1E1E1E), // Cinza neutro
+        backgroundColor: LummyColors.darkSurface, // Cinza neutro
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.poppins(
+        titleTextStyle: LummyFonts.body(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -390,9 +390,9 @@ class AppTheme {
 
       // Bottom navigation bar theme
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF1E1E1E), // Cinza neutro
-        selectedItemColor: Color(0xFF3B82F6), // Azul vibrante
-        unselectedItemColor: Color(0xFF718096),
+        backgroundColor: LummyColors.darkSurface, // Cinza neutro
+        selectedItemColor: LummyColors.blue500, // Azul vibrante
+        unselectedItemColor: LummyColors.steel500,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
@@ -402,21 +402,21 @@ class AppTheme {
 
       // Progress indicator theme
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: Color(0xFF3B82F6), // Azul vibrante
-        circularTrackColor: Color(0xFF2D3748),
+        color: LummyColors.blue500, // Azul vibrante
+        circularTrackColor: LummyColors.steel700,
       ),
 
       // Snackbar theme
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: const Color(0xFF1E1E1E), // Cinza neutro
-        contentTextStyle: GoogleFonts.poppins(
+        backgroundColor: LummyColors.darkSurface, // Cinza neutro
+        contentTextStyle: LummyFonts.body(
           color: Colors.white,
           fontSize: 14,
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Color(0xFF2D3748), width: 1),
+          side: const BorderSide(color: LummyColors.steel700, width: 1),
         ),
       ),
     );

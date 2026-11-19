@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/services/connectivity_service.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 /// Envolve o corpo principal com um aviso compacto quando offline, sem quebrar layout.
 class ConnectivityBanner extends StatefulWidget {
@@ -69,19 +69,19 @@ class _OfflineBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor =
-        isDark ? const Color(0xFFFCA5A5) : const Color(0xFFDC2626);
-    final bg = isDark ? const Color(0xFF7F1D1D) : const Color(0xFFFEF2F2);
+        isDark ? LummyColors.red300 : LummyColors.red600;
+    final bg = isDark ? LummyColors.red900 : LummyColors.red50;
     final screenW = MediaQuery.sizeOf(context).width;
     final narrow = screenW < 360;
 
-    final messageStyle = GoogleFonts.poppins(
+    final messageStyle = LummyFonts.body(
       fontSize: narrow ? 12.5 : 13,
       fontWeight: FontWeight.w500,
       height: 1.25,
       color: textColor,
     );
 
-    final actionStyle = GoogleFonts.poppins(
+    final actionStyle = LummyFonts.body(
       fontSize: narrow ? 12.5 : 13,
       fontWeight: FontWeight.w600,
       color: textColor,

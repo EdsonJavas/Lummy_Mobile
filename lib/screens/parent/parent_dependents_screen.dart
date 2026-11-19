@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:lummy/core/utils/formatters.dart';
 import 'package:lummy/domain/entities/user_entity.dart';
@@ -9,16 +8,17 @@ import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_cubit.d
 import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_state.dart';
 import 'package:lummy/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
 import 'package:lummy/screens/parent/child_control_panel_screen.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentDependentsScreen extends StatelessWidget {
   const ParentDependentsScreen({super.key});
 
   // Paleta de cores vibrantes
-  static const _purple = Color(0xFF8B5CF6);
-  static const _blue = Color(0xFF3B82F6);
-  static const _pink = Color(0xFFEC4899);
-  static const _green = Color(0xFF10B981);
-  static const _orange = Color(0xFFF59E0B);
+  static const _purple = LummyColors.violet500;
+  static const _blue = LummyColors.blue500;
+  static const _pink = LummyColors.pink500;
+  static const _green = LummyColors.emerald500;
+  static const _orange = LummyColors.amber500;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +26,8 @@ class ParentDependentsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+          ? LummyColors.darkMaterial
+          : LummyColors.slate50,
       body: BrandedRefreshIndicator(
         onRefresh: () => context.read<ParentDashboardCubit>().refresh(),
         color: _purple,
@@ -71,23 +71,23 @@ class ParentDependentsScreen extends StatelessWidget {
                             const SizedBox(height: 24),
                             Text(
                               'Nenhum filho cadastrado',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: isDark
                                     ? Colors.white
-                                    : const Color(0xFF1E293B),
+                                    : LummyColors.slate800,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Adicione seu primeiro filho para começar a gerenciar as finanças da família.',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 14,
                                 color: isDark
-                                    ? const Color(0xFF94A3B8)
-                                    : const Color(0xFF64748B),
+                                    ? LummyColors.slate400
+                                    : LummyColors.slate500,
                               ),
                             ),
                           ],
@@ -138,8 +138,8 @@ class ParentDependentsScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF2E1065), Color(0xFF3B0764), Color(0xFF581C87)]
-              : const [Color(0xFF8B5CF6), Color(0xFF7C3AED), Color(0xFF6D28D9)],
+              ? const [LummyColors.violet950, LummyColors.purple950, LummyColors.purple900]
+              : const [LummyColors.violet500, LummyColors.violet600, LummyColors.violet700],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
@@ -177,7 +177,7 @@ class ParentDependentsScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Meus Filhos',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -185,7 +185,7 @@ class ParentDependentsScreen extends StatelessWidget {
                     ),
                     Text(
                       '${state.children.length} ${state.children.length == 1 ? 'cadastrado' : 'cadastrados'}',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Colors.white.withValues(alpha: 0.8),
@@ -242,7 +242,7 @@ class ParentDependentsScreen extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                     color: Colors.white.withValues(alpha: 0.7),
@@ -250,7 +250,7 @@ class ParentDependentsScreen extends StatelessWidget {
                 ),
                 Text(
                   value,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -288,7 +288,7 @@ class ParentDependentsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF121212) : Colors.white,
+          color: isDark ? LummyColors.darkMaterial : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark
@@ -342,12 +342,12 @@ class ParentDependentsScreen extends StatelessWidget {
                     children: [
                       Text(
                         child.name,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: isDark
                               ? Colors.white
-                              : const Color(0xFF1E293B),
+                              : LummyColors.slate800,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -364,7 +364,7 @@ class ParentDependentsScreen extends StatelessWidget {
                             ),
                             child: Text(
                               '${child.age} anos',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                                 color: cardColor,
@@ -376,17 +376,17 @@ class ParentDependentsScreen extends StatelessWidget {
                             Icons.circle,
                             size: 4,
                             color: isDark
-                                ? const Color(0xFF64748B)
-                                : const Color(0xFFCBD5E1),
+                                ? LummyColors.slate500
+                                : LummyColors.slate300,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             child.gender == Gender.male ? 'Menino' : 'Menina',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 12,
                               color: isDark
-                                  ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF64748B),
+                                  ? LummyColors.slate400
+                                  : LummyColors.slate500,
                             ),
                           ),
                         ],
@@ -464,17 +464,17 @@ class ParentDependentsScreen extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                     color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
+                        ? LummyColors.slate400
+                        : LummyColors.slate500,
                   ),
                 ),
                 Text(
                   value,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: color,

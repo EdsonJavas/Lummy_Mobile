@@ -2,13 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy/core/theme/app_theme.dart';
 import 'package:lummy/di/locator.dart';
 import 'package:lummy/domain/repositories/auth_repository.dart';
 import 'package:lummy/services/family_service.dart';
 import 'package:lummy/screens/auth/register_children_screen.dart';
 import 'package:lummy/models/responsavel_model.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -105,9 +105,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               content: Text(
                 'Este e-mail já é de uma conta de dependente. '
                 'Use outro e-mail para cadastrar o responsável.',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                style: LummyFonts.body(fontWeight: FontWeight.w500),
               ),
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: LummyColors.red500,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -123,9 +123,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SnackBar(
               content: Text(
                 'Este e-mail já está cadastrado como responsável.',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                style: LummyFonts.body(fontWeight: FontWeight.w500),
               ),
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: LummyColors.red500,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -146,9 +146,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               content: Text(
                 'Este CPF já está vinculado a uma conta de dependente. '
                 'Use outro CPF para o responsável.',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                style: LummyFonts.body(fontWeight: FontWeight.w500),
               ),
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: LummyColors.red500,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -164,9 +164,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SnackBar(
               content: Text(
                 'Este CPF já está cadastrado como responsável.',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                style: LummyFonts.body(fontWeight: FontWeight.w500),
               ),
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: LummyColors.red500,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -198,7 +198,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               content: Text(
                 registerResult.error?.message ?? 'Erro ao criar conta',
               ),
-              backgroundColor: const Color(0xFFEF4444),
+              backgroundColor: LummyColors.red500,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -253,7 +253,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao criar conta: $e'),
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: LummyColors.red500,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -294,7 +294,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                          colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+                          colors: [LummyColors.brandBlue, LummyColors.brandBlueDark],
                         ),
                 ),
               ),
@@ -313,7 +313,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           children: [
                             TextSpan(
                               text: 'Lu',
-                              style: GoogleFonts.paytoneOne(
+                              style: LummyFonts.logo(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
                                 color:
@@ -325,7 +325,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             TextSpan(
                               text: 'm',
-                              style: GoogleFonts.paytoneOne(
+                              style: LummyFonts.logo(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.orange,
@@ -333,15 +333,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             TextSpan(
                               text: 'm',
-                              style: GoogleFonts.paytoneOne(
+                              style: LummyFonts.logo(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
-                                color: const Color(0xFF003092),
+                                color: LummyColors.brandNavy,
                               ),
                             ),
                             TextSpan(
                               text: 'y',
-                              style: GoogleFonts.paytoneOne(
+                              style: LummyFonts.logo(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
                                 color:
@@ -455,23 +455,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     Theme.of(context).brightness ==
                                         Brightness.dark
                                     ? [
-                                        const Color(0xFF3B82F6),
-                                        const Color(0xFF8B5CF6),
+                                        LummyColors.blue500,
+                                        LummyColors.violet500,
                                       ] // Azul → Roxo como no site
                                     : [
                                         Theme.of(
                                               context,
                                             ).textTheme.titleLarge?.color ??
-                                            const Color(0xFF1E293B),
+                                            LummyColors.slate800,
                                         Theme.of(
                                               context,
                                             ).textTheme.titleLarge?.color ??
-                                            const Color(0xFF1E293B),
+                                            LummyColors.slate800,
                                       ],
                               ).createShader(bounds),
                               child: Text(
                                 'Crie sua conta de Responsável',
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: isVerySmallScreen ? 24 : 28,
                                   fontWeight: FontWeight.w600,
                                   color: Colors
@@ -498,14 +498,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       controller: _nameController,
                                       keyboardType: TextInputType.name,
                                       textCapitalization: TextCapitalization.words,
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: isVerySmallScreen ? 15 : 17,
                                         color: Theme.of(context).textTheme.bodyLarge?.color,
                                         fontWeight: FontWeight.w500,
                                       ),
                                       decoration: InputDecoration(
                                         hintText: 'Nome do responsável',
-                                        hintStyle: GoogleFonts.poppins(
+                                        hintStyle: LummyFonts.body(
                                           color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
                                           fontSize: isVerySmallScreen ? 15 : 16,
                                           fontWeight: FontWeight.w400,
@@ -552,7 +552,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             width: 2,
                                           ),
                                         ),
-                                        errorStyle: GoogleFonts.poppins(
+                                        errorStyle: LummyFonts.body(
                                           fontSize: isVerySmallScreen ? 11 : 12,
                                         ),
                                       ),
@@ -595,14 +595,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           );
                                         }),
                                       ],
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: isVerySmallScreen ? 15 : 17,
                                         color: Theme.of(context).textTheme.bodyLarge?.color,
                                         fontWeight: FontWeight.w500,
                                       ),
                                       decoration: InputDecoration(
                                         hintText: 'CPF',
-                                        hintStyle: GoogleFonts.poppins(
+                                        hintStyle: LummyFonts.body(
                                           color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
                                           fontSize: isVerySmallScreen ? 15 : 16,
                                           fontWeight: FontWeight.w400,
@@ -649,7 +649,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             width: 2,
                                           ),
                                         ),
-                                        errorStyle: GoogleFonts.poppins(
+                                        errorStyle: LummyFonts.body(
                                           fontSize: isVerySmallScreen ? 11 : 12,
                                         ),
                                       ),
@@ -680,7 +680,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: TextFormField(
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: isVerySmallScreen ? 15 : 17,
                                   color: Theme.of(
                                     context,
@@ -689,7 +689,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 decoration: InputDecoration(
                                   hintText: 'E-mail do responsável',
-                                  hintStyle: GoogleFonts.poppins(
+                                  hintStyle: LummyFonts.body(
                                     color: Theme.of(
                                       context,
                                     ).inputDecorationTheme.hintStyle?.color,
@@ -742,7 +742,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       width: 2,
                                     ),
                                   ),
-                                  errorStyle: GoogleFonts.poppins(
+                                  errorStyle: LummyFonts.body(
                                     fontSize: isVerySmallScreen ? 11 : 12,
                                   ),
                                 ),
@@ -776,14 +776,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     child: TextFormField(
                                       controller: _passwordController,
                                       obscureText: !_isPasswordVisible,
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: isVerySmallScreen ? 15 : 17,
                                         color: Theme.of(context).textTheme.bodyLarge?.color,
                                         fontWeight: FontWeight.w500,
                                       ),
                                       decoration: InputDecoration(
                                         hintText: 'Sua Senha',
-                                        hintStyle: GoogleFonts.poppins(
+                                        hintStyle: LummyFonts.body(
                                           color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
                                           fontSize: isVerySmallScreen ? 15 : 16,
                                           fontWeight: FontWeight.w400,
@@ -846,7 +846,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             });
                                           },
                                         ),
-                                        errorStyle: GoogleFonts.poppins(
+                                        errorStyle: LummyFonts.body(
                                           fontSize: isVerySmallScreen ? 11 : 12,
                                         ),
                                       ),
@@ -873,14 +873,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     child: TextFormField(
                                       controller: _confirmPasswordController,
                                       obscureText: !_isConfirmPasswordVisible,
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: isVerySmallScreen ? 15 : 17,
                                         color: Theme.of(context).textTheme.bodyLarge?.color,
                                         fontWeight: FontWeight.w500,
                                       ),
                                       decoration: InputDecoration(
                                         hintText: 'Confirme a Senha',
-                                        hintStyle: GoogleFonts.poppins(
+                                        hintStyle: LummyFonts.body(
                                           color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
                                           fontSize: isVerySmallScreen ? 15 : 16,
                                           fontWeight: FontWeight.w400,
@@ -943,7 +943,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             });
                                           },
                                         ),
-                                        errorStyle: GoogleFonts.poppins(
+                                        errorStyle: LummyFonts.body(
                                           fontSize: isVerySmallScreen ? 11 : 12,
                                         ),
                                       ),
@@ -971,8 +971,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
                                   colors: [
-                                    Color(0xFFFF8C42),
-                                    Color(0xFFFF7A28),
+                                    LummyColors.brandOrange,
+                                    LummyColors.brandOrangeMid,
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(
@@ -980,7 +980,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF8C42).withValues(alpha: 0.3),
+                                    color: LummyColors.brandOrange.withValues(alpha: 0.3),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),
@@ -1013,7 +1013,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       )
                                     : Text(
                                         'Avançar',
-                                        style: GoogleFonts.poppins(
+                                        style: LummyFonts.body(
                                           fontSize: isVerySmallScreen ? 16 : 18,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -1034,23 +1034,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     children: [
                                       TextSpan(
                                         text: 'Já tem uma conta Lummy? ',
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF9E9E9E),
+                                        style: LummyFonts.body(
+                                          color: LummyColors.materialGrey,
                                           fontSize: isVerySmallScreen ? 12 : 14,
                                           fontWeight: FontWeight.w400,
                                         ),
                                       ),
                                       TextSpan(
                                         text: 'Faça L',
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF9E9E9E),
+                                        style: LummyFonts.body(
+                                          color: LummyColors.materialGrey,
                                           fontSize: isVerySmallScreen ? 12 : 14,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                       TextSpan(
                                         text: 'o',
-                                        style: GoogleFonts.poppins(
+                                        style: LummyFonts.body(
                                           color: Colors.orange,
                                           fontSize: isVerySmallScreen ? 12 : 14,
                                           fontWeight: FontWeight.w600,
@@ -1058,16 +1058,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       ),
                                       TextSpan(
                                         text: 'g',
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF003092),
+                                        style: LummyFonts.body(
+                                          color: LummyColors.brandNavy,
                                           fontSize: isVerySmallScreen ? 12 : 14,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                       TextSpan(
                                         text: 'in',
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF9E9E9E),
+                                        style: LummyFonts.body(
+                                          color: LummyColors.materialGrey,
                                           fontSize: isVerySmallScreen ? 12 : 14,
                                           fontWeight: FontWeight.w600,
                                         ),

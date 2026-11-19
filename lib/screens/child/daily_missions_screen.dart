@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/utils/ensure_child_record.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class DailyMissionsScreen extends StatefulWidget {
   const DailyMissionsScreen({super.key});
@@ -340,9 +340,9 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
         SnackBar(
           content: Text(
             'Erro ao completar missão: $e',
-            style: GoogleFonts.poppins(),
+            style: LummyFonts.body(),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -480,7 +480,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
               // Título
               Text(
                 'Missão Completa!',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                   color: Theme.of(context).textTheme.titleLarge?.color,
@@ -491,7 +491,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
               // Nome da missão
               Text(
                 mission['title'] as String,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -527,7 +527,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                     const SizedBox(width: 8),
                     Text(
                       '+$pointsEarned pontos',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: mission['color'] as Color,
@@ -557,7 +557,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                   ),
                   child: Text(
                     'Continuar',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
@@ -601,7 +601,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                         const SizedBox(height: 16),
                         Text(
                           _errorMessage!,
-                          style: GoogleFonts.poppins(),
+                          style: LummyFonts.body(),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
@@ -632,12 +632,12 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                   Theme.of(context).brightness ==
                                       Brightness.dark
                                   ? [
-                                      const Color(0xFF8B5CF6),
-                                      const Color(0xFF3B82F6),
+                                      LummyColors.violet500,
+                                      LummyColors.blue500,
                                     ]
                                   : [
-                                      const Color(0xFF1E40AF),
-                                      const Color(0xFF1E3A8A),
+                                      LummyColors.blue800,
+                                      LummyColors.blue900,
                                     ],
                             ),
                             borderRadius: const BorderRadius.only(
@@ -667,7 +667,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                   Expanded(
                                     child: Text(
                                       'Missões Diárias',
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w700,
                                         color: Colors.white,
@@ -691,7 +691,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                     children: [
                                       Text(
                                         'Seu Progresso',
-                                        style: GoogleFonts.poppins(
+                                        style: LummyFonts.body(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
                                           color: Colors.white.withValues(alpha: 0.9),
@@ -702,7 +702,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                         children: [
                                           Text(
                                             earnedPoints.toString(),
-                                            style: GoogleFonts.poppins(
+                                            style: LummyFonts.body(
                                               fontSize: 32,
                                               fontWeight: FontWeight.w700,
                                               color: Colors.white,
@@ -710,7 +710,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                           ),
                                           Text(
                                             ' / $totalPoints',
-                                            style: GoogleFonts.poppins(
+                                            style: LummyFonts.body(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w500,
                                               color: Colors.white.withValues(
@@ -723,7 +723,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                       const SizedBox(height: 4),
                                       Text(
                                         'Pontos hoje',
-                                        style: GoogleFonts.poppins(
+                                        style: LummyFonts.body(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
                                           color: Colors.white.withValues(alpha: 0.8),
@@ -741,7 +741,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                       children: [
                                         Text(
                                           '$completedMissions/${missions.length}',
-                                          style: GoogleFonts.poppins(
+                                          style: LummyFonts.body(
                                             fontSize: 24,
                                             fontWeight: FontWeight.w700,
                                             color: Colors.white,
@@ -749,7 +749,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                         ),
                                         Text(
                                           'Completas',
-                                          style: GoogleFonts.poppins(
+                                          style: LummyFonts.body(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
                                             color: Colors.white.withValues(
@@ -776,7 +776,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                           children: [
                                             Text(
                                               'Progresso Diário',
-                                              style: GoogleFonts.poppins(
+                                              style: LummyFonts.body(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w600,
                                                 color: Colors.white.withValues(
@@ -788,7 +788,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                               missions.isEmpty
                                                   ? '0%'
                                                   : '${((completedMissions / missions.length) * 100).toStringAsFixed(0)}%',
-                                              style: GoogleFonts.poppins(
+                                              style: LummyFonts.body(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w700,
                                                 color: Colors.white,
@@ -832,9 +832,9 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                                   gradient:
                                                       const LinearGradient(
                                                         colors: [
-                                                          Color(0xFF10B981),
-                                                          Color(0xFF34D399),
-                                                          Color(0xFF6EE7B7),
+                                                          LummyColors.emerald500,
+                                                          LummyColors.emerald400,
+                                                          LummyColors.emerald300,
                                                         ],
                                                       ),
                                                   borderRadius:
@@ -880,7 +880,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                     const SizedBox(height: 16),
                                     Text(
                                       'Nenhuma missão disponível',
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -889,7 +889,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                     const SizedBox(height: 8),
                                     Text(
                                       'As missões diárias aparecerão aqui!',
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: 14,
                                         color: Theme.of(
                                           context,
@@ -914,17 +914,17 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                                 Theme.of(context).brightness ==
                                                     Brightness.dark
                                                 ? [
-                                                    const Color(0xFF3B82F6),
-                                                    const Color(0xFF8B5CF6),
+                                                    LummyColors.blue500,
+                                                    LummyColors.violet500,
                                                   ] // Azul → Roxo
                                                 : [
-                                                    const Color(0xFF1E293B),
-                                                    const Color(0xFF1E293B),
+                                                    LummyColors.slate800,
+                                                    LummyColors.slate800,
                                                   ],
                                           ).createShader(bounds),
                                       child: Text(
                                         'Missões de Hoje',
-                                        style: GoogleFonts.poppins(
+                                        style: LummyFonts.body(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.white,
@@ -974,7 +974,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
               ? (mission['color'] as Color).withValues(alpha: 0.3)
               : Theme.of(context).brightness == Brightness.dark
               ? Theme.of(context).dividerColor
-              : const Color(0xFFE2E8F0),
+              : LummyColors.slate200,
           width: isCompleted ? 2 : 1,
         ),
         boxShadow: [
@@ -1011,7 +1011,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                   children: [
                     Text(
                       mission['title'] as String,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).textTheme.titleLarge?.color,
@@ -1020,7 +1020,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                     const SizedBox(height: 4),
                     Text(
                       mission['description'] as String,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -1040,7 +1040,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                 ),
                 child: Text(
                   '+${mission['points']}',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: mission['color'] as Color,
@@ -1059,7 +1059,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                   decoration: BoxDecoration(
                     color: Theme.of(context).brightness == Brightness.dark
                         ? Theme.of(context).dividerColor
-                        : const Color(0xFFE2E8F0),
+                        : LummyColors.slate200,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: FractionallySizedBox(
@@ -1077,7 +1077,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
               const SizedBox(width: 12),
               Text(
                 '$progress/$total',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -1102,7 +1102,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                 ),
                 child: Text(
                   'Completar Missão',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1115,7 +1115,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
             Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                color: LummyColors.emerald500.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -1123,16 +1123,16 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                 children: [
                   const Icon(
                     Icons.check_circle,
-                    color: Color(0xFF10B981),
+                    color: LummyColors.emerald500,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Missão Concluída!',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF10B981),
+                      color: LummyColors.emerald500,
                     ),
                   ),
                 ],

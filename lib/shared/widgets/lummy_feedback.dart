@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 enum LummyFeedbackType { success, error, warning, info }
 
 class LummyFeedback {
   LummyFeedback._();
 
-  static const _green = Color(0xFF10B981);
-  static const _red = Color(0xFFEF4444);
-  static const _orange = Color(0xFFF59E0B);
-  static const _blue = Color(0xFF3B82F6);
+  static const _green = LummyColors.emerald500;
+  static const _red = LummyColors.red500;
+  static const _orange = LummyColors.amber500;
+  static const _blue = LummyColors.blue500;
 
   static Color _colorFor(LummyFeedbackType type) {
     switch (type) {
@@ -57,7 +57,7 @@ class LummyFeedback {
               Expanded(
                 child: Text(
                   message,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
                     color: Colors.white,
@@ -137,7 +137,7 @@ class _LoadingScrim extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF1E1E2E)
+                ? LummyColors.darkNavySurface
                 : Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [

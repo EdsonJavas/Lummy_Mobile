@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class SkeletonLoader extends StatelessWidget {
   final double width;
@@ -18,15 +19,15 @@ class SkeletonLoader extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Shimmer.fromColors(
-      baseColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+      baseColor: isDark ? LummyColors.slate800 : LummyColors.slate200,
       highlightColor: isDark
-          ? const Color(0xFF334155)
-          : const Color(0xFFF1F5F9),
+          ? LummyColors.slate700
+          : LummyColors.slate100,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+          color: isDark ? LummyColors.slate800 : LummyColors.slate200,
           borderRadius: borderRadius ?? BorderRadius.circular(8),
         ),
       ),

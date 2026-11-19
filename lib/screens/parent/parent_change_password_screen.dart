@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy/application/app_facade.dart';
 import 'package:lummy/di/locator.dart';
 import 'package:lummy/shared/widgets/lummy_feedback.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentChangePasswordScreen extends StatefulWidget {
   const ParentChangePasswordScreen({super.key});
@@ -24,7 +24,7 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
   bool _obscureConfirm = true;
   bool _isLoading = false;
 
-  static const _purple = Color(0xFF8B5CF6);
+  static const _purple = LummyColors.violet500;
 
   @override
   void dispose() {
@@ -82,12 +82,12 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
               const SizedBox(width: 12),
               Text(
                 'Senha alterada com sucesso.',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                     fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],
           ),
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: LummyColors.emerald500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12)),
@@ -113,7 +113,7 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
       SnackBar(
         content: Text(
           message,
-          style: GoogleFonts.poppins(fontSize: 14),
+          style: LummyFonts.body(fontSize: 14),
         ),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
@@ -127,23 +127,23 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
 
     return Scaffold(
       backgroundColor:
-          isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC),
+          isDark ? LummyColors.darkMaterial : LummyColors.slate50,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
           onPressed: () => Navigator.of(context).pop(false),
         ),
         title: Text(
           'Alterar senha',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
         ),
       ),
@@ -157,11 +157,11 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
               const SizedBox(height: 16),
               Text(
                 'Informe sua senha atual e a nova senha. Use no mínimo 6 caracteres.',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
                   color: isDark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
+                      ? LummyColors.slate400
+                      : LummyColors.slate500,
                 ),
               ),
               const SizedBox(height: 24),
@@ -188,12 +188,12 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(
                       color: isDark
-                          ? const Color(0xFF334155)
-                          : const Color(0xFFE2E8F0),
+                          ? LummyColors.slate700
+                          : LummyColors.slate200,
                     ),
                   ),
                 ),
-                style: GoogleFonts.poppins(fontSize: 15),
+                style: LummyFonts.body(fontSize: 15),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Informe sua senha atual';
                   return null;
@@ -223,12 +223,12 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(
                       color: isDark
-                          ? const Color(0xFF334155)
-                          : const Color(0xFFE2E8F0),
+                          ? LummyColors.slate700
+                          : LummyColors.slate200,
                     ),
                   ),
                 ),
-                style: GoogleFonts.poppins(fontSize: 15),
+                style: LummyFonts.body(fontSize: 15),
                 validator: (v) {
                   if (v == null || v.isEmpty) return 'Informe a nova senha';
                   if (v.length < 6) return 'Mínimo 6 caracteres';
@@ -259,12 +259,12 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
                     borderRadius: BorderRadius.circular(14),
                     borderSide: BorderSide(
                       color: isDark
-                          ? const Color(0xFF334155)
-                          : const Color(0xFFE2E8F0),
+                          ? LummyColors.slate700
+                          : LummyColors.slate200,
                     ),
                   ),
                 ),
-                style: GoogleFonts.poppins(fontSize: 15),
+                style: LummyFonts.body(fontSize: 15),
                 validator: (v) {
                   if (v != _newController.text) return 'As senhas não conferem';
                   return null;
@@ -294,7 +294,7 @@ class _ParentChangePasswordScreenState extends State<ParentChangePasswordScreen>
                         )
                       : Text(
                           'Alterar senha',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                               fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                 ),

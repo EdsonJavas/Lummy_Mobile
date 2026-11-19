@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class MoneyTextField extends StatefulWidget {
   final String? label;
@@ -128,7 +128,7 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
         if (widget.label != null) ...[
           Text(
             widget.label!,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: widget.isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w600,
               color: theme.textTheme.titleMedium?.color,
@@ -142,16 +142,16 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: _isFocused
-                  ? const Color(0xFF3B82F6)
+                  ? LummyColors.blue500
                   : isDark
-                  ? const Color(0xFF2D3748)
-                  : const Color(0xFFE2E8F0),
+                  ? LummyColors.steel700
+                  : LummyColors.slate200,
               width: _isFocused ? 2 : 1,
             ),
             boxShadow: _isFocused
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                      color: LummyColors.blue500.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -166,20 +166,20 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
             textAlign: widget.textAlign,
             keyboardType: const TextInputType.numberWithOptions(decimal: false),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: widget.fontSize ?? (widget.isSmallScreen ? 18 : 20),
               fontWeight: widget.fontWeight ?? FontWeight.w600,
               color: theme.textTheme.titleLarge?.color,
             ),
             decoration: InputDecoration(
               hintText: widget.hint ?? '0,00',
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: LummyFonts.body(
                 fontSize: widget.fontSize ?? (widget.isSmallScreen ? 18 : 20),
                 fontWeight: FontWeight.w400,
                 color: theme.textTheme.bodyMedium?.color,
               ),
               prefixText: widget.showPrefix ? widget.prefixText : null,
-              prefixStyle: GoogleFonts.poppins(
+              prefixStyle: LummyFonts.body(
                 fontSize: widget.fontSize ?? (widget.isSmallScreen ? 18 : 20),
                 fontWeight: widget.fontWeight ?? FontWeight.w600,
                 color: widget.prefixColor ?? theme.textTheme.titleLarge?.color,
@@ -195,14 +195,14 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF374151)
-                              : const Color(0xFFF3F4F6),
+                              ? LummyColors.gray700
+                              : LummyColors.gray100,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
                           Icons.clear_rounded,
                           size: 16,
-                          color: Color(0xFF9CA3AF),
+                          color: LummyColors.gray400,
                         ),
                       ),
                     )
@@ -214,8 +214,8 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
               focusedErrorBorder: InputBorder.none,
               filled: true,
               fillColor: isDark
-                  ? const Color(0xFF1E293B).withValues(alpha: 0.5)
-                  : const Color(0xFFF8FAFC),
+                  ? LummyColors.slate800.withValues(alpha: 0.5)
+                  : LummyColors.slate50,
               contentPadding:
                   widget.contentPadding ??
                   EdgeInsets.symmetric(
@@ -234,16 +234,16 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
               const Icon(
                 Icons.error_outline_rounded,
                 size: 16,
-                color: Color(0xFFEF4444),
+                color: LummyColors.red500,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   widget.errorText!,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: widget.isSmallScreen ? 12 : 14,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFFEF4444),
+                    color: LummyColors.red500,
                   ),
                 ),
               ),

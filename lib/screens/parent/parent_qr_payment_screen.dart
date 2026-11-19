@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy/core/utils/formatters.dart';
 import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 /// Confirmação de envio ao filho após leitura do QR Code — identidade visual Lummy.
 class ParentQRPaymentScreen extends StatefulWidget {
@@ -26,11 +26,11 @@ class ParentQRPaymentScreen extends StatefulWidget {
 }
 
 class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
-  static const _purple = Color(0xFF8B5CF6);
-  static const _blue = Color(0xFF3B82F6);
-  static const _green = Color(0xFF10B981);
-  static const _red = Color(0xFFEF4444);
-  static const _orange = Color(0xFFF59E0B);
+  static const _purple = LummyColors.violet500;
+  static const _blue = LummyColors.blue500;
+  static const _green = LummyColors.emerald500;
+  static const _red = LummyColors.red500;
+  static const _orange = LummyColors.amber500;
 
   bool _isLoading = true;
   bool _isSending = false;
@@ -166,7 +166,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
           SnackBar(
             content: Text(
               '${AppFormatters.formatCurrency(widget.amount)} enviado para $_childName!',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              style: LummyFonts.body(fontWeight: FontWeight.w500),
             ),
             backgroundColor: _green,
             behavior: SnackBarBehavior.floating,
@@ -181,7 +181,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
         final message = cubit.state.error ?? 'Erro ao enviar. Tente novamente.';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(message, style: GoogleFonts.poppins()),
+            content: Text(message, style: LummyFonts.body()),
             backgroundColor: _red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -197,7 +197,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
           SnackBar(
             content: Text(
               'Erro ao enviar. Tente novamente.',
-              style: GoogleFonts.poppins(),
+              style: LummyFonts.body(),
             ),
             backgroundColor: _red,
             behavior: SnackBarBehavior.floating,
@@ -213,10 +213,10 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC);
-    final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
-    final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final bg = isDark ? LummyColors.darkMaterial : LummyColors.slate50;
+    final cardBg = isDark ? LummyColors.darkSurface : Colors.white;
+    final borderColor = isDark ? LummyColors.slate700 : LummyColors.slate200;
+    final textSecondary = isDark ? LummyColors.slate400 : LummyColors.slate500;
 
     Widget body;
     if (_isLoading) {
@@ -285,16 +285,16 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                 const SizedBox(height: 24),
                 Text(
                   'Validando pedido',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    color: isDark ? Colors.white : LummyColors.slate800,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Conectando com sua conta Lummy…',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     color: textSecondary,
                   ),
@@ -359,10 +359,10 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                   Text(
                     _error ?? 'Não foi possível carregar. Tente novamente.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: isDark ? Colors.white : LummyColors.slate800,
                       height: 1.55,
                     ),
                   ),
@@ -381,7 +381,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                       ),
                       child: Text(
                         'Voltar',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),
@@ -426,12 +426,12 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                     end: Alignment.bottomRight,
                     colors: isDark
                         ? [
-                            const Color(0xFF2E1065),
-                            const Color(0xFF1E1B4B),
+                            LummyColors.violet950,
+                            LummyColors.indigo950,
                           ]
                         : [
-                            const Color(0xFFF5F3FF),
-                            const Color(0xFFEEF2FF),
+                            LummyColors.violet50,
+                            LummyColors.indigo50,
                           ],
                   ),
                   borderRadius: BorderRadius.circular(24),
@@ -463,11 +463,11 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                         const SizedBox(width: 8),
                         Text(
                           'Pedido via QR Code',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: isDark
-                                ? const Color(0xFFC4B5FD)
+                                ? LummyColors.violet300
                                 : _purple,
                           ),
                         ),
@@ -476,22 +476,22 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                     const SizedBox(height: 16),
                     Text(
                       'Valor a enviar',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: isDark
-                            ? const Color(0xFFA5B4FC)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.indigo300
+                            : LummyColors.slate500,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       AppFormatters.formatCurrency(widget.amount),
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 40,
                         fontWeight: FontWeight.w800,
-                        color: isDark ? Colors.white : const Color(0xFF1E1B4B),
+                        color: isDark ? Colors.white : LummyColors.indigo950,
                         letterSpacing: -1.2,
                         height: 1.1,
                       ),
@@ -503,7 +503,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
               Center(
                 child: Text(
                   'Direto ao filho · via QR Code',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.2,
@@ -553,7 +553,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                       alignment: Alignment.center,
                       child: Text(
                         initial,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -567,16 +567,16 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                         children: [
                           Text(
                             name,
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                              color: isDark ? Colors.white : LummyColors.slate800,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Filho cadastrado na sua conta Lummy',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 12,
                               color: textSecondary,
                             ),
@@ -622,10 +622,10 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                             (_description != null && _description!.isNotEmpty)
                                 ? _description!
                                 : 'Sem descrição no QR',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                              color: isDark ? Colors.white : LummyColors.slate800,
                               height: 1.45,
                             ),
                           ),
@@ -633,7 +633,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                             const SizedBox(height: 6),
                             Text(
                               'O filho pode incluir um motivo ao gerar o código no futuro.',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 12,
                                 color: textSecondary,
                               ),
@@ -680,15 +680,15 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                         children: [
                           Text(
                             'Lummy',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                              color: isDark ? Colors.white : LummyColors.slate800,
                             ),
                           ),
                           Text(
                             'Educação financeira em família',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 12,
                               color: textSecondary,
                             ),
@@ -706,7 +706,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   gradient: const LinearGradient(
-                    colors: [_purple, Color(0xFF7C3AED)],
+                    colors: [_purple, LummyColors.violet600],
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -742,7 +742,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                                 const SizedBox(width: 10),
                                 Text(
                                   'Confirmar e enviar',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
@@ -758,7 +758,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
               Text(
                 'O valor será debitado do seu saldo Lummy e creditado no saldo do filho.',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 12,
                   color: textSecondary,
                   height: 1.4,
@@ -782,14 +782,14 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
           end: Alignment.bottomRight,
           colors: isDark
               ? const [
-                  Color(0xFF2E1065),
-                  Color(0xFF1E1B4B),
-                  Color(0xFF312E81),
+                  LummyColors.violet950,
+                  LummyColors.indigo950,
+                  LummyColors.indigo900,
                 ]
               : const [
-                  Color(0xFF8B5CF6),
-                  Color(0xFF7C3AED),
-                  Color(0xFF6366F1),
+                  LummyColors.violet500,
+                  LummyColors.violet600,
+                  LummyColors.indigo500,
                 ],
         ),
         borderRadius: const BorderRadius.only(
@@ -825,7 +825,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                   children: [
                     Text(
                       'Enviar dinheiro',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -835,7 +835,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
                     const SizedBox(height: 4),
                     Text(
                       'Pedido escaneado pelo QR Code',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Colors.white.withValues(alpha: 0.88),
@@ -865,7 +865,7 @@ class _ParentQRPaymentScreenState extends State<ParentQRPaymentScreen> {
         const SizedBox(width: 10),
         Text(
           text,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 14,
             fontWeight: FontWeight.w700,
             color: textSecondary,

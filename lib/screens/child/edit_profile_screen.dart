@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -95,9 +95,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         SnackBar(
           content: Text(
             'Erro ao carregar dados do perfil: $e',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -159,9 +159,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           SnackBar(
             content: Text(
               'Foto atualizada com sucesso! 📸',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+              style: LummyFonts.body(fontWeight: FontWeight.w500),
             ),
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: LummyColors.emerald500,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -175,9 +175,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         SnackBar(
           content: Text(
             'Erro ao selecionar imagem',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
         ),
       );
     }
@@ -193,9 +193,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         SnackBar(
           content: Text(
             'Por favor, selecione o sexo',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -253,9 +253,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         SnackBar(
           content: Text(
             'Perfil atualizado com sucesso! ✨',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: LummyColors.emerald500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -278,9 +278,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         SnackBar(
           content: Text(
             'Erro ao salvar perfil: $e',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontWeight: FontWeight.w500),
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: LummyColors.red500,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
@@ -305,7 +305,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           centerTitle: true,
           title: Text(
             'Editar Perfil',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -328,7 +328,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         centerTitle: true,
         title: Text(
           'Editar Perfil',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.white,
@@ -541,7 +541,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       width: 2,
                     ),
                   ),
-                  labelStyle: GoogleFonts.poppins(
+                  labelStyle: LummyFonts.body(
                     color: Theme.of(
                       context,
                     ).inputDecorationTheme.labelStyle?.color,
@@ -615,7 +615,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         children: [
                           Text(
                             'Requer Aprovação',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Theme.of(
@@ -626,7 +626,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           const SizedBox(height: 4),
                           Text(
                             'Transações precisam de aprovação do responsável',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 12,
                               color: Theme.of(
                                 context,
@@ -677,7 +677,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         )
                       : Text(
                           'Salvar Alterações',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -724,14 +724,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFEF4444)),
+          borderSide: const BorderSide(color: LummyColors.red500),
         ),
-        labelStyle: GoogleFonts.poppins(
+        labelStyle: LummyFonts.body(
           color: Theme.of(context).inputDecorationTheme.labelStyle?.color,
           fontWeight: FontWeight.w500,
         ),
       ),
-      style: GoogleFonts.poppins(
+      style: LummyFonts.body(
         fontSize: 16,
         color: Theme.of(context).textTheme.bodyLarge?.color,
       ),

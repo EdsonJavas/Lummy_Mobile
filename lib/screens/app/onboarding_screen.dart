@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class OnboardingScreen extends StatelessWidget {
   final Widget nextPage;
@@ -75,11 +75,11 @@ class _OnboardingContentState extends State<_OnboardingContent>
   late final AnimationController _contentController;
   late final AnimationController _floatController;
 
-  static const _blue = Color(0xFF3B82F6);
-  static const _purple = Color(0xFF8B5CF6);
-  static const _green = Color(0xFF10B981);
-  static const _orange = Color(0xFFF59E0B);
-  static const _teal = Color(0xFF14B8A6);
+  static const _blue = LummyColors.blue500;
+  static const _purple = LummyColors.violet500;
+  static const _green = LummyColors.emerald500;
+  static const _orange = LummyColors.amber500;
+  static const _teal = LummyColors.teal500;
 
   static const List<_OnboardingPage> _pages = [
     _OnboardingPage(
@@ -87,7 +87,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
       subtitle:
           'A forma mais simples de ensinar seus filhos a lidar com dinheiro — com segurança e controle total.',
       color: _blue,
-      colorDark: Color(0xFF1E40AF),
+      colorDark: LummyColors.blue800,
       heroIcon: Icons.family_restroom_rounded,
       steps: [
         _OnboardingStep(
@@ -109,7 +109,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
       subtitle:
           'Cada filho tem um saldo virtual que você controla. Ele vê quanto tem, aprende a planejar e só gasta com sua aprovação.',
       color: _purple,
-      colorDark: Color(0xFF6D28D9),
+      colorDark: LummyColors.violet700,
       heroIcon: Icons.account_balance_wallet_rounded,
       steps: [
         _OnboardingStep(
@@ -131,7 +131,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
       subtitle:
           'Mesada, presente ou um extra — envie valores direto pelo app em segundos, com biometria para segurança.',
       color: _orange,
-      colorDark: Color(0xFFD97706),
+      colorDark: LummyColors.amber600,
       heroIcon: Icons.bolt_rounded,
       steps: [
         _OnboardingStep(
@@ -153,7 +153,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
       subtitle:
           'Seu filho pede, você decide. Cada pedido chega com valor e motivo — aprove ou rejeite com um toque.',
       color: _green,
-      colorDark: Color(0xFF059669),
+      colorDark: LummyColors.emerald600,
       heroIcon: Icons.verified_user_rounded,
       steps: [
         _OnboardingStep(
@@ -175,7 +175,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
       subtitle:
           'Insights sobre gastos, metas de economia e conteúdos educativos para ensinar o valor do dinheiro.',
       color: _teal,
-      colorDark: Color(0xFF0D9488),
+      colorDark: LummyColors.teal600,
       heroIcon: Icons.auto_graph_rounded,
       steps: [
         _OnboardingStep(
@@ -267,7 +267,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF8FAFC);
+    final bg = isDark ? LummyColors.darkBase : LummyColors.slate50;
 
     return Scaffold(
       backgroundColor: bg,
@@ -297,14 +297,14 @@ class _OnboardingContentState extends State<_OnboardingContent>
 
   Widget _buildTopBar(bool isDark) {
     final subtitleColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+        isDark ? LummyColors.slate400 : LummyColors.slate500;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 12, 8, 0),
       child: Row(
         children: [
           Text(
             '${_currentPage + 1} de ${_pages.length}',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: _pages[_currentPage].color,
@@ -315,7 +315,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
             onPressed: _finish,
             child: Text(
               'Pular',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: subtitleColor,
@@ -333,7 +333,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
 
   Widget _buildProgressBar(bool isDark) {
     final trackColor =
-        isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
+        isDark ? LummyColors.slate800 : LummyColors.slate200;
     final progress = (_currentPage + 1) / _pages.length;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -375,12 +375,12 @@ class _OnboardingContentState extends State<_OnboardingContent>
 
   Widget _buildPage(int index, bool isDark) {
     final page = _pages[index];
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final titleColor = isDark ? Colors.white : LummyColors.slate900;
     final subtitleColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final cardBg = isDark ? const Color(0xFF1A1A2E) : Colors.white;
+        isDark ? LummyColors.slate400 : LummyColors.slate500;
+    final cardBg = isDark ? LummyColors.darkNavy : Colors.white;
     final borderColor =
-        isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0);
+        isDark ? LummyColors.darkSurfaceHigh : LummyColors.slate200;
 
     final heroAnim = CurvedAnimation(
       parent: _heroController,
@@ -429,7 +429,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
                   opacity: contentAnim.value.clamp(0.0, 1.0),
                   child: Text(
                     page.title,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 28,
                       fontWeight: FontWeight.w700,
                       color: titleColor,
@@ -456,7 +456,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
                   opacity: delayed,
                   child: Text(
                     page.subtitle,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 15,
                       fontWeight: FontWeight.w400,
                       color: subtitleColor,
@@ -652,7 +652,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
           Expanded(
             child: Text(
               step.text,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: titleColor,
@@ -673,7 +673,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
     final isLast = _currentPage == _pages.length - 1;
     final page = _pages[_currentPage];
     final subtitleColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+        isDark ? LummyColors.slate400 : LummyColors.slate500;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
@@ -698,7 +698,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
                 ),
                 style: IconButton.styleFrom(
                   backgroundColor:
-                      isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                      isDark ? LummyColors.slate800 : LummyColors.slate100,
                   padding: const EdgeInsets.all(12),
                 ),
               ),
@@ -739,7 +739,7 @@ class _OnboardingContentState extends State<_OnboardingContent>
                         children: [
                           Text(
                             isLast ? 'Começar' : 'Próximo',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,

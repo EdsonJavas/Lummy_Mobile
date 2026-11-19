@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 enum CardStyle { filled, outlined, elevated }
 
@@ -28,10 +29,10 @@ class CustomCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final defaultColor = color ??
         (isDark ? Theme.of(context).cardTheme.color : null) ??
-        const Color(AppConstants.backgroundWhite);
+        LummyColors.white;
     final borderColor = isDark
         ? Theme.of(context).dividerColor
-        : const Color(AppConstants.borderLight);
+        : LummyColors.slate200;
 
     final Widget cardChild = Container(
       padding: padding ?? const EdgeInsets.all(AppConstants.spacingLarge),

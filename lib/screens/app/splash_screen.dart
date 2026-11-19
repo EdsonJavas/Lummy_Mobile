@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/providers/theme_provider.dart';
@@ -13,6 +12,7 @@ import 'package:lummy/screens/child/main_navigation.dart';
 import 'package:lummy/screens/parent/parent_main_navigation.dart';
 import 'package:lummy/screens/app/onboarding_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -37,10 +37,10 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _textOpacity;
 
   // Cores da marca Lummy
-  static const _blue = Color(0xFF3B82F6);
-  static const _purple = Color(0xFF8B5CF6);
-  static const _orange = Color(0xFFF59E0B);
-  static const _green = Color(0xFF10B981);
+  static const _blue = LummyColors.blue500;
+  static const _purple = LummyColors.violet500;
+  static const _orange = LummyColors.amber500;
+  static const _green = LummyColors.emerald500;
 
   String _loadingText = 'Inicializando';
   int _loadingDots = 0;
@@ -233,7 +233,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF172554),
+      backgroundColor: LummyColors.blue950,
       body: Stack(
         children: [
           _buildBackground(),
@@ -267,7 +267,7 @@ class _SplashScreenState extends State<SplashScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF172554), Color(0xFF1E1B4B), Color(0xFF172554)],
+          colors: [LummyColors.blue950, LummyColors.indigo950, LummyColors.blue950],
           stops: [0.0, 0.5, 1.0],
         ),
       ),
@@ -330,9 +330,9 @@ class _SplashScreenState extends State<SplashScreen>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFF3B82F6),
-                        Color(0xFF8B5CF6),
-                        Color(0xFF6366F1),
+                        LummyColors.blue500,
+                        LummyColors.violet500,
+                        LummyColors.indigo500,
                       ],
                     ),
                     boxShadow: [
@@ -359,11 +359,11 @@ class _SplashScreenState extends State<SplashScreen>
       shaderCallback: (bounds) => const LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [Colors.white, Color(0xFFE0E7FF)],
+        colors: [Colors.white, LummyColors.indigo100],
       ).createShader(bounds),
       child: Text(
         'L',
-        style: GoogleFonts.fredoka(
+        style: LummyFonts.rounded(
           fontSize: 72,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -456,7 +456,7 @@ class _SplashScreenState extends State<SplashScreen>
                 children: [
                   TextSpan(
                     text: 'Lu',
-                    style: GoogleFonts.paytoneOne(
+                    style: LummyFonts.logo(
                       fontSize: 52,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -464,7 +464,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   TextSpan(
                     text: 'm',
-                    style: GoogleFonts.paytoneOne(
+                    style: LummyFonts.logo(
                       fontSize: 52,
                       fontWeight: FontWeight.w700,
                       color: Colors.orange,
@@ -472,15 +472,15 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   TextSpan(
                     text: 'm',
-                    style: GoogleFonts.paytoneOne(
+                    style: LummyFonts.logo(
                       fontSize: 52,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF003092),
+                      color: LummyColors.brandNavy,
                     ),
                   ),
                   TextSpan(
                     text: 'y',
-                    style: GoogleFonts.paytoneOne(
+                    style: LummyFonts.logo(
                       fontSize: 52,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -505,7 +505,7 @@ class _SplashScreenState extends State<SplashScreen>
           opacity: delayedOpacity,
           child: Text(
             'Educação Financeira Inteligente',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 14,
               fontWeight: FontWeight.w400,
               color: Colors.white.withValues(alpha: 0.6),
@@ -563,7 +563,7 @@ class _SplashScreenState extends State<SplashScreen>
             const SizedBox(height: 20),
             Text(
               '$_loadingText${'.' * _loadingDots}',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
                 color: Colors.white.withValues(alpha: 0.5),

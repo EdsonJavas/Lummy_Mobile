@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import 'custom_button.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class EmptyState extends StatelessWidget {
   final String emoji;
@@ -29,9 +29,9 @@ class EmptyState extends StatelessWidget {
         MediaQuery.of(context).size.height < AppConstants.smallScreenHeight;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final titleColor =
-        isDark ? Colors.white : const Color(AppConstants.textPrimary);
+        isDark ? Colors.white : LummyColors.slate800;
     final subtitleColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(AppConstants.textSecondary);
+        isDark ? LummyColors.slate400 : LummyColors.slate500;
 
     return Semantics(
       label: '$title. $message',
@@ -47,7 +47,7 @@ class EmptyState extends StatelessWidget {
                   width: isSmallScreen ? 80 : 96,
                   height: isSmallScreen ? 80 : 96,
                   decoration: BoxDecoration(
-                    color: (iconColor ?? const Color(AppConstants.primaryBlue))
+                    color: (iconColor ?? LummyColors.brandBlue)
                         .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
@@ -55,7 +55,7 @@ class EmptyState extends StatelessWidget {
                   child: Icon(
                     icon,
                     size: isSmallScreen ? 36 : 44,
-                    color: iconColor ?? const Color(AppConstants.primaryBlue),
+                    color: iconColor ?? LummyColors.brandBlue,
                   ),
                 ),
               ] else ...[
@@ -70,7 +70,7 @@ class EmptyState extends StatelessWidget {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 18 : 20,
                   fontWeight: FontWeight.w600,
                   color: titleColor,
@@ -80,7 +80,7 @@ class EmptyState extends StatelessWidget {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSmallScreen ? 14 : 15,
                   fontWeight: FontWeight.w400,
                   color: subtitleColor,

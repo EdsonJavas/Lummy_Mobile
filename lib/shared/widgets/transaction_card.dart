@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/formatters.dart';
 import '../../domain/entities/transaction_entity.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class TransactionCard extends StatelessWidget {
   final TransactionEntity transaction;
@@ -25,25 +25,25 @@ class TransactionCard extends StatelessWidget {
         MediaQuery.of(context).size.height < AppConstants.smallScreenHeight;
 
     // Cores adaptadas ao tema
-    final textPrimary = isDark ? Colors.white : const Color(0xFF1E293B);
+    final textPrimary = isDark ? Colors.white : LummyColors.slate800;
     final textSecondary = isDark
-        ? const Color(0xFF94A3B8)
-        : const Color(0xFF64748B);
+        ? LummyColors.slate400
+        : LummyColors.slate500;
     final dividerColor = isDark
         ? Colors.white.withValues(alpha: 0.2)
-        : const Color(0xFFCBD5E1);
+        : LummyColors.slate300;
 
     // Cor baseada no tipo e status
     Color amountColor;
     Color iconBackgroundColor;
 
     if (transaction.isIncome) {
-      amountColor = const Color(0xFF10B981);
+      amountColor = LummyColors.emerald500;
       iconBackgroundColor = const Color(
         0xFF10B981,
       ).withValues(alpha: isDark ? 0.2 : 0.1);
     } else {
-      amountColor = const Color(0xFFEF4444);
+      amountColor = LummyColors.red500;
       iconBackgroundColor = const Color(
         0xFFEF4444,
       ).withValues(alpha: isDark ? 0.2 : 0.1);
@@ -57,7 +57,7 @@ class TransactionCard extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? LummyColors.slate800 : Colors.white,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -85,7 +85,7 @@ class TransactionCard extends StatelessWidget {
                   children: [
                     Text(
                       transaction.description,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 14 : 16,
                         fontWeight: FontWeight.w600,
                         color: textPrimary,
@@ -99,7 +99,7 @@ class TransactionCard extends StatelessWidget {
                         Flexible(
                           child: Text(
                             transaction.category,
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: isSmallScreen ? 11 : 12,
                               fontWeight: FontWeight.w400,
                               color: textSecondary,
@@ -119,7 +119,7 @@ class TransactionCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           AppFormatters.formatRelativeDate(transaction.date),
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: isSmallScreen ? 11 : 12,
                             fontWeight: FontWeight.w400,
                             color: textSecondary,
@@ -143,10 +143,10 @@ class TransactionCard extends StatelessWidget {
                         ),
                         child: Text(
                           'Aguardando aprovação',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFFF59E0B),
+                            color: LummyColors.amber500,
                           ),
                         ),
                       ),
@@ -165,7 +165,7 @@ class TransactionCard extends StatelessWidget {
                       fit: BoxFit.scaleDown,
                       child: Text(
                         '${transaction.isIncome ? '+' : '-'} ${AppFormatters.formatCurrency(transaction.amount)}',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmallScreen ? 14 : 16,
                           fontWeight: FontWeight.w700,
                           color: amountColor,
@@ -194,7 +194,7 @@ class TransactionCard extends StatelessWidget {
                                 child: const Icon(
                                   Icons.check_rounded,
                                   size: 18,
-                                  color: Color(0xFF10B981),
+                                  color: LummyColors.emerald500,
                                 ),
                               ),
                             ),
@@ -215,7 +215,7 @@ class TransactionCard extends StatelessWidget {
                                 child: const Icon(
                                   Icons.close_rounded,
                                   size: 18,
-                                  color: Color(0xFFEF4444),
+                                  color: LummyColors.red500,
                                 ),
                               ),
                             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class CategoryChip extends StatelessWidget {
   final String category;
@@ -31,21 +31,19 @@ class CategoryChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(AppConstants.primaryBlue)
+              ? LummyColors.brandBlue
               : Colors.white,
           borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           border: Border.all(
             color: isSelected
-                ? const Color(AppConstants.primaryBlue)
-                : const Color(AppConstants.borderLight),
+                ? LummyColors.brandBlue
+                : LummyColors.slate200,
             width: isSelected ? 2 : 1,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(
-                      AppConstants.primaryBlue,
-                    ).withValues(alpha: 0.2),
+                    color: LummyColors.brandBlue.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -59,12 +57,12 @@ class CategoryChip extends StatelessWidget {
             const SizedBox(width: AppConstants.spacingSmall),
             Text(
               category,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: isSmallScreen ? 13 : 14,
                 fontWeight: FontWeight.w600,
                 color: isSelected
                     ? Colors.white
-                    : const Color(AppConstants.textPrimary),
+                    : LummyColors.slate800,
               ),
             ),
           ],

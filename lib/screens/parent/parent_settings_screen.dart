@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:lummy/core/providers/theme_provider.dart';
 import 'package:lummy/di/locator.dart';
@@ -9,21 +8,22 @@ import 'package:lummy/screens/auth/login_screen.dart';
 import 'package:lummy/screens/parent/parent_change_password_screen.dart';
 import 'package:lummy/screens/parent/parent_help_screen.dart';
 import 'package:lummy/screens/parent/parent_notifications_screen.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentSettingsScreen extends StatelessWidget {
   const ParentSettingsScreen({super.key});
 
-  static const _blue = Color(0xFF3B82F6);
-  static const _purple = Color(0xFF8B5CF6);
-  static const _orange = Color(0xFFF59E0B);
-  static const _red = Color(0xFFEF4444);
+  static const _blue = LummyColors.blue500;
+  static const _purple = LummyColors.violet500;
+  static const _orange = LummyColors.amber500;
+  static const _red = LummyColors.red500;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? LummyColors.darkMaterial : LummyColors.slate50,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -41,7 +41,7 @@ class ParentSettingsScreen extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: isDark
-                      ? [const Color(0xFF2E1065), const Color(0xFF4C1D95)]
+                      ? [LummyColors.violet950, LummyColors.violet900]
                       : [_blue, _purple],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -69,7 +69,7 @@ class ParentSettingsScreen extends StatelessWidget {
                       const SizedBox(width: 12),
                       Text(
                         'Configurações',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -80,7 +80,7 @@ class ParentSettingsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Conta, preferências e segurança',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: Colors.white.withValues(alpha: 0.92),
@@ -194,7 +194,7 @@ class ParentSettingsScreen extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [_purple, const Color(0xFF7C3AED)]
+                  ? [_purple, LummyColors.violet600]
                   : [_blue, _purple],
             ),
             borderRadius: BorderRadius.circular(16),
@@ -227,7 +227,7 @@ class ParentSettingsScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Tema do App',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -235,7 +235,7 @@ class ParentSettingsScreen extends StatelessWidget {
                     ),
                     Text(
                       isDark ? 'Modo escuro' : 'Modo claro',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         color: Colors.white.withValues(alpha: 0.8),
                       ),
@@ -275,10 +275,10 @@ class ParentSettingsScreen extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? LummyColors.slate800 : Colors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              color: isDark ? LummyColors.slate700 : LummyColors.slate200,
             ),
           ),
           child: Row(
@@ -298,19 +298,19 @@ class ParentSettingsScreen extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                        color: isDark ? Colors.white : LummyColors.slate800,
                       ),
                     ),
                     Text(
                       subtitle,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         color: isDark
-                            ? const Color(0xFF94A3B8)
-                            : const Color(0xFF64748B),
+                            ? LummyColors.slate400
+                            : LummyColors.slate500,
                       ),
                     ),
                   ],
@@ -319,8 +319,8 @@ class ParentSettingsScreen extends StatelessWidget {
               Icon(
                 Icons.chevron_right_rounded,
                 color: isDark
-                    ? const Color(0xFF64748B)
-                    : const Color(0xFF94A3B8),
+                    ? LummyColors.slate500
+                    : LummyColors.slate400,
               ),
             ],
           ),
@@ -332,10 +332,10 @@ class ParentSettingsScreen extends StatelessWidget {
   Widget _buildSectionLabel(String label, bool isDark) {
     return Text(
       label,
-      style: GoogleFonts.poppins(
+      style: LummyFonts.body(
         fontSize: 14,
         fontWeight: FontWeight.w700,
-        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+        color: isDark ? LummyColors.slate300 : LummyColors.slate700,
       ),
     );
   }
@@ -347,10 +347,10 @@ class ParentSettingsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+        color: isDark ? LummyColors.slate900 : LummyColors.slate100,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+          color: isDark ? LummyColors.slate800 : LummyColors.slate200,
         ),
       ),
       child: Column(children: children),
@@ -379,7 +379,7 @@ class ParentSettingsScreen extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               'Em desenvolvimento',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              style: LummyFonts.body(fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -395,7 +395,7 @@ class ParentSettingsScreen extends StatelessWidget {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF121212) : Colors.white,
+        backgroundColor: isDark ? LummyColors.darkMaterial : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Row(
           children: [
@@ -411,10 +411,10 @@ class ParentSettingsScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 'Sair da conta?',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontWeight: FontWeight.w700,
                   fontSize: 18,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
             ),
@@ -422,9 +422,9 @@ class ParentSettingsScreen extends StatelessWidget {
         ),
         content: Text(
           'Você precisará fazer login novamente para acessar sua conta.',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 15,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            color: isDark ? LummyColors.slate400 : LummyColors.slate500,
           ),
         ),
         actions: [
@@ -432,24 +432,24 @@ class ParentSettingsScreen extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'Cancelar',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontWeight: FontWeight.w600,
                 color: isDark
-                    ? const Color(0xFF94A3B8)
-                    : const Color(0xFF64748B),
+                    ? LummyColors.slate400
+                    : LummyColors.slate500,
               ),
             ),
           ),
           Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [_red, Color(0xFFDC2626)]),
+              gradient: const LinearGradient(colors: [_red, LummyColors.red600]),
               borderRadius: BorderRadius.circular(12),
             ),
             child: TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 'Sair',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),

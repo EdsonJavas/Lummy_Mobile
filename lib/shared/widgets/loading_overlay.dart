@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class LoadingOverlay extends StatelessWidget {
   final String? message;
@@ -23,7 +23,7 @@ class LoadingOverlay extends StatelessWidget {
             children: [
               const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  Color(AppConstants.primaryBlue),
+                  LummyColors.brandBlue,
                 ),
               ),
               if (message != null) ...[
@@ -31,10 +31,10 @@ class LoadingOverlay extends StatelessWidget {
                 Text(
                   message!,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: const Color(AppConstants.textPrimary),
+                    color: LummyColors.slate800,
                   ),
                 ),
               ],

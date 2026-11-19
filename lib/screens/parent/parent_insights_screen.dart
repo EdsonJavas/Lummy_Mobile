@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:lummy/core/utils/formatters.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
 import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_state.dart';
 import 'package:lummy/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentInsightsScreen extends StatefulWidget {
   final String parentId;
@@ -22,13 +22,13 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
   late TabController _tabController;
 
   // Paleta de cores vibrantes
-  static const _purple = Color(0xFF8B5CF6);
-  static const _blue = Color(0xFF3B82F6);
-  static const _green = Color(0xFF10B981);
-  static const _red = Color(0xFFEF4444);
-  static const _orange = Color(0xFFF59E0B);
-  static const _pink = Color(0xFFEC4899);
-  static const _cyan = Color(0xFF06B6D4);
+  static const _purple = LummyColors.violet500;
+  static const _blue = LummyColors.blue500;
+  static const _green = LummyColors.emerald500;
+  static const _red = LummyColors.red500;
+  static const _orange = LummyColors.amber500;
+  static const _pink = LummyColors.pink500;
+  static const _cyan = LummyColors.cyan500;
 
   @override
   void initState() {
@@ -48,8 +48,8 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+          ? LummyColors.darkMaterial
+          : LummyColors.slate50,
       body: BrandedRefreshIndicator(
         onRefresh: () =>
             context.read<ParentDashboardCubit>().loadDashboard(widget.parentId),
@@ -119,8 +119,8 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF2E1065), Color(0xFF312E81), Color(0xFF4C1D95)]
-              : const [Color(0xFF8B5CF6), Color(0xFF7C3AED), Color(0xFF6D28D9)],
+              ? const [LummyColors.violet950, LummyColors.indigo900, LummyColors.violet900]
+              : const [LummyColors.violet500, LummyColors.violet600, LummyColors.violet700],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
@@ -162,7 +162,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                   children: [
                     Text(
                       'Insights & Desempenho',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -170,7 +170,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                     ),
                     Text(
                       'Análise financeira da família',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         color: Colors.white.withValues(alpha: 0.8),
@@ -259,7 +259,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                         state.monthIncomeTotal >= state.monthExpenseTotal
                             ? 'Balanço positivo este mês! 🎉'
                             : 'Atenção: despesas superaram receitas',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -330,10 +330,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? LummyColors.slate800 : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            color: isDark ? LummyColors.slate700 : LummyColors.slate200,
           ),
           boxShadow: [
             BoxShadow(
@@ -359,10 +359,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 const SizedBox(width: 12),
                 Text(
                   'Relatório por filho',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    color: isDark ? Colors.white : LummyColors.slate800,
                   ),
                 ),
               ],
@@ -370,9 +370,9 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
             const SizedBox(height: 8),
             Text(
               'Gastos dos últimos 30 dias',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 13,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color: isDark ? LummyColors.slate400 : LummyColors.slate500,
               ),
             ),
             const SizedBox(height: 16),
@@ -386,16 +386,16 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                     Expanded(
                       child: Text(
                         child.name,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          color: isDark ? Colors.white : LummyColors.slate800,
                         ),
                       ),
                     ),
                     Text(
                       AppFormatters.formatCurrency(spent),
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: _red,
@@ -410,7 +410,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                       ),
                       child: Text(
                         '${pct.toStringAsFixed(0)}%',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: _cyan,
@@ -443,10 +443,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? LummyColors.slate800 : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            color: isDark ? LummyColors.slate700 : LummyColors.slate200,
           ),
           boxShadow: [
             BoxShadow(
@@ -480,21 +480,21 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                     children: [
                       Text(
                         'Fluxo Mensal',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           color: isDark
                               ? Colors.white
-                              : const Color(0xFF1E293B),
+                              : LummyColors.slate800,
                         ),
                       ),
                       Text(
                         'Comparativo dos últimos meses',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           color: isDark
-                              ? const Color(0xFF94A3B8)
-                              : const Color(0xFF64748B),
+                              ? LummyColors.slate400
+                              : LummyColors.slate500,
                         ),
                       ),
                     ],
@@ -520,10 +520,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 child: Center(
                   child: Text(
                     'Sem dados disponíveis',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                          ? LummyColors.slate400
+                          : LummyColors.slate500,
                     ),
                   ),
                 ),
@@ -565,7 +565,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                                       gradient: const LinearGradient(
                                         begin: Alignment.bottomCenter,
                                         end: Alignment.topCenter,
-                                        colors: [_green, Color(0xFF34D399)],
+                                        colors: [_green, LummyColors.emerald400],
                                       ),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
@@ -581,7 +581,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                                       gradient: const LinearGradient(
                                         begin: Alignment.bottomCenter,
                                         end: Alignment.topCenter,
-                                        colors: [_red, Color(0xFFF87171)],
+                                        colors: [_red, LummyColors.red400],
                                       ),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
@@ -592,12 +592,12 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                             const SizedBox(height: 8),
                             Text(
                               point.monthLabel,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,
                                 color: isDark
-                                    ? const Color(0xFF94A3B8)
-                                    : const Color(0xFF64748B),
+                                    ? LummyColors.slate400
+                                    : LummyColors.slate500,
                               ),
                             ),
                           ],
@@ -625,10 +625,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? LummyColors.slate800 : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            color: isDark ? LummyColors.slate700 : LummyColors.slate200,
           ),
           boxShadow: [
             BoxShadow(
@@ -654,10 +654,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 const SizedBox(width: 12),
                 Text(
                   'Por Categoria',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    color: isDark ? Colors.white : LummyColors.slate800,
                   ),
                 ),
               ],
@@ -669,10 +669,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                   padding: const EdgeInsets.all(20),
                   child: Text(
                     'Sem categorias registradas',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       color: isDark
-                          ? const Color(0xFF94A3B8)
-                          : const Color(0xFF64748B),
+                          ? LummyColors.slate400
+                          : LummyColors.slate500,
                     ),
                   ),
                 ),
@@ -709,12 +709,12 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                           Expanded(
                             child: Text(
                               item.category,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: isDark
                                     ? Colors.white
-                                    : const Color(0xFF1E293B),
+                                    : LummyColors.slate800,
                               ),
                             ),
                           ),
@@ -722,7 +722,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                             fit: BoxFit.scaleDown,
                             child: Text(
                               AppFormatters.formatCurrency(item.value),
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: color,
@@ -760,12 +760,12 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                         alignment: Alignment.centerRight,
                         child: Text(
                           '${percentage.toStringAsFixed(1)}%',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B),
+                                ? LummyColors.slate400
+                                : LummyColors.slate500,
                           ),
                         ),
                       ),
@@ -793,10 +793,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: isDark ? LummyColors.slate800 : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            color: isDark ? LummyColors.slate700 : LummyColors.slate200,
           ),
           boxShadow: [
             BoxShadow(
@@ -822,10 +822,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 const SizedBox(width: 12),
                 Text(
                   'Metas dos Filhos',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    color: isDark ? Colors.white : LummyColors.slate800,
                   ),
                 ),
               ],
@@ -845,13 +845,13 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFF8FAFC),
+                        ? LummyColors.slate800
+                        : LummyColors.slate50,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF334155)
-                          : const Color(0xFFE2E8F0),
+                          ? LummyColors.slate700
+                          : LummyColors.slate200,
                     ),
                   ),
                   child: Column(
@@ -884,21 +884,21 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                               children: [
                                 Text(
                                   summary.childName,
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: isDark
                                         ? Colors.white
-                                        : const Color(0xFF1E293B),
+                                        : LummyColors.slate800,
                                   ),
                                 ),
                                 Text(
                                   '${summary.completedGoals}/${summary.totalGoals} metas concluídas',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 12,
                                     color: isDark
-                                        ? const Color(0xFF94A3B8)
-                                        : const Color(0xFF64748B),
+                                        ? LummyColors.slate400
+                                        : LummyColors.slate500,
                                   ),
                                 ),
                               ],
@@ -915,7 +915,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                             ),
                             child: Text(
                               '${progress.toStringAsFixed(0)}%',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: progressColor,
@@ -984,10 +984,10 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
         children: [
           Text(
             'Insights',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
+              color: isDark ? Colors.white : LummyColors.slate800,
             ),
           ),
           const SizedBox(height: 16),
@@ -1054,7 +1054,7 @@ class _HeaderStatItem extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: Colors.white.withValues(alpha: 0.8),
@@ -1067,7 +1067,7 @@ class _HeaderStatItem extends StatelessWidget {
           fit: BoxFit.scaleDown,
           child: Text(
             value,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: Colors.white,
@@ -1099,10 +1099,10 @@ class _QuickStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? LummyColors.slate800 : Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          color: isDark ? LummyColors.slate700 : LummyColors.slate200,
         ),
         boxShadow: [
           BoxShadow(
@@ -1127,8 +1127,8 @@ class _QuickStatCard extends StatelessWidget {
               ),
               const Spacer(),
               Icon(
-                color == const Color(0xFF10B981) ||
-                        color == const Color(0xFF3B82F6)
+                color == LummyColors.emerald500 ||
+                        color == LummyColors.blue500
                     ? Icons.arrow_upward_rounded
                     : Icons.arrow_downward_rounded,
                 color: color,
@@ -1139,10 +1139,10 @@ class _QuickStatCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              color: isDark ? LummyColors.slate400 : LummyColors.slate500,
             ),
           ),
           const SizedBox(height: 4),
@@ -1151,10 +1151,10 @@ class _QuickStatCard extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               value,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white : const Color(0xFF1E293B),
+                color: isDark ? Colors.white : LummyColors.slate800,
               ),
             ),
           ),
@@ -1185,10 +1185,10 @@ class _ChartLegendItem extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: const Color(0xFF64748B),
+            color: LummyColors.slate500,
           ),
         ),
       ],
@@ -1244,20 +1244,20 @@ class _InsightCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                    color: isDark ? Colors.white : LummyColors.slate800,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 13,
                     color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
+                        ? LummyColors.slate400
+                        : LummyColors.slate500,
                     height: 1.4,
                   ),
                 ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 /// A gamified experience bar showing the child's XP level progress.
 class XpProgressBar extends StatelessWidget {
@@ -21,15 +21,15 @@ class XpProgressBar extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final progress =
         xpForNextLevel > 0 ? (currentXp / xpForNextLevel).clamp(0.0, 1.0) : 0.0;
-    final cardBg = isDark ? const Color(0xFF1A1A2E) : Colors.white;
+    final cardBg = isDark ? LummyColors.darkNavy : Colors.white;
     final borderColor =
-        isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0);
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+        isDark ? LummyColors.darkSurfaceHigh : LummyColors.slate200;
+    final titleColor = isDark ? Colors.white : LummyColors.slate900;
     final subtitleColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+        isDark ? LummyColors.slate400 : LummyColors.slate500;
 
-    const purple = Color(0xFF8B5CF6);
-    const orange = Color(0xFFF59E0B);
+    const purple = LummyColors.violet500;
+    const orange = LummyColors.amber500;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -48,14 +48,14 @@ class XpProgressBar extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [purple, Color(0xFF6D28D9)],
+                    colors: [purple, LummyColors.violet700],
                   ),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   '$level',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -69,7 +69,7 @@ class XpProgressBar extends StatelessWidget {
                   children: [
                     Text(
                       'Nível $level',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: titleColor,
@@ -77,7 +77,7 @@ class XpProgressBar extends StatelessWidget {
                     ),
                     Text(
                       '$currentXp / $xpForNextLevel XP',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         color: subtitleColor,
                       ),
@@ -106,7 +106,7 @@ class XpProgressBar extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '$streakDays dias',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: orange,

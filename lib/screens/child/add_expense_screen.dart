@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lummy/shared/widgets/money_text_field.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key, required this.expenseCategories});
@@ -24,10 +24,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final List<String> _incomeCategories = ['Mesada', 'Presente', 'Trabalho', 'Outros'];
   String _selectedIncomeCategory = 'Mesada';
 
-  static const _red = Color(0xFFEF4444);
-  static const _green = Color(0xFF10B981);
+  static const _red = LummyColors.red500;
+  static const _green = LummyColors.emerald500;
   // ignore: unused_field
-  static const _blue = Color(0xFF3B82F6);
+  static const _blue = LummyColors.blue500;
 
   static const _categoryEmojis = {
     'games': '🎮', 'food': '🍔', 'education': '📚', 'clothes': '👕',
@@ -46,7 +46,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     final topPadding = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? LummyColors.slate900 : LummyColors.slate50,
       body: Column(
         children: [
           _buildHeader(context, isDark, topPadding),
@@ -89,7 +89,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF1E1B4B), _accentColor.withValues(alpha: 0.4)]
+              ? [LummyColors.indigo950, _accentColor.withValues(alpha: 0.4)]
               : [_accentColor, _accentColor.withValues(alpha: 0.85)],
         ),
         borderRadius: const BorderRadius.only(
@@ -128,13 +128,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               children: [
                 Text(
                   _isExpense ? 'Registrar Gasto' : 'Adicionar Ganho',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white,
                   ),
                 ),
                 Text(
                   _isExpense ? 'Controle seus gastos' : 'Registre suas entradas',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 13, color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
@@ -192,10 +192,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             gradient: isActive
                 ? LinearGradient(colors: [color, color.withValues(alpha: 0.8)])
                 : null,
-            color: isActive ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
+            color: isActive ? null : (isDark ? LummyColors.slate800 : Colors.white),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isActive ? color : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+              color: isActive ? color : (isDark ? LummyColors.slate700 : LummyColors.slate200),
               width: isActive ? 2 : 1,
             ),
             boxShadow: isActive
@@ -208,12 +208,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               const SizedBox(height: 6),
               Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: isActive
                       ? Colors.white
-                      : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                      : (isDark ? LummyColors.slate400 : LummyColors.slate500),
                 ),
               ),
             ],
@@ -234,7 +234,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         Container(
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? LummyColors.slate800 : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: _accentColor.withValues(alpha: 0.2),
@@ -269,7 +269,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               ),
               child: Text(
                 _isExpense ? '- R\$ ${_currentAmount!.toStringAsFixed(2)}' : '+ R\$ ${_currentAmount!.toStringAsFixed(2)}',
-                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: _accentColor),
+                style: LummyFonts.body(fontSize: 12, fontWeight: FontWeight.w600, color: _accentColor),
               ),
             ),
           ),
@@ -288,27 +288,27 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         const SizedBox(height: 10),
         TextFormField(
           controller: _descriptionController,
-          style: GoogleFonts.poppins(
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+          style: LummyFonts.body(
+            color: isDark ? Colors.white : LummyColors.slate800,
             fontSize: 15,
           ),
           decoration: InputDecoration(
             hintText: _isExpense ? 'Ex: Lanche na escola' : 'Ex: Mesada da semana',
-            hintStyle: GoogleFonts.poppins(
-              color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+            hintStyle: LummyFonts.body(
+              color: isDark ? LummyColors.slate600 : LummyColors.slate300,
               fontSize: 14,
             ),
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 14, right: 8),
               child: Icon(
                 Icons.edit_note_rounded,
-                color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                color: isDark ? LummyColors.slate500 : LummyColors.slate400,
                 size: 22,
               ),
             ),
             prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
             filled: true,
-            fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            fillColor: isDark ? LummyColors.slate800 : Colors.white,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -317,7 +317,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                color: isDark ? LummyColors.slate700 : LummyColors.slate200,
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -366,10 +366,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 gradient: isActive
                     ? LinearGradient(colors: [_red.withValues(alpha: 0.18), _red.withValues(alpha: 0.08)])
                     : null,
-                color: isActive ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                color: isActive ? null : (isDark ? LummyColors.slate800 : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: isActive ? _red : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                  color: isActive ? _red : (isDark ? LummyColors.slate700 : LummyColors.slate200),
                   width: isActive ? 2 : 1,
                 ),
                 boxShadow: isActive
@@ -383,10 +383,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   const SizedBox(width: 8),
                   Text(
                     name,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 13,
                       fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                      color: isActive ? _red : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                      color: isActive ? _red : (isDark ? LummyColors.slate400 : LummyColors.slate500),
                     ),
                   ),
                   if (isActive) ...[
@@ -422,10 +422,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 gradient: isActive
                     ? LinearGradient(colors: [_green.withValues(alpha: 0.18), _green.withValues(alpha: 0.08)])
                     : null,
-                color: isActive ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                color: isActive ? null : (isDark ? LummyColors.slate800 : Colors.white),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: isActive ? _green : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                  color: isActive ? _green : (isDark ? LummyColors.slate700 : LummyColors.slate200),
                   width: isActive ? 2 : 1,
                 ),
                 boxShadow: isActive
@@ -439,10 +439,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   const SizedBox(width: 8),
                   Text(
                     cat,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 13,
                       fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                      color: isActive ? _green : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                      color: isActive ? _green : (isDark ? LummyColors.slate400 : LummyColors.slate500),
                     ),
                   ),
                   if (isActive) ...[
@@ -489,7 +489,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               const SizedBox(width: 10),
               Text(
                 _isExpense ? 'Registrar Gasto' : 'Adicionar Ganho',
-                style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
+                style: LummyFonts.body(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
               ),
             ],
           ),
@@ -503,10 +503,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   Widget _sectionLabel(String text, bool isDark) {
     return Text(
       text,
-      style: GoogleFonts.poppins(
+      style: LummyFonts.body(
         fontSize: 15,
         fontWeight: FontWeight.w600,
-        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+        color: isDark ? LummyColors.slate300 : LummyColors.slate700,
       ),
     );
   }

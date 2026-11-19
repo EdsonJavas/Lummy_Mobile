@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/formatters.dart';
 import '../../domain/entities/goal_entity.dart';
 import 'custom_card.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class GoalCard extends StatelessWidget {
   final GoalEntity goal;
@@ -40,7 +40,7 @@ class GoalCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(AppConstants.primaryBlue).withValues(alpha: 0.1),
+              color: LummyColors.brandBlue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
             ),
             child: Text(
@@ -56,10 +56,10 @@ class GoalCard extends StatelessWidget {
               children: [
                 Text(
                   goal.name,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 14 : 16,
                     fontWeight: FontWeight.w600,
-                    color: const Color(AppConstants.textPrimary),
+                    color: LummyColors.slate800,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -67,10 +67,10 @@ class GoalCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   AppFormatters.formatCurrency(goal.remainingAmount),
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 11 : 12,
                     fontWeight: FontWeight.w400,
-                    color: const Color(AppConstants.textSecondary),
+                    color: LummyColors.slate500,
                   ),
                 ),
               ],
@@ -79,10 +79,10 @@ class GoalCard extends StatelessWidget {
           // Progresso
           Text(
             '${goal.progressPercentage}%',
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w700,
-              color: const Color(AppConstants.primaryBlue),
+              color: LummyColors.brandBlue,
             ),
           ),
         ],
@@ -103,7 +103,7 @@ class GoalCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(AppConstants.primaryBlue).withValues(alpha: 0.1),
+                  color: LummyColors.brandBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                 ),
                 child: Text(
@@ -119,20 +119,20 @@ class GoalCard extends StatelessWidget {
                   children: [
                     Text(
                       goal.name,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 16 : 18,
                         fontWeight: FontWeight.w600,
-                        color: const Color(AppConstants.textPrimary),
+                        color: LummyColors.slate800,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'Meta de economia',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 12 : 14,
                         fontWeight: FontWeight.w400,
-                        color: const Color(AppConstants.textSecondary),
+                        color: LummyColors.slate500,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -143,10 +143,10 @@ class GoalCard extends StatelessWidget {
               Flexible(
                 child: Text(
                   '${goal.progressPercentage}%',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.w700,
-                    color: const Color(AppConstants.primaryBlue),
+                    color: LummyColors.brandBlue,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -160,7 +160,7 @@ class GoalCard extends StatelessWidget {
           Container(
             height: 8,
             decoration: BoxDecoration(
-              color: const Color(AppConstants.borderLight),
+              color: LummyColors.slate200,
               borderRadius: BorderRadius.circular(4),
             ),
             child: FractionallySizedBox(
@@ -170,8 +170,8 @@ class GoalCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(AppConstants.primaryBlue),
-                      Color(AppConstants.secondaryBlue),
+                      LummyColors.brandBlue,
+                      LummyColors.blue800,
                     ],
                   ),
                   borderRadius: BorderRadius.circular(4),
@@ -190,18 +190,18 @@ class GoalCard extends StatelessWidget {
                   children: [
                     Text(
                       'Economizado',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
-                        color: const Color(AppConstants.textSecondary),
+                        color: LummyColors.slate500,
                       ),
                     ),
                     Text(
                       AppFormatters.formatCurrency(goal.currentAmount),
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 14 : 16,
                         fontWeight: FontWeight.w600,
-                        color: const Color(AppConstants.textPrimary),
+                        color: LummyColors.slate800,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -217,18 +217,18 @@ class GoalCard extends StatelessWidget {
                   children: [
                     Text(
                       'Falta',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
-                        color: const Color(AppConstants.textSecondary),
+                        color: LummyColors.slate500,
                       ),
                     ),
                     Text(
                       AppFormatters.formatCurrency(goal.remainingAmount),
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: isSmallScreen ? 14 : 16,
                         fontWeight: FontWeight.w600,
-                        color: const Color(AppConstants.primaryBlue),
+                        color: LummyColors.brandBlue,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -246,8 +246,8 @@ class GoalCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: goal.isOverdue
-                    ? const Color(AppConstants.errorRed).withValues(alpha: 0.1)
-                    : const Color(AppConstants.primaryBlue).withValues(alpha: 0.1),
+                    ? LummyColors.red500.withValues(alpha: 0.1)
+                    : LummyColors.brandBlue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
               ),
               child: Row(
@@ -259,20 +259,20 @@ class GoalCard extends StatelessWidget {
                         : Icons.calendar_today,
                     size: 14,
                     color: goal.isOverdue
-                        ? const Color(AppConstants.errorRed)
-                        : const Color(AppConstants.primaryBlue),
+                        ? LummyColors.red500
+                        : LummyColors.brandBlue,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     goal.isOverdue
                         ? 'Prazo expirado'
                         : 'Faltam ${goal.daysUntilDeadline} dias',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: goal.isOverdue
-                          ? const Color(AppConstants.errorRed)
-                          : const Color(AppConstants.primaryBlue),
+                          ? LummyColors.red500
+                          : LummyColors.brandBlue,
                     ),
                   ),
                 ],

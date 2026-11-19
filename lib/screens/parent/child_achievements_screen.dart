@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy/domain/entities/user_entity.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ChildAchievementsScreen extends StatefulWidget {
   final ChildEntity child;
@@ -21,15 +21,15 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
   List<Map<String, dynamic>> _allAchievements = [];
   bool _isLoading = true;
 
-  static const _purple = Color(0xFF8B5CF6);
-  static const _blue = Color(0xFF3B82F6);
-  static const _green = Color(0xFF10B981);
-  static const _orange = Color(0xFFF59E0B);
+  static const _purple = LummyColors.violet500;
+  static const _blue = LummyColors.blue500;
+  static const _green = LummyColors.emerald500;
+  static const _orange = LummyColors.amber500;
   // ignore: unused_field
-  static const _red = Color(0xFFEF4444);
-  static const _pink = Color(0xFFEC4899);
-  static const _gold = Color(0xFFD97706);
-  static const _goldLight = Color(0xFFF59E0B);
+  static const _red = LummyColors.red500;
+  static const _pink = LummyColors.pink500;
+  static const _gold = LummyColors.amber600;
+  static const _goldLight = LummyColors.amber500;
 
   @override
   void initState() {
@@ -77,7 +77,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
 
     return Scaffold(
       backgroundColor:
-          isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+          isDark ? LummyColors.slate900 : LummyColors.slate50,
       body: BrandedRefreshIndicator(
         onRefresh: _loadAchievements,
         color: _gold,
@@ -203,7 +203,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
               const SizedBox(width: 8),
               Text(
                 'Nova Conquista',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                   color: Colors.white,
@@ -226,8 +226,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF1C1917), _gold.withValues(alpha: 0.4)]
-              : [_gold, _orange, const Color(0xFFEA580C)],
+              ? [LummyColors.stone900, _gold.withValues(alpha: 0.4)]
+              : [_gold, _orange, LummyColors.orange600],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
@@ -272,7 +272,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                   children: [
                     Text(
                       'Conquistas',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -280,7 +280,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                     ),
                     Text(
                       'Medalhas de ${widget.child.name}',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         color: Colors.white.withValues(alpha: 0.8),
                       ),
@@ -320,8 +320,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDark
-                ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
-                : [Colors.white, const Color(0xFFFFFBEB)],
+                ? [LummyColors.slate800, LummyColors.slate900]
+                : [Colors.white, LummyColors.amber50],
           ),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
@@ -349,7 +349,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 ),
                 Container(
                   width: 1, height: 50,
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  color: isDark ? LummyColors.slate700 : LummyColors.slate200,
                 ),
                 _buildStatItem(
                   '${totalAchievements - unlockedCount}',
@@ -360,7 +360,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 ),
                 Container(
                   width: 1, height: 50,
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  color: isDark ? LummyColors.slate700 : LummyColors.slate200,
                 ),
                 _buildStatItem(
                   '${(progress * 100).toInt()}%',
@@ -426,17 +426,17 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
         const SizedBox(height: 8),
         Text(
           value,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
         ),
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 11,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            color: isDark ? LummyColors.slate400 : LummyColors.slate500,
           ),
         ),
       ],
@@ -451,7 +451,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
           const LinearGradient(colors: [_gold, _orange]).createShader(bounds),
       child: Text(
         title,
-        style: GoogleFonts.poppins(
+        style: LummyFonts.body(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -505,7 +505,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
           const Spacer(),
           Text(
             name,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -517,7 +517,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
             const SizedBox(height: 2),
             Text(
               description,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 10,
                 color: Colors.white.withValues(alpha: 0.7),
               ),
@@ -549,16 +549,16 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
-                    ? [const Color(0xFF1E293B), color.withValues(alpha: 0.12)]
+                    ? [LummyColors.slate800, color.withValues(alpha: 0.12)]
                     : [Colors.white, color.withValues(alpha: 0.06)],
               )
             : null,
-        color: isUnlocked ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
+        color: isUnlocked ? null : (isDark ? LummyColors.slate800 : Colors.white),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isUnlocked
               ? color.withValues(alpha: 0.4)
-              : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+              : (isDark ? LummyColors.slate700 : LummyColors.slate200),
           width: isUnlocked ? 2 : 1,
         ),
         boxShadow: isUnlocked
@@ -593,12 +593,12 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                       : null,
                   color: isUnlocked
                       ? null
-                      : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
+                      : (isDark ? LummyColors.slate900 : LummyColors.slate100),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isUnlocked
                         ? color.withValues(alpha: 0.3)
-                        : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                        : (isDark ? LummyColors.slate700 : LummyColors.slate200),
                     width: 2,
                   ),
                 ),
@@ -610,13 +610,13 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 Container(
                   width: 64, height: 64,
                   decoration: BoxDecoration(
-                    color: (isDark ? const Color(0xFF0F172A) : Colors.white)
+                    color: (isDark ? LummyColors.slate900 : Colors.white)
                         .withValues(alpha: 0.6),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.lock_rounded,
-                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                    color: isDark ? LummyColors.slate600 : LummyColors.slate300,
                     size: 24,
                   ),
                 ),
@@ -625,12 +625,12 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
           const SizedBox(height: 12),
           Text(
             name,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: isUnlocked
-                  ? (isDark ? Colors.white : const Color(0xFF1E293B))
-                  : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
+                  ? (isDark ? Colors.white : LummyColors.slate800)
+                  : (isDark ? LummyColors.slate500 : LummyColors.slate400),
             ),
             textAlign: TextAlign.center,
             maxLines: 2,
@@ -648,7 +648,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
             ),
             child: Text(
               isUnlocked ? '✓ Desbloqueada' : '$pointsRequired pts',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: isUnlocked ? _green : _purple,
@@ -669,17 +669,17 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
   }
 
   InputDecoration _achieveFieldDecor(String hint, bool isDark, {Widget? prefixIcon, String? suffixText}) {
-    final fillColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    final fillColor = isDark ? LummyColors.slate900 : LummyColors.slate100;
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.poppins(
-        color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+      hintStyle: LummyFonts.body(
+        color: isDark ? LummyColors.slate600 : LummyColors.slate300,
         fontSize: 14,
       ),
       prefixIcon: prefixIcon,
       suffixText: suffixText,
-      suffixStyle: GoogleFonts.poppins(
-        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+      suffixStyle: LummyFonts.body(
+        color: isDark ? LummyColors.slate500 : LummyColors.slate400,
         fontWeight: FontWeight.w500,
       ),
       filled: true,
@@ -692,7 +692,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(
-          color: isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0),
+          color: isDark ? LummyColors.darkSurfaceHigh : LummyColors.slate200,
         ),
       ),
       focusedBorder: OutlineInputBorder(
@@ -707,10 +707,10 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: GoogleFonts.poppins(
+        style: LummyFonts.body(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+          color: isDark ? LummyColors.slate400 : LummyColors.slate500,
         ),
       ),
     );
@@ -739,7 +739,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
             MediaQuery.of(context).viewInsets.bottom + 20,
           ),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: isDark ? LummyColors.slate800 : Colors.white,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(28),
               topRight: Radius.circular(28),
@@ -753,7 +753,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 Container(
                   width: 40, height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                    color: isDark ? LummyColors.slate600 : LummyColors.slate300,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -795,7 +795,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                           children: [
                             Text(
                               'Nova Conquista',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
@@ -803,7 +803,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                             ),
                             Text(
                               'Pré-visualização',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 12,
                                 color: Colors.white.withValues(alpha: 0.7),
                               ),
@@ -837,7 +837,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                                 : null,
                             color: isSelected
                                 ? null
-                                : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC)),
+                                : (isDark ? LummyColors.slate900 : LummyColors.slate50),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isSelected ? selectedColor : Colors.transparent,
@@ -898,8 +898,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: nameController,
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  style: LummyFonts.body(
+                    color: isDark ? Colors.white : LummyColors.slate800,
                   ),
                   decoration: _achieveFieldDecor('Ex: Super Economista', isDark),
                 ),
@@ -908,8 +908,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: descriptionController,
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  style: LummyFonts.body(
+                    color: isDark ? Colors.white : LummyColors.slate800,
                   ),
                   maxLines: 2,
                   decoration: _achieveFieldDecor('Descreva a conquista...', isDark),
@@ -920,8 +920,8 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                 TextField(
                   controller: pointsController,
                   keyboardType: TextInputType.number,
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  style: LummyFonts.body(
+                    color: isDark ? Colors.white : LummyColors.slate800,
                   ),
                   decoration: _achieveFieldDecor(
                     '100',
@@ -977,7 +977,7 @@ class _ChildAchievementsScreenState extends State<ChildAchievementsScreen> {
                           const SizedBox(width: 10),
                           Text(
                             'Criar Conquista',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,

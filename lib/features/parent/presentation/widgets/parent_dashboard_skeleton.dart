@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/widgets.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentDashboardSkeleton extends StatelessWidget {
   const ParentDashboardSkeleton({super.key});
@@ -87,7 +87,7 @@ class ParentDashboardSkeleton extends StatelessWidget {
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: GoogleFonts.poppins(
+      style: LummyFonts.body(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: Theme.of(context).colorScheme.onSurface,

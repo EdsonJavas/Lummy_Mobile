@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -54,18 +54,18 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: const Color(AppConstants.backgroundGray),
+        color: LummyColors.offWhite,
         borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
         border: Border.all(
           color: _isFocused
-              ? const Color(AppConstants.primaryBlue)
+              ? LummyColors.brandBlue
               : Colors.transparent,
           width: 2,
         ),
         boxShadow: _isFocused
             ? [
                 BoxShadow(
-                  color: const Color(AppConstants.primaryBlue).withValues(alpha: 0.1),
+                  color: LummyColors.brandBlue.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -94,23 +94,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
           enabled: widget.enabled,
           maxLines: widget.maxLines,
           maxLength: widget.maxLength,
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: isSmallScreen ? 14 : 16,
-            color: const Color(AppConstants.textPrimary),
+            color: LummyColors.slate800,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             hintText: widget.hintText,
             labelText: widget.labelText,
-            hintStyle: GoogleFonts.poppins(
-              color: const Color(AppConstants.textSecondary),
+            hintStyle: LummyFonts.body(
+              color: LummyColors.slate500,
               fontSize: isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w400,
             ),
-            labelStyle: GoogleFonts.poppins(
+            labelStyle: LummyFonts.body(
               color: _isFocused
-                  ? const Color(AppConstants.primaryBlue)
-                  : const Color(AppConstants.textSecondary),
+                  ? LummyColors.brandBlue
+                  : LummyColors.slate500,
               fontSize: isSmallScreen ? 12 : 14,
               fontWeight: FontWeight.w500,
             ),
@@ -118,8 +118,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
                 ? Icon(
                     widget.prefixIcon,
                     color: _isFocused
-                        ? const Color(AppConstants.primaryBlue)
-                        : const Color(AppConstants.textSecondary),
+                        ? LummyColors.brandBlue
+                        : LummyColors.slate500,
                     size: isSmallScreen ? 20 : 22,
                   )
                 : null,
@@ -129,7 +129,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               horizontal: isSmallScreen ? 16 : 20,
               vertical: isSmallScreen ? 14 : 18,
             ),
-            errorStyle: GoogleFonts.poppins(fontSize: isSmallScreen ? 10 : 12),
+            errorStyle: LummyFonts.body(fontSize: isSmallScreen ? 10 : 12),
             counterText: '',
           ),
           validator: widget.validator,

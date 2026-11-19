@@ -3,31 +3,7 @@
 class AppConstants {
   AppConstants._();
 
-  // Cores do tema
-  static const primaryBlue = 0xFF4A90E2;
-  static const primaryBlueDark = 0xFF357ABD;
-  static const secondaryBlue = 0xFF1E40AF;
-  static const accentOrange = 0xFFFF8C42;
-  static const accentOrangeDark = 0xFFFF5722;
-  static const successGreen = 0xFF10B981;
-  static const errorRed = 0xFFEF4444;
-  static const warningOrange = 0xFFFF9800;
-  static const purple = 0xFF8B5CF6;
-  static const pink = 0xFFEC4899;
-
-  // Cores de texto
-  static const textPrimary = 0xFF1E293B;
-  static const textSecondary = 0xFF64748B;
-  static const textLight = 0xFF94A3B8;
-
-  // Cores de fundo
-  static const backgroundLight = 0xFFF8FAFC;
-  static const backgroundWhite = 0xFFFFFFFF;
-  static const backgroundGray = 0xFFF8F9FA;
-
-  // Cores de borda
-  static const borderLight = 0xFFE2E8F0;
-  static const borderMedium = 0xFFCBD5E1;
+  // Cores ficam em LummyColors (lib/core/theme/design_tokens.dart).
 
   // Limites de tela
   static const smallScreenHeight = 650.0;

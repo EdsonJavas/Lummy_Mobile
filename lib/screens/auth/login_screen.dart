@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -16,6 +15,7 @@ import 'package:lummy/core/theme/app_theme.dart';
 import 'package:lummy/core/providers/theme_provider.dart';
 import 'package:lummy/screens/auth/register_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(28),
             border: Theme.of(context).brightness == Brightness.dark
-                ? Border.all(color: const Color(0xFF475569), width: 1)
+                ? Border.all(color: LummyColors.slate600, width: 1)
                 : null,
             boxShadow: [
               BoxShadow(
@@ -101,19 +101,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     end: Alignment.bottomRight,
                     colors: Theme.of(context).brightness == Brightness.dark
                         ? [
-                            const Color(0xFF3B82F6).withValues(alpha: 0.2),
-                            const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+                            LummyColors.blue500.withValues(alpha: 0.2),
+                            LummyColors.violet500.withValues(alpha: 0.1),
                           ]
                         : [
-                            const Color(0xFF1E40AF).withValues(alpha: 0.1),
-                            const Color(0xFF8B5CF6).withValues(alpha: 0.05),
+                            LummyColors.blue800.withValues(alpha: 0.1),
+                            LummyColors.violet500.withValues(alpha: 0.05),
                           ],
                   ),
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? const Color(0xFF3B82F6).withValues(alpha: 0.3)
-                        : const Color(0xFF1E40AF).withValues(alpha: 0.2),
+                        ? LummyColors.blue500.withValues(alpha: 0.3)
+                        : LummyColors.blue800.withValues(alpha: 0.2),
                     width: 2,
                   ),
                 ),
@@ -121,8 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   Icons.fingerprint,
                   size: 64,
                   color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFF3B82F6)
-                      : const Color(0xFF1E40AF),
+                      ? LummyColors.blue500
+                      : LummyColors.blue800,
                 ),
               ),
               const SizedBox(height: 24),
@@ -130,12 +130,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ShaderMask(
                 shaderCallback: (bounds) => LinearGradient(
                   colors: Theme.of(context).brightness == Brightness.dark
-                      ? [const Color(0xFF3B82F6), const Color(0xFF8B5CF6)]
-                      : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+                      ? [LummyColors.blue500, LummyColors.violet500]
+                      : [LummyColors.slate800, LummyColors.slate800],
                 ).createShader(bounds),
                 child: Text(
                   'Ativar Biometria?',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Descrição
               Text(
                 'Salve sua digital para fazer login de forma rápida e segura nos próximos acessos!',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -165,10 +165,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFF1F5F9),
+                            ? LummyColors.slate700
+                            : LummyColors.slate100,
                         foregroundColor: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFFE2E8F0)
+                            ? LummyColors.slate200
                             : Theme.of(context).textTheme.bodyMedium?.color,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
@@ -176,8 +176,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           side: BorderSide(
                             color:
                                 Theme.of(context).brightness == Brightness.dark
-                                ? const Color(0xFF475569)
-                                : const Color(0xFFE2E8F0),
+                                ? LummyColors.slate600
+                                : LummyColors.slate200,
                             width: 1,
                           ),
                         ),
@@ -185,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Text(
                         'Agora Não',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
@@ -197,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(true),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B82F6),
+                        backgroundColor: LummyColors.blue500,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
@@ -207,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Text(
                         'Ativar',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
@@ -249,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(24),
             border: Theme.of(context).brightness == Brightness.dark
-                ? Border.all(color: const Color(0xFF475569), width: 1)
+                ? Border.all(color: LummyColors.slate600, width: 1)
                 : null,
             boxShadow: [
               BoxShadow(
@@ -270,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20),
               Text(
                 'Outra conta',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Theme.of(context).textTheme.titleLarge?.color,
@@ -280,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 10),
               Text(
                 'Você entrou com uma conta diferente da última. Deseja usar digital para esta conta daqui pra frente?',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -302,7 +302,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Text(
                         'Não',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
@@ -321,7 +321,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: Text(
                         'Sim, usar digital',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
@@ -388,7 +388,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showLoginError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message, style: GoogleFonts.poppins(fontSize: 14)),
+        content: Text(message, style: LummyFonts.body(fontSize: 14)),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -405,7 +405,7 @@ class _LoginScreenState extends State<LoginScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF1E293B)
+            ? LummyColors.slate800
             : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
@@ -413,21 +413,21 @@ class _LoginScreenState extends State<LoginScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A90E2).withValues(alpha: 0.15),
+                color: LummyColors.brandBlue.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.lock_reset_rounded, color: Color(0xFF4A90E2), size: 24),
+              child: const Icon(Icons.lock_reset_rounded, color: LummyColors.brandBlue, size: 24),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Recuperar senha',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontWeight: FontWeight.w700,
                   fontSize: 18,
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
-                      : const Color(0xFF1E293B),
+                      : LummyColors.slate800,
                 ),
               ),
             ),
@@ -441,11 +441,11 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Text(
                 'Digite seu e-mail e enviaremos um link para redefinir sua senha.',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
                   color: Theme.of(context).brightness == Brightness.dark
-                      ? const Color(0xFF94A3B8)
-                      : const Color(0xFF64748B),
+                      ? LummyColors.slate400
+                      : LummyColors.slate500,
                 ),
               ),
               const SizedBox(height: 16),
@@ -453,13 +453,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 autofocus: true,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 15,
                   color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
                 decoration: InputDecoration(
                   hintText: 'Seu e-mail',
-                  hintStyle: GoogleFonts.poppins(fontSize: 14),
+                  hintStyle: LummyFonts.body(fontSize: 14),
                   prefixIcon: const Icon(Icons.email_outlined, size: 20),
                   filled: true,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -482,11 +482,11 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'Cancelar',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFF94A3B8)
-                    : const Color(0xFF64748B),
+                    ? LummyColors.slate400
+                    : LummyColors.slate500,
               ),
             ),
           ),
@@ -503,7 +503,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SnackBar(
                       content: Text(
                         e.message.contains('rate limit') ? 'Muitas tentativas. Tente novamente em alguns minutos.' : e.message,
-                        style: GoogleFonts.poppins(fontSize: 14),
+                        style: LummyFonts.body(fontSize: 14),
                       ),
                       backgroundColor: Colors.red,
                       behavior: SnackBarBehavior.floating,
@@ -516,7 +516,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SnackBar(
                       content: Text(
                         'Erro ao enviar. Verifique sua conexão.',
-                        style: GoogleFonts.poppins(fontSize: 14),
+                        style: LummyFonts.body(fontSize: 14),
                       ),
                       backgroundColor: Colors.red,
                       behavior: SnackBarBehavior.floating,
@@ -526,11 +526,11 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             },
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF4A90E2),
+              backgroundColor: LummyColors.brandBlue,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: Text('Enviar', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            child: Text('Enviar', style: LummyFonts.body(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -546,12 +546,12 @@ class _LoginScreenState extends State<LoginScreen> {
               Expanded(
                 child: Text(
                   'Verifique seu e-mail. Enviamos um link para redefinir sua senha.',
-                  style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: LummyFonts.body(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
               ),
             ],
           ),
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: LummyColors.emerald500,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 5),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -568,13 +568,13 @@ class _LoginScreenState extends State<LoginScreen> {
           SnackBar(
             content: Text(
               'Sem internet. Conecte-se e toque em TENTAR NOVAMENTE no aviso acima.',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFFEA580C),
+            backgroundColor: LummyColors.orange600,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -649,7 +649,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(
           content: Text(
             'Nenhum usuário salvo para autenticação biométrica.',
-            style: GoogleFonts.poppins(fontSize: 14),
+            style: LummyFonts.body(fontSize: 14),
           ),
           backgroundColor: Colors.orange,
           behavior: SnackBarBehavior.floating,
@@ -665,10 +665,10 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(
           content: Text(
             'Sem internet. A biometria precisa de conexão para validar o login.',
-            style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+            style: LummyFonts.body(fontSize: 14, fontWeight: FontWeight.w500),
           ),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFFEA580C),
+          backgroundColor: LummyColors.orange600,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
@@ -697,7 +697,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SnackBar(
               content: Text(
                 'Biometria não está mais disponível. Use email e senha para fazer login.',
-                style: GoogleFonts.poppins(fontSize: 14),
+                style: LummyFonts.body(fontSize: 14),
               ),
               backgroundColor: Colors.orange,
               behavior: SnackBarBehavior.floating,
@@ -749,7 +749,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SnackBar(
               content: Text(
                 'Autenticação biométrica cancelada. Use email e senha para fazer login.',
-                style: GoogleFonts.poppins(fontSize: 14),
+                style: LummyFonts.body(fontSize: 14),
               ),
               backgroundColor: Colors.blue,
               behavior: SnackBarBehavior.floating,
@@ -783,7 +783,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(
           content: Text(
             'Erro na autenticação biométrica. Use email e senha para fazer login.',
-            style: GoogleFonts.poppins(fontSize: 14),
+            style: LummyFonts.body(fontSize: 14),
           ),
           backgroundColor: Colors.orange,
           behavior: SnackBarBehavior.floating,
@@ -824,7 +824,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0xFF4A90E2), Color(0xFF357ABD)],
+                    colors: [LummyColors.brandBlue, LummyColors.brandBlueDark],
                   ),
                 ),
               ),
@@ -843,7 +843,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             TextSpan(
                               text: 'Lu',
-                              style: GoogleFonts.paytoneOne(
+                              style: LummyFonts.logo(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
                                 color:
@@ -855,7 +855,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             TextSpan(
                               text: 'm',
-                              style: GoogleFonts.paytoneOne(
+                              style: LummyFonts.logo(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.orange,
@@ -863,17 +863,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             TextSpan(
                               text: 'm',
-                              style: GoogleFonts.paytoneOne(
+                              style: LummyFonts.logo(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
                                 color: Theme.of(context).brightness == Brightness.dark
-                                    ? const Color(0xFF60A5FA)
-                                    : const Color(0xFF003092),
+                                    ? LummyColors.blue400
+                                    : LummyColors.brandNavy,
                               ),
                             ),
                             TextSpan(
                               text: 'y',
-                              style: GoogleFonts.paytoneOne(
+                              style: LummyFonts.logo(
                                 fontSize: isVerySmallScreen ? 28 : 32,
                                 fontWeight: FontWeight.w400,
                                 color:
@@ -950,7 +950,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardTheme.color,
                       border: Theme.of(context).brightness == Brightness.dark
-                          ? Border.all(color: const Color(0xFF475569))
+                          ? Border.all(color: LummyColors.slate600)
                           : null,
                       boxShadow: [
                         BoxShadow(
@@ -984,18 +984,18 @@ class _LoginScreenState extends State<LoginScreen> {
                             // Título "Faça Login" - "og" em laranja e azul como Lummy
                             RichText(
                               text: TextSpan(
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: isVerySmallScreen ? 24 : 28,
                                   fontWeight: FontWeight.w600,
                                   color: Theme.of(context).brightness == Brightness.dark
                                       ? Colors.white
-                                      : const Color(0xFF1E293B),
+                                      : LummyColors.slate800,
                                 ),
                                 children: [
                                   const TextSpan(text: 'Faça L'),
                                   TextSpan(
                                     text: 'o',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       fontSize: isVerySmallScreen ? 24 : 28,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.orange,
@@ -1003,12 +1003,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   TextSpan(
                                     text: 'g',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       fontSize: isVerySmallScreen ? 24 : 28,
                                       fontWeight: FontWeight.w600,
                                       color: Theme.of(context).brightness == Brightness.dark
-                                          ? const Color(0xFF60A5FA)
-                                          : const Color(0xFF003092),
+                                          ? LummyColors.blue400
+                                          : LummyColors.brandNavy,
                                     ),
                                   ),
                                   const TextSpan(text: 'in'),
@@ -1033,19 +1033,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                     onPressed: _authenticateWithBiometrics,
                                     icon: const Icon(
                                       Icons.fingerprint,
-                                      color: Color(0xFF4A90E2),
+                                      color: LummyColors.brandBlue,
                                     ),
                                     label: Text(
                                       'Entrar com Digital',
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF4A90E2),
+                                        color: LummyColors.brandBlue,
                                       ),
                                     ),
                                     style: OutlinedButton.styleFrom(
                                       side: const BorderSide(
-                                        color: Color(0xFF4A90E2),
+                                        color: LummyColors.brandBlue,
                                         width: 2,
                                       ),
                                       shape: RoundedRectangleBorder(
@@ -1069,7 +1069,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: TextFormField(
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: isVerySmallScreen
                                       ? 14
                                       : 16, // Responsivo
@@ -1080,7 +1080,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 decoration: InputDecoration(
                                   hintText: 'Seu E-mail',
-                                  hintStyle: GoogleFonts.poppins(
+                                  hintStyle: LummyFonts.body(
                                     color: Theme.of(
                                       context,
                                     ).inputDecorationTheme.hintStyle?.color,
@@ -1104,7 +1104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     horizontal: isVerySmallScreen ? 16 : 20,
                                     vertical: isVerySmallScreen ? 14 : 18,
                                   ),
-                                  errorStyle: GoogleFonts.poppins(
+                                  errorStyle: LummyFonts.body(
                                     fontSize: isVerySmallScreen ? 10 : 12,
                                   ),
                                 ),
@@ -1135,7 +1135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: TextFormField(
                                 controller: _passwordController,
                                 obscureText: !_isPasswordVisible,
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: isVerySmallScreen ? 14 : 16,
                                   color: Theme.of(
                                     context,
@@ -1144,7 +1144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 decoration: InputDecoration(
                                   hintText: 'Sua Senha',
-                                  hintStyle: GoogleFonts.poppins(
+                                  hintStyle: LummyFonts.body(
                                     color: Theme.of(
                                       context,
                                     ).inputDecorationTheme.hintStyle?.color,
@@ -1185,7 +1185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       });
                                     },
                                   ),
-                                  errorStyle: GoogleFonts.poppins(
+                                  errorStyle: LummyFonts.body(
                                     fontSize: isVerySmallScreen ? 10 : 12,
                                   ),
                                 ),
@@ -1212,10 +1212,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 child: Text(
                                   'Esqueci minha senha',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: isVerySmallScreen ? 12 : 13,
                                     fontWeight: FontWeight.w500,
-                                    color: const Color(0xFF4A90E2),
+                                    color: LummyColors.brandBlue,
                                   ),
                                 ),
                               ),
@@ -1230,8 +1230,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
                                   colors: [
-                                    Color(0xFFFF8C42),
-                                    Color(0xFFFF5722),
+                                    LummyColors.brandOrange,
+                                    LummyColors.brandOrangeDeep,
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
@@ -1281,7 +1281,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         )
                                       : Text(
                                           'Entrar',
-                                          style: GoogleFonts.poppins(
+                                          style: LummyFonts.body(
                                             fontSize: isVerySmallScreen
                                                 ? 16
                                                 : 18,
@@ -1301,10 +1301,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 Text(
                                   'Não tem uma conta?',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: isVerySmallScreen ? 12 : 14,
                                     color: Theme.of(context).brightness == Brightness.dark
-                                        ? const Color(0xFFCBD5E1)
+                                        ? LummyColors.slate300
                                         : Theme.of(context).textTheme.bodyMedium?.color,
                                   ),
                                 ),
@@ -1320,7 +1320,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   },
                                   child: Text(
                                     'Registre-se',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       fontSize: isVerySmallScreen ? 12 : 14,
                                       fontWeight: FontWeight.w600,
                                       color: Theme.of(
@@ -1383,10 +1383,10 @@ class _LoginOfflineCard extends StatelessWidget {
     required this.compact,
   });
 
-  static const _accent = Color(0xFFEA580C);
-  static const _accentSoft = Color(0xFFFFF7ED);
-  static const _title = Color(0xFF1E293B);
-  static const _subtitle = Color(0xFF64748B);
+  static const _accent = LummyColors.orange600;
+  static const _accentSoft = LummyColors.orange50;
+  static const _title = LummyColors.slate800;
+  static const _subtitle = LummyColors.slate500;
 
   @override
   Widget build(BuildContext context) {
@@ -1430,22 +1430,22 @@ class _LoginOfflineCard extends StatelessWidget {
               ),
             );
 
-            final titleStyle = GoogleFonts.poppins(
+            final titleStyle = LummyFonts.body(
               fontSize: compact ? 13 : 14,
               fontWeight: FontWeight.w700,
               height: 1.2,
               color: _title,
             );
-            final bodyStyle = GoogleFonts.poppins(
+            final bodyStyle = LummyFonts.body(
               fontSize: compact ? 11.5 : 12,
               fontWeight: FontWeight.w500,
               height: 1.3,
               color: _subtitle,
             );
-            final actionStyle = GoogleFonts.poppins(
+            final actionStyle = LummyFonts.body(
               fontSize: compact ? 12 : 13,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF4A90E2),
+              color: LummyColors.brandBlue,
             );
 
             final textBlock = Expanded(
@@ -1468,7 +1468,7 @@ class _LoginOfflineCard extends StatelessWidget {
             final retry = TextButton(
               onPressed: onRetry,
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF4A90E2),
+                foregroundColor: LummyColors.brandBlue,
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 minimumSize: const Size(48, 40),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,

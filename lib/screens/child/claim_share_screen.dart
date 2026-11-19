@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ClaimShareScreen extends StatefulWidget {
   final String distributionId;
@@ -265,7 +265,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                             border: Border.all(
                               color: theme.brightness == Brightness.dark
                                   ? theme.dividerColor
-                                  : const Color(0xFFE2E8F0),
+                                  : LummyColors.slate200,
                               width: 1,
                             ),
                           ),
@@ -283,7 +283,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                           children: [
                             Text(
                               'Resgatar',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: isSmall ? 22 : 24,
                                 fontWeight: FontWeight.w700,
                                 color: theme.textTheme.titleLarge?.color,
@@ -292,7 +292,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                             const SizedBox(height: 4),
                             Text(
                               'Valor definido pelo responsável',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: isSmall ? 14 : 16,
                                 fontWeight: FontWeight.w400,
                                 color: theme.textTheme.bodyMedium?.color,
@@ -309,10 +309,10 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                        color: LummyColors.emerald500.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                          color: LummyColors.emerald500.withValues(alpha: 0.2),
                           width: 1,
                         ),
                       ),
@@ -320,17 +320,17 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                         children: [
                           const Icon(
                             Icons.check_circle,
-                            color: Color(0xFF10B981),
+                            color: LummyColors.emerald500,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               'Você já resgatou sua parte',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: isSmall ? 12 : 14,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF10B981),
+                                color: LummyColors.emerald500,
                               ),
                             ),
                           ),
@@ -350,7 +350,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                       border: Border.all(
                         color: theme.brightness == Brightness.dark
                             ? theme.dividerColor
-                            : const Color(0xFFE2E8F0),
+                            : LummyColors.slate200,
                         width: 1,
                       ),
                       boxShadow: [
@@ -367,7 +367,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF10B981), Color(0xFF059669)],
+                              colors: [LummyColors.emerald500, LummyColors.emerald600],
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -384,7 +384,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                             children: [
                               Text(
                                 'Valor em disputa',
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: isSmall ? 14 : 16,
                                   fontWeight: FontWeight.w600,
                                   color: theme.textTheme.titleLarge?.color,
@@ -393,7 +393,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                               const SizedBox(height: 4),
                               Text(
                                 'R\$ ${widget.totalAmount.toStringAsFixed(2)}',
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: isSmall ? 22 : 26,
                                   fontWeight: FontWeight.w800,
                                   color: theme.textTheme.titleLarge?.color,
@@ -411,7 +411,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                   // Breakdown proporcional
                   Text(
                     'Como o valor é dividido',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: isSmall ? 16 : 18,
                       fontWeight: FontWeight.w600,
                       color: theme.textTheme.titleMedium?.color,
@@ -420,8 +420,8 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                   const SizedBox(height: 12),
                   ...breakdown.map((p) {
                     final color = (p['isCurrent'] as bool)
-                        ? const Color(0xFF3B82F6)
-                        : const Color(0xFF64748B);
+                        ? LummyColors.blue500
+                        : LummyColors.slate500;
                     return Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(14),
@@ -431,7 +431,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                         border: Border.all(
                           color: theme.brightness == Brightness.dark
                               ? theme.dividerColor
-                              : const Color(0xFFE2E8F0),
+                              : LummyColors.slate200,
                           width: 1,
                         ),
                       ),
@@ -459,7 +459,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                               children: [
                                 Text(
                                   p['name'] as String,
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: theme.textTheme.titleMedium?.color,
@@ -468,7 +468,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                                 const SizedBox(height: 2),
                                 Text(
                                   'Score: ${(p['score'] as double).toStringAsFixed(0)} • ${(100 * (p['ratio'] as double)).toStringAsFixed(0)}% do total',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400,
                                     color: theme.textTheme.bodyMedium?.color,
@@ -479,7 +479,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                           ),
                           Text(
                             'R\$ ${(p['amount'] as double).toStringAsFixed(2)}',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: color,
@@ -498,12 +498,12 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                     padding: EdgeInsets.all(isSmall ? 16.0 : 18.0),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
+                        colors: [LummyColors.violet500, LummyColors.violet700],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF8B5CF6).withValues(alpha: 0.35),
+                          color: LummyColors.violet500.withValues(alpha: 0.35),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
@@ -514,7 +514,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                       children: [
                         Text(
                           'Sua parte estimada',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: isSmall ? 14 : 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white.withValues(alpha: 0.9),
@@ -523,7 +523,7 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                         const SizedBox(height: 4),
                         Text(
                           'R\$ ${yourShare.toStringAsFixed(2)}',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: isSmall ? 26 : 30,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
@@ -542,13 +542,13 @@ class _ClaimShareScreenState extends State<ClaimShareScreen>
                       icon: const Icon(Icons.payments_rounded, size: 22),
                       label: Text(
                         'Retirar minha parte',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: isSmall ? 16 : 18,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
+                        backgroundColor: LummyColors.emerald500,
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(
                           vertical: isSmall ? 16 : 18,

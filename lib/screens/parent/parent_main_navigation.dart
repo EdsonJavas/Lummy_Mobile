@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
 import 'package:lummy/core/utils/formatters.dart';
@@ -107,14 +106,14 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
         SnackBar(
           content: Text(
             'Pressione voltar novamente para sair',
-            style: GoogleFonts.poppins(),
+            style: LummyFonts.body(),
           ),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: const Color(0xFF121212),
+          backgroundColor: LummyColors.darkMaterial,
         ),
       );
       return false;
@@ -238,7 +237,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
   Widget _buildPremiumBottomNav(BuildContext context, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF121212) : Colors.white,
+        color: isDark ? LummyColors.darkMaterial : Colors.white,
         boxShadow: [
           BoxShadow(
             color: isDark
@@ -250,7 +249,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
         ],
         border: Border(
           top: BorderSide(
-            color: isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0),
+            color: isDark ? LummyColors.darkSurfaceHigh : LummyColors.slate200,
             width: 1,
           ),
         ),
@@ -327,22 +326,22 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
                   color: isSelected
                       ? Colors.white
                       : (isDark
-                            ? const Color(0xFF64748B)
-                            : const Color(0xFF94A3B8)),
+                            ? LummyColors.slate500
+                            : LummyColors.slate400),
                   size: isSelected ? 24 : 22,
                 ),
               ),
               const SizedBox(height: 5),
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: isSelected ? 12 : 11,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                   color: isSelected
                       ? item.color
                       : (isDark
-                            ? const Color(0xFF64748B)
-                            : const Color(0xFF94A3B8)),
+                            ? LummyColors.slate500
+                            : LummyColors.slate400),
                 ),
                 child: Text(
                   item.label,
@@ -411,20 +410,20 @@ class _ParentDrawer extends StatefulWidget {
 class _ParentDrawerState extends State<_ParentDrawer> {
   bool _balanceVisible = true;
 
-  static const _accent = Color(0xFF8B5CF6);
-  static const _blue = Color(0xFF3B82F6);
-  static const _green = Color(0xFF10B981);
+  static const _accent = LummyColors.violet500;
+  static const _blue = LummyColors.blue500;
+  static const _green = LummyColors.emerald500;
   static const _avatarUrl =
       'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png';
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surface = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF8FAFC);
+    final surface = isDark ? LummyColors.darkSurface : LummyColors.slate50;
     final headerGradient = isDark
-        ? const [Color(0xFF1E1B4B), Color(0xFF312E81), Color(0xFF4C1D95)]
-        : const [Color(0xFF7C3AED), Color(0xFF8B5CF6), Color(0xFFA78BFA)];
-    final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+        ? const [LummyColors.indigo950, LummyColors.indigo900, LummyColors.violet900]
+        : const [LummyColors.violet600, LummyColors.violet500, LummyColors.violet400];
+    final textSecondary = isDark ? LummyColors.slate400 : LummyColors.slate500;
     final closeIconColor = isDark ? textSecondary : Colors.white;
 
     final name = widget.parentName?.trim().isNotEmpty == true ? widget.parentName! : 'Responsável';
@@ -546,7 +545,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                                 children: [
                                   Text(
                                     name,
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       color: Colors.white,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
@@ -557,7 +556,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                                   const SizedBox(height: 4),
                                   Text(
                                     '$childrenText · ${widget.subscriptionLabel}',
-                                    style: GoogleFonts.poppins(
+                                    style: LummyFonts.body(
                                       color: Colors.white.withValues(alpha: 0.88),
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -593,7 +592,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                                   children: [
                                     Text(
                                       'Saldo disponível',
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         color: Colors.white.withValues(alpha: 0.85),
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
@@ -604,7 +603,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                                       _balanceVisible
                                           ? AppFormatters.formatCurrency(_kDrawerBalance)
                                           : 'R\$ •••••••',
-                                      style: GoogleFonts.poppins(
+                                      style: LummyFonts.body(
                                         color: Colors.white,
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
@@ -683,7 +682,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
               child: Center(
                 child: Text(
                   '© Lummy',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     color: textSecondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -719,13 +718,13 @@ class _DrawerListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Mesmo estilo do _CompactInfoCard da Visão Geral
-    final darkTop = Color.alphaBlend(iconColor.withAlpha(30), const Color(0xFF1E293B));
+    final darkTop = Color.alphaBlend(iconColor.withAlpha(30), LummyColors.slate800);
     final darkBorder = Color.alphaBlend(
       iconColor.withAlpha(52),
-      const Color(0xFF334155),
+      LummyColors.slate700,
     );
-    final labelColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final textColor = isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B);
+    final labelColor = isDark ? LummyColors.slate400 : LummyColors.slate500;
+    final textColor = isDark ? LummyColors.slate50 : LummyColors.slate800;
 
     return Material(
       color: Colors.transparent,
@@ -740,7 +739,7 @@ class _DrawerListTile extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [darkTop, const Color(0xFF1E293B)]
+                  ? [darkTop, LummyColors.slate800]
                   : [Colors.white, iconColor.withValues(alpha: 0.04)],
             ),
             borderRadius: BorderRadius.circular(20),
@@ -781,7 +780,7 @@ class _DrawerListTile extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: textColor,
@@ -792,7 +791,7 @@ class _DrawerListTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: labelColor,

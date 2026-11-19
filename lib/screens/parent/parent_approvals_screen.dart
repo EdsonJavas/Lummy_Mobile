@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:lummy/application/app_facade.dart';
 import 'package:lummy/di/locator.dart';
@@ -8,14 +7,15 @@ import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
 import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_state.dart';
 import 'package:lummy/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentApprovalsScreen extends StatelessWidget {
   const ParentApprovalsScreen({super.key});
 
   // Paleta de cores vibrantes
-  static const _green = Color(0xFF10B981);
-  static const _red = Color(0xFFEF4444);
-  static const _blue = Color(0xFF3B82F6);
+  static const _green = LummyColors.emerald500;
+  static const _red = LummyColors.red500;
+  static const _blue = LummyColors.blue500;
 
   static String _friendlyLoadError(String raw) {
     final s = raw.toLowerCase();
@@ -37,8 +37,8 @@ class ParentApprovalsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+          ? LummyColors.darkMaterial
+          : LummyColors.slate50,
       body: BrandedRefreshIndicator(
         onRefresh: () => context.read<ParentDashboardCubit>().refresh(),
         color: _green,
@@ -79,20 +79,20 @@ class ParentApprovalsScreen extends StatelessWidget {
                             Icons.error_outline_rounded,
                             size: 56,
                             color: isDark
-                                ? const Color(0xFF94A3B8)
-                                : const Color(0xFF64748B),
+                                ? LummyColors.slate400
+                                : LummyColors.slate500,
                           ),
                           const SizedBox(height: 20),
                           Text(
                             msg,
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                               height: 1.45,
                               color: isDark
                                   ? Colors.white
-                                  : const Color(0xFF1E293B),
+                                  : LummyColors.slate800,
                             ),
                           ),
                           const SizedBox(height: 28),
@@ -101,7 +101,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                             icon: const Icon(Icons.refresh_rounded),
                             label: Text(
                               'Tentar de novo',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -166,23 +166,23 @@ class ParentApprovalsScreen extends StatelessWidget {
                             const SizedBox(height: 24),
                             Text(
                               'Tudo em dia! ✨',
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w600,
                                 color: isDark
                                     ? Colors.white
-                                    : const Color(0xFF1E293B),
+                                    : LummyColors.slate800,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Não há solicitações pendentes no momento. Quando seus filhos fizerem pedidos, eles aparecerão aqui.',
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 14,
                                 color: isDark
-                                    ? const Color(0xFF94A3B8)
-                                    : const Color(0xFF64748B),
+                                    ? LummyColors.slate400
+                                    : LummyColors.slate500,
                               ),
                             ),
                           ],
@@ -233,8 +233,8 @@ class ParentApprovalsScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [Color(0xFF064E3B), Color(0xFF065F46), Color(0xFF047857)]
-              : const [Color(0xFF10B981), Color(0xFF059669), Color(0xFF047857)],
+              ? const [LummyColors.emerald900, LummyColors.emerald800, LummyColors.emerald700]
+              : const [LummyColors.emerald500, LummyColors.emerald600, LummyColors.emerald700],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(32),
@@ -275,7 +275,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Aprovações',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -284,7 +284,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                     ),
                     Text(
                       'Gerencie as solicitações',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         color: Colors.white.withValues(alpha: 0.8),
@@ -328,10 +328,10 @@ class ParentApprovalsScreen extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         '$pendingCount',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1E293B),
+                          color: LummyColors.slate800,
                         ),
                       ),
                     ],
@@ -361,7 +361,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'Deslize para a direita para aprovar ou esquerda para recusar',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         color: Colors.white.withValues(alpha: 0.9),
                       ),
@@ -386,8 +386,8 @@ class ParentApprovalsScreen extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
       child: Material(
         color: isDark
-            ? const Color(0xFF7F1D1D).withValues(alpha: 0.4)
-            : const Color(0xFFFEF2F2),
+            ? LummyColors.red900.withValues(alpha: 0.4)
+            : LummyColors.red50,
         borderRadius: BorderRadius.circular(14),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 10, 4, 10),
@@ -399,13 +399,13 @@ class ParentApprovalsScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   error,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     height: 1.35,
                     color: isDark
-                        ? const Color(0xFFFCA5A5)
-                        : const Color(0xFF991B1B),
+                        ? LummyColors.red300
+                        : LummyColors.red800,
                   ),
                 ),
               ),
@@ -434,10 +434,10 @@ class ParentApprovalsScreen extends StatelessWidget {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF121212) : Colors.white,
+        color: isDark ? LummyColors.darkMaterial : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          color: isDark ? LummyColors.slate700 : LummyColors.slate200,
           width: 1,
         ),
         boxShadow: [
@@ -462,7 +462,7 @@ class ParentApprovalsScreen extends StatelessWidget {
           // Action buttons
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC),
+              color: isDark ? LummyColors.darkMaterial : LummyColors.slate50,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),
@@ -559,7 +559,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     label,
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -596,7 +596,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   label,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: color,

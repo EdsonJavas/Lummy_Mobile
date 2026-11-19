@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy/domain/entities/user_entity.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ChildMissionsManagerScreen extends StatefulWidget {
   final ChildEntity child;
@@ -26,13 +26,13 @@ class _ChildMissionsManagerScreenState
   List<Map<String, dynamic>> _customMissions = [];
   bool _isLoading = true;
 
-  static const _purple = Color(0xFF8B5CF6);
-  static const _purpleDark = Color(0xFF6D28D9);
-  static const _blue = Color(0xFF3B82F6);
-  static const _green = Color(0xFF10B981);
-  static const _orange = Color(0xFFF59E0B);
-  static const _red = Color(0xFFEF4444);
-  static const _pink = Color(0xFFEC4899);
+  static const _purple = LummyColors.violet500;
+  static const _purpleDark = LummyColors.violet700;
+  static const _blue = LummyColors.blue500;
+  static const _green = LummyColors.emerald500;
+  static const _orange = LummyColors.amber500;
+  static const _red = LummyColors.red500;
+  static const _pink = LummyColors.pink500;
 
   @override
   void initState() {
@@ -91,7 +91,7 @@ class _ChildMissionsManagerScreenState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF8FAFC);
+    final bg = isDark ? LummyColors.darkBase : LummyColors.slate50;
 
     return Scaffold(
       backgroundColor: bg,
@@ -135,7 +135,7 @@ class _ChildMissionsManagerScreenState
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF1E1B4B), _purpleDark.withValues(alpha: 0.7)]
+              ? [LummyColors.indigo950, _purpleDark.withValues(alpha: 0.7)]
               : [_purple, _purpleDark],
         ),
         borderRadius: const BorderRadius.only(
@@ -164,7 +164,7 @@ class _ChildMissionsManagerScreenState
                   children: [
                     Text(
                       'Missões',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -174,7 +174,7 @@ class _ChildMissionsManagerScreenState
                     const SizedBox(height: 2),
                     Text(
                       widget.child.name,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Colors.white.withValues(alpha: 0.8),
@@ -265,7 +265,7 @@ class _ChildMissionsManagerScreenState
             const SizedBox(height: 4),
             Text(
               value,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -273,7 +273,7 @@ class _ChildMissionsManagerScreenState
             ),
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 10,
                 fontWeight: FontWeight.w400,
                 color: Colors.white.withValues(alpha: 0.75),
@@ -294,7 +294,7 @@ class _ChildMissionsManagerScreenState
 
   Widget _buildTabBar(bool isDark) {
     final trackColor =
-        isDark ? const Color(0xFF1E293B) : const Color(0xFFEDE9FE);
+        isDark ? LummyColors.slate800 : LummyColors.violet100;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
       child: Container(
@@ -320,11 +320,11 @@ class _ChildMissionsManagerScreenState
           ),
           labelColor: Colors.white,
           unselectedLabelColor:
-              isDark ? const Color(0xFF94A3B8) : const Color(0xFF7C3AED),
+              isDark ? LummyColors.slate400 : LummyColors.violet600,
           labelStyle:
-              GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
+              LummyFonts.body(fontSize: 13, fontWeight: FontWeight.w600),
           unselectedLabelStyle:
-              GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+              LummyFonts.body(fontSize: 13, fontWeight: FontWeight.w500),
           padding: const EdgeInsets.all(3),
           tabs: const [
             Tab(text: 'Hoje'),
@@ -370,7 +370,7 @@ class _ChildMissionsManagerScreenState
                 const SizedBox(width: 8),
                 Text(
                   'Nova Missão',
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -538,11 +538,11 @@ class _ChildMissionsManagerScreenState
     ];
     const colors = [_purple, _blue, _green, _orange, _pink, _red];
 
-    final cardBg = isDark ? const Color(0xFF1A1A2E) : Colors.white;
-    final fieldBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final cardBg = isDark ? LummyColors.darkNavy : Colors.white;
+    final fieldBg = isDark ? LummyColors.slate900 : LummyColors.slate50;
+    final titleColor = isDark ? Colors.white : LummyColors.slate900;
     final labelColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+        isDark ? LummyColors.slate400 : LummyColors.slate500;
 
     showModalBottomSheet(
       context: context,
@@ -579,8 +579,8 @@ class _ChildMissionsManagerScreenState
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF334155)
-                            : const Color(0xFFCBD5E1),
+                            ? LummyColors.slate700
+                            : LummyColors.slate300,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -611,7 +611,7 @@ class _ChildMissionsManagerScreenState
                       Expanded(
                         child: Text(
                           'Nova Missão',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
                             color: titleColor,
@@ -711,7 +711,7 @@ class _ChildMissionsManagerScreenState
                   const SizedBox(height: 6),
                   TextField(
                     controller: titleCtl,
-                    style: GoogleFonts.poppins(color: titleColor),
+                    style: LummyFonts.body(color: titleColor),
                     decoration: _fieldDecor(
                       'Ex: Arrumar o quarto',
                       fieldBg,
@@ -725,7 +725,7 @@ class _ChildMissionsManagerScreenState
                   const SizedBox(height: 6),
                   TextField(
                     controller: descCtl,
-                    style: GoogleFonts.poppins(color: titleColor),
+                    style: LummyFonts.body(color: titleColor),
                     maxLines: 2,
                     decoration: _fieldDecor(
                       'Detalhe o que precisa ser feito...',
@@ -741,14 +741,14 @@ class _ChildMissionsManagerScreenState
                   TextField(
                     controller: pointsCtl,
                     keyboardType: TextInputType.number,
-                    style: GoogleFonts.poppins(color: titleColor),
+                    style: LummyFonts.body(color: titleColor),
                     decoration: _fieldDecor(
                       '50',
                       fieldBg,
                       isDark,
                     ).copyWith(
                       suffixText: 'pontos',
-                      suffixStyle: GoogleFonts.poppins(
+                      suffixStyle: LummyFonts.body(
                         color: labelColor,
                         fontWeight: FontWeight.w500,
                       ),
@@ -815,7 +815,7 @@ class _ChildMissionsManagerScreenState
                                 const SizedBox(width: 8),
                                 Text(
                                   'Criar Missão',
-                                  style: GoogleFonts.poppins(
+                                  style: LummyFonts.body(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
@@ -840,7 +840,7 @@ class _ChildMissionsManagerScreenState
   Widget _sectionLabel(String text, Color color) {
     return Text(
       text,
-      style: GoogleFonts.poppins(
+      style: LummyFonts.body(
         fontSize: 13,
         fontWeight: FontWeight.w600,
         color: color,
@@ -851,8 +851,8 @@ class _ChildMissionsManagerScreenState
   InputDecoration _fieldDecor(String hint, Color fillColor, bool isDark) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.poppins(
-        color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+      hintStyle: LummyFonts.body(
+        color: isDark ? LummyColors.slate600 : LummyColors.slate300,
         fontSize: 14,
       ),
       filled: true,
@@ -865,7 +865,7 @@ class _ChildMissionsManagerScreenState
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(
-          color: isDark ? const Color(0xFF2D2D2D) : const Color(0xFFE2E8F0),
+          color: isDark ? LummyColors.darkSurfaceHigh : LummyColors.slate200,
         ),
       ),
       focusedBorder: OutlineInputBorder(
@@ -1002,18 +1002,18 @@ class _MissionCard extends StatelessWidget {
     this.onDelete,
   });
 
-  static const _green = Color(0xFF10B981);
-  static const _red = Color(0xFFEF4444);
+  static const _green = LummyColors.emerald500;
+  static const _red = LummyColors.red500;
 
   @override
   Widget build(BuildContext context) {
-    final cardBg = isDark ? const Color(0xFF1A1A2E) : Colors.white;
+    final cardBg = isDark ? LummyColors.darkNavy : Colors.white;
     final borderColor = isCompleted
         ? _green.withValues(alpha: 0.3)
-        : (isDark ? const Color(0xFF2D2D2D) : color.withValues(alpha: 0.15));
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+        : (isDark ? LummyColors.darkSurfaceHigh : color.withValues(alpha: 0.15));
+    final titleColor = isDark ? Colors.white : LummyColors.slate900;
     final subtitleColor =
-        isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+        isDark ? LummyColors.slate400 : LummyColors.slate500;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1064,7 +1064,7 @@ class _MissionCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             title,
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: titleColor,
@@ -1091,7 +1091,7 @@ class _MissionCard extends StatelessWidget {
                             ),
                             child: Text(
                               badge!,
-                              style: GoogleFonts.poppins(
+                              style: LummyFonts.body(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                                 color: badgeColor ?? color,
@@ -1105,7 +1105,7 @@ class _MissionCard extends StatelessWidget {
                       const SizedBox(height: 3),
                       Text(
                         description,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           color: subtitleColor,
                           height: 1.3,
@@ -1141,7 +1141,7 @@ class _MissionCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       '+$points pts',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: color,
@@ -1174,7 +1174,7 @@ class _MissionCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         'Concluída',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: _green,
@@ -1202,7 +1202,7 @@ class _MissionCard extends StatelessWidget {
                       ),
                       child: Text(
                         actionLabel!,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,

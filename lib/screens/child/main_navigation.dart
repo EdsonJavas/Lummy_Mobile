@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy/core/constants/app_constants.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'home_page.dart';
@@ -43,14 +41,14 @@ class _MainNavigationState extends State<MainNavigation> {
         SnackBar(
           content: Text(
             'Pressione voltar novamente para sair',
-            style: GoogleFonts.poppins(),
+            style: LummyFonts.body(),
           ),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor ?? const Color(0xFF1E293B),
+          backgroundColor: Theme.of(context).snackBarTheme.backgroundColor ?? LummyColors.slate800,
         ),
       );
       return false;
@@ -97,7 +95,7 @@ class _MainNavigationState extends State<MainNavigation> {
                       0,
                       Iconsax.home_1,
                       'Início',
-                      const Color(AppConstants.primaryBlue),
+                      LummyColors.brandBlue,
                     ),
                   ),
                   Expanded(
@@ -169,7 +167,7 @@ class _MainNavigationState extends State<MainNavigation> {
             const SizedBox(height: 3),
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
@@ -191,7 +189,7 @@ class TransactionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: LummyColors.slate50,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -200,19 +198,19 @@ class TransactionsPage extends StatelessWidget {
             children: [
               Text(
                 'Meus Gastos',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 28,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1E293B),
+                  color: LummyColors.slate800,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Acompanhe onde você gasta seu dinheiro',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
-                  color: const Color(0xFF64748B),
+                  color: LummyColors.slate500,
                 ),
               ),
               const SizedBox(height: 40),
@@ -225,32 +223,32 @@ class TransactionsPage extends StatelessWidget {
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                          color: LummyColors.red500.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Iconsax.receipt_2,
-                          color: Color(0xFFEF4444),
+                          color: LummyColors.red500,
                           size: 50,
                         ),
                       ),
                       const SizedBox(height: 24),
                       Text(
                         'Em Desenvolvimento',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF1E293B),
+                          color: LummyColors.slate800,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Esta tela estará disponível em breve!',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
-                          color: const Color(0xFF64748B),
+                          color: LummyColors.slate500,
                         ),
                       ),
                     ],

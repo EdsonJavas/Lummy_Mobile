@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../../domain/entities/user_entity.dart';
 import '../../../../domain/entities/transaction_entity.dart';
 import '../../../../domain/entities/notification_entity.dart';
 import '../../../../utils/parent_notification_service.dart';
 import 'parent_dashboard_state.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ParentDashboardCubit extends Cubit<ParentDashboardState> {
   ParentDashboardCubit() : super(const ParentDashboardState());
@@ -799,11 +798,11 @@ class ParentDashboardCubit extends Cubit<ParentDashboardState> {
 
       // Converter para lista e calcular percentuais
       final colors = [
-        const Color(AppConstants.primaryBlue),
-        const Color(AppConstants.accentOrange),
-        const Color(AppConstants.purple),
-        const Color(AppConstants.successGreen),
-        const Color(AppConstants.textSecondary),
+        LummyColors.brandBlue,
+        LummyColors.brandOrange,
+        LummyColors.violet500,
+        LummyColors.emerald500,
+        LummyColors.slate500,
       ];
 
       final entries = categoryMap.entries.toList()

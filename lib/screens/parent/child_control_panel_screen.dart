@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy/core/utils/formatters.dart';
@@ -9,6 +8,7 @@ import 'package:lummy/screens/parent/child_missions_manager_screen.dart';
 import 'package:lummy/screens/parent/child_achievements_screen.dart';
 import 'package:lummy/screens/parent/child_settings_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ChildControlPanelScreen extends StatefulWidget {
   final ChildEntity child;
@@ -40,12 +40,12 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
   bool _isLoading = true;
 
   // Paleta de cores
-  static const _purple = Color(0xFF8B5CF6);
-  static const _blue = Color(0xFF3B82F6);
-  static const _pink = Color(0xFFEC4899);
-  static const _green = Color(0xFF10B981);
-  static const _orange = Color(0xFFF59E0B);
-  static const _red = Color(0xFFEF4444);
+  static const _purple = LummyColors.violet500;
+  static const _blue = LummyColors.blue500;
+  static const _pink = LummyColors.pink500;
+  static const _green = LummyColors.emerald500;
+  static const _orange = LummyColors.amber500;
+  static const _red = LummyColors.red500;
 
   @override
   void initState() {
@@ -141,8 +141,8 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF121212)
-          : const Color(0xFFF8FAFC),
+          ? LummyColors.darkMaterial
+          : LummyColors.slate50,
       body: BrandedRefreshIndicator(
         onRefresh: _loadChildData,
         color: _blue,
@@ -179,8 +179,8 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           end: Alignment.bottomRight,
           colors: isDark
               ? [
-                  const Color(0xFF1E293B),
-                  const Color(0xFF0F172A),
+                  LummyColors.slate800,
+                  LummyColors.slate900,
                   cardColor.withValues(alpha: 0.3),
                 ]
               : [
@@ -281,7 +281,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                   children: [
                     Text(
                       widget.child.name,
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -295,12 +295,12 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                              colors: [LummyColors.gold, LummyColors.orangeWeb],
                             ),
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFFFD700).withValues(alpha: 0.4),
+                                color: LummyColors.gold.withValues(alpha: 0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -313,7 +313,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                               const SizedBox(width: 3),
                               Text(
                                 'Nível $_level',
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
@@ -337,7 +337,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                               const SizedBox(width: 4),
                               Text(
                                 '${widget.child.age} anos',
-                                style: GoogleFonts.poppins(
+                                style: LummyFonts.body(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white,
@@ -370,7 +370,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                   children: [
                     Text(
                       'Saldo Atual',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                         color: Colors.white.withValues(alpha: 0.8),
@@ -379,7 +379,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                     const SizedBox(height: 4),
                     Text(
                       AppFormatters.formatCurrency(widget.child.balance),
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 28,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -392,32 +392,32 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        const Color(0xFFFFD700).withValues(alpha: 0.25),
-                        const Color(0xFFFFA500).withValues(alpha: 0.15),
+                        LummyColors.gold.withValues(alpha: 0.25),
+                        LummyColors.orangeWeb.withValues(alpha: 0.15),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+                      color: LummyColors.gold.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.stars_rounded, color: Color(0xFFFFD700), size: 18),
+                      const Icon(Icons.stars_rounded, color: LummyColors.gold, size: 18),
                       const SizedBox(width: 6),
                       Text(
                         '$_totalPoints',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFFFFD700),
+                          color: LummyColors.gold,
                         ),
                       ),
                       const SizedBox(width: 3),
                       Text(
                         'pts',
-                        style: GoogleFonts.poppins(
+                        style: LummyFonts.body(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: Colors.white.withValues(alpha: 0.7),
@@ -488,7 +488,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? LummyColors.slate800 : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: color.withValues(alpha: isDark ? 0.3 : 0.15),
@@ -515,19 +515,19 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           const SizedBox(height: 12),
           Text(
             value,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
+              color: isDark ? Colors.white : LummyColors.slate800,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              color: isDark ? LummyColors.slate400 : LummyColors.slate500,
             ),
             textAlign: TextAlign.center,
           ),
@@ -596,12 +596,12 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     return ShaderMask(
       shaderCallback: (bounds) => LinearGradient(
         colors: isDark
-            ? [const Color(0xFF3B82F6), const Color(0xFF8B5CF6)]
-            : [const Color(0xFF1E293B), const Color(0xFF1E293B)],
+            ? [LummyColors.blue500, LummyColors.violet500]
+            : [LummyColors.slate800, LummyColors.slate800],
       ).createShader(bounds),
       child: Text(
         title,
-        style: GoogleFonts.poppins(
+        style: LummyFonts.body(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: Colors.white,
@@ -646,7 +646,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
               Expanded(
                 child: Text(
                   label,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -667,7 +667,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
       child: Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+          color: isDark ? LummyColors.slate800 : LummyColors.slate200,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -681,7 +681,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           controller: _tabController,
           indicator: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+              colors: [LummyColors.blue500, LummyColors.violet500],
             ),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
@@ -696,13 +696,13 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           dividerColor: Colors.transparent,
           labelColor: Colors.white,
           unselectedLabelColor: isDark
-              ? const Color(0xFF64748B)
-              : const Color(0xFF94A3B8),
-          labelStyle: GoogleFonts.poppins(
+              ? LummyColors.slate500
+              : LummyColors.slate400,
+          labelStyle: LummyFonts.body(
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
-          unselectedLabelStyle: GoogleFonts.poppins(
+          unselectedLabelStyle: LummyFonts.body(
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -762,12 +762,12 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? LummyColors.slate800 : Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: accent != null
               ? accent.withValues(alpha: isDark ? 0.15 : 0.1)
-              : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+              : (isDark ? LummyColors.slate700 : LummyColors.slate200),
         ),
         boxShadow: [
           BoxShadow(
@@ -796,9 +796,9 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         Expanded(
           child: Text(
             title,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 16, fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
+              color: isDark ? Colors.white : LummyColors.slate800,
             ),
           ),
         ),
@@ -812,7 +812,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Text(
                   'Ver todas',
-                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: color),
+                  style: LummyFonts.body(fontSize: 12, fontWeight: FontWeight.w600, color: color),
                 ),
               ),
             ),
@@ -832,8 +832,8 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF064E3B), _green.withValues(alpha: 0.3)]
-              : [_green, const Color(0xFF059669)],
+              ? [LummyColors.emerald900, _green.withValues(alpha: 0.3)]
+              : [_green, LummyColors.emerald600],
         ),
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
@@ -863,7 +863,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                   const SizedBox(width: 12),
                   Text(
                     'Progresso de Hoje',
-                    style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                    style: LummyFonts.body(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
                   ),
                 ],
               ),
@@ -875,7 +875,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                 ),
                 child: Text(
                   '$progressPercent%',
-                  style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                  style: LummyFonts.body(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
                 ),
               ),
             ],
@@ -906,7 +906,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           const SizedBox(height: 12),
           Text(
             '$_completedMissions de $_totalMissions missões completadas',
-            style: GoogleFonts.poppins(fontSize: 13, color: Colors.white.withValues(alpha: 0.8)),
+            style: LummyFonts.body(fontSize: 13, color: Colors.white.withValues(alpha: 0.8)),
           ),
         ],
       ),
@@ -947,10 +947,10 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         gradient: done
             ? LinearGradient(colors: [_green.withValues(alpha: 0.08), _green.withValues(alpha: 0.03)])
             : null,
-        color: done ? null : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC)),
+        color: done ? null : (isDark ? LummyColors.slate900 : LummyColors.slate50),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: done ? _green.withValues(alpha: 0.25) : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+          color: done ? _green.withValues(alpha: 0.25) : (isDark ? LummyColors.slate800 : LummyColors.slate100),
         ),
       ),
       child: Row(
@@ -971,17 +971,17 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 14, fontWeight: FontWeight.w600,
                     color: done
                         ? _green
-                        : (isDark ? Colors.white : const Color(0xFF1E293B)),
+                        : (isDark ? Colors.white : LummyColors.slate800),
                     decoration: done ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 Text(
                   '+$pts pontos',
-                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w500, color: done ? _green : _orange),
+                  style: LummyFonts.body(fontSize: 11, fontWeight: FontWeight.w500, color: done ? _green : _orange),
                 ),
               ],
             ),
@@ -989,13 +989,13 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           Container(
             width: 28, height: 28,
             decoration: BoxDecoration(
-              gradient: done ? const LinearGradient(colors: [_green, Color(0xFF059669)]) : null,
-              color: done ? null : (isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0)),
+              gradient: done ? const LinearGradient(colors: [_green, LummyColors.emerald600]) : null,
+              color: done ? null : (isDark ? LummyColors.slate800 : LummyColors.slate200),
               shape: BoxShape.circle,
             ),
             child: Icon(
               done ? Icons.check_rounded : Icons.circle_outlined,
-              color: done ? Colors.white : const Color(0xFF94A3B8),
+              color: done ? Colors.white : LummyColors.slate400,
               size: done ? 16 : 20,
             ),
           ),
@@ -1045,9 +1045,9 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           const SizedBox(width: 6),
           Text(
             name,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 12, fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : const Color(0xFF1E293B),
+              color: isDark ? Colors.white : LummyColors.slate800,
             ),
           ),
         ],
@@ -1099,10 +1099,10 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         gradient: done
             ? LinearGradient(colors: [_green.withValues(alpha: 0.08), _green.withValues(alpha: 0.03)])
             : null,
-        color: done ? null : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC)),
+        color: done ? null : (isDark ? LummyColors.slate900 : LummyColors.slate50),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: done ? _green.withValues(alpha: 0.2) : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+          color: done ? _green.withValues(alpha: 0.2) : (isDark ? LummyColors.slate800 : LummyColors.slate100),
         ),
       ),
       child: Row(
@@ -1121,8 +1121,8 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B))),
+                Text(name, style: LummyFonts.body(fontSize: 13, fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : LummyColors.slate800)),
                 const SizedBox(height: 4),
                 if (!done)
                   Stack(
@@ -1131,14 +1131,14 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                         color: _purple.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(3))),
                       FractionallySizedBox(widthFactor: progress, child: Container(height: 5,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [_purple, Color(0xFF7C3AED)]),
+                          gradient: const LinearGradient(colors: [_purple, LummyColors.violet600]),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       )),
                     ],
                   )
                 else
-                  Text('Concluída!', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: _green)),
+                  Text('Concluída!', style: LummyFonts.body(fontSize: 11, fontWeight: FontWeight.w600, color: _green)),
               ],
             ),
           ),
@@ -1146,11 +1146,11 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           if (done)
             Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(gradient: LinearGradient(colors: [_green, Color(0xFF059669)]), shape: BoxShape.circle),
+              decoration: const BoxDecoration(gradient: LinearGradient(colors: [_green, LummyColors.emerald600]), shape: BoxShape.circle),
               child: const Icon(Icons.check_rounded, color: Colors.white, size: 14),
             )
           else
-            Text('${(progress * 100).toInt()}%', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: _purple)),
+            Text('${(progress * 100).toInt()}%', style: LummyFonts.body(fontSize: 13, fontWeight: FontWeight.w700, color: _purple)),
         ],
       ),
     );
@@ -1164,9 +1164,9 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         children: [
           Text(emoji, style: const TextStyle(fontSize: 20)),
           const SizedBox(width: 8),
-          Text(text, style: GoogleFonts.poppins(
+          Text(text, style: LummyFonts.body(
             fontSize: 13, fontWeight: FontWeight.w500,
-            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            color: isDark ? LummyColors.slate400 : LummyColors.slate500,
           )),
         ],
       ),
@@ -1184,20 +1184,20 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
               width: 52, height: 52,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF8B5CF6).withValues(alpha: 0.1)
-                    : const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+                    ? LummyColors.violet500.withValues(alpha: 0.1)
+                    : LummyColors.violet500.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
               ),
               alignment: Alignment.center,
-              child: Icon(icon, size: 26, color: isDark ? const Color(0xFF7C3AED) : const Color(0xFF8B5CF6)),
+              child: Icon(icon, size: 26, color: isDark ? LummyColors.violet600 : LummyColors.violet500),
             ),
             const SizedBox(height: 14),
             Text(
               text,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 14, fontWeight: FontWeight.w600,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color: isDark ? LummyColors.slate400 : LummyColors.slate500,
               ),
             ),
           ],
@@ -1298,7 +1298,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                color: isDark ? LummyColors.slate800 : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: color.withValues(alpha: isDark ? 0.12 : 0.08),
@@ -1333,23 +1333,23 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                       children: [
                         Text(
                           tx['description'] ?? 'Transação',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 14, fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                            color: isDark ? Colors.white : LummyColors.slate800,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                            color: isDark ? LummyColors.slate900 : LummyColors.slate100,
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             tx['category'] ?? 'Outros',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 10, fontWeight: FontWeight.w500,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                              color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                             ),
                           ),
                         ),
@@ -1366,7 +1366,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                     ),
                     child: Text(
                       '${isIncome ? '+' : '-'}${AppFormatters.formatCurrency(amount)}',
-                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700, color: color),
+                      style: LummyFonts.body(fontSize: 14, fontWeight: FontWeight.w700, color: color),
                     ),
                   ),
                 ],
@@ -1393,10 +1393,10 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
       children: [
         Text(
           'Filtros',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: isDark ? Colors.white : const Color(0xFF1E293B),
+            color: isDark ? Colors.white : LummyColors.slate800,
           ),
         ),
         const SizedBox(height: 8),
@@ -1458,14 +1458,14 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             gradient: selected
-                ? const LinearGradient(colors: [_blue, Color(0xFF2563EB)])
+                ? const LinearGradient(colors: [_blue, LummyColors.blue600])
                 : null,
             color: selected
                 ? null
-                : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                : (isDark ? LummyColors.slate800 : Colors.white),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: selected ? _blue : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+              color: selected ? _blue : (isDark ? LummyColors.slate700 : LummyColors.slate200),
             ),
             boxShadow: selected
                 ? [BoxShadow(color: _blue.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
@@ -1473,10 +1473,10 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           ),
           child: Text(
             label,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 13,
               fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-              color: selected ? Colors.white : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+              color: selected ? Colors.white : (isDark ? LummyColors.slate400 : LummyColors.slate500),
             ),
           ),
         ),
@@ -1538,8 +1538,8 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF064E3B), _green.withValues(alpha: 0.25)]
-              : [_green, const Color(0xFF059669)],
+              ? [LummyColors.emerald900, _green.withValues(alpha: 0.25)]
+              : [_green, LummyColors.emerald600],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
@@ -1568,11 +1568,11 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
               children: [
                 Text(
                   'Parabéns!',
-                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+                  style: LummyFonts.body(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
                 ),
                 Text(
                   '$count ${count == 1 ? 'meta concluída' : 'metas concluídas'} com sucesso',
-                  style: GoogleFonts.poppins(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
+                  style: LummyFonts.body(fontSize: 13, color: Colors.white.withValues(alpha: 0.85)),
                 ),
               ],
             ),
@@ -1594,9 +1594,9 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
           child: Icon(icon, color: color, size: 18),
         ),
         const SizedBox(width: 10),
-        Text(title, style: GoogleFonts.poppins(
+        Text(title, style: LummyFonts.body(
           fontSize: 16, fontWeight: FontWeight.w600,
-          color: isDark ? Colors.white : const Color(0xFF1E293B),
+          color: isDark ? Colors.white : LummyColors.slate800,
         )),
         const Spacer(),
         Container(
@@ -1605,7 +1605,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
             gradient: LinearGradient(colors: [color.withValues(alpha: 0.18), color.withValues(alpha: 0.08)]),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Text(count, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
+          child: Text(count, style: LummyFonts.body(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
         ),
       ],
     );
@@ -1627,11 +1627,11 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
         gradient: isCompleted
             ? LinearGradient(
                 colors: isDark
-                    ? [const Color(0xFF1E293B), _green.withValues(alpha: 0.1)]
+                    ? [LummyColors.slate800, _green.withValues(alpha: 0.1)]
                     : [Colors.white, _green.withValues(alpha: 0.04)],
               )
             : null,
-        color: isCompleted ? null : (isDark ? const Color(0xFF1E293B) : Colors.white),
+        color: isCompleted ? null : (isDark ? LummyColors.slate800 : Colors.white),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.12)),
         boxShadow: [
@@ -1661,15 +1661,15 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: GoogleFonts.poppins(
+                    Text(name, style: LummyFonts.body(
                       fontSize: 15, fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      color: isDark ? Colors.white : LummyColors.slate800,
                     ), maxLines: 1, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 2),
                     Text(
                       'Meta: ${AppFormatters.formatCurrency(target)}',
-                      style: GoogleFonts.poppins(fontSize: 12,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                      style: LummyFonts.body(fontSize: 12,
+                          color: isDark ? LummyColors.slate400 : LummyColors.slate500),
                     ),
                   ],
                 ),
@@ -1678,7 +1678,7 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [_green, Color(0xFF059669)]),
+                    gradient: const LinearGradient(colors: [_green, LummyColors.emerald600]),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [BoxShadow(color: _green.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))],
                   ),
@@ -1687,14 +1687,14 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                     children: [
                       const Icon(Icons.check_rounded, color: Colors.white, size: 14),
                       const SizedBox(width: 4),
-                      Text('Concluída', style: GoogleFonts.poppins(
+                      Text('Concluída', style: LummyFonts.body(
                         fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white,
                       )),
                     ],
                   ),
                 )
               else
-                Text('$pct%', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700, color: color)),
+                Text('$pct%', style: LummyFonts.body(fontSize: 18, fontWeight: FontWeight.w700, color: color)),
             ],
           ),
           if (!isCompleted) ...[
@@ -1726,14 +1726,14 @@ class _ChildControlPanelScreenState extends State<ChildControlPanelScreen>
                     const SizedBox(width: 6),
                     Text(
                       AppFormatters.formatCurrency(current),
-                      style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: color),
+                      style: LummyFonts.body(fontSize: 12, fontWeight: FontWeight.w600, color: color),
                     ),
                   ],
                 ),
                 Text(
                   'Falta ${AppFormatters.formatCurrency(target - current)}',
-                  style: GoogleFonts.poppins(fontSize: 12,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                  style: LummyFonts.body(fontSize: 12,
+                      color: isDark ? LummyColors.slate400 : LummyColors.slate500),
                 ),
               ],
             ),

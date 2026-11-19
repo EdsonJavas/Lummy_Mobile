@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 /// Central de Ajuda (FAQ): perguntas frequentes expandíveis.
 class ParentHelpScreen extends StatelessWidget {
   const ParentHelpScreen({super.key});
 
-  static const _purple = Color(0xFF8B5CF6);
-  static const _blue = Color(0xFF3B82F6);
-  static const _green = Color(0xFF10B981);
-  static const _orange = Color(0xFFF59E0B);
+  static const _purple = LummyColors.violet500;
+  static const _blue = LummyColors.blue500;
+  static const _green = LummyColors.emerald500;
+  static const _orange = LummyColors.amber500;
 
   static final List<Map<String, dynamic>> _faqItems = [
     {
@@ -56,11 +56,11 @@ class ParentHelpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF121212) : const Color(0xFFF8FAFC);
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final bodyColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final sectionBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final bg = isDark ? LummyColors.darkMaterial : LummyColors.slate50;
+    final titleColor = isDark ? Colors.white : LummyColors.slate900;
+    final bodyColor = isDark ? LummyColors.slate400 : LummyColors.slate500;
+    final sectionBg = isDark ? LummyColors.slate800 : Colors.white;
+    final borderColor = isDark ? LummyColors.slate700 : LummyColors.slate200;
 
     return Scaffold(
       backgroundColor: bg,
@@ -69,7 +69,7 @@ class ParentHelpScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         title: Text(
           'Central de Ajuda',
-          style: GoogleFonts.poppins(
+          style: LummyFonts.body(
             fontSize: 20,
             fontWeight: FontWeight.w700,
             color: titleColor,
@@ -102,7 +102,7 @@ class ParentHelpScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Perguntas frequentes',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: titleColor,
@@ -136,7 +136,7 @@ class ParentHelpScreen extends StatelessWidget {
           Center(
             child: Text(
               'Lummy — Educação financeira para a família',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: bodyColor,
@@ -169,8 +169,8 @@ class _FaqTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final bodyColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final titleColor = isDark ? Colors.white : LummyColors.slate900;
+    final bodyColor = isDark ? LummyColors.slate400 : LummyColors.slate500;
 
     return Container(
       decoration: BoxDecoration(
@@ -193,7 +193,7 @@ class _FaqTile extends StatelessWidget {
           ),
           title: Text(
             question,
-            style: GoogleFonts.poppins(
+            style: LummyFonts.body(
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: titleColor,
@@ -204,7 +204,7 @@ class _FaqTile extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 answer,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   color: bodyColor,

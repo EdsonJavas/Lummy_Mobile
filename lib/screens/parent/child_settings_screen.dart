@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:lummy/domain/entities/user_entity.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/core/utils/app_log.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
 
 class ChildSettingsScreen extends StatefulWidget {
   final ChildEntity child;
@@ -22,13 +22,13 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
   late List<String> _allowedCategories;
   bool _isSaving = false;
 
-  static const _purple = Color(0xFF8B5CF6);
-  static const _blue = Color(0xFF3B82F6);
-  static const _green = Color(0xFF10B981);
-  static const _orange = Color(0xFFF59E0B);
-  static const _red = Color(0xFFEF4444);
-  static const _pink = Color(0xFFEC4899);
-  static const _blueDark = Color(0xFF1D4ED8);
+  static const _purple = LummyColors.violet500;
+  static const _blue = LummyColors.blue500;
+  static const _green = LummyColors.emerald500;
+  static const _orange = LummyColors.amber500;
+  static const _red = LummyColors.red500;
+  static const _pink = LummyColors.pink500;
+  static const _blueDark = LummyColors.blue700;
 
   final List<Map<String, dynamic>> _categories = [
     {'id': 'games', 'name': 'Jogos', 'emoji': '🎮', 'color': _purple},
@@ -46,13 +46,13 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
       'id': 'sports',
       'name': 'Esportes',
       'emoji': '⚽',
-      'color': const Color(0xFF06B6D4),
+      'color': LummyColors.cyan500,
     },
     {
       'id': 'other',
       'name': 'Outros',
       'emoji': '📦',
-      'color': const Color(0xFF64748B),
+      'color': LummyColors.slate500,
     },
   ];
 
@@ -76,7 +76,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
 
     return Scaffold(
       backgroundColor:
-          isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+          isDark ? LummyColors.slate900 : LummyColors.slate50,
       body: Column(
         children: [
           _buildHeader(context, isDark, topPadding),
@@ -116,7 +116,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [const Color(0xFF1E1B4B), _blue.withValues(alpha: 0.5)]
+              ? [LummyColors.indigo950, _blue.withValues(alpha: 0.5)]
               : [_blue, _blueDark],
         ),
         borderRadius: const BorderRadius.only(
@@ -161,7 +161,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                   children: [
                     Text(
                       'Configurações',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -169,7 +169,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                     ),
                     Text(
                       'Gerenciar ${widget.child.name}',
-                      style: GoogleFonts.poppins(
+                      style: LummyFonts.body(
                         fontSize: 14,
                         color: Colors.white.withValues(alpha: 0.8),
                       ),
@@ -240,7 +240,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
           Flexible(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
                 color: Colors.white.withValues(alpha: 0.9),
@@ -263,12 +263,12 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: isDark ? LummyColors.slate800 : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: accentColor != null
               ? accentColor.withValues(alpha: isDark ? 0.2 : 0.12)
-              : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+              : (isDark ? LummyColors.slate700 : LummyColors.slate200),
         ),
         boxShadow: [
           BoxShadow(
@@ -309,20 +309,20 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
             children: [
               Text(
                 title,
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: isDark ? Colors.white : LummyColors.slate800,
                 ),
               ),
               if (subtitle != null)
                 Text(
                   subtitle,
-                  style: GoogleFonts.poppins(
+                  style: LummyFonts.body(
                     fontSize: 12,
                     color: isDark
-                        ? const Color(0xFF94A3B8)
-                        : const Color(0xFF64748B),
+                        ? LummyColors.slate400
+                        : LummyColors.slate500,
                   ),
                 ),
             ],
@@ -380,7 +380,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                   Expanded(
                     child: Text(
                       'Você receberá notificações para aprovar ou rejeitar transações.',
-                      style: GoogleFonts.poppins(fontSize: 12, color: _green, fontWeight: FontWeight.w500),
+                      style: LummyFonts.body(fontSize: 12, color: _green, fontWeight: FontWeight.w500),
                     ),
                   ),
                 ],
@@ -417,7 +417,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
               ),
               child: Text(
                 'R\$ ${_allowance.toStringAsFixed(2)}',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: _orange,
@@ -430,7 +430,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
           Center(
             child: Text(
               'R\$ ${_allowance.toStringAsFixed(0)}',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 36,
                 fontWeight: FontWeight.w700,
                 color: _orange,
@@ -441,9 +441,9 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
           Center(
             child: Text(
               'por mês',
-              style: GoogleFonts.poppins(
+              style: LummyFonts.body(
                 fontSize: 13,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                color: isDark ? LummyColors.slate400 : LummyColors.slate500,
               ),
             ),
           ),
@@ -475,18 +475,18 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
             children: [
               Text(
                 'R\$ 0',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                  color: isDark ? LummyColors.slate500 : LummyColors.slate400,
                 ),
               ),
               Text(
                 'R\$ 500',
-                style: GoogleFonts.poppins(
+                style: LummyFonts.body(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                  color: isDark ? LummyColors.slate500 : LummyColors.slate400,
                 ),
               ),
             ],
@@ -513,19 +513,19 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                               : null,
                           color: isActive
                               ? null
-                              : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
+                              : (isDark ? LummyColors.slate900 : LummyColors.slate100),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: isActive ? _orange : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                            color: isActive ? _orange : (isDark ? LummyColors.slate700 : LummyColors.slate200),
                           ),
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           'R\$ ${val.toInt()}',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: isActive ? Colors.white : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                            color: isActive ? Colors.white : (isDark ? LummyColors.slate400 : LummyColors.slate500),
                           ),
                         ),
                       ),
@@ -572,7 +572,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Text(
                     _allowedCategories.length == _categories.length ? 'Limpar' : 'Todas',
-                    style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: _purple),
+                    style: LummyFonts.body(fontSize: 12, fontWeight: FontWeight.w600, color: _purple),
                   ),
                 ),
               ),
@@ -608,12 +608,12 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                           : null,
                       color: isEnabled
                           ? null
-                          : (isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9)),
+                          : (isDark ? LummyColors.slate900 : LummyColors.slate100),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: isEnabled
                             ? color
-                            : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                            : (isDark ? LummyColors.slate700 : LummyColors.slate200),
                         width: isEnabled ? 2 : 1,
                       ),
                       boxShadow: isEnabled
@@ -627,12 +627,12 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                         const SizedBox(width: 8),
                         Text(
                           category['name'] as String,
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 13,
                             fontWeight: isEnabled ? FontWeight.w600 : FontWeight.w500,
                             color: isEnabled
                                 ? color
-                                : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                                : (isDark ? LummyColors.slate400 : LummyColors.slate500),
                           ),
                         ),
                         if (isEnabled) ...[
@@ -673,7 +673,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                color: isDark ? LummyColors.slate900 : LummyColors.slate50,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Column(
@@ -681,14 +681,14 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                   Icon(
                     Icons.category_outlined,
                     size: 32,
-                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                    color: isDark ? LummyColors.slate600 : LummyColors.slate300,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Nenhuma categoria habilitada',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 13,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                     ),
                   ),
                 ],
@@ -723,12 +723,12 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA),
+                  color: isDark ? LummyColors.slate900 : LummyColors.neutral50,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: limit > 0
                         ? color.withValues(alpha: 0.25)
-                        : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+                        : (isDark ? LummyColors.slate800 : LummyColors.slate100),
                   ),
                 ),
                 child: Column(
@@ -749,10 +749,10 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                         Expanded(
                           child: Text(
                             category['name'] as String,
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : const Color(0xFF1E293B),
+                              color: isDark ? Colors.white : LummyColors.slate800,
                             ),
                           ),
                         ),
@@ -764,17 +764,17 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                                 : null,
                             color: limit > 0
                                 ? null
-                                : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+                                : (isDark ? LummyColors.slate800 : LummyColors.slate100),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             limit > 0 ? 'R\$ ${limit.toStringAsFixed(0)}' : 'Sem limite',
-                            style: GoogleFonts.poppins(
+                            style: LummyFonts.body(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: limit > 0
                                   ? color
-                                  : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
+                                  : (isDark ? LummyColors.slate500 : LummyColors.slate400),
                             ),
                           ),
                         ),
@@ -827,7 +827,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
               decoration: BoxDecoration(
                 gradient: _isSaving
                     ? null
-                    : const LinearGradient(colors: [_green, Color(0xFF059669)]),
+                    : const LinearGradient(colors: [_green, LummyColors.emerald600]),
                 color: _isSaving ? _green.withValues(alpha: 0.5) : null,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: _isSaving
@@ -853,7 +853,7 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                         const SizedBox(width: 10),
                         Text(
                           'Salvar Configurações',
-                          style: GoogleFonts.poppins(
+                          style: LummyFonts.body(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -875,10 +875,10 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                color: isDark ? LummyColors.slate800 : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  color: isDark ? LummyColors.slate700 : LummyColors.slate200,
                 ),
               ),
               alignment: Alignment.center,
@@ -888,15 +888,15 @@ class _ChildSettingsScreenState extends State<ChildSettingsScreen> {
                   Icon(
                     Icons.refresh_rounded,
                     size: 22,
-                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                   ),
                   const SizedBox(width: 10),
                   Text(
                     'Restaurar Padrões',
-                    style: GoogleFonts.poppins(
+                    style: LummyFonts.body(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      color: isDark ? LummyColors.slate400 : LummyColors.slate500,
                     ),
                   ),
                 ],
