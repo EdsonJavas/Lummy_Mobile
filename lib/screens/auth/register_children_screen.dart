@@ -556,7 +556,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Icon(
@@ -622,15 +622,15 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Colors.white.withValues(alpha: 0.3),
                   width: 3,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -734,7 +734,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         decoration: BoxDecoration(
           gradient: isSelected
               ? LinearGradient(
-                  colors: [color, color.withOpacity(0.8)],
+                  colors: [color, color.withValues(alpha: 0.8)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 )
@@ -752,14 +752,14 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: color.withOpacity(0.4),
+                    color: color.withValues(alpha: 0.4),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
                 ]
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -772,8 +772,8 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
               height: 50,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Colors.white.withOpacity(0.2)
-                    : color.withOpacity(0.1),
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
@@ -834,7 +834,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
+                color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -863,7 +863,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
                 margin: const EdgeInsets.all(12),
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 20),
@@ -892,7 +892,7 @@ class _RegisterChildrenScreenState extends State<RegisterChildrenScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: _purple.withOpacity(0.4),
+            color: _purple.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),

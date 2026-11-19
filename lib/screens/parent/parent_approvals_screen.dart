@@ -151,8 +151,8 @@ class ParentApprovalsScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    _green.withOpacity(0.15),
-                                    _blue.withOpacity(0.1),
+                                    _green.withValues(alpha: 0.15),
+                                    _blue.withValues(alpha: 0.1),
                                   ],
                                 ),
                                 shape: BoxShape.circle,
@@ -242,7 +242,7 @@ class ParentApprovalsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: _green.withOpacity(isDark ? 0.2 : 0.3),
+            color: _green.withValues(alpha: isDark ? 0.2 : 0.3),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -256,7 +256,7 @@ class ParentApprovalsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -287,7 +287,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -308,7 +308,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
+                        color: Colors.black.withValues(alpha: 0.15),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -346,9 +346,9 @@ class ParentApprovalsScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -363,7 +363,7 @@ class ParentApprovalsScreen extends StatelessWidget {
                       'Deslize para a direita para aprovar ou esquerda para recusar',
                       style: GoogleFonts.poppins(
                         fontSize: 13,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ),
@@ -442,7 +442,7 @@ class ParentApprovalsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -535,11 +535,11 @@ class ParentApprovalsScreen extends StatelessWidget {
     if (isPrimary) {
       return Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [color, color.withOpacity(0.8)]),
+          gradient: LinearGradient(colors: [color, color.withValues(alpha: 0.8)]),
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.4),
+              color: color.withValues(alpha: 0.4),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -575,10 +575,10 @@ class ParentApprovalsScreen extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: color.withOpacity(isDark ? 0.15 : 0.1),
+        color: color.withValues(alpha: isDark ? 0.15 : 0.1),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: color.withOpacity(isDark ? 0.3 : 0.2),
+          color: color.withValues(alpha: isDark ? 0.3 : 0.2),
           width: 1.5,
         ),
       ),

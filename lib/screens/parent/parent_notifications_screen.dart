@@ -147,7 +147,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF8B5CF6).withOpacity(0.15),
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -183,7 +183,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
                   Switch(
                     value: _notificationsEnabled,
                     onChanged: _setEnabled,
-                    activeTrackColor: const Color(0xFF8B5CF6).withOpacity(0.5),
+                    activeTrackColor: const Color(0xFF8B5CF6).withValues(alpha: 0.5),
                     activeThumbColor: const Color(0xFF8B5CF6),
                   ),
                 ],
@@ -270,7 +270,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
         color: sectionBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: enabled ? color.withOpacity(0.2) : borderColor,
+          color: enabled ? color.withValues(alpha: 0.2) : borderColor,
           width: 1,
         ),
       ),
@@ -279,7 +279,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(enabled ? 0.15 : 0.08),
+              color: color.withValues(alpha: enabled ? 0.15 : 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -318,7 +318,7 @@ class _ParentNotificationsScreenState extends State<ParentNotificationsScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeTrackColor: color.withOpacity(0.5),
+            activeTrackColor: color.withValues(alpha: 0.5),
             activeThumbColor: color,
           ),
         ],

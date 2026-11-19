@@ -363,7 +363,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           BoxShadow(
                             color: Theme.of(
                               context,
-                            ).colorScheme.primary.withOpacity(0.3),
+                            ).colorScheme.primary.withValues(alpha: 0.3),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -377,7 +377,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             return Container(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.primary.withOpacity(0.1),
+                              ).colorScheme.primary.withValues(alpha: 0.1),
                               child: Icon(
                                 Icons.person,
                                 size: 60,
@@ -401,7 +401,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             border: Border.all(color: Colors.white, width: 2),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),

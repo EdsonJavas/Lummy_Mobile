@@ -58,18 +58,18 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
           end: Alignment.bottomRight,
           colors: isDark
               ? const [Color(0xFF334155), Color(0xFF1E293B)]
-              : [Colors.white, _orange.withOpacity(0.03)],
+              : [Colors.white, _orange.withValues(alpha: 0.03)],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF475569) : _orange.withOpacity(0.12),
+          color: isDark ? const Color(0xFF475569) : _orange.withValues(alpha: 0.12),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.25)
-                : _orange.withOpacity(0.08),
+                ? Colors.black.withValues(alpha: 0.25)
+                : _orange.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 7),
           ),
@@ -129,9 +129,9 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: _orange.withOpacity(isDark ? 0.15 : 0.1),
+              color: _orange.withValues(alpha: isDark ? 0.15 : 0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _orange.withOpacity(0.2)),
+              border: Border.all(color: _orange.withValues(alpha: 0.2)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -315,15 +315,15 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                 ? LinearGradient(colors: gradient)
                 : LinearGradient(
                     colors: [
-                      Colors.grey.withOpacity(0.3),
-                      Colors.grey.withOpacity(0.2),
+                      Colors.grey.withValues(alpha: 0.3),
+                      Colors.grey.withValues(alpha: 0.2),
                     ],
                   ),
             borderRadius: BorderRadius.circular(14),
             boxShadow: isEnabled
                 ? [
                     BoxShadow(
-                      color: gradient[0].withOpacity(0.4),
+                      color: gradient[0].withValues(alpha: 0.4),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -624,7 +624,7 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: _green.withOpacity(0.4),
+                        color: _green.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

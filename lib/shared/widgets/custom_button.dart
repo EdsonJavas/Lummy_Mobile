@@ -70,7 +70,7 @@ class CustomButton extends StatelessWidget {
         boxShadow = [
           BoxShadow(
             color: (customColor ?? const Color(AppConstants.accentOrange))
-                .withOpacity(0.3),
+                .withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -83,7 +83,7 @@ class CustomButton extends StatelessWidget {
         boxShadow = [
           BoxShadow(
             color: (customColor ?? const Color(AppConstants.primaryBlue))
-                .withOpacity(0.3),
+                .withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -112,7 +112,7 @@ class CustomButton extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: type == ButtonType.primary || type == ButtonType.secondary
             ? LinearGradient(
-                colors: [backgroundColor, backgroundColor.withOpacity(0.8)],
+                colors: [backgroundColor, backgroundColor.withValues(alpha: 0.8)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )

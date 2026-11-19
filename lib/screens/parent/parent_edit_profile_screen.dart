@@ -226,7 +226,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
                               width: 100,
                               height: 100,
                               decoration: BoxDecoration(
-                                color: _purple.withOpacity(0.2),
+                                color: _purple.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: _purple, width: 2),
                               ),
@@ -250,7 +250,7 @@ class _ParentEditProfileScreenState extends State<ParentEditProfileScreen> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: _purple.withOpacity(0.4),
+                                color: _purple.withValues(alpha: 0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),

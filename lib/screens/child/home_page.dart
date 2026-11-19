@@ -1085,7 +1085,7 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF1E40AF).withOpacity(0.35),
+                color: const Color(0xFF1E40AF).withValues(alpha: 0.35),
                 blurRadius: 24,
                 offset: const Offset(0, 10),
               ),
@@ -1102,13 +1102,13 @@ class _HomePageState extends State<HomePage> {
                     style: GoogleFonts.poppins(
                       fontSize: isSmallScreen ? 17 : 19,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white.withOpacity(0.95),
+                      color: Colors.white.withValues(alpha: 0.95),
                     ),
                   ),
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.22),
+                      color: Colors.white.withValues(alpha: 0.22),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -1136,7 +1136,7 @@ class _HomePageState extends State<HomePage> {
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     height: 1.35,
                   ),
                 ),
@@ -1148,7 +1148,7 @@ class _HomePageState extends State<HomePage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.25),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.25),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -1174,7 +1174,7 @@ class _HomePageState extends State<HomePage> {
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white.withOpacity(0.88),
+                            color: Colors.white.withValues(alpha: 0.88),
                           ),
                         ),
                       ),
@@ -1186,7 +1186,7 @@ class _HomePageState extends State<HomePage> {
                     style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),
               ],
@@ -2070,7 +2070,7 @@ class _HomePageState extends State<HomePage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -2083,7 +2083,7 @@ class _HomePageState extends State<HomePage> {
             width: isSmallScreen ? 40 : 48,
             height: isSmallScreen ? 40 : 48,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: isSmallScreen ? 20 : 24),
@@ -2170,13 +2170,13 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.4),
+                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
                     blurRadius: 24,
                     offset: const Offset(0, 10),
                     spreadRadius: -4,
                   ),
                   BoxShadow(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                     blurRadius: 40,
                     offset: const Offset(0, 20),
                   ),
@@ -2191,10 +2191,10 @@ class _HomePageState extends State<HomePage> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.25),
+                          color: Colors.white.withValues(alpha: 0.25),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 2,
                           ),
                         ),
@@ -2222,7 +2222,7 @@ class _HomePageState extends State<HomePage> {
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
                           ],
@@ -2240,7 +2240,7 @@ class _HomePageState extends State<HomePage> {
                       height: 1.5,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           offset: const Offset(0, 2),
                           blurRadius: 4,
                         ),
@@ -2345,7 +2345,7 @@ class _HomePageState extends State<HomePage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -2389,14 +2389,14 @@ class _HomePageState extends State<HomePage> {
           height: isSmallScreen ? 48 : 56,
           decoration: BoxDecoration(
             color: isCompleted
-                ? const Color(0xFF10B981).withOpacity(0.1)
+                ? const Color(0xFF10B981).withValues(alpha: 0.1)
                 : Theme.of(context).brightness == Brightness.dark
                 ? const Color(0xFF1E293B)
                 : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isCompleted
-                  ? const Color(0xFF10B981).withOpacity(0.3)
+                  ? const Color(0xFF10B981).withValues(alpha: 0.3)
                   : Theme.of(context).brightness == Brightness.dark
                       ? const Color(0xFF475569)
                       : const Color(0xFFE2E8F0),

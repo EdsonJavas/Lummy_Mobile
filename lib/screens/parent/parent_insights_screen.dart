@@ -128,7 +128,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: _purple.withOpacity(isDark ? 0.2 : 0.35),
+            color: _purple.withValues(alpha: isDark ? 0.2 : 0.35),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -145,7 +145,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -173,7 +173,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -182,7 +182,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
@@ -199,9 +199,9 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: Column(
               children: [
@@ -220,7 +220,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                     Container(
                       width: 1,
                       height: 50,
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                     ),
                     Expanded(
                       child: _HeaderStatItem(
@@ -239,7 +239,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -337,7 +337,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -351,7 +351,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _cyan.withOpacity(0.15),
+                    color: _cyan.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.bar_chart_rounded, color: _cyan, size: 22),
@@ -405,7 +405,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _cyan.withOpacity(0.15),
+                        color: _cyan.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -450,7 +450,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -464,7 +464,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _purple.withOpacity(0.12),
+                    color: _purple.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -632,7 +632,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -646,7 +646,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _pink.withOpacity(0.12),
+                    color: _pink.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.pie_chart_rounded, color: _pink, size: 22),
@@ -695,7 +695,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                             width: 32,
                             height: 32,
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.15),
+                              color: color.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Center(
@@ -737,7 +737,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                           Container(
                             height: 8,
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.15),
+                              color: color.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
@@ -747,7 +747,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                               height: 8,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
-                                  colors: [color, color.withOpacity(0.7)],
+                                  colors: [color, color.withValues(alpha: 0.7)],
                                 ),
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -800,7 +800,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -814,7 +814,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _orange.withOpacity(0.12),
+                    color: _orange.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.flag_rounded, color: _orange, size: 22),
@@ -866,7 +866,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                               gradient: LinearGradient(
                                 colors: [
                                   progressColor,
-                                  progressColor.withOpacity(0.7),
+                                  progressColor.withValues(alpha: 0.7),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(10),
@@ -910,7 +910,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: progressColor.withOpacity(0.15),
+                              color: progressColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -930,7 +930,7 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                           Container(
                             height: 10,
                             decoration: BoxDecoration(
-                              color: progressColor.withOpacity(0.15),
+                              color: progressColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -942,13 +942,13 @@ class _ParentInsightsScreenState extends State<ParentInsightsScreen>
                                 gradient: LinearGradient(
                                   colors: [
                                     progressColor,
-                                    progressColor.withOpacity(0.7),
+                                    progressColor.withValues(alpha: 0.7),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(5),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: progressColor.withOpacity(0.3),
+                                    color: progressColor.withValues(alpha: 0.3),
                                     blurRadius: 6,
                                     offset: const Offset(0, 2),
                                   ),
@@ -1057,7 +1057,7 @@ class _HeaderStatItem extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -1106,7 +1106,7 @@ class _QuickStatCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.15 : 0.04),
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -1120,7 +1120,7 @@ class _QuickStatCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 18),
@@ -1220,19 +1220,19 @@ class _InsightCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(isDark ? 0.15 : 0.1),
-            color.withOpacity(isDark ? 0.08 : 0.05),
+            color.withValues(alpha: isDark ? 0.15 : 0.1),
+            color.withValues(alpha: isDark ? 0.08 : 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(isDark ? 0.25 : 0.2)),
+        border: Border.all(color: color.withValues(alpha: isDark ? 0.25 : 0.2)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(icon, color: color, size: 24),

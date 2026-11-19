@@ -172,7 +172,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   Positioned.fill(
                     child: Container(
                       color: (isDark ? const Color(0xFF121212) : Colors.white)
-                          .withOpacity(0.85),
+                          .withValues(alpha: 0.85),
                       child: const Center(
                         child: BrandedLoader(
                           label: 'Atualizando informações...',
@@ -303,7 +303,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                               style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w400,
-                                color: Colors.white.withOpacity(0.85),
+                                color: Colors.white.withValues(alpha: 0.85),
                               ),
                             ),
                           ],
@@ -324,12 +324,12 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2.5,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -357,18 +357,18 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.white.withOpacity(isDark ? 0.12 : 0.2),
-                  Colors.white.withOpacity(isDark ? 0.06 : 0.1),
+                  Colors.white.withValues(alpha: isDark ? 0.12 : 0.2),
+                  Colors.white.withValues(alpha: isDark ? 0.06 : 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 24,
                   offset: const Offset(0, 12),
                 ),
@@ -382,7 +382,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
@@ -398,7 +398,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -410,7 +410,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -418,7 +418,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -460,7 +460,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                             balanceVisible
                                 ? Icons.visibility_rounded
                                 : Icons.visibility_off_rounded,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             size: 26,
                           ),
                         ),
@@ -474,7 +474,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     fontWeight: FontWeight.w400,
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -603,7 +603,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                 value: progress,
                                 minHeight: 6,
                                 backgroundColor: borderColor,
-                                valueColor: AlwaysStoppedAnimation<Color>(
+                                valueColor: const AlwaysStoppedAnimation<Color>(
                                   _green,
                                 ),
                               ),
@@ -650,19 +650,19 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
-              ? [_purple.withOpacity(0.15), _primaryBlue.withOpacity(0.1)]
-              : [_purple.withOpacity(0.08), _primaryBlue.withOpacity(0.05)],
+              ? [_purple.withValues(alpha: 0.15), _primaryBlue.withValues(alpha: 0.1)]
+              : [_purple.withValues(alpha: 0.08), _primaryBlue.withValues(alpha: 0.05)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? _purple.withOpacity(0.3) : _purple.withOpacity(0.2),
+          color: isDark ? _purple.withValues(alpha: 0.3) : _purple.withValues(alpha: 0.2),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: _purple.withOpacity(isDark ? 0.1 : 0.05),
+            color: _purple.withValues(alpha: isDark ? 0.1 : 0.05),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -678,12 +678,12 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      _purple.withOpacity(0.2),
-                      _primaryBlue.withOpacity(0.15),
+                      _purple.withValues(alpha: 0.2),
+                      _primaryBlue.withValues(alpha: 0.15),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: _purple.withOpacity(0.3)),
+                  border: Border.all(color: _purple.withValues(alpha: 0.3)),
                 ),
                 child: const Icon(
                   Icons.insights_rounded,
@@ -755,7 +755,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: _purple.withOpacity(0.35),
+                    color: _purple.withValues(alpha: 0.35),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -996,20 +996,20 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
             end: Alignment.bottomRight,
             colors: isDark
                 ? [darkTop, const Color(0xFF1E293B)]
-                : [Colors.white, data.color.withOpacity(0.03)],
+                : [Colors.white, data.color.withValues(alpha: 0.03)],
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isDark
                 ? darkBorder
-                : data.color.withOpacity(0.12),
+                : data.color.withValues(alpha: 0.12),
             width: 1.2,
           ),
           boxShadow: [
             BoxShadow(
               color: isDark
                   ? data.color.withAlpha(34)
-                  : data.color.withOpacity(0.08),
+                  : data.color.withValues(alpha: 0.08),
               blurRadius: 14,
               offset: const Offset(0, 5),
             ),
@@ -1026,13 +1026,13 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        data.color.withOpacity(isDark ? 0.28 : 0.18),
-                        data.color.withOpacity(isDark ? 0.12 : 0.08),
+                        data.color.withValues(alpha: isDark ? 0.28 : 0.18),
+                        data.color.withValues(alpha: isDark ? 0.12 : 0.08),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: data.color.withOpacity(isDark ? 0.34 : 0.18),
+                      color: data.color.withValues(alpha: isDark ? 0.34 : 0.18),
                       width: 1.2,
                     ),
                   ),
@@ -1140,8 +1140,8 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                           color: child.gender == Gender.male
                               ? const Color(
                                   AppConstants.primaryBlue,
-                                ).withOpacity(0.1)
-                              : const Color(AppConstants.pink).withOpacity(0.1),
+                                ).withValues(alpha: 0.1)
+                              : const Color(AppConstants.pink).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppConstants.radiusMedium,
                           ),
@@ -1177,7 +1177,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                     fontWeight: FontWeight.w400,
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onSurface.withOpacity(0.65),
+                                    ).colorScheme.onSurface.withValues(alpha: 0.65),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -1187,7 +1187,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                                   decoration: BoxDecoration(
                                     color: Theme.of(
                                       context,
-                                    ).colorScheme.onSurface.withOpacity(0.25),
+                                    ).colorScheme.onSurface.withValues(alpha: 0.25),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -1220,7 +1220,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                               fontWeight: FontWeight.w400,
                               color: Theme.of(
                                 context,
-                              ).colorScheme.onSurface.withOpacity(0.6),
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                           ),
                           Text(
@@ -1238,7 +1238,7 @@ class _ParentDashboardScreenState extends State<ParentDashboardScreen> {
                         Icons.chevron_right,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.4),
+                        ).colorScheme.onSurface.withValues(alpha: 0.4),
                       ),
                     ],
                   ),

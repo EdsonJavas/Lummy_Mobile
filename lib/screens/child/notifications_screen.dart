@@ -53,7 +53,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     : null,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
+                    color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -67,7 +67,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                          color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -224,7 +224,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isEnabled
-              ? color.withOpacity(0.2)
+              ? color.withValues(alpha: 0.2)
               : Theme.of(context).brightness == Brightness.dark
               ? Theme.of(context).dividerColor
               : const Color(0xFFE2E8F0),
@@ -232,7 +232,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -243,7 +243,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(isEnabled ? 0.1 : 0.05),
+              color: color.withValues(alpha: isEnabled ? 0.1 : 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(

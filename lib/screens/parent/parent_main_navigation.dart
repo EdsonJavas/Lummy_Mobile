@@ -164,7 +164,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => setState(() => _drawerOpen = false),
-                  child: Container(color: Colors.black.withOpacity(0.42)),
+                  child: Container(color: Colors.black.withValues(alpha: 0.42)),
                 ),
               ),
             ),
@@ -181,7 +181,7 @@ class _ParentMainNavigationState extends State<ParentMainNavigation>
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.28),
+                        color: Colors.black.withValues(alpha: 0.28),
                         blurRadius: 24,
                         offset: const Offset(10, 0),
                       ),
@@ -463,7 +463,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                       ),
                     ),
                   ),
@@ -475,7 +475,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                       height: 56,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.05),
+                        color: Colors.white.withValues(alpha: 0.05),
                       ),
                     ),
                   ),
@@ -496,7 +496,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                                   width: 40,
                                   height: 40,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color: Colors.white.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   alignment: Alignment.center,
@@ -520,7 +520,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.95),
+                                  color: Colors.white.withValues(alpha: 0.95),
                                   width: 2.5,
                                 ),
                                 boxShadow: [
@@ -558,7 +558,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                                   Text(
                                     '$childrenText · ${widget.subscriptionLabel}',
                                     style: GoogleFonts.poppins(
-                                      color: Colors.white.withOpacity(0.88),
+                                      color: Colors.white.withValues(alpha: 0.88),
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -575,14 +575,14 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.account_balance_wallet_rounded,
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 size: 20,
                               ),
                               const SizedBox(width: 10),
@@ -594,7 +594,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                                     Text(
                                       'Saldo disponível',
                                       style: GoogleFonts.poppins(
-                                        color: Colors.white.withOpacity(0.85),
+                                        color: Colors.white.withValues(alpha: 0.85),
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -626,7 +626,7 @@ class _ParentDrawerState extends State<_ParentDrawer> {
                                       _balanceVisible
                                           ? Icons.visibility_rounded
                                           : Icons.visibility_off_rounded,
-                                      color: Colors.white.withOpacity(0.9),
+                                      color: Colors.white.withValues(alpha: 0.9),
                                       size: 24,
                                     ),
                                   ),
@@ -741,18 +741,18 @@ class _DrawerListTile extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: isDark
                   ? [darkTop, const Color(0xFF1E293B)]
-                  : [Colors.white, iconColor.withOpacity(0.04)],
+                  : [Colors.white, iconColor.withValues(alpha: 0.04)],
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isDark ? darkBorder : iconColor.withOpacity(0.15),
+              color: isDark ? darkBorder : iconColor.withValues(alpha: 0.15),
               width: 1.2,
             ),
             boxShadow: [
               BoxShadow(
                 color: isDark
                     ? iconColor.withAlpha(30)
-                    : iconColor.withOpacity(0.08),
+                    : iconColor.withValues(alpha: 0.08),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -765,8 +765,8 @@ class _DrawerListTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      iconColor.withOpacity(isDark ? 0.3 : 0.2),
-                      iconColor.withOpacity(isDark ? 0.14 : 0.1),
+                      iconColor.withValues(alpha: isDark ? 0.3 : 0.2),
+                      iconColor.withValues(alpha: isDark ? 0.14 : 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -805,7 +805,7 @@ class _DrawerListTile extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: textColor.withOpacity(0.45),
+                color: textColor.withValues(alpha: 0.45),
                 size: 24,
               ),
             ],

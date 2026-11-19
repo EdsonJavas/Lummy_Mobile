@@ -231,7 +231,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -243,7 +243,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               height: 60,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -263,7 +263,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -367,7 +367,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                               Icon(
                                 Icons.email_rounded,
                                 size: 14,
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                               ),
                               const SizedBox(width: 6),
                               Flexible(
@@ -375,7 +375,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                                   userEmail,
                                   style: GoogleFonts.poppins(
                                     fontSize: 13,
-                                    color: Colors.white.withOpacity(0.85),
+                                    color: Colors.white.withValues(alpha: 0.85),
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -390,7 +390,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -427,7 +427,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -441,7 +441,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                       Container(
                         width: 1,
                         height: 30,
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                       ),
                       _buildCompactStat(
                         value: 'R\$${totalChildrenBalance.toStringAsFixed(0)}',
@@ -451,7 +451,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                       Container(
                         width: 1,
                         height: 30,
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                       ),
                       _buildCompactStat(
                         value: _getMemberSinceShort(),
@@ -484,7 +484,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: Colors.white.withOpacity(0.9), size: 18),
+        Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 18),
         const SizedBox(height: 4),
         FittedBox(
           fit: BoxFit.scaleDown,
@@ -502,7 +502,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           style: GoogleFonts.poppins(
             fontSize: 10,
             fontWeight: FontWeight.w500,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
       ],
@@ -517,7 +517,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -567,8 +567,8 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                 width: 1,
                 height: 50,
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.black.withOpacity(0.08),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.08),
               ),
               Expanded(
                 child: _buildMiniStat(
@@ -584,8 +584,8 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                 width: 1,
                 height: 50,
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.black.withOpacity(0.08),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.08),
               ),
               Expanded(
                 child: _buildMiniStat(
@@ -656,7 +656,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: _purple.withOpacity(0.4),
+                color: _purple.withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -667,7 +667,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
@@ -695,7 +695,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: 0.85),
                       ),
                     ),
                   ],
@@ -704,7 +704,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -728,11 +728,11 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? [_blue.withOpacity(0.15), _purple.withOpacity(0.1)]
-              : [_blue.withOpacity(0.08), _purple.withOpacity(0.05)],
+              ? [_blue.withValues(alpha: 0.15), _purple.withValues(alpha: 0.1)]
+              : [_blue.withValues(alpha: 0.08), _purple.withValues(alpha: 0.05)],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _blue.withOpacity(isDark ? 0.2 : 0.15)),
+        border: Border.all(color: _blue.withValues(alpha: isDark ? 0.2 : 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -742,7 +742,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _blue.withOpacity(0.15),
+                  color: _blue.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.bolt_rounded, color: _blue, size: 20),
@@ -804,7 +804,7 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF121212) : Colors.white,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: color.withOpacity(isDark ? 0.3 : 0.2)),
+            border: Border.all(color: color.withValues(alpha: isDark ? 0.3 : 0.2)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -56,8 +56,8 @@ class ParentDependentsScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    _purple.withOpacity(0.15),
-                                    _blue.withOpacity(0.1),
+                                    _purple.withValues(alpha: 0.15),
+                                    _blue.withValues(alpha: 0.1),
                                   ],
                                 ),
                                 shape: BoxShape.circle,
@@ -147,7 +147,7 @@ class ParentDependentsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: _purple.withOpacity(isDark ? 0.2 : 0.3),
+            color: _purple.withValues(alpha: isDark ? 0.2 : 0.3),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -161,7 +161,7 @@ class ParentDependentsScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -188,7 +188,7 @@ class ParentDependentsScreen extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -228,13 +228,13 @@ class ParentDependentsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white.withOpacity(0.9), size: 20),
+          Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -245,7 +245,7 @@ class ParentDependentsScreen extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
                 Text(
@@ -292,13 +292,13 @@ class ParentDependentsScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark
-                ? cardColor.withOpacity(0.3)
-                : cardColor.withOpacity(0.15),
+                ? cardColor.withValues(alpha: 0.3)
+                : cardColor.withValues(alpha: 0.15),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: cardColor.withOpacity(isDark ? 0.1 : 0.08),
+              color: cardColor.withValues(alpha: isDark ? 0.1 : 0.08),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
@@ -316,12 +316,12 @@ class ParentDependentsScreen extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [cardColor, cardColor.withOpacity(0.7)],
+                      colors: [cardColor, cardColor.withValues(alpha: 0.7)],
                     ),
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: [
                       BoxShadow(
-                        color: cardColor.withOpacity(0.4),
+                        color: cardColor.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -359,7 +359,7 @@ class ParentDependentsScreen extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: cardColor.withOpacity(0.15),
+                              color: cardColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -398,7 +398,7 @@ class ParentDependentsScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: cardColor.withOpacity(0.1),
+                    color: cardColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -450,9 +450,9 @@ class ParentDependentsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? color.withOpacity(0.1) : color.withOpacity(0.08),
+        color: isDark ? color.withValues(alpha: 0.1) : color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(isDark ? 0.2 : 0.15)),
+        border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.15)),
       ),
       child: Row(
         children: [

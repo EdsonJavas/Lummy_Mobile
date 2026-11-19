@@ -151,7 +151,7 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
             boxShadow: _isFocused
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF3B82F6).withOpacity(0.1),
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -214,7 +214,7 @@ class _MoneyTextFieldState extends State<MoneyTextField> {
               focusedErrorBorder: InputBorder.none,
               filled: true,
               fillColor: isDark
-                  ? const Color(0xFF1E293B).withOpacity(0.5)
+                  ? const Color(0xFF1E293B).withValues(alpha: 0.5)
                   : const Color(0xFFF8FAFC),
               contentPadding:
                   widget.contentPadding ??

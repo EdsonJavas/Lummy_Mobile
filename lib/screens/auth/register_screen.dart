@@ -381,7 +381,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? 250
                           : (isSmallScreen ? 300 : 380),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           isVerySmallScreen ? 125 : (isSmallScreen ? 150 : 190),
                         ),
@@ -422,7 +422,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           : null,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 20,
                           offset: const Offset(0, -5),
                         ),
@@ -527,7 +527,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(14),
                                           borderSide: BorderSide(
-                                            color: Theme.of(context).dividerColor.withOpacity(0.8),
+                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
                                             width: 1.2,
                                           ),
                                         ),
@@ -624,7 +624,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(14),
                                           borderSide: BorderSide(
-                                            color: Theme.of(context).dividerColor.withOpacity(0.8),
+                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
                                             width: 1.2,
                                           ),
                                         ),
@@ -717,7 +717,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(14),
                                     borderSide: BorderSide(
-                                      color: Theme.of(context).dividerColor.withOpacity(0.8),
+                                      color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
                                       width: 1.2,
                                     ),
                                   ),
@@ -805,7 +805,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(14),
                                           borderSide: BorderSide(
-                                            color: Theme.of(context).dividerColor.withOpacity(0.8),
+                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
                                             width: 1.2,
                                           ),
                                         ),
@@ -902,7 +902,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(14),
                                           borderSide: BorderSide(
-                                            color: Theme.of(context).dividerColor.withOpacity(0.8),
+                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
                                             width: 1.2,
                                           ),
                                         ),
@@ -980,7 +980,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFFFF8C42).withOpacity(0.3),
+                                    color: const Color(0xFFFF8C42).withValues(alpha: 0.3),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),

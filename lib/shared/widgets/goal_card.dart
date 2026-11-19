@@ -40,7 +40,7 @@ class GoalCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(AppConstants.primaryBlue).withOpacity(0.1),
+              color: const Color(AppConstants.primaryBlue).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
             ),
             child: Text(
@@ -103,7 +103,7 @@ class GoalCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(AppConstants.primaryBlue).withOpacity(0.1),
+                  color: const Color(AppConstants.primaryBlue).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                 ),
                 child: Text(
@@ -246,8 +246,8 @@ class GoalCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: goal.isOverdue
-                    ? const Color(AppConstants.errorRed).withOpacity(0.1)
-                    : const Color(AppConstants.primaryBlue).withOpacity(0.1),
+                    ? const Color(AppConstants.errorRed).withValues(alpha: 0.1)
+                    : const Color(AppConstants.primaryBlue).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
               ),
               child: Row(

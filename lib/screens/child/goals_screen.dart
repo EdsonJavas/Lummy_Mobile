@@ -623,7 +623,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7C3AED).withOpacity(0.35),
+            color: const Color(0xFF7C3AED).withValues(alpha: 0.35),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -637,7 +637,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -666,7 +666,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: isSmallScreen ? 13 : 15,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -703,10 +703,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
+          color: Colors.white.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -742,17 +742,17 @@ class _GoalsScreenState extends State<GoalsScreen> {
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: primaryColor.withOpacity(isDark ? 0.25 : 0.4),
+            color: primaryColor.withValues(alpha: isDark ? 0.25 : 0.4),
             width: isDark ? 1.5 : 2,
           ),
           boxShadow: [
             BoxShadow(
-              color: primaryColor.withOpacity(isDark ? 0.15 : 0.2),
+              color: primaryColor.withValues(alpha: isDark ? 0.15 : 0.2),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.2 : 0.12),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.12),
               blurRadius: isDark ? 12 : 16,
               offset: const Offset(0, 4),
             ),
@@ -774,7 +774,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         child: CircularProgressIndicator(
                           value: progress,
                           strokeWidth: 6,
-                          backgroundColor: primaryColor.withOpacity(0.15),
+                          backgroundColor: primaryColor.withValues(alpha: 0.15),
                           valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
                         ),
                       ),
@@ -785,7 +785,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: primaryColor.withOpacity(0.2),
+                              color: primaryColor.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -812,7 +812,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.12),
+                          color: primaryColor.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
@@ -859,7 +859,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 10,
-                backgroundColor: primaryColor.withOpacity(0.15),
+                backgroundColor: primaryColor.withValues(alpha: 0.15),
                 valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
               ),
             ),
@@ -904,10 +904,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withOpacity(0.12),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: const Color(0xFF10B981).withOpacity(0.25),
+                    color: const Color(0xFF10B981).withValues(alpha: 0.25),
                     width: 1,
                   ),
                 ),
@@ -949,7 +949,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     bool fullWidth = false,
   }) {
     return Material(
-      color: color.withOpacity(0.1),
+      color: color.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: onTap,
@@ -1019,12 +1019,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: dark
-              ? [headerColor.withOpacity(0.05), headerColor.withOpacity(0.02)]
-              : [headerColor.withOpacity(0.12), headerColor.withOpacity(0.06)],
+              ? [headerColor.withValues(alpha: 0.05), headerColor.withValues(alpha: 0.02)]
+              : [headerColor.withValues(alpha: 0.12), headerColor.withValues(alpha: 0.06)],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: headerColor.withOpacity(dark ? 0.1 : 0.25),
+          color: headerColor.withValues(alpha: dark ? 0.1 : 0.25),
           width: dark ? 1 : 1.5,
         ),
       ),
@@ -1033,7 +1033,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: headerColor.withOpacity(dark ? 0.1 : 0.18),
+              color: headerColor.withValues(alpha: dark ? 0.1 : 0.18),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -1061,15 +1061,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  headerColor.withOpacity(0.2),
-                  headerColor.withOpacity(0.1),
+                  headerColor.withValues(alpha: 0.2),
+                  headerColor.withValues(alpha: 0.1),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: headerColor.withOpacity(0.3), width: 1),
+              border: Border.all(color: headerColor.withValues(alpha: 0.3), width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: headerColor.withOpacity(0.1),
+                  color: headerColor.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -1119,18 +1119,18 @@ class _GoalsScreenState extends State<GoalsScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: goal.status == GoalStatus.completed
-              ? primaryColor.withOpacity(dark ? 0.2 : 0.35)
-              : primaryColor.withOpacity(dark ? 0.15 : 0.3),
+              ? primaryColor.withValues(alpha: dark ? 0.2 : 0.35)
+              : primaryColor.withValues(alpha: dark ? 0.15 : 0.3),
           width: dark ? 1.5 : 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(dark ? 0.1 : 0.15),
+            color: primaryColor.withValues(alpha: dark ? 0.1 : 0.15),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(dark ? 0.03 : 0.08),
+            color: Colors.black.withValues(alpha: dark ? 0.03 : 0.08),
             blurRadius: dark ? 8 : 12,
             offset: const Offset(0, 2),
           ),
@@ -1147,15 +1147,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 width: isSmallScreen ? 52 : 60,
                 height: isSmallScreen ? 52 : 60,
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: primaryColor.withOpacity(0.2),
+                    color: primaryColor.withValues(alpha: 0.2),
                     width: 1,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: primaryColor.withOpacity(0.1),
+                      color: primaryColor.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -1198,13 +1198,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: goal.status == GoalStatus.completed
-                                ? const Color(0xFF10B981).withOpacity(0.1)
-                                : const Color(0xFF8B5CF6).withOpacity(0.1),
+                                ? const Color(0xFF10B981).withValues(alpha: 0.1)
+                                : const Color(0xFF8B5CF6).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: goal.status == GoalStatus.completed
-                                  ? const Color(0xFF10B981).withOpacity(0.3)
-                                  : const Color(0xFF8B5CF6).withOpacity(0.3),
+                                  ? const Color(0xFF10B981).withValues(alpha: 0.3)
+                                  : const Color(0xFF8B5CF6).withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -1291,7 +1291,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
-                            color: primaryColor.withOpacity(0.25),
+                            color: primaryColor.withValues(alpha: 0.25),
                             blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
@@ -1321,10 +1321,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.03),
+              color: primaryColor.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: primaryColor.withOpacity(0.1),
+                color: primaryColor.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -1358,7 +1358,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 Container(
                   height: 40,
                   width: 1,
-                  color: primaryColor.withOpacity(0.2),
+                  color: primaryColor.withValues(alpha: 0.2),
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                 ),
                 Expanded(
@@ -1410,10 +1410,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.1),
+                color: const Color(0xFF10B981).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF10B981).withOpacity(0.2),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -1659,7 +1659,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF10B981).withOpacity(0.3),
+                              color: const Color(0xFF10B981).withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 3),
                             ),
@@ -1783,10 +1783,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEF4444).withOpacity(0.05),
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFEF4444).withOpacity(0.2),
+                    color: const Color(0xFFEF4444).withValues(alpha: 0.2),
                     width: 1,
                   ),
                 ),
@@ -1858,7 +1858,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFEF4444).withOpacity(0.3),
+                            color: const Color(0xFFEF4444).withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),

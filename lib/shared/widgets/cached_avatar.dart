@@ -31,7 +31,7 @@ class CachedAvatar extends StatelessWidget {
         boxShadow: borderColor != null
             ? [
                 BoxShadow(
-                  color: borderColor!.withOpacity(0.2),
+                  color: borderColor!.withValues(alpha: 0.2),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -58,7 +58,7 @@ class CachedAvatar extends StatelessWidget {
           errorBuilder: (context, error, stackTrace) {
             return Container(
               color: (borderColor ?? Theme.of(context).colorScheme.primary)
-                  .withOpacity(0.1),
+                  .withValues(alpha: 0.1),
               child: Icon(
                 fallbackIcon,
                 color:

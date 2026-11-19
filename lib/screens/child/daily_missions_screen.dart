@@ -444,7 +444,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                 : null,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -461,13 +461,13 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      (mission['color'] as Color).withOpacity(0.2),
-                      (mission['color'] as Color).withOpacity(0.1),
+                      (mission['color'] as Color).withValues(alpha: 0.2),
+                      (mission['color'] as Color).withValues(alpha: 0.1),
                     ],
                   ),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: (mission['color'] as Color).withOpacity(0.3),
+                    color: (mission['color'] as Color).withValues(alpha: 0.3),
                     width: 2,
                   ),
                 ),
@@ -510,13 +510,13 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      (mission['color'] as Color).withOpacity(0.15),
-                      (mission['color'] as Color).withOpacity(0.08),
+                      (mission['color'] as Color).withValues(alpha: 0.15),
+                      (mission['color'] as Color).withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: (mission['color'] as Color).withOpacity(0.2),
+                    color: (mission['color'] as Color).withValues(alpha: 0.2),
                     width: 1,
                   ),
                 ),
@@ -694,7 +694,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                         style: GoogleFonts.poppins(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.white.withOpacity(0.9),
+                                          color: Colors.white.withValues(alpha: 0.9),
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -713,8 +713,8 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                             style: GoogleFonts.poppins(
                                               fontSize: 20,
                                               fontWeight: FontWeight.w500,
-                                              color: Colors.white.withOpacity(
-                                                0.7,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.7,
                                               ),
                                             ),
                                           ),
@@ -726,7 +726,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                         style: GoogleFonts.poppins(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400,
-                                          color: Colors.white.withOpacity(0.8),
+                                          color: Colors.white.withValues(alpha: 0.8),
                                         ),
                                       ),
                                     ],
@@ -734,7 +734,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                   Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
+                                      color: Colors.white.withValues(alpha: 0.2),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Column(
@@ -752,8 +752,8 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                           style: GoogleFonts.poppins(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.white.withOpacity(
-                                              0.9,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.9,
                                             ),
                                           ),
                                         ),
@@ -779,8 +779,8 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                               style: GoogleFonts.poppins(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.w600,
-                                                color: Colors.white.withOpacity(
-                                                  0.9,
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.9,
                                                 ),
                                               ),
                                             ),
@@ -800,16 +800,16 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                         Container(
                                           height: 10,
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.2,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.2,
                                             ),
                                             borderRadius: BorderRadius.circular(
                                               8,
                                             ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.1,
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.1,
                                                 ),
                                                 blurRadius: 4,
                                                 offset: const Offset(0, 2),
@@ -843,7 +843,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                                     BoxShadow(
                                                       color: const Color(
                                                         0xFF10B981,
-                                                      ).withOpacity(0.5),
+                                                      ).withValues(alpha: 0.5),
                                                       blurRadius: 8,
                                                       offset: const Offset(
                                                         0,
@@ -875,7 +875,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                                           .textTheme
                                           .bodyMedium
                                           ?.color
-                                          ?.withOpacity(0.5),
+                                          ?.withValues(alpha: 0.5),
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
@@ -971,7 +971,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isCompleted
-              ? (mission['color'] as Color).withOpacity(0.3)
+              ? (mission['color'] as Color).withValues(alpha: 0.3)
               : Theme.of(context).brightness == Brightness.dark
               ? Theme.of(context).dividerColor
               : const Color(0xFFE2E8F0),
@@ -979,7 +979,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -994,7 +994,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: (mission['color'] as Color).withOpacity(0.1),
+                  color: (mission['color'] as Color).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
@@ -1035,7 +1035,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: (mission['color'] as Color).withOpacity(0.1),
+                  color: (mission['color'] as Color).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -1115,7 +1115,7 @@ class _DailyMissionsScreenState extends State<DailyMissionsScreen>
             Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.1),
+                color: const Color(0xFF10B981).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(

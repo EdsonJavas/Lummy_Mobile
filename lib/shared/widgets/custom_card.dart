@@ -45,7 +45,7 @@ class CustomCard extends StatelessWidget {
         boxShadow: style == CardStyle.elevated || elevation != null
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(elevation ?? 0.04),
+                  color: Colors.black.withValues(alpha: elevation ?? 0.04),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

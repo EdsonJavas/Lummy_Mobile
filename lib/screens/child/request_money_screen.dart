@@ -328,7 +328,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -409,7 +409,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -423,7 +423,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3B82F6).withOpacity(0.15),
+                  color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -545,7 +545,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF8B5CF6).withOpacity(0.4),
+              color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
               blurRadius: 24,
               offset: const Offset(0, 10),
               spreadRadius: -4,
@@ -559,10 +559,10 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
+                    color: Colors.white.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       width: 2,
                     ),
                   ),
@@ -591,7 +591,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                         style: GoogleFonts.poppins(
                           fontSize: isSmallScreen ? 14 : 16,
                           fontWeight: FontWeight.w400,
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ),
                     ],
@@ -607,7 +607,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -639,7 +639,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
               style: GoogleFonts.poppins(
                 fontSize: isSmallScreen ? 14 : 16,
                 fontWeight: FontWeight.w500,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -687,7 +687,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF1E293B).withOpacity(0.5)
+                  ? const Color(0xFF1E293B).withValues(alpha: 0.5)
                   : const Color(0xFFF8FAFC),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
@@ -715,7 +715,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3B82F6).withOpacity(0.1),
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -807,7 +807,7 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFF8C42).withOpacity(0.1),
+                      color: const Color(0xFFFF8C42).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

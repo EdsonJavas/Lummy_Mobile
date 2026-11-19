@@ -67,8 +67,8 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    _orange.withOpacity(0.15),
-                                    _amber.withOpacity(0.1),
+                                    _orange.withValues(alpha: 0.15),
+                                    _amber.withValues(alpha: 0.1),
                                   ],
                                 ),
                                 shape: BoxShape.circle,
@@ -160,7 +160,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: _orange.withOpacity(isDark ? 0.2 : 0.3),
+            color: _orange.withValues(alpha: isDark ? 0.2 : 0.3),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -174,7 +174,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -201,7 +201,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: 0.85),
                       ),
                     ),
                   ],
@@ -215,10 +215,10 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withOpacity(0.25),
+                color: Colors.white.withValues(alpha: 0.25),
                 width: 1.5,
               ),
             ),
@@ -230,7 +230,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(
@@ -245,7 +245,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -285,11 +285,11 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
           end: Alignment.bottomRight,
           colors: isDark
               ? [const Color(0xFF1E293B), const Color(0xFF312E81)]
-              : [_blue.withOpacity(0.1), _purple.withOpacity(0.1)],
+              : [_blue.withValues(alpha: 0.1), _purple.withValues(alpha: 0.1)],
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? _purple.withOpacity(0.3) : _blue.withOpacity(0.2),
+          color: isDark ? _purple.withValues(alpha: 0.3) : _blue.withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),
@@ -304,7 +304,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: _blue.withOpacity(0.3),
+                      color: _blue.withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -363,7 +363,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: _blue.withOpacity(0.3),
+                            color: _blue.withValues(alpha: 0.3),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -404,11 +404,11 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : _purple.withOpacity(0.1),
+                            ? Colors.white.withValues(alpha: 0.1)
+                            : _purple.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: _purple.withOpacity(isDark ? 0.3 : 0.3),
+                          color: _purple.withValues(alpha: isDark ? 0.3 : 0.3),
                           width: 1.5,
                         ),
                       ),
@@ -534,7 +534,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                 margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: _purple.withOpacity(0.3), width: 3),
+                  border: Border.all(color: _purple.withValues(alpha: 0.3), width: 3),
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: MobileScanner(
@@ -622,7 +622,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [_blue.withOpacity(0.1), _purple.withOpacity(0.1)],
+                    colors: [_blue.withValues(alpha: 0.1), _purple.withValues(alpha: 0.1)],
                   ),
                   shape: BoxShape.circle,
                 ),
@@ -736,7 +736,7 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: _blue.withOpacity(0.3),
+                            color: _blue.withValues(alpha: 0.3),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -880,14 +880,14 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF475569) : _orange.withOpacity(0.14),
+          color: isDark ? const Color(0xFF475569) : _orange.withValues(alpha: 0.14),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.24)
-                : _orange.withOpacity(0.08),
+                ? Colors.black.withValues(alpha: 0.24)
+                : _orange.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -1011,13 +1011,13 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(isDark ? 0.2 : 0.12),
-                color.withOpacity(isDark ? 0.1 : 0.06),
+                color.withValues(alpha: isDark ? 0.2 : 0.12),
+                color.withValues(alpha: isDark ? 0.1 : 0.06),
               ],
             ),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: color.withOpacity(isDark ? 0.3 : 0.2),
+              color: color.withValues(alpha: isDark ? 0.3 : 0.2),
               width: 1.5,
             ),
           ),

@@ -307,14 +307,14 @@ class _SplashScreenState extends State<SplashScreen>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: _blue.withOpacity(
-                            0.2 + _pulseController.value * 0.15),
+                        color: _blue.withValues(
+                            alpha: 0.2 + _pulseController.value * 0.15),
                         blurRadius: 60 + _pulseController.value * 20,
                         spreadRadius: 10,
                       ),
                       BoxShadow(
-                        color: _purple.withOpacity(
-                            0.15 + _pulseController.value * 0.1),
+                        color: _purple.withValues(
+                            alpha: 0.15 + _pulseController.value * 0.1),
                         blurRadius: 80 + _pulseController.value * 30,
                         spreadRadius: 20,
                       ),
@@ -337,7 +337,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: _blue.withOpacity(0.4),
+                        color: _blue.withValues(alpha: 0.4),
                         blurRadius: 30,
                         offset: const Offset(0, 10),
                       ),
@@ -385,7 +385,7 @@ class _SplashScreenState extends State<SplashScreen>
               height: 200,
               child: CustomPaint(
                 painter: _OrbitalPainter(
-                  color: _blue.withOpacity(0.3),
+                  color: _blue.withValues(alpha: 0.3),
                   strokeWidth: 1.5,
                   dashLength: 8,
                   gapLength: 12,
@@ -434,7 +434,7 @@ class _SplashScreenState extends State<SplashScreen>
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.6),
+            color: color.withValues(alpha: 0.6),
             blurRadius: 10,
             spreadRadius: 2,
           ),
@@ -508,7 +508,7 @@ class _SplashScreenState extends State<SplashScreen>
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               letterSpacing: 1.5,
             ),
           ),
@@ -530,7 +530,7 @@ class _SplashScreenState extends State<SplashScreen>
                   Container(
                     height: 3,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -547,7 +547,7 @@ class _SplashScreenState extends State<SplashScreen>
                             borderRadius: BorderRadius.circular(2),
                             boxShadow: [
                               BoxShadow(
-                                color: _purple.withOpacity(0.5),
+                                color: _purple.withValues(alpha: 0.5),
                                 blurRadius: 8,
                                 spreadRadius: 1,
                               ),
@@ -566,7 +566,7 @@ class _SplashScreenState extends State<SplashScreen>
               style: GoogleFonts.poppins(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 letterSpacing: 0.5,
               ),
             ),
@@ -594,7 +594,7 @@ class _ParticlePainter extends CustomPainter {
       final opacity = (0.1 + random.nextDouble() * 0.2) *
           (1 - (y / size.height).clamp(0.5, 1.0));
       final paint = Paint()
-        ..color = colors[i % colors.length].withOpacity(opacity)
+        ..color = colors[i % colors.length].withValues(alpha: opacity)
         ..style = PaintingStyle.fill;
       canvas.drawCircle(Offset(x, y), particleSize, paint);
     }

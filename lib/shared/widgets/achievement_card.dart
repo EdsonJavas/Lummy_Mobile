@@ -33,7 +33,7 @@ class AchievementCard extends StatelessWidget {
       onTap: onTap,
       style: CardStyle.filled,
       color: achievement.isCompleted
-          ? const Color(AppConstants.successGreen).withOpacity(0.05)
+          ? const Color(AppConstants.successGreen).withValues(alpha: 0.05)
           : null,
       padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
       child: Row(
@@ -43,12 +43,12 @@ class AchievementCard extends StatelessWidget {
             height: isSmallScreen ? 40 : 48,
             decoration: BoxDecoration(
               color: achievement.isCompleted
-                  ? const Color(AppConstants.successGreen).withOpacity(0.1)
+                  ? const Color(AppConstants.successGreen).withValues(alpha: 0.1)
                   : const Color(AppConstants.backgroundGray),
               borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
               border: Border.all(
                 color: achievement.isCompleted
-                    ? const Color(AppConstants.successGreen).withOpacity(0.3)
+                    ? const Color(AppConstants.successGreen).withValues(alpha: 0.3)
                     : const Color(AppConstants.borderLight),
                 width: 1,
               ),
@@ -110,7 +110,7 @@ class AchievementCard extends StatelessWidget {
       onTap: onTap,
       style: CardStyle.filled,
       color: achievement.isCompleted
-          ? const Color(AppConstants.successGreen).withOpacity(0.05)
+          ? const Color(AppConstants.successGreen).withValues(alpha: 0.05)
           : null,
       padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
       child: Column(
@@ -121,12 +121,12 @@ class AchievementCard extends StatelessWidget {
             height: isSmallScreen ? 60 : 80,
             decoration: BoxDecoration(
               color: achievement.isCompleted
-                  ? const Color(AppConstants.successGreen).withOpacity(0.1)
+                  ? const Color(AppConstants.successGreen).withValues(alpha: 0.1)
                   : const Color(AppConstants.backgroundGray),
               borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
               border: Border.all(
                 color: achievement.isCompleted
-                    ? const Color(AppConstants.successGreen).withOpacity(0.3)
+                    ? const Color(AppConstants.successGreen).withValues(alpha: 0.3)
                     : const Color(AppConstants.borderLight),
                 width: 2,
               ),
@@ -168,7 +168,7 @@ class AchievementCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(AppConstants.accentOrange).withOpacity(0.1),
+                color: const Color(AppConstants.accentOrange).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppConstants.radiusFull),
               ),
               child: Row(

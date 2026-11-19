@@ -33,7 +33,7 @@ class BrandedLoader extends StatelessWidget {
         boxShadow: showShadow
             ? [
                 BoxShadow(
-                  color: colorScheme.primary.withOpacity(0.25),
+                  color: colorScheme.primary.withValues(alpha: 0.25),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -47,7 +47,7 @@ class BrandedLoader extends StatelessWidget {
         child: CircularProgressIndicator(
           strokeWidth: 3,
           valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
-          backgroundColor: colorScheme.primary.withOpacity(0.1),
+          backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
         ),
       ),
     );

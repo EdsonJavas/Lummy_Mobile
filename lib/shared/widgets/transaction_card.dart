@@ -30,7 +30,7 @@ class TransactionCard extends StatelessWidget {
         ? const Color(0xFF94A3B8)
         : const Color(0xFF64748B);
     final dividerColor = isDark
-        ? Colors.white.withOpacity(0.2)
+        ? Colors.white.withValues(alpha: 0.2)
         : const Color(0xFFCBD5E1);
 
     // Cor baseada no tipo e status
@@ -41,12 +41,12 @@ class TransactionCard extends StatelessWidget {
       amountColor = const Color(0xFF10B981);
       iconBackgroundColor = const Color(
         0xFF10B981,
-      ).withOpacity(isDark ? 0.2 : 0.1);
+      ).withValues(alpha: isDark ? 0.2 : 0.1);
     } else {
       amountColor = const Color(0xFFEF4444);
       iconBackgroundColor = const Color(
         0xFFEF4444,
-      ).withOpacity(isDark ? 0.2 : 0.1);
+      ).withValues(alpha: isDark ? 0.2 : 0.1);
     }
 
     return Material(
@@ -138,7 +138,7 @@ class TransactionCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: const Color(
                             0xFFF59E0B,
-                          ).withOpacity(isDark ? 0.2 : 0.1),
+                          ).withValues(alpha: isDark ? 0.2 : 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -188,7 +188,7 @@ class TransactionCard extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: const Color(
                                     0xFF10B981,
-                                  ).withOpacity(isDark ? 0.2 : 0.1),
+                                  ).withValues(alpha: isDark ? 0.2 : 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(
@@ -209,7 +209,7 @@ class TransactionCard extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: const Color(
                                     0xFFEF4444,
-                                  ).withOpacity(isDark ? 0.2 : 0.1),
+                                  ).withValues(alpha: isDark ? 0.2 : 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(
