@@ -1,0 +1,3 @@
+tags:
+  # Testes que acessam a internet de verdade. Para pular: flutter test -x network
+  network:
