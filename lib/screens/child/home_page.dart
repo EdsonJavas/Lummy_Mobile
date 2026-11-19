@@ -4,7 +4,6 @@ import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/constants/app_constants.dart';
 import 'package:lummy/core/utils/network_errors.dart';
-import 'package:lummy/core/utils/formatters.dart';
 import 'package:lummy/screens/child/new_goal_screen.dart';
 import 'package:lummy/screens/child/request_money_screen.dart';
 import 'package:lummy/screens/child/claim_share_screen.dart';
@@ -15,6 +14,14 @@ import 'package:lummy/screens/child/profile_page.dart';
 import 'package:lummy/screens/child/daily_missions_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/child/widgets/home/home_achievements_section.dart';
+import 'package:lummy/screens/child/widgets/home/home_balance_card.dart';
+import 'package:lummy/screens/child/widgets/home/home_education_section.dart';
+import 'package:lummy/screens/child/widgets/home/home_educational_tips.dart';
+import 'package:lummy/screens/child/widgets/home/home_empty_goal_card.dart';
+import 'package:lummy/screens/child/widgets/home/home_header.dart';
+import 'package:lummy/screens/child/widgets/home/home_quick_actions.dart';
+import 'package:lummy/screens/child/widgets/home/home_savings_goal_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -80,233 +87,7 @@ class _HomePageState extends State<HomePage> {
 
   // Lista de dicas educativas - MUITAS dicas!
   int currentTipIndex = 0;
-  final List<EducationalTip> educationalTips = [
-    EducationalTip(
-      'Dica do Dia',
-      'Que tal anotar todos os seus gastos por uma semana? Isso ajuda a entender para onde vai seu dinheiro!',
-      '📝',
-    ),
-    EducationalTip(
-      'Você Sabia?',
-      'Guardar 10% do que você ganha é um ótimo começo para realizar seus sonhos!',
-      '💡',
-    ),
-    EducationalTip(
-      'Desafio',
-      'Tente economizar R\$ 5,00 esta semana comprando menos doces e lanches!',
-      '🎯',
-    ),
-    EducationalTip(
-      'Aprenda',
-      'Antes de comprar algo, pergunte: "Eu realmente preciso disso agora?"',
-      '🤔',
-    ),
-    EducationalTip(
-      'Meta Inteligente',
-      'Divida sua meta grande em metas menores. Assim fica mais fácil de conquistar!',
-      '🧠',
-    ),
-    EducationalTip(
-      'Super Dica',
-      'Antes de pedir algo aos pais, pense se pode economizar sua mesada para comprar!',
-      '⭐',
-    ),
-    EducationalTip(
-      'Sabedoria',
-      'Dinheiro guardado hoje é um sonho realizado amanhã!',
-      '🌟',
-    ),
-    EducationalTip(
-      'Aprenda Mais',
-      'Compare preços antes de comprar. Às vezes o mesmo produto está mais barato em outro lugar!',
-      '🔍',
-    ),
-    EducationalTip(
-      'Você Sabia?',
-      'Fazer uma lista antes de comprar ajuda a não gastar com coisas que não precisa!',
-      '📋',
-    ),
-    EducationalTip(
-      'Desafio Diário',
-      'Conte quantas vezes você resistiu comprar algo desnecessário hoje!',
-      '💪',
-    ),
-    EducationalTip(
-      'Dica Especial',
-      'Guarde as moedas que sobram no troco. No fim do mês você se surpreende!',
-      '🪙',
-    ),
-    EducationalTip(
-      'Educação Financeira',
-      'Aprenda a diferença entre QUERER e PRECISAR. Isso muda tudo!',
-      '🎓',
-    ),
-    EducationalTip(
-      'Pensamento do Dia',
-      'Pequenas economias se transformam em grandes conquistas!',
-      '💭',
-    ),
-    EducationalTip(
-      'Truque Ninja',
-      'Espere 24 horas antes de comprar algo que você viu. Se ainda quiser, talvez valha a pena!',
-      '🥷',
-    ),
-    EducationalTip(
-      'Você Sabia?',
-      'Ter um cofrinho em casa ajuda você a ver seu dinheiro crescendo todos os dias!',
-      '🐷',
-    ),
-    EducationalTip(
-      'Desafio da Semana',
-      'Tente economizar o dinheiro do lanche de 3 dias e veja quanto juntou!',
-      '🏆',
-    ),
-    EducationalTip(
-      'Aprenda Jogando',
-      'Transforme economia em jogo: a cada R\$ 10 economizados, ganhe 1 ponto!',
-      '🎮',
-    ),
-    EducationalTip(
-      'Dica de Ouro',
-      'Quando ganhar dinheiro, separe uma parte para economizar ANTES de gastar!',
-      '🥇',
-    ),
-    EducationalTip(
-      'Sabedoria Popular',
-      'Dinheiro não dá em árvore, mas você pode fazer ele crescer com paciência!',
-      '🌱',
-    ),
-    EducationalTip(
-      'Aprenda Cedo',
-      'Quanto mais cedo você aprende a economizar, mais sonhos você vai realizar!',
-      '🚀',
-    ),
-    EducationalTip(
-      'Você Sabia?',
-      'Anotar seus gastos é como ter um mapa do tesouro do seu dinheiro!',
-      '🗺️',
-    ),
-    EducationalTip(
-      'Desafio Master',
-      'Passe um dia inteiro sem gastar nada. Você consegue?',
-      '🎖️',
-    ),
-    EducationalTip(
-      'Dica Incrível',
-      'Troque guloseimas por frutas 2x na semana e economize!',
-      '🍎',
-    ),
-    EducationalTip(
-      'Aprenda Sempre',
-      'Pergunte aos seus pais como eles economizam. Você vai aprender muito!',
-      '👨‍👩‍👧',
-    ),
-    EducationalTip(
-      'Pensamento',
-      'Economizar não é deixar de comprar, é comprar o que realmente importa!',
-      '✨',
-    ),
-    EducationalTip(
-      'Planejamento Inteligente',
-      'Faça uma lista com tudo que você quer comprar e coloque números de 1 a 10 do mais importante para o menos. Assim você economiza para o que realmente importa primeiro!',
-      '📊',
-    ),
-    EducationalTip(
-      'Cuide do que é Seu',
-      'Quando você cuida bem dos seus brinquedos, roupas e materiais escolares, eles duram muito mais tempo e você não precisa pedir para comprar novos!',
-      '🛡️',
-    ),
-    EducationalTip(
-      'Economia Compartilhada',
-      'Que tal combinar com seus amigos de trocar brinquedos ou jogos por um tempo? Assim todos experimentam coisas novas sem precisar gastar dinheiro!',
-      '🤝',
-    ),
-    EducationalTip(
-      'Seja Criativo',
-      'Presentes feitos por você são especiais e únicos! Desenhos, cartões, pulseiras... Use sua criatividade e economize dinheiro fazendo presentes com amor!',
-      '🎨',
-    ),
-    EducationalTip(
-      'Controle Semanal',
-      'No final de cada semana, anote quanto dinheiro você conseguiu guardar. Você vai se surpreender como pequenas economias viram grandes conquistas!',
-      '📈',
-    ),
-    EducationalTip(
-      'O Poder da Espera',
-      'Quando você espera alguns dias antes de comprar algo, descobre se realmente quer ou se era só vontade do momento. Isso te ajuda a economizar muito!',
-      '⏰',
-    ),
-    EducationalTip(
-      'Organize Seu Dinheiro',
-      'Use três potes ou cofrinhos: um para gastar no que você quiser, um para economizar para seus sonhos e um para ajudar quem precisa. É uma forma perfeita de aprender!',
-      '🏺',
-    ),
-    EducationalTip(
-      'Preciso ou Quero?',
-      'Sempre que quiser comprar algo, pergunte: é algo que eu PRECISO agora ou só QUERO? Essa pergunta mágica ajuda você a economizar para o que é realmente importante!',
-      '🎯',
-    ),
-    EducationalTip(
-      'Crescendo com Responsabilidade',
-      'Cada vez que você guarda dinheiro ao invés de gastar tudo, está mostrando que está crescendo e aprendendo a ser responsável com suas escolhas!',
-      '🌟',
-    ),
-    EducationalTip(
-      'Agradeça Sempre',
-      'Antes de pedir algo novo, olhe tudo que você já tem e agradeça. Você vai perceber que já tem muitas coisas legais e talvez não precise comprar mais agora!',
-      '🙏',
-    ),
-    EducationalTip(
-      'Construa Seu Futuro',
-      'Cada moedinha que você guarda hoje é como colocar um tijolinho na construção da sua casa dos sonhos. Com paciência e dedicação, você realiza tudo!',
-      '🏗️',
-    ),
-    EducationalTip(
-      'Sabedoria dos Avós',
-      'Seus avós viveram em tempos diferentes e aprenderam muito sobre economizar. Peça para eles contarem histórias de quando eram jovens, você vai aprender demais!',
-      '👴',
-    ),
-    EducationalTip(
-      'Ajude o Planeta',
-      'Sabia que quando você compra menos coisas, também está ajudando o meio ambiente? Menos lixo, menos poluição e um planeta mais feliz para todos!',
-      '🌍',
-    ),
-    EducationalTip(
-      'Visualize Seus Sonhos',
-      'Tire uma foto ou recorte uma imagem do que você está economizando para comprar e cole no seu cofrinho. Assim você lembra todos os dias do seu objetivo!',
-      '🖼️',
-    ),
-    EducationalTip(
-      'Celebre Suas Conquistas',
-      'Quando você alcançar uma meta de economia, comemore! Você pode fazer um desenho, dançar, ou contar para sua família. Você merece por todo esforço que fez!',
-      '🎉',
-    ),
-    EducationalTip(
-      'Errar Faz Parte',
-      'Se você gastou mais do que planejava, não tem problema! O importante é entender o que aconteceu e tentar fazer diferente da próxima vez. Todo mundo erra e aprende!',
-      '💪',
-    ),
-    EducationalTip(
-      'Família Unida',
-      'Converse com seus pais e irmãos sobre economia. Vocês podem criar desafios juntos, como ver quem economiza mais água ou energia. Juntos é mais divertido!',
-      '👨‍👩‍👧‍👦',
-    ),
-    EducationalTip(
-      'Faça Seu Dinheiro Crescer',
-      'Dinheiro parado no cofrinho não aumenta sozinho. Pergunte aos seus pais sobre poupança e como o dinheiro pode crescer um pouquinho todo mês. É mágico!',
-      '💰',
-    ),
-    EducationalTip(
-      'Economizar é Divertido',
-      'Transforme economia em um jogo! A cada R\$ 5 economizados você ganha pontos. Quando chegar a 100 pontos, faça algo especial que não custa dinheiro, como um piquenique!',
-      '🎪',
-    ),
-    EducationalTip(
-      'Prepare-se para Emergências',
-      'Sempre guarde um dinheirinho extra para imprevistos, como quando você quebra algo sem querer ou precisa comprar algo urgente. Ter essa reserva te deixa mais tranquilo!',
-      '🚨',
-    ),
-  ];
+  final List<EducationalTip> educationalTips = buildHomeEducationalTips();
 
   @override
   void initState() {
@@ -932,7 +713,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenHeight < 700;
 
     final theme = Theme.of(context);
@@ -951,29 +731,65 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Column(
                     children: [
-                      _buildSimpleHeader(screenWidth, isSmallScreen)
+                      HomeHeader(
+                        userName: userName,
+                        isSmallScreen: isSmallScreen,
+                        onAvatarTap: _openProfile,
+                      )
                           .animate()
                           .fadeIn(duration: 220.ms)
                           .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      _buildBalanceCard(screenWidth, isSmallScreen)
+                      HomeBalanceCard(
+                        isSmallScreen: isSmallScreen,
+                        balanceLoadFailed: _balanceLoadFailed,
+                        currentBalance: currentBalance,
+                        weekIncomeTotal: _weekIncomeTotal,
+                        onRetry: () => _loadBalance(),
+                      )
                           .animate()
                           .fadeIn(delay: 80.ms, duration: 260.ms)
                           .slideY(begin: 0.03, end: 0, curve: Curves.easeOut),
                       (hasActiveGoal
-                              ? _buildSavingsGoal(screenWidth, isSmallScreen)
-                              : _buildEmptyGoalCard(screenWidth, isSmallScreen))
+                              ? HomeSavingsGoalCard(
+                                  isSmallScreen: isSmallScreen,
+                                  savingsGoal: savingsGoal,
+                                  goalCurrentAmount: goalCurrentAmount,
+                                  goalName: goalName,
+                                  goalEmoji: goalEmoji,
+                                  currentBalance: currentBalance,
+                                  balanceLoadFailed: _balanceLoadFailed,
+                                )
+                              : HomeEmptyGoalCard(
+                                  isSmallScreen: isSmallScreen,
+                                  onTap: _onEmptyGoalCardTap,
+                                ))
                           .animate()
                           .fadeIn(delay: 140.ms, duration: 260.ms)
                           .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      _buildQuickActionsInter(screenWidth, isSmallScreen)
+                      HomeQuickActions(
+                        isSmallScreen: isSmallScreen,
+                        claimShareSubtitle: _claimShareSubtitle,
+                        onDailyMissionsTap: _openDailyMissions,
+                        onNewGoalTap: _onNewGoalTap,
+                        onRequestMoneyTap: _openRequestMoney,
+                        onClaimShareTap: _onClaimShareTap,
+                      )
                           .animate()
                           .fadeIn(delay: 200.ms, duration: 260.ms)
                           .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      _buildEducationSection(screenWidth, isSmallScreen)
+                      HomeEducationSection(
+                        isSmallScreen: isSmallScreen,
+                        educationalTips: educationalTips,
+                        currentTipIndex: currentTipIndex,
+                        onNextTip: _nextTip,
+                      )
                           .animate()
                           .fadeIn(delay: 260.ms, duration: 260.ms)
                           .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
-                      _buildAchievementsImproved(screenWidth, isSmallScreen)
+                      HomeAchievementsSection(
+                        isSmallScreen: isSmallScreen,
+                        achievements: achievements,
+                      )
                           .animate()
                           .fadeIn(delay: 320.ms, duration: 260.ms)
                           .slideY(begin: 0.02, end: 0, curve: Curves.easeOut),
@@ -986,1477 +802,171 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSimpleHeader(double screenWidth, bool isSmallScreen) {
-    final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
-    return Container(
-      width: double.infinity,
-      color: theme.scaffoldBackgroundColor,
-      padding: EdgeInsets.all(isSmallScreen ? AppConstants.spacingMedium : AppConstants.spacingLarge),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Olá, ',
-                      style: LummyFonts.body(
-                        fontSize: isSmallScreen ? 24 : 28,
-                        fontWeight: FontWeight.w600,
-                        color: theme.textTheme.bodyLarge?.color,
-                      ),
-                    ),
-                    Flexible(
-                      child: ShaderMask(
-                        shaderCallback: (bounds) => LinearGradient(
-                          colors: [
-                            primary,
-                            LummyColors.violet500,
-                          ],
-                        ).createShader(bounds),
-                        child: Text(
-                          userName,
-                          style: LummyFonts.body(
-                            fontSize: isSmallScreen ? 24 : 28,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const Gap(4),
-                Text(
-                  'Como estão suas finanças hoje?',
-                  style: LummyFonts.body(
-                    fontSize: isSmallScreen ? 14 : 16,
-                    fontWeight: FontWeight.w400,
-                    color: theme.textTheme.bodyMedium?.color,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
-              );
-            },
-            child: CachedAvatar(
-              imageUrl:
-                  'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
-              size: isSmallScreen ? 50 : 56,
-              borderColor: primary,
-              borderWidth: 2,
-              fallbackIcon: Icons.person_rounded,
-              fallbackIconColor: primary,
-            ),
-          ),
-        ],
+  void _openProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ProfilePage(),
       ),
     );
   }
 
-  Widget _buildBalanceCard(double screenWidth, bool isSmallScreen) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: _balanceLoadFailed ? () => _loadBalance() : null,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 12 : 16),
-          padding: EdgeInsets.all(isSmallScreen ? 22 : 28),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [LummyColors.blue800, LummyColors.blue900],
+  Future<void> _onEmptyGoalCardTap() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const NewGoalScreen()),
+    );
+
+    if (result != null) {
+      // Recarregar meta do banco após criar nova meta
+      await _loadGoal();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Nova meta criada! 🎯',
+              style: LummyFonts.body(fontWeight: FontWeight.w500),
             ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: LummyColors.blue800.withValues(alpha: 0.35),
-                blurRadius: 24,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Meu Cofrinho',
-                    style: LummyFonts.body(
-                      fontSize: isSmallScreen ? 17 : 19,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white.withValues(alpha: 0.95),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.22),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '🐷',
-                      style: TextStyle(fontSize: isSmallScreen ? 20 : 24),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Text(
-                _balanceLoadFailed
-                    ? '—'
-                    : 'R\$ ${currentBalance.toStringAsFixed(2)}',
-                style: LummyFonts.body(
-                  fontSize: isSmallScreen ? 38 : 44,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              if (_balanceLoadFailed) ...[
-                const SizedBox(height: 8),
-                Text(
-                  'Não foi possível carregar o saldo. Toque aqui para tentar de novo.',
-                  style: LummyFonts.body(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    height: 1.35,
-                  ),
-                ),
-              ] else ...[
-                const SizedBox(height: 10),
-                if (_weekIncomeTotal > 0)
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: LummyColors.emerald500.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.trending_up, color: LummyColors.emerald500, size: 16),
-                            const SizedBox(width: 6),
-                            Text(
-                              '+${AppFormatters.formatCurrency(_weekIncomeTotal)}',
-                              style: LummyFonts.body(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: LummyColors.emerald500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'entradas nos últimos 7 dias',
-                          style: LummyFonts.body(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.88),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                else
-                  Text(
-                    'Nenhuma entrada registrada nos últimos 7 dias',
-                    style: LummyFonts.body(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.85),
-                    ),
-                  ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSavingsGoal(double screenWidth, bool isSmallScreen) {
-    // Usar valor reservado da meta (goalCurrentAmount) e nunca exceder o alvo
-    final cappedTarget = savingsGoal < 0 ? 0.0 : savingsGoal;
-    final contributed = goalCurrentAmount.clamp(0.0, cappedTarget);
-    final progress = cappedTarget > 0 ? contributed / cappedTarget : 0.0;
-    final remaining = cappedTarget - contributed;
-    final progressPercent = (progress * 100).clamp(0, 100).toInt();
-    final isCompleted = progress >= 1.0;
-
-    final theme = Theme.of(context);
-    return Container(
-      margin: EdgeInsets.all(isSmallScreen ? AppConstants.spacingMedium : AppConstants.spacingLarge),
-      padding: EdgeInsets.all(isSmallScreen ? AppConstants.spacingLarge : AppConstants.spacingXLarge),
-      decoration: BoxDecoration(
-        color: theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(AppConstants.radiusXLarge),
-        border: Border.all(
-          color: theme.brightness == Brightness.dark
-              ? LummyColors.slate600
-              : LummyColors.slate200,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isCompleted
-                        ? [
-                            LummyColors.emerald500.withValues(alpha: 0.15),
-                            LummyColors.emerald500.withValues(alpha: 0.05),
-                          ]
-                        : [
-                            theme.colorScheme.primary.withValues(alpha: 0.15),
-                            theme.colorScheme.primary.withValues(alpha: 0.05),
-                          ],
-                  ),
-                  borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                ),
-                child: Text(
-                  goalEmoji,
-                  style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
-                ),
-              ),
-              const Gap(14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      goalName,
-                      style: LummyFonts.body(
-                        fontSize: isSmallScreen ? 17 : 19,
-                        fontWeight: FontWeight.w600,
-                        color: theme.textTheme.titleLarge?.color,
-                        height: 1.2,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Gap(4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isCompleted
-                            ? LummyColors.emerald500.withValues(alpha: 0.12)
-                            : theme.colorScheme.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        isCompleted ? 'Meta concluída' : 'Em progresso',
-                        style: LummyFonts.body(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: isCompleted
-                              ? LummyColors.emerald500
-                              : theme.colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isCompleted
-                      ? LummyColors.emerald500.withValues(alpha: 0.12)
-                      : theme.colorScheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '$progressPercent%',
-                  style: LummyFonts.body(
-                    fontSize: isSmallScreen ? 16 : 18,
-                    fontWeight: FontWeight.w700,
-                    color: isCompleted
-                        ? LummyColors.emerald500
-                        : theme.colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const Gap(24),
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'R\$ ${contributed.toStringAsFixed(2)}',
-                    style: LummyFonts.body(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: LummyColors.emerald500,
-                    ),
-                  ),
-                  Text(
-                    'R\$ ${savingsGoal.toStringAsFixed(2)}',
-                    style: LummyFonts.body(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: theme.textTheme.bodySmall?.color,
-                    ),
-                  ),
-                ],
-              ),
-              const Gap(8),
-              Stack(
-                children: [
-                  Container(
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark
-                          ? LummyColors.slate600
-                          : LummyColors.slate200,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  FractionallySizedBox(
-                    widthFactor: progress.clamp(0.0, 1.0),
-                    child: Container(
-                      height: 10,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isCompleted
-                              ? [
-                                  LummyColors.emerald500,
-                                  LummyColors.emerald600,
-                                ]
-                              : [
-                                  theme.colorScheme.primary,
-                                  theme.colorScheme.primary.withValues(alpha: 0.8),
-                                ],
-                        ),
-                        borderRadius: BorderRadius.circular(5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (isCompleted
-                                    ? LummyColors.emerald500
-                                    : theme.colorScheme.primary)
-                                .withValues(alpha: 0.3),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const Gap(20),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark
-                        ? LummyColors.slate800
-                        : LummyColors.offWhite,
-                    borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                    border: Border.all(
-                      color: theme.brightness == Brightness.dark
-                          ? LummyColors.slate600
-                          : LummyColors.slate200,
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.savings_outlined,
-                            size: 16,
-                            color: LummyColors.emerald500,
-                          ),
-                          const Gap(6),
-                          Expanded(
-                            child: Text(
-                              'Economizado',
-                              style: LummyFonts.body(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: theme.brightness == Brightness.dark
-                                    ? LummyColors.slate400
-                                    : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Gap(8),
-                      Text(
-                        _balanceLoadFailed
-                            ? '—'
-                            : 'R\$ ${currentBalance.toStringAsFixed(2)}',
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 16 : 18,
-                          fontWeight: FontWeight.w700,
-                          color: theme.textTheme.titleLarge?.color,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Gap(12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: theme.brightness == Brightness.dark
-                        ? LummyColors.slate800
-                        : LummyColors.offWhite,
-                    borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                    border: Border.all(
-                      color: theme.brightness == Brightness.dark
-                          ? LummyColors.slate600
-                          : LummyColors.slate200,
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            remaining > 0
-                                ? Icons.trending_up_rounded
-                                : Icons.check_circle_outline_rounded,
-                            size: 16,
-                            color: remaining > 0
-                                ? LummyColors.materialOrange
-                                : LummyColors.emerald500,
-                          ),
-                          const Gap(6),
-                          Expanded(
-                            child: Text(
-                              remaining > 0 ? 'Falta' : 'Excedente',
-                              style: LummyFonts.body(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: theme.brightness == Brightness.dark
-                                    ? LummyColors.slate400
-                                    : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Gap(8),
-                      Text(
-                        'R\$ ${remaining.abs().toStringAsFixed(2)}',
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 16 : 18,
-                          fontWeight: FontWeight.w700,
-                          color: theme.textTheme.titleLarge?.color,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyGoalCard(double screenWidth, bool isSmallScreen) {
-    return GestureDetector(
-      onTap: () async {
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewGoalScreen()),
         );
+      }
+    }
+  }
 
-        if (result != null) {
-          // Recarregar meta do banco após criar nova meta
-          await _loadGoal();
-
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Nova meta criada! 🎯',
-                  style: LummyFonts.body(fontWeight: FontWeight.w500),
-                ),
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
-                ),
-              ),
-            );
-          }
-        }
-      },
-      child: Builder(
-        builder: (context) {
-          final theme = Theme.of(context);
-          return Container(
-            margin: EdgeInsets.all(isSmallScreen ? AppConstants.spacingMedium : AppConstants.spacingLarge),
-            padding: EdgeInsets.all(isSmallScreen ? AppConstants.spacingLarge : AppConstants.spacingXLarge),
-            decoration: BoxDecoration(
-              color: theme.cardTheme.color,
-              borderRadius: BorderRadius.circular(AppConstants.radiusXLarge),
-              border: Border.all(
-                color: theme.brightness == Brightness.dark
-                    ? LummyColors.slate600
-                    : LummyColors.slate200,
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            LummyColors.violet500.withValues(alpha: 0.15),
-                            LummyColors.violet500.withValues(alpha: 0.05),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                      ),
-                      child: Text(
-                        '🎯',
-                        style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
-                      ),
-                    ),
-                    const Gap(14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Sem metas ainda',
-                            style: LummyFonts.body(
-                              fontSize: isSmallScreen ? 17 : 19,
-                              fontWeight: FontWeight.w600,
-                              color: theme.brightness == Brightness.dark
-                                  ? LummyColors.slate300
-                                  : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.6),
-                              height: 1.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const Gap(4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: LummyColors.violet500.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              'Crie sua primeira meta',
-                              style: LummyFonts.body(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: LummyColors.violet500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: LummyColors.violet500.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '0%',
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 16 : 18,
-                          fontWeight: FontWeight.w700,
-                          color: LummyColors.violet500.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const Gap(24),
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'R\$ 0,00',
-                          style: LummyFonts.body(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: theme.brightness == Brightness.dark
-                                ? LummyColors.slate400
-                                : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        Text(
-                          'R\$ 0,00',
-                          style: LummyFonts.body(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: theme.brightness == Brightness.dark
-                                ? LummyColors.slate400
-                                : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Gap(8),
-                    Stack(
-                      children: [
-                        Container(
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: theme.brightness == Brightness.dark
-                                ? LummyColors.slate600
-                                : LummyColors.slate200,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        FractionallySizedBox(
-                          widthFactor: 0.0,
-                          child: Container(
-                            height: 10,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [LummyColors.violet500, LummyColors.violet600],
-                              ),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const Gap(20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: theme.brightness == Brightness.dark
-                              ? LummyColors.slate800
-                              : LummyColors.offWhite,
-                          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                          border: Border.all(
-                            color: theme.brightness == Brightness.dark
-                                ? LummyColors.slate600
-                                : LummyColors.slate200,
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.savings_outlined,
-                                  size: 16,
-                                  color: theme.brightness == Brightness.dark
-                                      ? LummyColors.slate400
-                                      : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
-                                ),
-                                const Gap(6),
-                                Expanded(
-                                  child: Text(
-                                    'Economizado',
-                                    style: LummyFonts.body(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: theme.brightness == Brightness.dark
-                                          ? LummyColors.slate400
-                                          : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Gap(8),
-                            Text(
-                              'R\$ 0,00',
-                              style: LummyFonts.body(
-                                fontSize: isSmallScreen ? 16 : 18,
-                                fontWeight: FontWeight.w700,
-                                color: theme.brightness == Brightness.dark
-                                    ? LummyColors.slate300
-                                    : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const Gap(12),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: theme.brightness == Brightness.dark
-                              ? LummyColors.slate800
-                              : LummyColors.offWhite,
-                          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                          border: Border.all(
-                            color: theme.brightness == Brightness.dark
-                                ? LummyColors.slate600
-                                : LummyColors.slate200,
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.trending_up_rounded,
-                                  size: 16,
-                                  color: theme.brightness == Brightness.dark
-                                      ? LummyColors.slate400
-                                      : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
-                                ),
-                                const Gap(6),
-                                Expanded(
-                                  child: Text(
-                                    'Falta',
-                                    style: LummyFonts.body(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w500,
-                                      color: theme.brightness == Brightness.dark
-                                          ? LummyColors.slate400
-                                          : theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Gap(8),
-                            Text(
-                              'R\$ 0,00',
-                              style: LummyFonts.body(
-                                fontSize: isSmallScreen ? 16 : 18,
-                                fontWeight: FontWeight.w700,
-                                color: theme.brightness == Brightness.dark
-                                    ? LummyColors.slate300
-                                    : theme.textTheme.titleLarge?.color?.withValues(alpha: 0.5),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
+  void _openDailyMissions() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const DailyMissionsScreen(),
       ),
     );
   }
 
-  Widget _buildQuickActionsInter(double screenWidth, bool isSmallScreen) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: isSmallScreen ? AppConstants.spacingMedium : AppConstants.spacingLarge,
+  Future<void> _onNewGoalTap() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NewGoalScreen(),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ShaderMask(
-            shaderCallback: (bounds) => LinearGradient(
-              colors: Theme.of(context).brightness == Brightness.dark
-                  ? [
-                      LummyColors.blue500,
-                      LummyColors.violet500,
-                    ] // Azul → Roxo como no site
-                  : [LummyColors.slate800, LummyColors.slate800],
-            ).createShader(bounds),
-            child: Text(
-              'O que você quer fazer?',
+    );
+
+    if (result != null) {
+      // Recarregar meta do banco após criar nova meta
+      await _loadGoal();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Nova meta criada! 🎯',
               style: LummyFonts.body(
-                fontSize: isSmallScreen ? 18 : 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+                fontWeight: FontWeight.w500,
               ),
             ),
+            backgroundColor: LummyColors.violet500,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-          const SizedBox(height: 16),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DailyMissionsScreen(),
-                          ),
-                        );
-                      },
-                      child: _buildActionCardInter(
-                        'Missões Diárias',
-                        'Complete desafios e ganhe pontos',
-                        Icons.emoji_events_outlined,
-                        LummyColors.amber500,
-                        isSmallScreen,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NewGoalScreen(),
-                          ),
-                        );
+        );
+      }
+    }
+  }
 
-                        if (result != null) {
-                          // Recarregar meta do banco após criar nova meta
-                          await _loadGoal();
-
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Nova meta criada! 🎯',
-                                  style: LummyFonts.body(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                backgroundColor: LummyColors.violet500,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            );
-                          }
-                        }
-                      },
-                      child: _buildActionCardInter(
-                        'Nova Meta',
-                        'Defina um novo objetivo',
-                        Icons.flag_outlined,
-                        LummyColors.violet500,
-                        isSmallScreen,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RequestMoneyScreen(),
-                          ),
-                        );
-                      },
-                      child: _buildActionCardInter(
-                        'Pedir Dinheiro',
-                        'Peça dinheiro ao responsável',
-                        Icons.request_quote_rounded,
-                        LummyColors.emerald500,
-                        isSmallScreen,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        if (_isClaimContextLoading) return;
-                        if (!_hasRealSiblings) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Não há irmãos cadastrados pelo mesmo responsável.',
-                              ),
-                            ),
-                          );
-                          return;
-                        }
-                        if (_activeDistributionId == null ||
-                            _activeDistributionAmount <= 0) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Sem valor ativo para resgate no momento.',
-                              ),
-                            ),
-                          );
-                          return;
-                        }
-                        if (_alreadyClaimedCurrentDistribution) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Você já retirou sua parte desta distribuição.',
-                              ),
-                            ),
-                          );
-                          return;
-                        }
-
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ClaimShareScreen(
-                              distributionId: _activeDistributionId!,
-                              childId: _currentChildId,
-                              totalAmount: _activeDistributionAmount,
-                              currentChildScore: _currentWeightedScore,
-                              otherChildrenScores: _otherSiblingsScores,
-                              otherChildrenNames: _otherSiblingsNames,
-                              currentChildName: _currentChildName,
-                            ),
-                          ),
-                        );
-                        if (result is Map && result['claimed'] == true) {
-                          final claimedAmount =
-                              ((result['amount'] ?? 0.0) as double);
-                          await _refreshData();
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Você retirou R\$ ${claimedAmount.toStringAsFixed(2)}',
-                                style: LummyFonts.body(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              backgroundColor: LummyColors.emerald500,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      child: _buildActionCardInter(
-                        'Retirar Minha Parte',
-                        _isClaimContextLoading
-                            ? 'Carregando distribuição...'
-                            : (!_hasRealSiblings
-                                  ? 'Inativo: sem irmãos cadastrados'
-                                  : (_alreadyClaimedCurrentDistribution
-                                        ? 'Você já retirou nesta distribuição'
-                                        : (_activeDistributionId == null
-                                              ? 'Sem distribuição ativa'
-                                              : 'Resgate sua parte do valor do responsável'))),
-                        Icons.payments_rounded,
-                        LummyColors.emerald500,
-                        isSmallScreen,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+  void _openRequestMoney() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const RequestMoneyScreen(),
       ),
     );
   }
 
-  Widget _buildActionCardInter(
-    String title,
-    String subtitle,
-    IconData icon,
-    Color color,
-    bool isSmallScreen,
-  ) {
-    return Container(
-      padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? LummyColors.slate600
-              : LummyColors.slate200,
-          width: 1,
+  Future<void> _onClaimShareTap() async {
+    if (_isClaimContextLoading) return;
+    if (!_hasRealSiblings) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Não há irmãos cadastrados pelo mesmo responsável.',
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+      );
+      return;
+    }
+    if (_activeDistributionId == null ||
+        _activeDistributionAmount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Sem valor ativo para resgate no momento.',
           ),
-        ],
+        ),
+      );
+      return;
+    }
+    if (_alreadyClaimedCurrentDistribution) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Você já retirou sua parte desta distribuição.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ClaimShareScreen(
+          distributionId: _activeDistributionId!,
+          childId: _currentChildId,
+          totalAmount: _activeDistributionAmount,
+          currentChildScore: _currentWeightedScore,
+          otherChildrenScores: _otherSiblingsScores,
+          otherChildrenNames: _otherSiblingsNames,
+          currentChildName: _currentChildName,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: isSmallScreen ? 40 : 48,
-            height: isSmallScreen ? 40 : 48,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: isSmallScreen ? 20 : 24),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
+    );
+    if (result is Map && result['claimed'] == true) {
+      final claimedAmount =
+          ((result['amount'] ?? 0.0) as double);
+      await _refreshData();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Você retirou R\$ ${claimedAmount.toStringAsFixed(2)}',
             style: LummyFonts.body(
-              fontSize: isSmallScreen ? 14 : 16,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).textTheme.titleMedium?.color,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: LummyFonts.body(
-              fontSize: isSmallScreen ? 12 : 14,
-              fontWeight: FontWeight.w400,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEducationSection(double screenWidth, bool isSmallScreen) {
-    final currentTip = educationalTips[currentTipIndex];
-
-    return Container(
-      margin: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ShaderMask(
-            shaderCallback: (bounds) => LinearGradient(
-              colors: Theme.of(context).brightness == Brightness.dark
-                  ? [
-                      LummyColors.brandOrange,
-                      LummyColors.emerald500,
-                    ] // Laranja → Verde como no site
-                  : [LummyColors.slate800, LummyColors.slate800],
-            ).createShader(bounds),
-            child: Text(
-              'Aprenda Brincando',
-              style: LummyFonts.body(
-                fontSize: isSmallScreen ? 18 : 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 400),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              return FadeTransition(
-                opacity: animation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0.3, 0),
-                    end: Offset.zero,
-                  ).animate(animation),
-                  child: child,
-                ),
-              );
-            },
-            child: Container(
-              key: ValueKey<int>(currentTipIndex),
-              width: double.infinity,
-              constraints: BoxConstraints(minHeight: isSmallScreen ? 200 : 220),
-              padding: EdgeInsets.all(isSmallScreen ? 24.0 : 28.0),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    LummyColors.violet500,
-                    LummyColors.violet600,
-                    LummyColors.violet700,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: LummyColors.violet500.withValues(alpha: 0.4),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
-                    spreadRadius: -4,
-                  ),
-                  BoxShadow(
-                    color: LummyColors.violet500.withValues(alpha: 0.2),
-                    blurRadius: 40,
-                    offset: const Offset(0, 20),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3),
-                            width: 2,
-                          ),
-                        ),
-                        child: Text(
-                          currentTip.emoji,
-                          style: TextStyle(fontSize: isSmallScreen ? 24 : 28),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              currentTip.category,
-                              style: LummyFonts.body(
-                                fontSize: isSmallScreen ? 15 : 17,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            Text(
-                              'Dica ${currentTipIndex + 1} de ${educationalTips.length}',
-                              style: LummyFonts.body(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white.withValues(alpha: 0.8),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    currentTip.content,
-                    style: LummyFonts.body(
-                      fontSize: isSmallScreen ? 16 : 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      height: 1.5,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          offset: const Offset(0, 2),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                    textAlign: TextAlign.justify,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _nextTip,
-                      icon: const Icon(
-                        Icons.arrow_forward_rounded,
-                        color: LummyColors.violet500,
-                        size: 22,
-                      ),
-                      label: Text(
-                        'Próxima Dica',
-                        style: LummyFonts.body(
-                          fontSize: isSmallScreen ? 15 : 16,
-                          fontWeight: FontWeight.w700,
-                          color: LummyColors.violet500,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: LummyColors.violet500,
-                        padding: EdgeInsets.symmetric(
-                          vertical: isSmallScreen ? 14 : 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                        shadowColor: Colors.transparent,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAchievementsImproved(double screenWidth, bool isSmallScreen) {
-    final completedAchievements = achievements
-        .where((a) => a['isCompleted'] == true)
-        .length;
-
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16.0 : 20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  colors: Theme.of(context).brightness == Brightness.dark
-                      ? [
-                          LummyColors.emerald500,
-                          LummyColors.blue500,
-                        ] // Verde → Azul como no site
-                      : [LummyColors.slate800, LummyColors.slate800],
-                ).createShader(bounds),
-                child: Text(
-                  'Suas Conquistas',
-                  style: LummyFonts.body(
-                    fontSize: isSmallScreen ? 18 : 20,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Text(
-                '$completedAchievements de ${achievements.length}',
-                style: LummyFonts.body(
-                  fontSize: isSmallScreen ? 14 : 16,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: EdgeInsets.all(isSmallScreen ? 16.0 : 20.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardTheme.color,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? LummyColors.slate600
-                    : LummyColors.slate200,
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: achievements.asMap().entries.map((entry) {
-                final index = entry.key;
-                final achievement = entry.value;
-                return Column(
-                  children: [
-                    if (index > 0) const SizedBox(height: 16),
-                    _buildAchievementItem(
-                      achievement['emoji'],
-                      achievement['title'],
-                      achievement['description'],
-                      achievement['isCompleted'],
-                      isSmallScreen,
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAchievementItem(
-    String emoji,
-    String title,
-    String description,
-    bool isCompleted,
-    bool isSmallScreen,
-  ) {
-    return Row(
-      children: [
-        Container(
-          width: isSmallScreen ? 48 : 56,
-          height: isSmallScreen ? 48 : 56,
-          decoration: BoxDecoration(
-            color: isCompleted
-                ? LummyColors.emerald500.withValues(alpha: 0.1)
-                : Theme.of(context).brightness == Brightness.dark
-                ? LummyColors.slate800
-                : LummyColors.slate100,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isCompleted
-                  ? LummyColors.emerald500.withValues(alpha: 0.3)
-                  : Theme.of(context).brightness == Brightness.dark
-                      ? LummyColors.slate600
-                      : LummyColors.slate200,
-              width: 1,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              emoji,
-              style: TextStyle(fontSize: isSmallScreen ? 20 : 24),
-            ),
+          backgroundColor: LummyColors.emerald500,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: LummyFonts.body(
-                  fontSize: isSmallScreen ? 14 : 16,
-                  fontWeight: FontWeight.w600,
-                  color: isCompleted
-                      ? Theme.of(context).textTheme.titleMedium?.color
-                      : Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                description,
-                style: LummyFonts.body(
-                  fontSize: isSmallScreen ? 12 : 14,
-                  fontWeight: FontWeight.w400,
-                  color: Theme.of(context).textTheme.bodySmall?.color,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        if (isCompleted)
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(
-              color: LummyColors.emerald500,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.check, color: Colors.white, size: 16),
-          ),
-      ],
-    );
+      );
+    }
   }
-}
 
-class EducationalTip {
-  final String category;
-  final String content;
-  final String emoji;
-
-  EducationalTip(this.category, this.content, this.emoji);
+  String get _claimShareSubtitle => _isClaimContextLoading
+      ? 'Carregando distribuição...'
+      : (!_hasRealSiblings
+            ? 'Inativo: sem irmãos cadastrados'
+            : (_alreadyClaimedCurrentDistribution
+                  ? 'Você já retirou nesta distribuição'
+                  : (_activeDistributionId == null
+                        ? 'Sem distribuição ativa'
+                        : 'Resgate sua parte do valor do responsável')));
 }

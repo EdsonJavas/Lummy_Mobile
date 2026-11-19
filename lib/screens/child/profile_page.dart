@@ -7,13 +7,17 @@ import 'package:lummy/screens/auth/login_screen.dart';
 import 'package:lummy/core/providers/theme_provider.dart';
 import 'package:lummy/screens/child/edit_profile_screen.dart';
 import 'package:lummy/screens/child/notifications_screen.dart';
-import 'package:lummy/shared/widgets/cached_image.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/application/app_facade.dart';
 import 'package:lummy/di/locator.dart';
 import 'package:lummy/domain/repositories/auth_repository.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/child/widgets/profile/profile_achievements_section.dart';
+import 'package:lummy/screens/child/widgets/profile/profile_header.dart';
+import 'package:lummy/screens/child/widgets/profile/profile_settings_section.dart';
+import 'package:lummy/screens/child/widgets/profile/profile_skeleton_loader.dart';
+import 'package:lummy/screens/child/widgets/profile/profile_stats_section.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -234,7 +238,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     if (_isLoadingStats) {
-      return Scaffold(body: _buildSkeletonLoader(screenWidth, screenHeight));
+      return Scaffold(body: ProfileSkeletonLoader(screenHeight: screenHeight));
     }
 
     return Scaffold(
@@ -248,7 +252,16 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.only(bottom: 0.0),
             child: Column(
               children: [
-                _buildProfileHeader(screenWidth, screenHeight),
+                ProfileHeader(
+                  screenWidth: screenWidth,
+                  screenHeight: screenHeight,
+                  isLoadingStats: _isLoadingStats,
+                  userLevel: userLevel,
+                  totalPoints: totalPoints,
+                  userName: userName,
+                  userRole: userRole,
+                  onBack: () => Navigator.pop(context),
+                ),
                 Transform(
                   transform: Matrix4.translationValues(0, -40, 0),
                   child: Container(
@@ -277,11 +290,22 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildStatsSection(),
+                          ProfileStatsSection(
+                            completedGoals: completedGoals,
+                            totalSaved: totalSaved,
+                          ),
                           const Gap(20),
-                          _buildAchievementsSection(),
+                          ProfileAchievementsSection(
+                            isLoadingStats: _isLoadingStats,
+                            achievements: achievements,
+                          ),
                           const Gap(20),
-                          _buildSettingsSection(),
+                          ProfileSettingsSection(
+                            onEditProfileTap: _onEditProfileTap,
+                            onNotificationsTap: _onNotificationsTap,
+                            onHelpTap: _onHelpTap,
+                            onLogoutTap: _onLogoutTap,
+                          ),
                           const Gap(8),
                         ],
                       ),
@@ -296,1051 +320,113 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSkeletonLoader(double screenWidth, double screenHeight) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Header skeleton
-          Container(
-            height: screenHeight * 0.60,
-            width: double.infinity,
-            decoration: BoxDecoration(color: Colors.grey[300]),
-          ),
-          Transform(
-            transform: Matrix4.translationValues(0, -40, 0),
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20.0, 50.0, 20.0, 0.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Stats skeleton
-                    const SkeletonText(width: 150, height: 24),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: SkeletonLoader(
-                            width: double.infinity,
-                            height: 140,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: SkeletonLoader(
-                            width: double.infinity,
-                            height: 140,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    // Achievements skeleton
-                    const SkeletonText(width: 150, height: 24),
-                    const SizedBox(height: 16),
-                    SkeletonLoader(
-                      width: double.infinity,
-                      height: 200,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    const SizedBox(height: 20),
-                    // Settings skeleton
-                    const SkeletonText(width: 120, height: 24),
-                    const SizedBox(height: 16),
-                    ...List.generate(
-                      4,
-                      (index) => Padding(
-                        padding: EdgeInsets.only(bottom: index == 3 ? 0 : 12),
-                        child: SkeletonLoader(
-                          width: double.infinity,
-                          height: 70,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+  Future<void> _onEditProfileTap() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EditProfileScreen(),
+      ),
+    );
+    // Se houve atualização, recarregar o nome
+    if (result == true) {
+      _loadUserName();
+    }
+  }
+
+  void _onNotificationsTap() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificationsScreen(),
       ),
     );
   }
 
-  Widget _buildProfileHeader(double screenWidth, double screenHeight) {
-    return SizedBox(
-      height: screenHeight * 0.60,
-      width: double.infinity,
-      child: Stack(
-        children: [
-          SizedBox(
-            height: screenHeight * 0.60,
-            width: double.infinity,
-            child: Consumer<ThemeProvider>(
-              builder: (context, themeProvider, _) {
-                return Container(
-                  decoration: BoxDecoration(
-                    image: themeProvider.isDarkMode
-                        ? const DecorationImage(
-                            image: AssetImage('dark.png'),
-                            fit: BoxFit.cover,
-                            opacity: 0.8,
-                          )
-                        : null,
-                  ),
-                  child: themeProvider.isDarkMode
-                      ? Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withValues(alpha: 0.6),
-                                Colors.black.withValues(alpha: 0.8),
-                              ],
-                              stops: const [0.0, 0.7, 1.0],
-                            ),
-                          ),
-                        )
-                      : CachedImage(
-                          imageUrl:
-                              'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/fotocriancafodase%201-MFp8K8GLj7deZeGCFVqMJVDVgEtfsc.png',
-                          width: double.infinity,
-                          height: screenHeight * 0.60,
-                          fit: BoxFit.cover,
-                          errorWidget: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.topCenter,
-                                colors: [LummyColors.skyWeb, LummyColors.materialGreen],
-                              ),
-                            ),
-                          ),
-                        ),
-                );
-              },
-            ),
-          ),
-          Positioned(
-            top: 50,
-            left: 20,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 55,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Text(
-                'Seu Perfil',
-                style: LummyFonts.body(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.12,
-            left: screenWidth / 2 - 60,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.primary,
-                  width: 4,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: CachedAvatar(
-                imageUrl:
-                    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png',
-                size: 120,
-                borderColor: Colors.white,
-                borderWidth: 4,
-                fallbackIcon: Icons.person_rounded,
-                fallbackIconColor: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.27,
-            left: screenWidth / 2 - 80,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: LummyColors.brandOrange,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: _isLoadingStats
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            userLevel.toString(),
-                            style: LummyFonts.body(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.star,
-                          color: LummyColors.brandOrange,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        _isLoadingStats
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                totalPoints.toString(),
-                                style: LummyFonts.body(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ],
-                    ),
-                    Text(
-                      'PONTOS TOTAIS',
-                      style: LummyFonts.body(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.36,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                Text(
-                  userName,
-                  style: LummyFonts.body(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    userRole,
-                    style: LummyFonts.body(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ShaderMask(
-          shaderCallback: (bounds) => LinearGradient(
-            colors: Theme.of(context).brightness == Brightness.dark
-                ? [
-                    LummyColors.emerald500,
-                    LummyColors.violet500,
-                  ] // Verde → Roxo como no site
-                : [LummyColors.slate800, LummyColors.slate800],
-          ).createShader(bounds),
-          child: Text(
-            'Minhas Conquistas',
-            style: LummyFonts.body(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
+  void _onHelpTap() {
+    // TODO: Implementar tela de ajuda
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Tela de ajuda em desenvolvimento 🚧',
+          style: LummyFonts.body(fontWeight: FontWeight.w500),
         ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildStatCard(
-                'Metas Concluídas',
-                completedGoals.toString(),
-                Icons.flag_rounded,
-                LummyColors.violet500,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildStatCard(
-                'Total Economizado',
-                'R\$ ${totalSaved.toStringAsFixed(0)}',
-                Icons.savings_rounded,
-                LummyColors.emerald500,
-              ),
-            ),
-          ],
+        backgroundColor: LummyColors.emerald500,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: LummyFonts.body(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: LummyFonts.body(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildAchievementsSection() {
-    return Container(
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(20),
-        border: Theme.of(context).brightness == Brightness.dark
-            ? Border.all(color: Theme.of(context).dividerColor)
-            : null,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            // Esta é a Row que estava causando o overflow
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                // Adicionado Expanded aqui
-                child: ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: Theme.of(context).brightness == Brightness.dark
-                        ? [
-                            LummyColors.brandOrange,
-                            LummyColors.red500,
-                          ] // Laranja → Vermelho como no site
-                        : [LummyColors.slate800, LummyColors.slate800],
-                  ).createShader(bounds),
-                  child: Text(
-                    'Medalhas Conquistadas',
-                    style: LummyFonts.body(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                    overflow: TextOverflow
-                        .ellipsis, // Adicionado para evitar overflow de texto
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [LummyColors.brandOrange, LummyColors.brandOrangeMid],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: LummyColors.brandOrange.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Builder(
-                  builder: (context) {
-                    final completedCount = achievements
-                        .where((a) => a['is_completed'] == true)
-                        .length;
-                    final totalCount = achievements.isNotEmpty
-                        ? achievements.length
-                        : 5; // Default 5 se não houver conquistas
-                    final uncompletedCount = totalCount - completedCount;
-
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Medalhas conquistadas
-                        ...List.generate(
-                          completedCount > 5 ? 5 : completedCount,
-                          (index) => Container(
-                            width: 8,
-                            height: 8,
-                            margin: const EdgeInsets.only(right: 3),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.white.withValues(alpha: 0.5),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        if (completedCount > 0 && uncompletedCount > 0) ...[
-                          const SizedBox(width: 6),
-                          // Separador
-                          Container(
-                            width: 1,
-                            height: 12,
-                            color: Colors.white.withValues(alpha: 0.5),
-                          ),
-                          const SizedBox(width: 6),
-                        ],
-
-                        // Medalhas não conquistadas
-                        ...List.generate(
-                          uncompletedCount > 5 ? 5 : uncompletedCount,
-                          (index) => Container(
-                            width: 6,
-                            height: 6,
-                            margin: const EdgeInsets.only(right: 3),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(width: 8),
-
-                        Text(
-                          '$completedCount/$totalCount',
-                          style: LummyFonts.body(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _isLoadingStats
-              ? const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : achievements.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.emoji_events_outlined,
-                          size: 48,
-                          color: Theme.of(
-                            context,
-                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Nenhuma conquista ainda',
-                          style: LummyFonts.body(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.color,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Complete missões para desbloquear conquistas!',
-                          style: LummyFonts.body(
-                            fontSize: 14,
-                            color: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: achievements.map((achievement) {
-                      final title = achievement['title'] ?? 'Conquista';
-                      final emoji = achievement['emoji'] ?? '🏆';
-                      final isCompleted = achievement['is_completed'] == true;
-
-                      // Quebrar título em 2 linhas se necessário
-                      final titleParts = title.split(' ');
-                      String displayTitle;
-                      if (titleParts.length > 1) {
-                        final mid = (titleParts.length / 2).ceil();
-                        displayTitle =
-                            '${titleParts.sublist(0, mid).join(' ')}\n${titleParts.sublist(mid).join(' ')}';
-                      } else {
-                        displayTitle = title;
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: _buildBadge(emoji, displayTitle, isCompleted),
-                      );
-                    }).toList(),
-                  ),
-                ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBadge(String emoji, String label, bool isUnlocked) {
-    return Column(
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: isUnlocked
-                ? LummyColors.brandOrange.withValues(alpha: 0.1)
-                : Theme.of(context).brightness == Brightness.dark
-                ? Theme.of(context).colorScheme.surfaceContainerHighest
-                : LummyColors.slate100,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isUnlocked
-                  ? LummyColors.brandOrange.withValues(alpha: 0.3)
-                  : Theme.of(context).dividerColor,
-              width: 2,
-            ),
-          ),
-          child: Center(
+  Future<void> _onLogoutTap() async {
+    // Mostrar diálogo de confirmação
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Sair da conta?',
+          style: LummyFonts.body(fontWeight: FontWeight.w600),
+        ),
+        content: Text(
+          'Tem certeza que deseja sair? Você precisará fazer login novamente.',
+          style: LummyFonts.body(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              emoji,
-              style: const TextStyle(
-                fontSize: 24,
-                // opacity: isUnlocked ? 1.0 : 0.5,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: LummyFonts.body(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: isUnlocked
-                ? Theme.of(context).textTheme.titleMedium?.color
-                : Theme.of(context).textTheme.bodyMedium?.color,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSettingsSection() {
-    return Container(
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(20),
-        border: Theme.of(context).brightness == Brightness.dark
-            ? Border.all(color: Theme.of(context).dividerColor)
-            : null,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ShaderMask(
-            shaderCallback: (bounds) => LinearGradient(
-              colors: Theme.of(context).brightness == Brightness.dark
-                  ? [
-                      LummyColors.blue500,
-                      LummyColors.emerald500,
-                    ] // Azul → Verde como no site
-                  : [LummyColors.slate800, LummyColors.slate800],
-            ).createShader(bounds),
-            child: Text(
-              'Configurações',
+              'Cancelar',
               style: LummyFonts.body(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: Theme.of(context).textTheme.bodyMedium?.color,
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          _buildSettingItem(
-            Icons.edit_rounded,
-            'Editar Perfil',
-            'Altere suas informações pessoais',
-            LummyColors.blue800,
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const EditProfileScreen(),
-                ),
-              );
-              // Se houve atualização, recarregar o nome
-              if (result == true) {
-                _loadUserName();
-              }
-            },
-          ),
-          _buildSettingItem(
-            Icons.notifications_rounded,
-            'Notificações',
-            'Gerencie suas notificações',
-            LummyColors.violet500,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationsScreen(),
-                ),
-              );
-            },
-          ),
-          _buildPremiumThemeSettingItem(),
-          _buildSettingItem(
-            Icons.help_rounded,
-            'Ajuda',
-            'Tire suas dúvidas',
-            LummyColors.emerald500,
-            onTap: () {
-              // TODO: Implementar tela de ajuda
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Tela de ajuda em desenvolvimento 🚧',
-                    style: LummyFonts.body(fontWeight: FontWeight.w500),
-                  ),
-                  backgroundColor: LummyColors.emerald500,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            },
-          ),
-          _buildSettingItem(
-            Icons.logout_rounded,
-            'Sair',
-            'Desconectar da conta',
-            LummyColors.red500,
-            onTap: () async {
-              // Mostrar diálogo de confirmação
-              final shouldLogout = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(
-                    'Sair da conta?',
-                    style: LummyFonts.body(fontWeight: FontWeight.w600),
-                  ),
-                  content: Text(
-                    'Tem certeza que deseja sair? Você precisará fazer login novamente.',
-                    style: LummyFonts.body(),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: Text(
-                        'Cancelar',
-                        style: LummyFonts.body(
-                          color: Theme.of(context).textTheme.bodyMedium?.color,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: Text(
-                        'Sair',
-                        style: LummyFonts.body(
-                          color: LummyColors.red500,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-
-              if (shouldLogout == true) {
-                try {
-                  final authRepo = locator<AuthRepository>();
-                  await authRepo.logout();
-                  await locator<BiometricAuthService>().clearCachedUser();
-
-
-                  // Navegar para tela de login
-                  if (!mounted) return;
-                  context.read<ThemeProvider>().setPreLoginLightOnly(true);
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    (route) => false,
-                  );
-                } catch (e) {
-                  appLog('❌ Erro ao fazer logout: $e');
-                  if (!mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Erro ao fazer logout: $e',
-                        style: LummyFonts.body(),
-                      ),
-                      backgroundColor: LummyColors.red500,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              'Sair',
+              style: LummyFonts.body(
+                color: LummyColors.red500,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
     );
-  }
 
-  Widget _buildSettingItem(
-    IconData icon,
-    String title,
-    String subtitle,
-    Color color, {
-    VoidCallback? onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 20),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: LummyFonts.body(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).textTheme.titleMedium?.color,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: LummyFonts.body(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Theme.of(context).textTheme.bodyMedium?.color,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-                size: 20,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+    if (shouldLogout == true) {
+      try {
+        final authRepo = locator<AuthRepository>();
+        await authRepo.logout();
+        await locator<BiometricAuthService>().clearCachedUser();
 
-  Widget _buildPremiumThemeSettingItem() {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, _) {
-        final isDark = themeProvider.isDarkMode;
 
-        return Container(
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? [
-                      LummyColors.violet500, // Roxo
-                      LummyColors.violet600, // Roxo mais escuro
-                    ]
-                  : [
-                      LummyColors.blue500, // Azul vibrante
-                      LummyColors.violet500, // Roxo vibrante
-                    ],
+        // Navegar para tela de login
+        if (!mounted) return;
+        context.read<ThemeProvider>().setPreLoginLightOnly(true);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
+        );
+      } catch (e) {
+        appLog('❌ Erro ao fazer logout: $e');
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro ao fazer logout: $e',
+              style: LummyFonts.body(),
             ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color:
-                    (isDark ? LummyColors.violet500 : LummyColors.blue500)
-                        .withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Tema do App',
-                      style: LummyFonts.body(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      isDark ? 'Modo escuro' : 'Modo claro',
-                      style: LummyFonts.body(
-                        fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.8),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: isDark,
-                onChanged: (_) => themeProvider.toggleTheme(),
-                activeThumbColor: Colors.white,
-                activeTrackColor: Colors.white.withValues(alpha: 0.3),
-                inactiveThumbColor: Colors.white,
-                inactiveTrackColor: Colors.white.withValues(alpha: 0.3),
-              ),
-            ],
+            backgroundColor: LummyColors.red500,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         );
-      },
-    );
+      }
+    }
   }
 }
