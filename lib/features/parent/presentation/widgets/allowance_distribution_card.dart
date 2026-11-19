@@ -245,7 +245,6 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                           );
                           if (!auth || !mounted) return;
                           setState(() => _isProcessing = true);
-                          final ctx = context;
                           final ok =
                               await widget.onDistributeEqually(amount);
                           if (!mounted) return;
@@ -253,14 +252,15 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
                             _isProcessing = false;
                             if (ok) _amountController.clear();
                           });
+                          if (!context.mounted) return;
                           if (ok) {
                             LummyFeedback.success(
-                              ctx,
+                              context,
                               'Distribuição realizada com sucesso!',
                             );
                           } else {
                             LummyFeedback.error(
-                              ctx,
+                              context,
                               'Erro ao distribuir. Tente novamente.',
                             );
                           }
@@ -686,12 +686,11 @@ class _AllowanceDistributionCardState extends State<AllowanceDistributionCard> {
       },
     );
 
-    if (!mounted) return;
-    final ctx = context;
+    if (!context.mounted) return;
     if (result == true) {
-      LummyFeedback.success(ctx, 'Depósito realizado com sucesso!');
+      LummyFeedback.success(context, 'Depósito realizado com sucesso!');
     } else if (result == false) {
-      LummyFeedback.error(ctx, 'Erro ao depositar. Tente novamente.');
+      LummyFeedback.error(context, 'Erro ao depositar. Tente novamente.');
     }
   }
 

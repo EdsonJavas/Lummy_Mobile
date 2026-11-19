@@ -2007,6 +2007,7 @@ class _HomePageState extends State<HomePage> {
                           final claimedAmount =
                               ((result['amount'] ?? 0.0) as double);
                           await _refreshData();
+                          if (!mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(

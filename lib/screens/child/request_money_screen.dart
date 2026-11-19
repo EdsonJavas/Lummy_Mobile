@@ -618,7 +618,14 @@ class _RequestMoneyScreenState extends State<RequestMoneyScreen>
                 version: QrVersions.auto,
                 size: isSmallScreen ? 200.0 : 240.0,
                 backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF1E293B),
+                eyeStyle: const QrEyeStyle(
+                  eyeShape: QrEyeShape.square,
+                  color: Color(0xFF1E293B),
+                ),
+                dataModuleStyle: const QrDataModuleStyle(
+                  dataModuleShape: QrDataModuleShape.square,
+                  color: Color(0xFF1E293B),
+                ),
                 errorCorrectionLevel: QrErrorCorrectLevel.M,
               ),
             ),

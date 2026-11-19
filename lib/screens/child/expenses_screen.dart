@@ -505,7 +505,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             final ok = await _saveTransactionToDatabase(result);
             if (!mounted) return;
             await _loadData();
-            if (!ok && mounted) {
+            if (!ok && context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
