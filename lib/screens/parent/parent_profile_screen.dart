@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy/core/constants/app_constants.dart';
 import 'package:lummy/shared/widgets/widgets.dart';
 import 'package:lummy/screens/auth/register_children_screen.dart';
 import 'package:lummy/models/responsavel_model.dart';
@@ -9,6 +8,12 @@ import 'package:lummy/screens/parent/parent_edit_profile_screen.dart';
 import 'package:lummy/screens/parent/parent_change_password_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/parent/widgets/profile/parent_profile_account_info_card.dart';
+import 'package:lummy/screens/parent/widgets/profile/parent_profile_add_child_card.dart';
+import 'package:lummy/screens/parent/widgets/profile/parent_profile_current_plan_card.dart';
+import 'package:lummy/screens/parent/widgets/profile/parent_profile_header.dart';
+import 'package:lummy/screens/parent/widgets/profile/parent_profile_quick_actions.dart';
+import 'package:lummy/screens/parent/widgets/profile/parent_profile_stats_grid.dart';
 
 class ParentProfileScreen extends StatefulWidget {
   const ParentProfileScreen({super.key});
@@ -27,16 +32,9 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
   DateTime? createdAt;
   bool _isLoadingStats = true;
 
-  // URL do avatar padrão (fallback quando não há foto)
-  static const _avatarUrlDefault =
-      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Lum%202-0CkW5uvZjaDxIjCSextrqE198N99r7.png';
-
   // Paleta de cores vibrantes
-  static const _blue = LummyColors.blue500;
   static const _purple = LummyColors.violet500;
-  static const _green = LummyColors.emerald500;
   static const _orange = LummyColors.amber500;
-  static const _pink = LummyColors.pink500;
 
   @override
   void initState() {
@@ -157,9 +155,6 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
       );
     }
 
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: isDark
           ? LummyColors.darkMaterial
@@ -172,850 +167,54 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
           child: Column(
             children: [
               // Header visual estilo versão infantil
-              _buildVisualHeader(context, isDark, screenHeight, screenWidth),
+              ParentProfileHeader(
+                isDark: isDark,
+                userName: userName,
+                userEmail: userEmail,
+                avatarUrl: _avatarUrl,
+                childrenCount: childrenCount,
+                totalChildrenBalance: totalChildrenBalance,
+                createdAt: createdAt,
+                onBack: () => Navigator.pop(context),
+              ),
               // Conteúdo principal
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 child: Column(
                   children: [
-                    _buildStatsGrid(isDark),
+                    ParentProfileStatsGrid(
+                      isDark: isDark,
+                      childrenCount: childrenCount,
+                      totalChildrenBalance: totalChildrenBalance,
+                    ),
                     const SizedBox(height: 16),
-                    _buildCurrentPlanCard(isDark),
+                    ParentProfileCurrentPlanCard(
+                      isDark: isDark,
+                      onTap: _openSubscription,
+                    ),
                     const SizedBox(height: 16),
-                    _buildAddChildCard(isDark),
+                    ParentProfileAddChildCard(
+                      onTap: _navigateToRegisterChild,
+                    ),
                     const SizedBox(height: 16),
-                    _buildQuickActions(isDark),
+                    ParentProfileQuickActions(
+                      isDark: isDark,
+                      onEditProfile: _openEditProfile,
+                      onChangePassword: _openChangePassword,
+                    ),
                     const SizedBox(height: 16),
-                    _buildAccountInfoCard(isDark),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVisualHeader(
-    BuildContext context,
-    bool isDark,
-    double screenHeight,
-    double screenWidth,
-  ) {
-    final topPadding = MediaQuery.of(context).padding.top;
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? const [LummyColors.indigo950, LummyColors.indigo900, LummyColors.violet900]
-              : const [LummyColors.violet600, LummyColors.violet500, LummyColors.violet400],
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-      ),
-      child: Stack(
-        children: [
-          // Círculos decorativos (menores)
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.08),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            left: -20,
-            child: Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.05),
-              ),
-            ),
-          ),
-
-          // Conteúdo compacto
-          Padding(
-            padding: EdgeInsets.fromLTRB(20, topPadding + 8, 20, 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Barra superior
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                    const Expanded(child: SizedBox()),
-                    Text(
-                      'Meu Perfil',
-                      style: LummyFonts.body(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const Expanded(child: SizedBox()),
-                    const SizedBox(width: 40),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Avatar + Info em Row
-                Row(
-                  children: [
-                    // Avatar compacto
-                    Stack(
-                      children: [
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: SweepGradient(
-                              colors: [_purple, _blue, _pink, _orange, _purple],
-                            ),
-                          ),
-                        ),
-                        Positioned.fill(
-                          child: Padding(
-                            padding: const EdgeInsets.all(3),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3,
-                                ),
-                              ),
-                              child: ClipOval(
-                                child: CachedAvatar(
-                                  imageUrl: _avatarUrl ?? _avatarUrlDefault,
-                                  size: 74,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: _green,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.check_rounded,
-                              color: Colors.white,
-                              size: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 16),
-
-                    // Info do usuário
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              userName,
-                              style: LummyFonts.body(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.email_rounded,
-                                size: 14,
-                                color: Colors.white.withValues(alpha: 0.8),
-                              ),
-                              const SizedBox(width: 6),
-                              Flexible(
-                                child: Text(
-                                  userEmail,
-                                  style: LummyFonts.body(
-                                    fontSize: 13,
-                                    color: Colors.white.withValues(alpha: 0.85),
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          // Badge inline
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.shield_rounded,
-                                  color: Colors.white,
-                                  size: 12,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Responsável',
-                                  style: LummyFonts.body(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Stats compactos
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildCompactStat(
-                        value: childrenCount.toString(),
-                        label: childrenCount == 1 ? 'Filho' : 'Filhos',
-                        icon: Icons.child_care_rounded,
-                      ),
-                      Container(
-                        width: 1,
-                        height: 30,
-                        color: Colors.white.withValues(alpha: 0.3),
-                      ),
-                      _buildCompactStat(
-                        value: 'R\$${totalChildrenBalance.toStringAsFixed(0)}',
-                        label: 'Saldo Total',
-                        icon: Icons.account_balance_wallet_rounded,
-                      ),
-                      Container(
-                        width: 1,
-                        height: 30,
-                        color: Colors.white.withValues(alpha: 0.3),
-                      ),
-                      _buildCompactStat(
-                        value: _getMemberSinceShort(),
-                        label: 'Membro',
-                        icon: Icons.access_time_rounded,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getMemberSinceShort() {
-    if (createdAt == null) return '—';
-    final months = DateTime.now().difference(createdAt!).inDays ~/ 30;
-    if (months < 1) return '<1m';
-    return '${months}m';
-  }
-
-  Widget _buildCompactStat({
-    required String value,
-    required String label,
-    required IconData icon,
-  }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 18),
-        const SizedBox(height: 4),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            value,
-            style: LummyFonts.body(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        Text(
-          label,
-          style: LummyFonts.body(
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            color: Colors.white.withValues(alpha: 0.8),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatsGrid(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? LummyColors.darkMaterial : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.06),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [_purple, _blue]),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.insights_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Resumo da Família',
-                style: LummyFonts.body(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : LummyColors.slate800,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _buildMiniStat(
-                  icon: Icons.child_care_rounded,
-                  value: childrenCount.toString(),
-                  label: childrenCount == 1 ? 'Filho' : 'Filhos',
-                  color: _orange,
-                  isDark: isDark,
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 50,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.black.withValues(alpha: 0.08),
-              ),
-              Expanded(
-                child: _buildMiniStat(
-                  icon: Icons.account_balance_wallet_rounded,
-                  value:
-                      'R\$${totalChildrenBalance.toStringAsFixed(2).replaceAll('.', ',')}',
-                  label: 'Saldo Total',
-                  color: _green,
-                  isDark: isDark,
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 50,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.1)
-                    : Colors.black.withValues(alpha: 0.08),
-              ),
-              Expanded(
-                child: _buildMiniStat(
-                  icon: Icons.verified_user_rounded,
-                  value: '100%',
-                  label: 'Segurança',
-                  color: _purple,
-                  isDark: isDark,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMiniStat({
-    required IconData icon,
-    required String value,
-    required String label,
-    required Color color,
-    required bool isDark,
-  }) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            value,
-            style: LummyFonts.body(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : LummyColors.slate800,
-            ),
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: LummyFonts.body(
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-            color: isDark ? LummyColors.slate400 : LummyColors.slate500,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAddChildCard(bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _navigateToRegisterChild(),
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [_purple, LummyColors.violet600],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: _purple.withValues(alpha: 0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(
-                  Icons.person_add_rounded,
-                  color: Colors.white,
-                  size: 26,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Adicionar Filho',
-                      style: LummyFonts.body(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Cadastre um novo dependente',
-                      style: LummyFonts.body(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white.withValues(alpha: 0.85),
-                      ),
+                    ParentProfileAccountInfoCard(
+                      isDark: isDark,
+                      userEmail: userEmail,
+                      createdAt: createdAt,
                     ),
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.arrow_forward_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildQuickActions(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [_blue.withValues(alpha: 0.15), _purple.withValues(alpha: 0.1)]
-              : [_blue.withValues(alpha: 0.08), _purple.withValues(alpha: 0.05)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _blue.withValues(alpha: isDark ? 0.2 : 0.15)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: _blue.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.bolt_rounded, color: _blue, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Ações Rápidas',
-                style: LummyFonts.body(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : LummyColors.slate800,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildQuickActionButton(
-                  icon: Icons.edit_rounded,
-                  label: 'Editar Perfil',
-                  color: _orange,
-                  isDark: isDark,
-                  onTap: () => _openEditProfile(),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildQuickActionButton(
-                  icon: Icons.lock_rounded,
-                  label: 'Segurança',
-                  color: _green,
-                  isDark: isDark,
-                  onTap: () => _openChangePassword(),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required bool isDark,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-          decoration: BoxDecoration(
-            color: isDark ? LummyColors.darkMaterial : Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: color.withValues(alpha: isDark ? 0.3 : 0.2)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: color, size: 18),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: LummyFonts.body(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : LummyColors.slate800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCurrentPlanCard(bool isDark) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ParentSubscriptionScreen(),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? [_orange.withValues(alpha: 0.2), _pink.withValues(alpha: 0.12)]
-                  : [_orange.withValues(alpha: 0.12), _pink.withValues(alpha: 0.06)],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: _orange.withValues(alpha: isDark ? 0.35 : 0.25),
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: _orange.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(
-                  Icons.card_membership_rounded,
-                  color: _orange,
-                  size: 26,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Plano atual',
-                      style: LummyFonts.body(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? LummyColors.slate400
-                            : LummyColors.slate500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Lummy For You',
-                      style: LummyFonts.body(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : LummyColors.slate800,
-                      ),
-                    ),
-                    Text(
-                      'Até ${AppConstants.lummyForYouMaxChildren} filhos · proporcional',
-                      style: LummyFonts.body(
-                        fontSize: 12,
-                        color: isDark
-                            ? LummyColors.slate400
-                            : LummyColors.slate500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 16,
-                color: isDark
-                    ? LummyColors.slate400
-                    : LummyColors.slate500,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAccountInfoCard(bool isDark) {
-    final memberSince = createdAt != null
-        ? '${createdAt!.day.toString().padLeft(2, '0')}/${createdAt!.month.toString().padLeft(2, '0')}/${createdAt!.year}'
-        : '—';
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? LummyColors.darkMaterial : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: _green.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.person_rounded, color: _green, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Sua conta',
-                style: LummyFonts.body(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : LummyColors.slate800,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildInfoRow(
-            Icons.email_outlined,
-            'E-mail',
-            userEmail.isNotEmpty ? userEmail : '—',
-            isDark,
-          ),
-          const SizedBox(height: 12),
-          _buildInfoRow(
-            Icons.calendar_today_rounded,
-            'Membro desde',
-            memberSince,
-            isDark,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(
-    IconData icon,
-    String label,
-    String value,
-    bool isDark,
-  ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18, color: isDark ? LummyColors.slate500 : LummyColors.slate400),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: LummyFonts.body(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? LummyColors.slate400 : LummyColors.slate500,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: LummyFonts.body(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : LummyColors.slate800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -1024,6 +223,15 @@ class _ParentProfileScreenState extends State<ParentProfileScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => const ParentChangePasswordScreen(),
+      ),
+    );
+  }
+
+  void _openSubscription() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ParentSubscriptionScreen(),
       ),
     );
   }

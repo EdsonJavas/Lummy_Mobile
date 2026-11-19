@@ -1,7 +1,5 @@
 // register_screen.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lummy/core/theme/app_theme.dart';
 import 'package:lummy/di/locator.dart';
 import 'package:lummy/domain/repositories/auth_repository.dart';
@@ -9,6 +7,14 @@ import 'package:lummy/services/family_service.dart';
 import 'package:lummy/screens/auth/register_children_screen.dart';
 import 'package:lummy/models/responsavel_model.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/auth/widgets/register/register_email_field.dart';
+import 'package:lummy/screens/auth/widgets/register/register_hero_illustration.dart';
+import 'package:lummy/screens/auth/widgets/register/register_login_link.dart';
+import 'package:lummy/screens/auth/widgets/register/register_logo.dart';
+import 'package:lummy/screens/auth/widgets/register/register_name_cpf_fields.dart';
+import 'package:lummy/screens/auth/widgets/register/register_password_fields.dart';
+import 'package:lummy/screens/auth/widgets/register/register_submit_button.dart';
+import 'package:lummy/screens/auth/widgets/register/register_title.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -274,6 +280,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isVerySmallScreen = screenHeight < 650;
     final isSmallScreen = screenHeight < 700;
 
+    // Theme from ABOVE the light override below; the extracted sections
+    // receive it so they keep reading the same values as before.
+    final theme = Theme.of(context);
+
     // Tela de cadastro sempre em tema claro (não aplica dark mode)
     return Theme(
       data: AppTheme.lightTheme,
@@ -300,63 +310,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
 
               // Logo no topo - SUBIDO (menos padding)
-              SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 24.0,
-                    top: isVerySmallScreen ? 10 : 20,
-                  ),
-                  child: Row(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Lu',
-                              style: LummyFonts.logo(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'm',
-                              style: LummyFonts.logo(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.orange,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'm',
-                              style: LummyFonts.logo(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color: LummyColors.brandNavy,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'y',
-                              style: LummyFonts.logo(
-                                fontSize: isVerySmallScreen ? 28 : 32,
-                                fontWeight: FontWeight.w400,
-                                color:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              RegisterLogo(
+                theme: theme,
+                isVerySmallScreen: isVerySmallScreen,
               ),
 
               // Astronauta - mesmo tamanho da tela de login
@@ -366,35 +322,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     : screenHeight * 0.10,
                 left: screenWidth * 0.15,
                 right: screenWidth * 0.05,
-                child: Center(
-                  child: SvgPicture.network(
-                    'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/astronauta-lummy-OXK8DpNpgdSxKxNZKtIyQynALBlh6n.svg',
-                    height: isVerySmallScreen
-                        ? 250
-                        : (isSmallScreen ? 300 : 380),
-                    fit: BoxFit.contain,
-                    placeholderBuilder: (context) => Container(
-                      height: isVerySmallScreen
-                          ? 250
-                          : (isSmallScreen ? 300 : 380),
-                      width: isVerySmallScreen
-                          ? 250
-                          : (isSmallScreen ? 300 : 380),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(
-                          isVerySmallScreen ? 125 : (isSmallScreen ? 150 : 190),
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.person,
-                        size: isVerySmallScreen
-                            ? 100
-                            : (isSmallScreen ? 120 : 180),
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                child: RegisterHeroIllustration(
+                  isVerySmallScreen: isVerySmallScreen,
+                  isSmallScreen: isSmallScreen,
                 ),
               ),
 
@@ -449,35 +379,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
 
                             // Título "Crie sua conta" - responsivo
-                            ShaderMask(
-                              shaderCallback: (bounds) => LinearGradient(
-                                colors:
-                                    Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? [
-                                        LummyColors.blue500,
-                                        LummyColors.violet500,
-                                      ] // Azul → Roxo como no site
-                                    : [
-                                        Theme.of(
-                                              context,
-                                            ).textTheme.titleLarge?.color ??
-                                            LummyColors.slate800,
-                                        Theme.of(
-                                              context,
-                                            ).textTheme.titleLarge?.color ??
-                                            LummyColors.slate800,
-                                      ],
-                              ).createShader(bounds),
-                              child: Text(
-                                'Crie sua conta de Responsável',
-                                style: LummyFonts.body(
-                                  fontSize: isVerySmallScreen ? 24 : 28,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors
-                                      .white, // This color is masked by the shader
-                                ),
-                              ),
+                            RegisterTitle(
+                              theme: theme,
+                              isVerySmallScreen: isVerySmallScreen,
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 18 : 24),
@@ -488,181 +392,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               children: [
                                 Expanded(
                                   flex: 2,
-                                  child: Focus(
+                                  child: RegisterNameField(
+                                    theme: theme,
+                                    isVerySmallScreen: isVerySmallScreen,
+                                    controller: _nameController,
+                                    focused: _nameFocused,
                                     onFocusChange: (hasFocus) {
                                       setState(() {
                                         _nameFocused = hasFocus;
                                       });
                                     },
-                                    child: TextFormField(
-                                      controller: _nameController,
-                                      keyboardType: TextInputType.name,
-                                      textCapitalization: TextCapitalization.words,
-                                      style: LummyFonts.body(
-                                        fontSize: isVerySmallScreen ? 15 : 17,
-                                        color: Theme.of(context).textTheme.bodyLarge?.color,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Nome do responsável',
-                                        hintStyle: LummyFonts.body(
-                                          color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
-                                          fontSize: isVerySmallScreen ? 15 : 16,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.person_outline,
-                                          color: _nameFocused
-                                              ? Theme.of(context).colorScheme.primary
-                                              : Theme.of(context).iconTheme.color,
-                                          size: isVerySmallScreen ? 22 : 24,
-                                        ),
-                                        filled: true,
-                                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: isVerySmallScreen ? 18 : 22,
-                                          vertical: isVerySmallScreen ? 16 : 20,
-                                        ),
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
-                                            width: 1.2,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.primary,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        errorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.error,
-                                            width: 1.2,
-                                          ),
-                                        ),
-                                        focusedErrorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.error,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        errorStyle: LummyFonts.body(
-                                          fontSize: isVerySmallScreen ? 11 : 12,
-                                        ),
-                                      ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Insira o nome';
-                                        }
-                                        if (value.trim().length < 2) {
-                                          return 'Nome com 2+ caracteres';
-                                        }
-                                        return null;
-                                      },
-                                    ),
                                   ),
                                 ),
                                 SizedBox(width: isVerySmallScreen ? 10 : 14),
                                 Expanded(
-                                  child: Focus(
+                                  child: RegisterCpfField(
+                                    theme: theme,
+                                    isVerySmallScreen: isVerySmallScreen,
+                                    controller: _cpfController,
+                                    focused: _cpfFocused,
                                     onFocusChange: (hasFocus) {
                                       setState(() {
                                         _cpfFocused = hasFocus;
                                       });
                                     },
-                                    child: TextFormField(
-                                      controller: _cpfController,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        LengthLimitingTextInputFormatter(11),
-                                        TextInputFormatter.withFunction((
-                                          oldValue,
-                                          newValue,
-                                        ) {
-                                          final formatted = _formatCPF(newValue.text);
-                                          return TextEditingValue(
-                                            text: formatted,
-                                            selection: TextSelection.collapsed(
-                                              offset: formatted.length,
-                                            ),
-                                          );
-                                        }),
-                                      ],
-                                      style: LummyFonts.body(
-                                        fontSize: isVerySmallScreen ? 15 : 17,
-                                        color: Theme.of(context).textTheme.bodyLarge?.color,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: 'CPF',
-                                        hintStyle: LummyFonts.body(
-                                          color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
-                                          fontSize: isVerySmallScreen ? 15 : 16,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.badge_outlined,
-                                          color: _cpfFocused
-                                              ? Theme.of(context).colorScheme.primary
-                                              : Theme.of(context).iconTheme.color,
-                                          size: isVerySmallScreen ? 22 : 24,
-                                        ),
-                                        filled: true,
-                                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: isVerySmallScreen ? 18 : 22,
-                                          vertical: isVerySmallScreen ? 16 : 20,
-                                        ),
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
-                                            width: 1.2,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.primary,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        errorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.error,
-                                            width: 1.2,
-                                          ),
-                                        ),
-                                        focusedErrorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.error,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        errorStyle: LummyFonts.body(
-                                          fontSize: isVerySmallScreen ? 11 : 12,
-                                        ),
-                                      ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Insira o CPF';
-                                        }
-                                        if (!_isValidCPF(value)) {
-                                          return 'CPF inválido';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                    formatCPF: _formatCPF,
+                                    isValidCPF: _isValidCPF,
                                   ),
                                 ),
                               ],
@@ -671,93 +426,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(height: isVerySmallScreen ? 14 : 18),
 
                             // Campo E-mail do responsável
-                            Focus(
+                            RegisterEmailField(
+                              theme: theme,
+                              isVerySmallScreen: isVerySmallScreen,
+                              controller: _emailController,
+                              focused: _emailFocused,
                               onFocusChange: (hasFocus) {
                                 setState(() {
                                   _emailFocused = hasFocus;
                                 });
                               },
-                              child: TextFormField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                style: LummyFonts.body(
-                                  fontSize: isVerySmallScreen ? 15 : 17,
-                                  color: Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge?.color,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'E-mail do responsável',
-                                  hintStyle: LummyFonts.body(
-                                    color: Theme.of(
-                                      context,
-                                    ).inputDecorationTheme.hintStyle?.color,
-                                    fontSize: isVerySmallScreen ? 15 : 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  prefixIcon: Icon(
-                                    Icons.email_outlined,
-                                    color: _emailFocused
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context).iconTheme.color,
-                                    size: isVerySmallScreen ? 22 : 24,
-                                  ),
-                                  filled: true,
-                                  fillColor: Theme.of(
-                                    context,
-                                  ).inputDecorationTheme.fillColor,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: isVerySmallScreen ? 18 : 22,
-                                    vertical: isVerySmallScreen ? 16 : 20,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
-                                      width: 1.2,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.error,
-                                      width: 1.2,
-                                    ),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.error,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  errorStyle: LummyFonts.body(
-                                    fontSize: isVerySmallScreen ? 11 : 12,
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Por favor, insira o e-mail do responsável';
-                                  }
-                                  if (!RegExp(
-                                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                                  ).hasMatch(value)) {
-                                    return 'Por favor, insira um e-mail válido';
-                                  }
-                                  return null;
-                                },
-                              ),
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 14 : 18),
@@ -767,196 +445,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Expanded(
-                                  child: Focus(
+                                  child: RegisterPasswordField(
+                                    theme: theme,
+                                    isVerySmallScreen: isVerySmallScreen,
+                                    controller: _passwordController,
+                                    focused: _passwordFocused,
+                                    isVisible: _isPasswordVisible,
                                     onFocusChange: (hasFocus) {
                                       setState(() {
                                         _passwordFocused = hasFocus;
                                       });
                                     },
-                                    child: TextFormField(
-                                      controller: _passwordController,
-                                      obscureText: !_isPasswordVisible,
-                                      style: LummyFonts.body(
-                                        fontSize: isVerySmallScreen ? 15 : 17,
-                                        color: Theme.of(context).textTheme.bodyLarge?.color,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Sua Senha',
-                                        hintStyle: LummyFonts.body(
-                                          color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
-                                          fontSize: isVerySmallScreen ? 15 : 16,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.lock_outline,
-                                          color: _passwordFocused
-                                              ? Theme.of(context).colorScheme.primary
-                                              : Theme.of(context).iconTheme.color,
-                                          size: isVerySmallScreen ? 22 : 24,
-                                        ),
-                                        filled: true,
-                                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: isVerySmallScreen ? 18 : 22,
-                                          vertical: isVerySmallScreen ? 16 : 20,
-                                        ),
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
-                                            width: 1.2,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.primary,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        errorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.error,
-                                            width: 1.2,
-                                          ),
-                                        ),
-                                        focusedErrorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.error,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        suffixIcon: IconButton(
-                                          icon: Icon(
-                                            _isPasswordVisible
-                                                ? Icons.visibility_outlined
-                                                : Icons.visibility_off_outlined,
-                                            color: _passwordFocused
-                                                ? Theme.of(context).colorScheme.primary
-                                                : Theme.of(context).iconTheme.color,
-                                            size: isVerySmallScreen ? 22 : 24,
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _isPasswordVisible = !_isPasswordVisible;
-                                            });
-                                          },
-                                        ),
-                                        errorStyle: LummyFonts.body(
-                                          fontSize: isVerySmallScreen ? 11 : 12,
-                                        ),
-                                      ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Insira a senha';
-                                        }
-                                        if (value.length < 6) {
-                                          return 'Mín. 6 caracteres';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                    onToggleVisibility: () {
+                                      setState(() {
+                                        _isPasswordVisible = !_isPasswordVisible;
+                                      });
+                                    },
                                   ),
                                 ),
                                 SizedBox(width: isVerySmallScreen ? 10 : 14),
                                 Expanded(
-                                  child: Focus(
+                                  child: RegisterConfirmPasswordField(
+                                    theme: theme,
+                                    isVerySmallScreen: isVerySmallScreen,
+                                    controller: _confirmPasswordController,
+                                    passwordController: _passwordController,
+                                    focused: _confirmPasswordFocused,
+                                    isVisible: _isConfirmPasswordVisible,
                                     onFocusChange: (hasFocus) {
                                       setState(() {
                                         _confirmPasswordFocused = hasFocus;
                                       });
                                     },
-                                    child: TextFormField(
-                                      controller: _confirmPasswordController,
-                                      obscureText: !_isConfirmPasswordVisible,
-                                      style: LummyFonts.body(
-                                        fontSize: isVerySmallScreen ? 15 : 17,
-                                        color: Theme.of(context).textTheme.bodyLarge?.color,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Confirme a Senha',
-                                        hintStyle: LummyFonts.body(
-                                          color: Theme.of(context).inputDecorationTheme.hintStyle?.color,
-                                          fontSize: isVerySmallScreen ? 15 : 16,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                        prefixIcon: Icon(
-                                          Icons.lock_outline,
-                                          color: _confirmPasswordFocused
-                                              ? Theme.of(context).colorScheme.primary
-                                              : Theme.of(context).iconTheme.color,
-                                          size: isVerySmallScreen ? 22 : 24,
-                                        ),
-                                        filled: true,
-                                        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: isVerySmallScreen ? 18 : 22,
-                                          vertical: isVerySmallScreen ? 16 : 20,
-                                        ),
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).dividerColor.withValues(alpha: 0.8),
-                                            width: 1.2,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.primary,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        errorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.error,
-                                            width: 1.2,
-                                          ),
-                                        ),
-                                        focusedErrorBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                          borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.error,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        suffixIcon: IconButton(
-                                          icon: Icon(
-                                            _isConfirmPasswordVisible
-                                                ? Icons.visibility_outlined
-                                                : Icons.visibility_off_outlined,
-                                            color: _confirmPasswordFocused
-                                                ? Theme.of(context).colorScheme.primary
-                                                : Theme.of(context).iconTheme.color,
-                                            size: isVerySmallScreen ? 22 : 24,
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-                                            });
-                                          },
-                                        ),
-                                        errorStyle: LummyFonts.body(
-                                          fontSize: isVerySmallScreen ? 11 : 12,
-                                        ),
-                                      ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Confirme a senha';
-                                        }
-                                        if (value != _passwordController.text) {
-                                          return 'Senhas não coincidem';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                    onToggleVisibility: () {
+                                      setState(() {
+                                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                      });
+                                    },
                                   ),
                                 ),
                               ],
@@ -965,117 +490,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
 
                             // Botão Avançar com gradiente
-                            Container(
-                              width: double.infinity,
-                              height: isVerySmallScreen ? 50 : 56,
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    LummyColors.brandOrange,
-                                    LummyColors.brandOrangeMid,
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(
-                                  isVerySmallScreen ? 25 : 28,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: LummyColors.brandOrange.withValues(alpha: 0.3),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: ElevatedButton(
-                                onPressed: _isLoading ? null : _handleRegister,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      isVerySmallScreen ? 25 : 28,
-                                    ),
-                                  ),
-                                ),
-                                child: _isLoading
-                                    ? SizedBox(
-                                        height: isVerySmallScreen ? 18 : 20,
-                                        width: isVerySmallScreen ? 18 : 20,
-                                        child: const CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                        ),
-                                      )
-                                    : Text(
-                                        'Avançar',
-                                        style: LummyFonts.body(
-                                          fontSize: isVerySmallScreen ? 16 : 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                              ),
+                            RegisterSubmitButton(
+                              isVerySmallScreen: isVerySmallScreen,
+                              isLoading: _isLoading,
+                              onPressed: _isLoading ? null : _handleRegister,
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 15 : 20),
 
                             // Link para fazer login
-                            Center(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                                child: RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'Já tem uma conta Lummy? ',
-                                        style: LummyFonts.body(
-                                          color: LummyColors.materialGrey,
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'Faça L',
-                                        style: LummyFonts.body(
-                                          color: LummyColors.materialGrey,
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'o',
-                                        style: LummyFonts.body(
-                                          color: Colors.orange,
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'g',
-                                        style: LummyFonts.body(
-                                          color: LummyColors.brandNavy,
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'in',
-                                        style: LummyFonts.body(
-                                          color: LummyColors.materialGrey,
-                                          fontSize: isVerySmallScreen ? 12 : 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                            RegisterLoginLink(
+                              isVerySmallScreen: isVerySmallScreen,
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
                             ),
 
                             SizedBox(height: isVerySmallScreen ? 15 : 20),

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -15,6 +14,11 @@ import 'package:lummy/features/parent/presentation/widgets/parent_dashboard_skel
 import 'package:lummy/screens/parent/parent_qr_payment_screen.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/screens/parent/widgets/distribution/distribution_code_input_sheet.dart';
+import 'package:lummy/screens/parent/widgets/distribution/distribution_empty_state.dart';
+import 'package:lummy/screens/parent/widgets/distribution/distribution_header.dart';
+import 'package:lummy/screens/parent/widgets/distribution/distribution_quick_send_section.dart';
+import 'package:lummy/screens/parent/widgets/distribution/distribution_scan_qr_section.dart';
 
 class ParentDistributionScreen extends StatefulWidget {
   const ParentDistributionScreen({super.key});
@@ -27,7 +31,6 @@ class ParentDistributionScreen extends StatefulWidget {
 class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
   // Paleta de cores - laranja vibrante
   static const _orange = LummyColors.amber500;
-  static const _amber = LummyColors.amber600;
   static const _blue = LummyColors.blue500;
   static const _purple = LummyColors.violet500;
 
@@ -52,68 +55,33 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
               physics: const BouncingScrollPhysics(),
               slivers: [
                 // Header com gradiente
-                SliverToBoxAdapter(child: _buildHeader(context, state, isDark)),
+                SliverToBoxAdapter(
+                  child: DistributionHeader(
+                    isDark: isDark,
+                    walletBalance: state.walletBalance,
+                  ),
+                ),
                 // Conteúdo
                 if (state.children.isEmpty)
                   SliverFillRemaining(
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    _orange.withValues(alpha: 0.15),
-                                    _amber.withValues(alpha: 0.1),
-                                  ],
-                                ),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.send_rounded,
-                                size: 64,
-                                color: _orange,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            Text(
-                              'Sem filhos cadastrados',
-                              style: LummyFonts.body(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? Colors.white
-                                    : LummyColors.slate800,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Cadastre pelo menos um filho para poder enviar dinheiro.',
-                              textAlign: TextAlign.center,
-                              style: LummyFonts.body(
-                                fontSize: 14,
-                                color: isDark
-                                    ? LummyColors.slate400
-                                    : LummyColors.slate500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    child: DistributionEmptyState(isDark: isDark),
                   )
                 else
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        _buildScanQRSection(context, state, isDark),
+                        DistributionScanQrSection(
+                          isDark: isDark,
+                          onScan: () => _openQRScanner(context, state),
+                          onTypeCode: () => _showCodeInputDialog(context, state),
+                        ),
                         const SizedBox(height: 20),
-                        _buildQuickSendSection(context, state, isDark),
+                        DistributionQuickSendSection(
+                          isDark: isDark,
+                          onQuickSend: (amount) =>
+                              _beginQuickSendWithAuth(context, state, amount),
+                        ),
                         const SizedBox(height: 20),
                         AllowanceDistributionCard(
                           availableBalance: state.walletBalance,
@@ -133,315 +101,6 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
             );
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(
-    BuildContext context,
-    ParentDashboardState state,
-    bool isDark,
-  ) {
-    final topPadding = MediaQuery.of(context).padding.top;
-
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, topPadding + 20, 20, 32),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? const [LummyColors.yellow950, LummyColors.amber900, LummyColors.amber800]
-              : const [LummyColors.amber500, LummyColors.amber600, LummyColors.amber700],
-        ),
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: _orange.withValues(alpha: isDark ? 0.2 : 0.3),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.payments_rounded,
-                  color: Colors.white,
-                  size: 26,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Enviar Dinheiro',
-                      style: LummyFonts.body(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      'Distribua recursos para seus filhos',
-                      style: LummyFonts.body(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.white.withValues(alpha: 0.85),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          // Saldo disponível
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
-                width: 1.5,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.account_balance_wallet_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Saldo Disponível para Envio',
-                      style: LummyFonts.body(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    AppFormatters.formatCurrency(state.walletBalance),
-                    style: LummyFonts.body(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: -1,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildScanQRSection(
-    BuildContext context,
-    ParentDashboardState state,
-    bool isDark,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [LummyColors.slate800, LummyColors.indigo900]
-              : [_blue.withValues(alpha: 0.1), _purple.withValues(alpha: 0.1)],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark ? _purple.withValues(alpha: 0.3) : _blue.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [_blue, _purple]),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _blue.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.qr_code_scanner_rounded,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Escanear QR Code',
-                      style: LummyFonts.body(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : LummyColors.slate800,
-                      ),
-                    ),
-                    Text(
-                      'Seu filho pediu dinheiro? Escaneie!',
-                      style: LummyFonts.body(
-                        fontSize: 13,
-                        color: isDark
-                            ? LummyColors.slate400
-                            : LummyColors.slate500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          // Botões de ação
-          Row(
-            children: [
-              Expanded(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => _openQRScanner(context, state),
-                    borderRadius: BorderRadius.circular(14),
-                    child: Container(
-                      height: 54,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [_blue, _purple],
-                        ),
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _blue.withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.qr_code_scanner_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Escanear',
-                            style: LummyFonts.body(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => _showCodeInputDialog(context, state),
-                    borderRadius: BorderRadius.circular(14),
-                    child: Container(
-                      height: 54,
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.1)
-                            : _purple.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: _purple.withValues(alpha: isDark ? 0.3 : 0.3),
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.keyboard_rounded,
-                            color: _purple,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              'Digitar código',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: LummyFonts.body(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: _purple,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -582,184 +241,21 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? const [LummyColors.slate700, LummyColors.slate800]
-                  : const [Colors.white, LummyColors.slate50],
-            ),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(32),
-              topRight: Radius.circular(32),
-            ),
-            border: Border.all(
-              color: isDark
-                  ? LummyColors.slate600
-                  : LummyColors.slate200,
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? LummyColors.slate500 : Colors.black12,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [_blue.withValues(alpha: 0.1), _purple.withValues(alpha: 0.1)],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.keyboard_rounded,
-                  color: _purple,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Digite o código',
-                style: LummyFonts.body(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : LummyColors.slate800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Cole o código que seu filho compartilhou',
-                textAlign: TextAlign.center,
-                style: LummyFonts.body(
-                  fontSize: 14,
-                  color: isDark
-                      ? LummyColors.slate400
-                      : LummyColors.slate500,
-                ),
-              ),
-              const SizedBox(height: 24),
-              TextField(
-                controller: controller,
-                autofocus: true,
-                style: LummyFonts.body(
-                  fontSize: 16,
-                  color: isDark ? Colors.white : LummyColors.slate800,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Ex: LUMMY-ABC123',
-                  hintStyle: LummyFonts.body(
-                    color: isDark
-                        ? LummyColors.slate400
-                        : LummyColors.slate400,
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? LummyColors.slate800
-                      : LummyColors.slate100,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(
-                      color: isDark
-                          ? LummyColors.slate600
-                          : LummyColors.slate200,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: _purple, width: 2),
-                  ),
-                  prefixIcon: Icon(
-                    Icons.code_rounded,
-                    color: isDark
-                        ? LummyColors.slate400
-                        : LummyColors.slate400,
-                  ),
-                  prefixIconConstraints: const BoxConstraints(
-                    minWidth: 44,
-                    minHeight: 44,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 18,
-                  ),
-                  suffixIcon: IconButton(
-                    onPressed: () async {
-                      final data = await Clipboard.getData('text/plain');
-                      if (data?.text != null) {
-                        controller.text = data!.text!;
-                      }
-                    },
-                    icon: const Icon(Icons.paste_rounded, color: _purple),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      if (controller.text.isNotEmpty) {
-                        Navigator.pop(sheetContext);
-                        if (!parentContext.mounted) return;
-                        _processQRCodeWithCubit(
-                          parentContext,
-                          controller.text,
-                          state,
-                          cubit,
-                        );
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [_blue, _purple],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: _blue.withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Processar código',
-                          style: LummyFonts.body(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        ),
+      builder: (sheetContext) => DistributionCodeInputSheet(
+        isDark: isDark,
+        controller: controller,
+        onSubmit: () {
+          if (controller.text.isNotEmpty) {
+            Navigator.pop(sheetContext);
+            if (!parentContext.mounted) return;
+            _processQRCodeWithCubit(
+              parentContext,
+              controller.text,
+              state,
+              cubit,
+            );
+          }
+        },
       ),
     );
   }
@@ -858,193 +354,6 @@ class _ParentDistributionScreenState extends State<ParentDistributionScreen> {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickSendSection(
-    BuildContext context,
-    ParentDashboardState state,
-    bool isDark,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? const [LummyColors.slate700, LummyColors.slate800]
-              : const [Colors.white, LummyColors.cream],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark ? LummyColors.slate600 : _orange.withValues(alpha: 0.14),
-          width: 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.24)
-                : _orange.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [_orange, _amber]),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.bolt_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                  Text(
-                    'Envio Rápido',
-                    style: LummyFonts.body(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? Colors.white : LummyColors.slate800,
-                    ),
-                  ),
-                  Text(
-                    'Selecione um valor pré-definido',
-                    style: LummyFonts.body(
-                      fontSize: 13.5,
-                      color: isDark
-                          ? LummyColors.slate400
-                          : LummyColors.slate500,
-                    ),
-                  ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          // Quick amount buttons - Design moderno
-          Row(
-            children: [
-              Expanded(
-                child: _buildQuickAmountChip(
-                  context,
-                  state,
-                  10.0,
-                  _orange,
-                  isDark,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildQuickAmountChip(
-                  context,
-                  state,
-                  20.0,
-                  _amber,
-                  isDark,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildQuickAmountChip(
-                  context,
-                  state,
-                  50.0,
-                  _blue,
-                  isDark,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildQuickAmountChip(
-                  context,
-                  state,
-                  100.0,
-                  _purple,
-                  isDark,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickAmountChip(
-    BuildContext context,
-    ParentDashboardState state,
-    double amount,
-    Color color,
-    bool isDark,
-  ) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _beginQuickSendWithAuth(context, state, amount),
-        borderRadius: BorderRadius.circular(14),
-        child: Container(
-          height: 86,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withValues(alpha: isDark ? 0.2 : 0.12),
-                color.withValues(alpha: isDark ? 0.1 : 0.06),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: color.withValues(alpha: isDark ? 0.3 : 0.2),
-              width: 1.5,
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                AppFormatters.formatCurrency(amount),
-                style: LummyFonts.body(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Enviar',
-                style: LummyFonts.body(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? LummyColors.slate400
-                      : LummyColors.slate500,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
