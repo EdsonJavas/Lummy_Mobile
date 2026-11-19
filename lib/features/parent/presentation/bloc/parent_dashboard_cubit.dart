@@ -7,7 +7,7 @@ import '../../../../domain/entities/transaction_entity.dart';
 import '../../../../domain/entities/notification_entity.dart';
 import '../../../../utils/parent_notification_service.dart';
 import 'parent_dashboard_state.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class ParentDashboardCubit extends Cubit<ParentDashboardState> {
   ParentDashboardCubit() : super(const ParentDashboardState());

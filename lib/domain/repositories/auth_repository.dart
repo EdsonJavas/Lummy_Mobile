@@ -1,4 +1,4 @@
-import 'package:lummy_login/core/result.dart';
+import 'package:lummy/core/result.dart';
 
 abstract class AuthRepository {
   Future<Result<String>> login({

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy_login/core/constants/app_constants.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
-import 'package:lummy_login/screens/auth/register_children_screen.dart';
-import 'package:lummy_login/models/responsavel_model.dart';
-import 'package:lummy_login/screens/parent/parent_subscription_screen.dart';
-import 'package:lummy_login/screens/parent/parent_edit_profile_screen.dart';
-import 'package:lummy_login/screens/parent/parent_change_password_screen.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/constants/app_constants.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/screens/auth/register_children_screen.dart';
+import 'package:lummy/models/responsavel_model.dart';
+import 'package:lummy/screens/parent/parent_subscription_screen.dart';
+import 'package:lummy/screens/parent/parent_edit_profile_screen.dart';
+import 'package:lummy/screens/parent/parent_change_password_screen.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class ParentProfileScreen extends StatefulWidget {
   const ParentProfileScreen({super.key});

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy_login/core/result.dart';
-import 'package:lummy_login/domain/repositories/auth_repository.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/result.dart';
+import 'package:lummy/domain/repositories/auth_repository.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class SupabaseAuthRepository implements AuthRepository {
   final SupabaseClient _supabase;

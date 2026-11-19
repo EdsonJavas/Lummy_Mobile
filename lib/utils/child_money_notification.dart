@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 const _prefKeyLastBalance = 'child_last_known_balance';
 

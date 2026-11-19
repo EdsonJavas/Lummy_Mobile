@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy_login/core/constants/app_constants.dart';
+import 'package:lummy/core/constants/app_constants.dart';
 
 class ParentSubscriptionScreen extends StatefulWidget {
   const ParentSubscriptionScreen({super.key});

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:lummy_login/core/config/supabase_config.dart';
+import 'package:lummy/core/config/supabase_config.dart';
 
 /// Função que responde se há conexão. Injetável para testes.
 typedef ConnectionProbe = Future<bool> Function();

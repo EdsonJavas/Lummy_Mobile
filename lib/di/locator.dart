@@ -1,11 +1,11 @@
 import 'package:get_it/get_it.dart';
-import 'package:lummy_login/data/repositories/supabase_auth_repository.dart';
-import 'package:lummy_login/domain/repositories/auth_repository.dart';
-import 'package:lummy_login/domain/usecases/login_use_case.dart';
-import 'package:lummy_login/application/app_facade.dart';
+import 'package:lummy/data/repositories/supabase_auth_repository.dart';
+import 'package:lummy/domain/repositories/auth_repository.dart';
+import 'package:lummy/domain/usecases/login_use_case.dart';
+import 'package:lummy/application/app_facade.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:lummy_login/services/family_service.dart';
+import 'package:lummy/services/family_service.dart';
 
 final GetIt locator = GetIt.instance;
 

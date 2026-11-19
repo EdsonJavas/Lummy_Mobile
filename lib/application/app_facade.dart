@@ -1,9 +1,9 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:lummy_login/core/result.dart';
-import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/domain/usecases/login_use_case.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/result.dart';
+import 'package:lummy/di/locator.dart';
+import 'package:lummy/domain/usecases/login_use_case.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class BiometricAuthService {
   final LocalAuthentication _localAuth;

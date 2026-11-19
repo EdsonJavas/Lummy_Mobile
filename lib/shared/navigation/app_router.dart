@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:lummy_login/core/providers/theme_provider.dart';
-import 'package:lummy_login/screens/app/splash_screen.dart';
-import 'package:lummy_login/domain/entities/user_entity.dart';
-import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
-import 'package:lummy_login/screens/auth/login_screen.dart';
-import 'package:lummy_login/screens/child/main_navigation.dart';
-import 'package:lummy_login/screens/auth/register_screen.dart';
+import 'package:lummy/core/providers/theme_provider.dart';
+import 'package:lummy/screens/app/splash_screen.dart';
+import 'package:lummy/domain/entities/user_entity.dart';
+import 'package:lummy/screens/parent/parent_main_navigation.dart';
+import 'package:lummy/screens/auth/login_screen.dart';
+import 'package:lummy/screens/child/main_navigation.dart';
+import 'package:lummy/screens/auth/register_screen.dart';
 
 // Nomes de rotas
 class AppRoutes {

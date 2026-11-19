@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
-import 'package:lummy_login/utils/ensure_child_record.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/utils/ensure_child_record.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class DailyMissionsScreen extends StatefulWidget {
   const DailyMissionsScreen({super.key});

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy_login/core/constants/app_constants.dart';
-import 'package:lummy_login/models/responsavel_model.dart';
-import 'package:lummy_login/screens/parent/parent_subscription_screen.dart';
-import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/services/family_service.dart';
-import 'package:lummy_login/domain/repositories/auth_repository.dart';
+import 'package:lummy/core/constants/app_constants.dart';
+import 'package:lummy/models/responsavel_model.dart';
+import 'package:lummy/screens/parent/parent_subscription_screen.dart';
+import 'package:lummy/di/locator.dart';
+import 'package:lummy/services/family_service.dart';
+import 'package:lummy/domain/repositories/auth_repository.dart';
 
 class RegisterChildrenScreen extends StatefulWidget {
   final Responsavel responsavel;

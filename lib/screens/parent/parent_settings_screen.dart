@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:lummy_login/core/providers/theme_provider.dart';
-import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/domain/repositories/auth_repository.dart';
-import 'package:lummy_login/application/app_facade.dart';
-import 'package:lummy_login/screens/auth/login_screen.dart';
-import 'package:lummy_login/screens/parent/parent_change_password_screen.dart';
-import 'package:lummy_login/screens/parent/parent_help_screen.dart';
-import 'package:lummy_login/screens/parent/parent_notifications_screen.dart';
+import 'package:lummy/core/providers/theme_provider.dart';
+import 'package:lummy/di/locator.dart';
+import 'package:lummy/domain/repositories/auth_repository.dart';
+import 'package:lummy/application/app_facade.dart';
+import 'package:lummy/screens/auth/login_screen.dart';
+import 'package:lummy/screens/parent/parent_change_password_screen.dart';
+import 'package:lummy/screens/parent/parent_help_screen.dart';
+import 'package:lummy/screens/parent/parent_notifications_screen.dart';
 
 class ParentSettingsScreen extends StatelessWidget {
   const ParentSettingsScreen({super.key});

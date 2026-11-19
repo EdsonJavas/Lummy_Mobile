@@ -1,5 +1,5 @@
-import 'package:lummy_login/core/result.dart';
-import 'package:lummy_login/domain/repositories/auth_repository.dart';
+import 'package:lummy/core/result.dart';
+import 'package:lummy/domain/repositories/auth_repository.dart';
 
 class LoginUseCase {
   final AuthRepository authRepository;

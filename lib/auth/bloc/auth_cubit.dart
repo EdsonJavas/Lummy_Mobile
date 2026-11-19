@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
-import 'package:lummy_login/domain/entities/user_entity.dart';
-import 'package:lummy_login/auth/bloc/auth_state.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/domain/entities/user_entity.dart';
+import 'package:lummy/auth/bloc/auth_state.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());

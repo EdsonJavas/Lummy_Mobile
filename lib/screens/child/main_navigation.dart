@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy_login/core/constants/app_constants.dart';
-import 'package:lummy_login/core/theme/design_tokens.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy/core/constants/app_constants.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
 import 'home_page.dart';
 import 'expenses_screen.dart';
 import 'lessons_screen.dart';

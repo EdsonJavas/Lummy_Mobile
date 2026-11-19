@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:lummy_login/core/utils/formatters.dart';
-import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/utils/formatters.dart';
+import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 /// Confirmação de envio ao filho após leitura do QR Code — identidade visual Lummy.
 class ParentQRPaymentScreen extends StatefulWidget {

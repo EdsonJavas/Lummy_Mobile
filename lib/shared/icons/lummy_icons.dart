@@ -4,7 +4,7 @@
 /// Em outras telas, prefira `Iconsax` em vez de `Icons` ao refatorar.
 ///
 /// ```dart
-/// import 'package:lummy_login/shared/icons/lummy_icons.dart';
+/// import 'package:lummy/shared/icons/lummy_icons.dart';
 ///
 /// Icon(Iconsax.home_1, size: 24)
 /// ```

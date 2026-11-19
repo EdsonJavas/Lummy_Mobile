@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/entities/user_entity.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 /// Resultado da checagem de e-mail nas tabelas `responsaveis` / `children`.
 enum EmailRegistrationStatus {

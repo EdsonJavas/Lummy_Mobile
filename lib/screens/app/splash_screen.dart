@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy_login/core/providers/theme_provider.dart';
-import 'package:lummy_login/application/app_facade.dart';
-import 'package:lummy_login/core/config/supabase_config.dart';
-import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/screens/auth/login_screen.dart';
-import 'package:lummy_login/screens/child/main_navigation.dart';
-import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
-import 'package:lummy_login/screens/app/onboarding_screen.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/providers/theme_provider.dart';
+import 'package:lummy/application/app_facade.dart';
+import 'package:lummy/core/config/supabase_config.dart';
+import 'package:lummy/di/locator.dart';
+import 'package:lummy/screens/auth/login_screen.dart';
+import 'package:lummy/screens/child/main_navigation.dart';
+import 'package:lummy/screens/parent/parent_main_navigation.dart';
+import 'package:lummy/screens/app/onboarding_screen.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

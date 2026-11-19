@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy_login/models/goal.dart';
-import 'package:lummy_login/screens/child/new_goal_screen.dart';
-import 'package:lummy_login/shared/widgets/money_text_field.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
-import 'package:lummy_login/utils/ensure_child_record.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/models/goal.dart';
+import 'package:lummy/screens/child/new_goal_screen.dart';
+import 'package:lummy/shared/widgets/money_text_field.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/utils/ensure_child_record.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
 
 class ParentEditProfileScreen extends StatefulWidget {
   final String parentId;

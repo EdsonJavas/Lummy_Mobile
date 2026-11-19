@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:lummy_login/application/app_facade.dart';
-import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/shared/widgets/lummy_feedback.dart';
+import 'package:lummy/application/app_facade.dart';
+import 'package:lummy/di/locator.dart';
+import 'package:lummy/shared/widgets/lummy_feedback.dart';
 
 class ParentChangePasswordScreen extends StatefulWidget {
   const ParentChangePasswordScreen({super.key});

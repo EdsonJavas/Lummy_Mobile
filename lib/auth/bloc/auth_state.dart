@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:lummy_login/domain/entities/user_entity.dart';
+import 'package:lummy/domain/entities/user_entity.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();

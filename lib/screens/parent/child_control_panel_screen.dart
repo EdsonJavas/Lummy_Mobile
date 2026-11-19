@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:lummy_login/core/utils/formatters.dart';
-import 'package:lummy_login/domain/entities/user_entity.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
-import 'package:lummy_login/screens/parent/child_missions_manager_screen.dart';
-import 'package:lummy_login/screens/parent/child_achievements_screen.dart';
-import 'package:lummy_login/screens/parent/child_settings_screen.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/utils/formatters.dart';
+import 'package:lummy/domain/entities/user_entity.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/screens/parent/child_missions_manager_screen.dart';
+import 'package:lummy/screens/parent/child_achievements_screen.dart';
+import 'package:lummy/screens/parent/child_settings_screen.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class ChildControlPanelScreen extends StatefulWidget {
   final ChildEntity child;

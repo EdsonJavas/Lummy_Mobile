@@ -4,18 +4,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:lummy_login/core/services/connectivity_service.dart';
-import 'package:lummy_login/screens/child/main_navigation.dart';
-import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/application/app_facade.dart';
-import 'package:lummy_login/core/result.dart';
-import 'package:lummy_login/domain/entities/user_entity.dart';
-import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
-import 'package:lummy_login/services/family_service.dart';
-import 'package:lummy_login/core/theme/app_theme.dart';
-import 'package:lummy_login/core/providers/theme_provider.dart';
-import 'package:lummy_login/screens/auth/register_screen.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/core/services/connectivity_service.dart';
+import 'package:lummy/screens/child/main_navigation.dart';
+import 'package:lummy/di/locator.dart';
+import 'package:lummy/application/app_facade.dart';
+import 'package:lummy/core/result.dart';
+import 'package:lummy/domain/entities/user_entity.dart';
+import 'package:lummy/screens/parent/parent_main_navigation.dart';
+import 'package:lummy/services/family_service.dart';
+import 'package:lummy/core/theme/app_theme.dart';
+import 'package:lummy/core/providers/theme_provider.dart';
+import 'package:lummy/screens/auth/register_screen.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

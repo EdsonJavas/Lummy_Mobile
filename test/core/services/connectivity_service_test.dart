@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lummy_login/core/services/connectivity_service.dart';
+import 'package:lummy/core/services/connectivity_service.dart';
 
 void main() {
   group('ConnectivityService', () {

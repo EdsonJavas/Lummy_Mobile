@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy_login/shared/widgets/money_text_field.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy/shared/widgets/money_text_field.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key, required this.expenseCategories});

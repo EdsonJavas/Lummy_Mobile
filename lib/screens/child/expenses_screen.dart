@@ -5,11 +5,11 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:lummy_login/screens/child/add_expense_screen.dart';
-import 'package:lummy_login/core/constants/app_constants.dart';
-import 'package:lummy_login/core/utils/formatters.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/screens/child/add_expense_screen.dart';
+import 'package:lummy/core/constants/app_constants.dart';
+import 'package:lummy/core/utils/formatters.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});

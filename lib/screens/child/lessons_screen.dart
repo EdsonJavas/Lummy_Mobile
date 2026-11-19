@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
 
 class LessonItem {
   final String id;

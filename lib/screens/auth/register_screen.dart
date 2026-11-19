@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy_login/core/theme/app_theme.dart';
-import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/domain/repositories/auth_repository.dart';
-import 'package:lummy_login/services/family_service.dart';
-import 'package:lummy_login/screens/auth/register_children_screen.dart';
-import 'package:lummy_login/models/responsavel_model.dart';
+import 'package:lummy/core/theme/app_theme.dart';
+import 'package:lummy/di/locator.dart';
+import 'package:lummy/domain/repositories/auth_repository.dart';
+import 'package:lummy/services/family_service.dart';
+import 'package:lummy/screens/auth/register_children_screen.dart';
+import 'package:lummy/models/responsavel_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

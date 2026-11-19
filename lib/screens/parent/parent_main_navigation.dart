@@ -3,18 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:lummy_login/core/theme/design_tokens.dart';
-import 'package:lummy_login/core/utils/formatters.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
-import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
-import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_state.dart';
-import 'package:lummy_login/screens/parent/parent_dashboard_screen.dart';
-import 'package:lummy_login/screens/parent/parent_dependents_screen.dart';
-import 'package:lummy_login/screens/parent/parent_distribution_screen.dart';
-import 'package:lummy_login/screens/parent/parent_approvals_screen.dart';
-import 'package:lummy_login/screens/parent/parent_settings_screen.dart';
-import 'package:lummy_login/screens/parent/parent_subscription_screen.dart';
-import 'package:lummy_login/screens/parent/parent_help_screen.dart';
+import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/utils/formatters.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
+import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_state.dart';
+import 'package:lummy/screens/parent/parent_dashboard_screen.dart';
+import 'package:lummy/screens/parent/parent_dependents_screen.dart';
+import 'package:lummy/screens/parent/parent_distribution_screen.dart';
+import 'package:lummy/screens/parent/parent_approvals_screen.dart';
+import 'package:lummy/screens/parent/parent_settings_screen.dart';
+import 'package:lummy/screens/parent/parent_subscription_screen.dart';
+import 'package:lummy/screens/parent/parent_help_screen.dart';
 
 class ParentMainNavigation extends StatefulWidget {
   final String parentId;

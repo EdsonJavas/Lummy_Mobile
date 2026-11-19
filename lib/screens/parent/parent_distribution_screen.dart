@@ -5,16 +5,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-import 'package:lummy_login/application/app_facade.dart';
-import 'package:lummy_login/core/utils/formatters.dart';
-import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
-import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
-import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_state.dart';
-import 'package:lummy_login/features/parent/presentation/widgets/allowance_distribution_card.dart';
-import 'package:lummy_login/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
-import 'package:lummy_login/screens/parent/parent_qr_payment_screen.dart';
-import 'package:lummy_login/core/utils/app_log.dart';
+import 'package:lummy/application/app_facade.dart';
+import 'package:lummy/core/utils/formatters.dart';
+import 'package:lummy/di/locator.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
+import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_state.dart';
+import 'package:lummy/features/parent/presentation/widgets/allowance_distribution_card.dart';
+import 'package:lummy/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
+import 'package:lummy/screens/parent/parent_qr_payment_screen.dart';
+import 'package:lummy/core/utils/app_log.dart';
 
 class ParentDistributionScreen extends StatefulWidget {
   const ParentDistributionScreen({super.key});

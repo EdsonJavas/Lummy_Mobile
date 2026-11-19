@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lummy_login/core/constants/app_constants.dart';
-import 'package:lummy_login/core/utils/formatters.dart';
-import 'package:lummy_login/shared/widgets/widgets.dart';
-import 'package:lummy_login/domain/entities/user_entity.dart';
-import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
-import 'package:lummy_login/features/parent/presentation/bloc/parent_dashboard_state.dart';
-import 'package:lummy_login/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
-import 'package:lummy_login/screens/parent/parent_profile_screen.dart';
-import 'package:lummy_login/screens/parent/parent_insights_screen.dart';
+import 'package:lummy/core/constants/app_constants.dart';
+import 'package:lummy/core/utils/formatters.dart';
+import 'package:lummy/shared/widgets/widgets.dart';
+import 'package:lummy/domain/entities/user_entity.dart';
+import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_cubit.dart';
+import 'package:lummy/features/parent/presentation/bloc/parent_dashboard_state.dart';
+import 'package:lummy/features/parent/presentation/widgets/parent_dashboard_skeleton.dart';
+import 'package:lummy/screens/parent/parent_profile_screen.dart';
+import 'package:lummy/screens/parent/parent_insights_screen.dart';
 
 class ParentDashboardScreen extends StatefulWidget {
   final String parentId;
