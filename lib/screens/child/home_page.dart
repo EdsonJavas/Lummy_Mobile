@@ -12,7 +12,6 @@ import 'package:lummy_login/screens/child/request_money_screen.dart';
 import 'package:lummy_login/screens/child/claim_share_screen.dart';
 import 'package:lummy_login/shared/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:lummy_login/utils/supabase_test.dart';
 import 'package:lummy_login/utils/child_money_notification.dart';
 import 'package:lummy_login/screens/child/profile_page.dart';
 import 'package:lummy_login/screens/child/daily_missions_screen.dart';
@@ -314,10 +313,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _initializeData();
     _subscribeGoalsRealtime();
-    // Testar conexão na inicialização (apenas em debug)
-    if (kDebugMode) {
-      _testConnection();
-    }
   }
 
   Future<void> _initializeData() async {
@@ -502,19 +497,6 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (_) {}
     super.dispose();
-  }
-
-  Future<void> _testConnection() async {
-    try {
-      debugPrint('🧪 Iniciando teste de conexão com Supabase...');
-      final results = await SupabaseTest.testConnection();
-      debugPrint('📊 Resultados do teste:');
-      results.forEach((key, value) {
-        debugPrint('   $key: $value');
-      });
-    } catch (e) {
-      debugLogDataLoad('Teste de conexão Supabase', e);
-    }
   }
 
   Future<void> _loadUserName() async {

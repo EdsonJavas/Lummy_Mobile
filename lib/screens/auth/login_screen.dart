@@ -12,7 +12,6 @@ import 'package:lummy_login/core/result.dart';
 import 'package:lummy_login/domain/entities/user_entity.dart';
 import 'package:lummy_login/screens/parent/parent_main_navigation.dart';
 import 'package:lummy_login/services/family_service.dart';
-import 'package:lummy_login/utils/login_debug_helper.dart';
 import 'package:lummy_login/core/theme/app_theme.dart';
 import 'package:lummy_login/core/providers/theme_provider.dart';
 import 'package:lummy_login/screens/auth/register_screen.dart';
@@ -370,20 +369,11 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         debugPrint('⚠️ Perfil não encontrado para o usuário: $userId');
-        
-        // Executar diagnóstico
-        final diagnosis = await LoginDebugHelper.diagnoseLoginIssue(userId);
-        debugPrint('📊 Resultado do diagnóstico: $diagnosis');
-        
-        String errorMessage = 'Não encontramos o perfil associado a esta conta.\n\n';
-        errorMessage += 'Diagnóstico: ${diagnosis['diagnosis'] ?? 'Erro desconhecido'}\n\n';
-        errorMessage += 'Isso pode acontecer se:\n';
-        errorMessage += '• Você ainda não completou o cadastro\n';
-        errorMessage += '• Há um problema de conexão com o banco de dados\n';
-        errorMessage += '• Há problema de permissões (RLS) no Supabase\n\n';
-        errorMessage += 'Tente fazer o cadastro novamente ou entre em contato com o suporte.';
-        
-        _showLoginError(errorMessage);
+        _showLoginError(
+          'Não encontramos o perfil desta conta.\n\n'
+          'Se você ainda não terminou o cadastro, conclua-o e tente de novo. '
+          'Se o problema continuar, fale com o suporte.',
+        );
       }
     } catch (e, stackTrace) {
       debugPrint('❌ Erro ao navegar para perfil: $e');

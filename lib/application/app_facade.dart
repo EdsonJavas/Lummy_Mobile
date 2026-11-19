@@ -3,12 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:lummy_login/core/result.dart';
 import 'package:lummy_login/di/locator.dart';
-import 'package:lummy_login/domain/usecases/add_transaction_use_case.dart';
-import 'package:lummy_login/domain/usecases/get_financial_data_use_case.dart';
 import 'package:lummy_login/domain/usecases/login_use_case.dart';
-import 'package:lummy_login/domain/usecases/set_goal_use_case.dart';
-import 'package:lummy_login/models/financial_data.dart';
-import 'package:lummy_login/models/goal.dart';
 
 class BiometricAuthService {
   final LocalAuthentication _localAuth;
@@ -136,10 +131,6 @@ class AppFacade {
 
   // Usar lazy getters para evitar acesso ao locator antes da inicialização
   LoginUseCase get _login => locator<LoginUseCase>();
-  AddTransactionUseCase get _addTransaction => locator<AddTransactionUseCase>();
-  SetGoalUseCase get _setGoal => locator<SetGoalUseCase>();
-  GetFinancialDataUseCase get _getFinancial =>
-      locator<GetFinancialDataUseCase>();
 
   Future<Result<String>> login(String email, String password) {
     return _login(email: email, password: password);
@@ -153,34 +144,5 @@ class AppFacade {
       );
     }
     return _login(email: email, password: password);
-  }
-
-  Future<Result<FinancialData>> getFinancialData(String userId) {
-    return _getFinancial(userId);
-  }
-
-  Future<Result<FinancialData>> addTransaction({
-    required String userId,
-    required String description,
-    required double amount,
-    required String type,
-    required String category,
-  }) {
-    return _addTransaction(
-      userId: userId,
-      description: description,
-      amount: amount,
-      type: type,
-      category: category,
-    );
-  }
-
-  Future<Result<Goal>> setGoal({
-    required String userId,
-    required String name,
-    required String emoji,
-    required double amount,
-  }) {
-    return _setGoal(userId: userId, name: name, emoji: emoji, amount: amount);
   }
 }
