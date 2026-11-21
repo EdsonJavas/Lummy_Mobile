@@ -1,0 +1,45 @@
+# Codemagic: gera o Lummy para iOS e envia ao TestFlight.
+#
+# Assinatura automática pela integração "Codemagic Lummy"
+# (Settings → Integrations → Developer Portal), com a chave de API
+# "Codemagic Lummy" do App Store Connect (Key ID 2FVU3763G5, papel Gerente de apps).
+# O certificado de distribuição e o perfil App Store de com.lummy.app ficam em
+# Settings → codemagic.yaml settings → Code signing identities.
+#
+# O build é disparado à mão no painel (Start new build), na branch escolhida.
+workflows:
+  ios-testflight:
+    name: iOS para TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    integrations:
+      app_store_connect: Codemagic Lummy
+    environment:
+      flutter: 3.47.6
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.lummy.app
+      vars:
+        # ID Apple do app no App Store Connect.
+        APP_STORE_APPLE_ID: 6837684297
+    scripts:
+      - name: Dependências do Flutter
+        script: flutter pub get
+      - name: Perfis de assinatura no projeto Xcode
+        script: xcode-project use-profiles
+      - name: Gerar o IPA
+        script: |
+          # Número do build = último do TestFlight + 1 (o pubspec está em 1.0.0+2).
+          ULTIMO=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 2)
+          flutter build ipa --release \
+            --build-number=$((ULTIMO + 1)) \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
