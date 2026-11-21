@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 
 import 'lummy_icon.dart';
 import 'v1_text.dart';
@@ -148,6 +149,7 @@ class _NavButton extends StatelessWidget {
                   overflow: TextOverflow.visible,
                   softWrap: false,
                   style: LummyText.poppins(
+                    context,
                     size: 12,
                     weight: selected ? FontWeight.w700 : FontWeight.w500,
                     color: fg,
@@ -178,7 +180,7 @@ class ChildBottomFade extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [LummyColors.white.withValues(alpha: 0), LummyColors.white],
+            colors: [context.cores.fundo.withValues(alpha: 0), context.cores.fundo],
             stops: const [0, 0.6],
           ),
         ),

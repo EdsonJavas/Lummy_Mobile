@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 import 'expenses_v1_calc.dart';
@@ -46,7 +47,7 @@ class ExpensesV1NeedWant extends StatelessWidget {
           Text(
             'Mais da metade foi com coisas que você queria. '
             'Tudo bem querer, só vale ficar de olho.',
-            style: LummyText.poppins(size: 13, height: 1.45, color: LummyColors.ink600),
+            style: LummyText.poppins(context, size: 13, height: 1.45, color: context.cores.tintaApoio),
           ),
         ],
       ],
@@ -147,13 +148,13 @@ class _Legenda extends StatelessWidget {
             decoration: BoxDecoration(color: cor, borderRadius: BorderRadius.circular(3)),
           ),
           const SizedBox(width: 8),
-          Expanded(child: Text(rotulo, style: LummyText.poppins(size: 14))),
+          Expanded(child: Text(rotulo, style: LummyText.poppins(context, size: 14))),
           const SizedBox(width: 8),
           Text(
             valorTexto,
             maxLines: 1,
             softWrap: false,
-            style: LummyText.poppins(size: 14, weight: FontWeight.w600),
+            style: LummyText.poppins(context, size: 14, weight: FontWeight.w600),
           ),
           const SizedBox(width: 8),
           SizedBox(
@@ -163,7 +164,7 @@ class _Legenda extends StatelessWidget {
               textAlign: TextAlign.right,
               maxLines: 1,
               softWrap: false,
-              style: LummyText.poppins(size: 14, color: LummyColors.ink600),
+              style: LummyText.poppins(context, size: 14, color: context.cores.tintaApoio),
             ),
           ),
         ],

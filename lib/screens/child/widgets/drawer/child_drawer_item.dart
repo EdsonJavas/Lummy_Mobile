@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/lummy_icon.dart';
 import 'package:lummy/screens/child/widgets/v1/neutral_icon_tile.dart';
 import 'package:lummy/screens/child/widgets/v1/v1_text.dart';
@@ -48,7 +48,7 @@ class ChildDrawerItem extends StatelessWidget {
                     rotulo,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: LummyText.corpo(),
+                    style: LummyText.corpo(context),
                   ),
                 ),
                 AnimatedSwitcher(
@@ -63,8 +63,9 @@ class ChildDrawerItem extends StatelessWidget {
                             maxLines: 1,
                             softWrap: false,
                             style: LummyText.poppins(
+                              context,
                               size: 13,
-                              color: LummyColors.ink600,
+                              color: context.cores.tintaApoio,
                             ),
                           ),
                         ),

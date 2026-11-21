@@ -97,7 +97,7 @@ class _MoneySheetIncomeState extends State<MoneySheetIncome> {
           linha: 'Fica registrado no seu histórico.',
         ),
         const SizedBox(height: 16),
-        Text('De onde veio?', style: LummyText.pergunta()),
+        Text('De onde veio?', style: LummyText.pergunta(context)),
         const SizedBox(height: 10),
         MoneySheetOptionGrid(
           opcoes: _origens,

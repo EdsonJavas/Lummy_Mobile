@@ -79,7 +79,7 @@ class _Item extends StatelessWidget {
             ),
             child: Text(
               conquista.emoji,
-              style: LummyText.poppins(size: 26, height: 1),
+              style: LummyText.poppins(context, size: 26, height: 1),
             ),
           ),
           const SizedBox(height: 8),
@@ -88,7 +88,7 @@ class _Item extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: LummyText.poppins(size: 12, height: 1.3),
+            style: LummyText.poppins(context, size: 12, height: 1.3),
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 import 'goals_v1_calc.dart';
@@ -19,12 +20,12 @@ class GoalsV1InfoLine extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 1),
+        Padding(
+          padding: const EdgeInsets.only(top: 1),
           child: LummyIcon(
             LummyGlyphs.info,
             size: 16,
-            color: LummyColors.ink600,
+            color: context.cores.tintaApoio,
             strokeWidth: 2,
           ),
         ),
@@ -33,8 +34,9 @@ class GoalsV1InfoLine extends StatelessWidget {
           child: Text(
             texto,
             style: LummyText.poppins(
+              context,
               size: 13,
-              color: LummyColors.ink600,
+              color: context.cores.tintaApoio,
               height: 1.45,
             ),
           ),
@@ -120,6 +122,7 @@ class GoalsV1Simulator extends StatelessWidget {
                     resultado,
                     key: ValueKey(resultado),
                     style: LummyText.poppins(
+                      context,
                       size: 15,
                       weight: FontWeight.w600,
                       height: 1.35,

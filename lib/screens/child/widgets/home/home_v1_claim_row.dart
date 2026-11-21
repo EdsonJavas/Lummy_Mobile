@@ -28,7 +28,7 @@ class HomeV1ClaimRow extends StatelessWidget {
             'Seus pais separaram ${V1Format.brl(minhaParte)} para você',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: LummyText.poppins(size: 14, weight: FontWeight.w500),
+            style: LummyText.poppins(context, size: 14, weight: FontWeight.w500),
           ),
         ),
         const SizedBox(width: 12),

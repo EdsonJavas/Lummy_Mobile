@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/data/child/child_missions_repository.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
@@ -47,7 +48,7 @@ class HomeV1Header extends StatelessWidget {
               nome.isEmpty ? 'Oi!' : 'Oi, $nome!',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: LummyText.saudacao(),
+              style: LummyText.saudacao(context),
             ),
           ),
         ),
@@ -79,7 +80,7 @@ class _PilulaSequencia extends StatelessWidget {
         height: 36,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: LummyColors.surface100,
+          color: context.cores.superficieNeutra,
           borderRadius: BorderRadius.circular(18),
         ),
         child: Row(
@@ -97,7 +98,7 @@ class _PilulaSequencia extends StatelessWidget {
               texto,
               maxLines: 1,
               softWrap: false,
-              style: LummyText.poppins(size: 13, weight: FontWeight.w600),
+              style: LummyText.poppins(context, size: 13, weight: FontWeight.w600),
             ),
           ],
         ),
@@ -121,14 +122,14 @@ class _Sininho extends StatelessWidget {
         width: 44,
         height: 44,
         alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: LummyColors.surface100,
+        decoration: BoxDecoration(
+          color: context.cores.superficieNeutra,
           shape: BoxShape.circle,
         ),
-        child: const LummyIcon(
+        child: LummyIcon(
           LummyGlyphs.bell,
           size: 21,
-          color: LummyColors.ink900,
+          color: context.cores.tinta,
           strokeWidth: 2,
         ),
       ),

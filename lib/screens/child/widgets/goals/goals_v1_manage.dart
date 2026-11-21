@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 import 'goals_v1_simulator.dart';
@@ -40,16 +40,16 @@ class GoalsV1Manage extends StatelessWidget {
             height: 48,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: LummyColors.surface100,
+              color: context.cores.superficieNeutra,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const LummyIcon(
+                LummyIcon(
                   LummyGlyphs.trash,
                   size: 17,
-                  color: LummyColors.danger700,
+                  color: context.cores.perigo,
                   strokeWidth: 2.2,
                 ),
                 const SizedBox(width: 8),
@@ -57,9 +57,10 @@ class GoalsV1Manage extends StatelessWidget {
                   child: Text(
                     'Desistir da meta',
                     style: LummyText.poppins(
+                      context,
                       size: 14,
                       weight: FontWeight.w600,
-                      color: LummyColors.danger700,
+                      color: context.cores.perigo,
                     ),
                   ),
                 ),

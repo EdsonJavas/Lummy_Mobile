@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 
 import 'v1_text.dart';
 
@@ -59,14 +60,14 @@ class LummySegmented<T> extends StatelessWidget {
         height: tamanho.altura,
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: LummyColors.surface100,
+          color: context.cores.superficieNeutra,
           borderRadius: BorderRadius.circular(tamanho.raio),
         ),
         child: Row(
           children: [
             for (var i = 0; i < opcoes.length; i++) ...[
               if (i > 0) const SizedBox(width: 4),
-              Expanded(child: _item(opcoes[i])),
+              Expanded(child: _item(context, opcoes[i])),
             ],
           ],
         ),
@@ -74,7 +75,7 @@ class LummySegmented<T> extends StatelessWidget {
     );
   }
 
-  Widget _item(LummySegment<T> opcao) {
+  Widget _item(BuildContext context, LummySegment<T> opcao) {
     final ativo = opcao.valor == selecionado;
     return Semantics(
       button: true,
@@ -89,7 +90,7 @@ class LummySegmented<T> extends StatelessWidget {
           curve: Curves.easeOut,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: ativo ? LummyColors.white : LummyColors.white.withValues(alpha: 0),
+            color: ativo ? context.cores.superficieElevada : context.cores.superficieElevada.withValues(alpha: 0),
             borderRadius: BorderRadius.circular(tamanho.raioItem),
             boxShadow: ativo ? LummyShadows.segment : const [],
           ),
@@ -98,9 +99,10 @@ class LummySegmented<T> extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: LummyText.poppins(
+              context,
               size: 14,
               weight: ativo ? FontWeight.w600 : FontWeight.w500,
-              color: ativo ? LummyColors.ink900 : LummyColors.ink600,
+              color: ativo ? context.cores.tinta : context.cores.tintaApoio,
             ),
           ),
         ),

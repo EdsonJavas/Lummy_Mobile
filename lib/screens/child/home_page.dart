@@ -9,8 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/providers/child_data_changes.dart';
 import 'package:lummy/core/providers/child_profile_controller.dart';
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
-import 'package:lummy/core/theme/app_theme.dart';
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/core/utils/network_errors.dart';
 import 'package:lummy/data/child/child_achievements_repository.dart';
 import 'package:lummy/data/child/child_goals_repository.dart';
@@ -583,10 +582,7 @@ class _HomePageState extends State<HomePage> {
 
     final result = await Navigator.of(context).push<Object?>(
       MaterialPageRoute(
-        // Área da criança sempre clara (D12), também nesta tela empurrada.
-        builder: (context) => Theme(
-          data: AppTheme.lightTheme,
-          child: ClaimShareScreen(
+        builder: (context) => ClaimShareScreen(
           distributionId: distributionId,
           childId: _currentChildId,
           totalAmount: _activeDistributionAmount,
@@ -594,7 +590,6 @@ class _HomePageState extends State<HomePage> {
           otherChildrenScores: _otherSiblingsScores,
           otherChildrenNames: _otherSiblingsNames,
           currentChildName: _currentChildName,
-        ),
         ),
       ),
     );
@@ -642,7 +637,7 @@ class _HomePageState extends State<HomePage> {
     final tema = ChildThemeColorController.of(context).tema;
 
     return ColoredBox(
-      color: LummyColors.white,
+      color: context.cores.fundo,
       child: SafeArea(
         bottom: false,
         child: _carregando
@@ -650,7 +645,7 @@ class _HomePageState extends State<HomePage> {
             : BrandedRefreshIndicator(
                 onRefresh: _refreshData,
                 color: tema,
-                backgroundColor: LummyColors.white,
+                backgroundColor: context.cores.superficie,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
                     parent: BouncingScrollPhysics(),

@@ -108,7 +108,7 @@ class LummyActionSquare extends StatelessWidget {
             child: Text(
               rotulo,
               textAlign: TextAlign.center,
-              style: LummyText.poppins(size: 13, weight: FontWeight.w500),
+              style: LummyText.poppins(context, size: 13, weight: FontWeight.w500),
             ),
           ),
         ],
@@ -165,6 +165,7 @@ class LummyPillButton extends StatelessWidget {
                 maxLines: 1,
                 softWrap: false,
                 style: LummyText.poppins(
+                  context,
                   size: 15,
                   weight: FontWeight.w700,
                   color: LummyColors.white,
@@ -229,6 +230,7 @@ class LummyWideButton extends StatelessWidget {
                 child: Text(
                   rotulo,
                   style: LummyText.poppins(
+                    context,
                     size: 18,
                     weight: FontWeight.w700,
                     color: LummyColors.white,

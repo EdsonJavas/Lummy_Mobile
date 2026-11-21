@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/data/child/child_transactions_repository.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
@@ -56,7 +57,7 @@ class ExpensesV1Recent extends StatelessWidget {
                         header: true,
                         child: Text(
                           V1Format.rotuloDia(grupo.data, agora: agora),
-                          style: LummyText.contagem(),
+                          style: LummyText.contagem(context),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -93,9 +94,9 @@ class _Vazio extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nenhuma transação recente', style: LummyText.corpo()),
+            Text('Nenhuma transação recente', style: LummyText.corpo(context)),
             const SizedBox(height: 2),
-            Text('Suas movimentações aparecerão aqui', style: LummyText.apoio()),
+            Text('Suas movimentações aparecerão aqui', style: LummyText.apoio(context)),
           ],
         ),
       ),
@@ -126,8 +127,8 @@ class _GastoItem extends StatelessWidget {
       child: Container(
         // `min-height: 64px` de conteúdo + 1 da borda de baixo (content-box).
         constraints: const BoxConstraints(minHeight: 65),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: LummyColors.line100)),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: context.cores.linha)),
         ),
         child: Row(
           children: [
@@ -148,7 +149,7 @@ class _GastoItem extends StatelessWidget {
                     titulo,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: LummyText.corpo(),
+                    style: LummyText.corpo(context),
                   ),
                   if (temSubLinha) ...[
                     const SizedBox(height: 2),
@@ -160,7 +161,7 @@ class _GastoItem extends StatelessWidget {
                               cat.nome,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: LummyText.apoio(),
+                              style: LummyText.apoio(context),
                             ),
                           ),
                         if (!repeteCategoria && marca != null) const SizedBox(width: 10),
@@ -176,7 +177,7 @@ class _GastoItem extends StatelessWidget {
               V1Format.brl(gasto.valor),
               maxLines: 1,
               softWrap: false,
-              style: LummyText.corpo(weight: FontWeight.w600),
+              style: LummyText.corpo(context, weight: FontWeight.w600),
             ),
           ],
         ),
@@ -207,7 +208,7 @@ class _Marca extends StatelessWidget {
           decoration: BoxDecoration(color: cor, borderRadius: BorderRadius.circular(2)),
         ),
         const SizedBox(width: 4),
-        Text(marca.rotulo, maxLines: 1, softWrap: false, style: LummyText.apoio()),
+        Text(marca.rotulo, maxLines: 1, softWrap: false, style: LummyText.apoio(context)),
       ],
     );
   }

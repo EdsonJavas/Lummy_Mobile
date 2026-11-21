@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/data/child/child_missions_repository.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
@@ -52,7 +53,7 @@ class HomeBStreak extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             'Faça 1 missão hoje e chegue a ${n + 1} dias.',
-            style: LummyText.apoio(),
+            style: LummyText.apoio(context),
           ),
         ],
       ],
@@ -82,22 +83,22 @@ class _Dia extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _circulo(),
+          _circulo(context),
           const SizedBox(height: 6),
           Text(
             rotulo,
             maxLines: 1,
             softWrap: false,
             style: dia.ehHoje
-                ? LummyText.poppins(size: 12, weight: FontWeight.w600)
-                : LummyText.poppins(size: 12, color: LummyColors.ink600),
+                ? LummyText.poppins(context, size: 12, weight: FontWeight.w600)
+                : LummyText.poppins(context, size: 12, color: context.cores.tintaApoio),
           ),
         ],
       ),
     );
   }
 
-  Widget _circulo() {
+  Widget _circulo(BuildContext context) {
     switch (dia.estado) {
       case StreakDayState.feito:
         return Container(
@@ -128,9 +129,9 @@ class _Dia extends StatelessWidget {
         return Container(
           width: 32,
           height: 32,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: LummyColors.line100,
+            color: context.cores.linha,
           ),
         );
     }

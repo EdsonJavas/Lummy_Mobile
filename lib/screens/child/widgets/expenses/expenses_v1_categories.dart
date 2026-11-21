@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 import 'expenses_v1_calc.dart';
@@ -81,7 +81,7 @@ class _CategoriaItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final cat = item.categoria;
     final valor = V1Format.brl(item.valor);
-    final estilo = LummyText.poppins(size: 14, weight: FontWeight.w600);
+    final estilo = LummyText.poppins(context, size: 14, weight: FontWeight.w600);
 
     return Semantics(
       button: true,
@@ -104,8 +104,8 @@ class _CategoriaItem extends StatelessWidget {
                   border: Border.all(
                     width: 2,
                     color: selecionada
-                        ? LummyColors.chartInk
-                        : LummyColors.chartInk.withValues(alpha: 0),
+                        ? context.cores.grafico
+                        : context.cores.grafico.withValues(alpha: 0),
                   ),
                 ),
                 child: NeutralIconTile(
@@ -139,7 +139,7 @@ class _CategoriaItem extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 7),
-                    ThinProgressBar(valor: item.fracao, cor: LummyColors.chartInk),
+                    ThinProgressBar(valor: item.fracao, cor: context.cores.grafico),
                   ],
                 ),
               ),

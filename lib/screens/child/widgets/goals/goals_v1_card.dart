@@ -68,6 +68,7 @@ class GoalsV1Card extends StatelessWidget {
                     Text(
                       'Sua meta agora',
                       style: LummyText.poppins(
+                        context,
                         size: 13,
                         weight: FontWeight.w500,
                         color: LummyColors.white75,
@@ -104,7 +105,7 @@ class GoalsV1Card extends StatelessWidget {
                 Text(
                   'de ${V1Format.brl(meta.targetAmount)}',
                   maxLines: 1,
-                  style: LummyText.poppins(size: 15, color: LummyColors.white75),
+                  style: LummyText.poppins(context, size: 15, color: LummyColors.white75),
                 ),
               ],
             ),

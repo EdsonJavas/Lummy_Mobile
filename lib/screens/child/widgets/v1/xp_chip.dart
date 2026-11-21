@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 
 import 'lummy_icon.dart';
 import 'v1_text.dart';
@@ -32,7 +33,7 @@ class XpChip extends StatelessWidget {
         texto,
         maxLines: 1,
         softWrap: false,
-        style: LummyText.poppins(size: 13, weight: pesoFeito, color: LummyColors.ink600),
+        style: LummyText.poppins(context, size: 13, weight: pesoFeito, color: context.cores.tintaApoio),
       );
     }
     return Row(
@@ -50,7 +51,7 @@ class XpChip extends StatelessWidget {
           texto,
           maxLines: 1,
           softWrap: false,
-          style: LummyText.poppins(size: 13, weight: FontWeight.w600),
+          style: LummyText.poppins(context, size: 13, weight: FontWeight.w600),
         ),
       ],
     );
@@ -76,7 +77,7 @@ class LevelPill extends StatelessWidget {
       ),
       child: Text(
         'Nível $level',
-        style: LummyText.poppins(size: 12, weight: FontWeight.w700),
+        style: LummyText.poppins(context, size: 12, weight: FontWeight.w700),
       ),
     );
   }

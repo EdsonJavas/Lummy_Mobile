@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/data/child/child_missions_repository.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
@@ -32,8 +33,8 @@ class HomeBMissionRow extends StatelessWidget {
           // 56 de conteúdo + 1 da linha de baixo (o <li> do mockup é
           // content-box).
           constraints: const BoxConstraints(minHeight: 57),
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: LummyColors.line100)),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: context.cores.linha)),
           ),
           child: Row(
             children: [
@@ -58,11 +59,12 @@ class HomeBMissionRow extends StatelessWidget {
                     missao.titulo,
                     style: feita
                         ? LummyText.poppins(
+                            context,
                             size: 15,
-                            color: LummyColors.ink600,
+                            color: context.cores.tintaApoio,
                             decoration: TextDecoration.lineThrough,
                           )
-                        : LummyText.corpo(),
+                        : LummyText.corpo(context),
                   ),
                 ),
               ),
@@ -92,7 +94,7 @@ class _Check extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: feita ? LummyColors.brandGreen : null,
-        border: feita ? null : Border.all(color: LummyColors.ink300, width: 2),
+        border: feita ? null : Border.all(color: context.cores.bordaPendente, width: 2),
       ),
       child: feita
           ? const LummyIcon(
@@ -117,17 +119,17 @@ class HomeBMissionRowSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 57,
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: LummyColors.line100)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: context.cores.linha)),
       ),
       child: Row(
         children: [
           Container(
             width: 26,
             height: 26,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: LummyColors.surface100,
+              color: context.cores.superficieNeutra,
             ),
           ),
           const SizedBox(width: 15),
@@ -138,7 +140,7 @@ class HomeBMissionRowSkeleton extends StatelessWidget {
               child: Container(
                 height: 14,
                 decoration: BoxDecoration(
-                  color: LummyColors.surface100,
+                  color: context.cores.superficieNeutra,
                   borderRadius: BorderRadius.circular(7),
                 ),
               ),
@@ -149,7 +151,7 @@ class HomeBMissionRowSkeleton extends StatelessWidget {
             width: 52,
             height: 14,
             decoration: BoxDecoration(
-              color: LummyColors.surface100,
+              color: context.cores.superficieNeutra,
               borderRadius: BorderRadius.circular(7),
             ),
           ),

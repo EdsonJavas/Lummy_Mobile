@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 /// Abre um painel de baixo de dinheiro e devolve `true` se ele gravou.
@@ -22,7 +22,7 @@ Future<bool> showMoneySheet(
     isScrollControlled: true,
     useSafeArea: false,
     backgroundColor: Colors.transparent,
-    barrierColor: LummyColors.scrimInk,
+    barrierColor: context.cores.veu,
     elevation: 0,
     showDragHandle: false,
     enableDrag: true,
@@ -103,7 +103,7 @@ class MoneySheetFrame extends StatelessWidget {
               onVerticalDragUpdate: bloqueado ? (_) {} : null,
               onVerticalDragEnd: bloqueado ? (_) {} : null,
               child: Material(
-                color: LummyColors.white,
+                color: context.cores.superficie,
                 borderRadius: _raio,
                 clipBehavior: Clip.antiAlias,
                 child: Semantics(
@@ -159,7 +159,7 @@ class _Alca extends StatelessWidget {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: LummyColors.ink100,
+          color: context.cores.alca,
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -189,7 +189,7 @@ class _Cabecalho extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Semantics(
                   header: true,
-                  child: Text(titulo, maxLines: 1, softWrap: false, style: LummyText.h2()),
+                  child: Text(titulo, maxLines: 1, softWrap: false, style: LummyText.h2(context)),
                 ),
               ),
             ),
@@ -204,14 +204,14 @@ class _Cabecalho extends StatelessWidget {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: onFechar,
-                child: const SizedBox(
+                child: SizedBox(
                   width: 44,
                   height: 44,
                   child: Center(
                     child: LummyIcon(
                       LummyGlyphs.x,
                       size: 22,
-                      color: LummyColors.ink600,
+                      color: context.cores.tintaApoio,
                       strokeWidth: 2.2,
                     ),
                   ),

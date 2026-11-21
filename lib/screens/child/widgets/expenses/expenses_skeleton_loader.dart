@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 /// Esqueleto da aba Gastos (redesenho V1), com as medidas da tela pronta:
 /// cabeçalho, segmentado de 44, bloco do valor e 4 linhas de categoria de 56.
 ///
-/// Sempre claro (DECISOES 12): não lê o tema do app.
+/// Segue o modo claro/escuro do app (cores de `context.cores`).
 class ExpensesSkeletonLoader extends StatelessWidget {
   const ExpensesSkeletonLoader({super.key});
 
@@ -17,8 +17,8 @@ class ExpensesSkeletonLoader extends StatelessWidget {
       label: 'Carregando seus gastos',
       child: ExcludeSemantics(
         child: Shimmer.fromColors(
-          baseColor: LummyColors.line100,
-          highlightColor: LummyColors.surface100,
+          baseColor: context.cores.linha,
+          highlightColor: context.cores.superficieNeutra,
           child: SingleChildScrollView(
             physics: const NeverScrollableScrollPhysics(),
             padding: EdgeInsets.fromLTRB(
@@ -117,7 +117,7 @@ class _Bloco extends StatelessWidget {
       width: largura ?? double.infinity,
       height: altura,
       decoration: BoxDecoration(
-        color: LummyColors.line100,
+        color: context.cores.linha,
         borderRadius: BorderRadius.circular(raio),
       ),
     );

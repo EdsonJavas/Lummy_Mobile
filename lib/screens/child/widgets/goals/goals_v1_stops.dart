@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 import 'goals_v1_calc.dart';
@@ -61,7 +62,7 @@ class _StopItem extends StatelessWidget {
                 bottom: 0,
                 child: Container(
                   width: 2,
-                  color: parada.feita ? LummyColors.brandGreen : LummyColors.line100,
+                  color: parada.feita ? LummyColors.brandGreen : context.cores.linha,
                 ),
               ),
             Padding(
@@ -78,10 +79,10 @@ class _StopItem extends StatelessWidget {
                       children: [
                         Text(
                           parada.titulo,
-                          style: LummyText.poppins(size: 15, weight: FontWeight.w600),
+                          style: LummyText.poppins(context, size: 15, weight: FontWeight.w600),
                         ),
                         const SizedBox(height: 2),
-                        Text(parada.subtitulo, style: LummyText.apoio()),
+                        Text(parada.subtitulo, style: LummyText.apoio(context)),
                       ],
                     ),
                   ),
@@ -132,7 +133,7 @@ class _StopMarker extends StatelessWidget {
           height: 28,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: LummyColors.white,
+            color: context.cores.superficie,
             shape: BoxShape.circle,
             border: Border.all(color: LummyColors.brandGreen, width: 3),
           ),
@@ -151,14 +152,14 @@ class _StopMarker extends StatelessWidget {
           height: 28,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: LummyColors.surface100,
+            color: context.cores.superficieNeutra,
             shape: BoxShape.circle,
-            border: Border.all(color: LummyColors.ink200, width: 2),
+            border: Border.all(color: context.cores.tracejado, width: 2),
           ),
-          child: const LummyIcon(
+          child: LummyIcon(
             LummyGlyphs.flag,
             size: 13,
-            color: LummyColors.ink500,
+            color: context.cores.iconeApagado,
             strokeWidth: 2.6,
           ),
         );

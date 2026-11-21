@@ -205,6 +205,7 @@ class GoalTrailLegend extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: LummyText.poppins(
+              context,
               size: 13,
               weight: FontWeight.w500,
               color: LummyColors.white75,
@@ -216,6 +217,7 @@ class GoalTrailLegend extends StatelessWidget {
           direita,
           maxLines: 1,
           style: LummyText.poppins(
+            context,
             size: 13,
             weight: FontWeight.w700,
             color: LummyColors.white,

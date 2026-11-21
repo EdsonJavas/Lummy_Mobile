@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/models/goal.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
@@ -39,8 +40,8 @@ class _CompletedItem extends StatelessWidget {
       child: Container(
         // min-height: 64px de conteúdo + 1 da borda de baixo (content-box).
         constraints: const BoxConstraints(minHeight: 65),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: LummyColors.line100)),
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: context.cores.linha)),
         ),
         child: Row(
           children: [
@@ -55,7 +56,7 @@ class _CompletedItem extends StatelessWidget {
               child: LummyIcon(
                 GoalIcon.doEmoji(meta.emoji),
                 size: 20,
-                color: LummyColors.ink900,
+                color: context.cores.tinta,
                 strokeWidth: 2.1,
               ),
             ),
@@ -72,12 +73,12 @@ class _CompletedItem extends StatelessWidget {
                       meta.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: LummyText.corpo(),
+                      style: LummyText.corpo(context),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       GoalsV1Calc.legendaConquistada(meta),
-                      style: LummyText.apoio(),
+                      style: LummyText.apoio(context),
                     ),
                   ],
                 ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 /// Teclado numérico próprio do painel (`Anotar-gasto.dc.html`, D17).
@@ -58,10 +58,10 @@ class MoneySheetKeypad extends StatelessWidget {
               rotuloAcessivel: 'Apagar',
               onTap: onApagar,
               onLongPress: onLimpar,
-              child: const LummyIcon(
+              child: LummyIcon(
                 LummyGlyphs.delete,
                 size: 24,
-                color: LummyColors.ink900,
+                color: context.cores.tinta,
                 strokeWidth: 2,
               ),
             ),
@@ -102,7 +102,7 @@ class _TextoTecla extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       texto,
-      style: LummyText.poppins(size: 24, weight: FontWeight.w500),
+      style: LummyText.poppins(context, size: 24, weight: FontWeight.w500),
     );
   }
 }
@@ -131,7 +131,7 @@ class _Tecla extends StatelessWidget {
       excludeSemantics: true,
       child: InkWell(
         borderRadius: _raio,
-        highlightColor: LummyColors.surface100,
+        highlightColor: context.cores.superficieNeutra,
         splashColor: Colors.transparent,
         hoverColor: Colors.transparent,
         focusColor: Colors.transparent,

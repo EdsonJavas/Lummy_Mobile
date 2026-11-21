@@ -41,6 +41,7 @@ class HomeV1PiggyCard extends StatelessWidget {
           Text(
             'Meu cofrinho',
             style: LummyText.poppins(
+              context,
               size: 13,
               weight: FontWeight.w500,
               color: LummyColors.white75,
@@ -52,7 +53,7 @@ class HomeV1PiggyCard extends StatelessWidget {
             child: _valor(),
           ),
           const Spacer(),
-          ..._blocoDaMeta(),
+          ..._blocoDaMeta(context),
         ],
       ),
     );
@@ -84,7 +85,7 @@ class HomeV1PiggyCard extends StatelessWidget {
     );
   }
 
-  List<Widget> _blocoDaMeta() {
+  List<Widget> _blocoDaMeta(BuildContext context) {
     final e = estado;
     // Primeira leitura do saldo falhou: diz o que houve e como resolver.
     if (saldo == null) {
@@ -92,6 +93,7 @@ class HomeV1PiggyCard extends StatelessWidget {
         Text(
           'Não deu para carregar seu saldo.',
           style: LummyText.poppins(
+            context,
             size: 13,
             weight: FontWeight.w500,
             color: LummyColors.white75,
@@ -125,6 +127,7 @@ class HomeV1PiggyCard extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: LummyText.poppins(
+          context,
           size: 15,
           weight: FontWeight.w600,
           color: LummyColors.white,

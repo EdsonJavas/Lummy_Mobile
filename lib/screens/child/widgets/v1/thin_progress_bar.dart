@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 
 /// Barra fina de progresso (C-9): trilho `#EEF0F4` e preenchimento [cor].
 ///
@@ -14,7 +14,7 @@ class ThinProgressBar extends StatelessWidget {
     required this.cor,
     this.altura = 8,
     this.raio = 4,
-    this.fundo = LummyColors.line100,
+    this.fundo,
   });
 
   /// Fração preenchida (0..1; fora disso é limitada).
@@ -22,7 +22,8 @@ class ThinProgressBar extends StatelessWidget {
   final Color cor;
   final double altura;
   final double raio;
-  final Color fundo;
+  /// Trilho. Padrão: `context.cores.linha`.
+  final Color? fundo;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class ThinProgressBar extends StatelessWidget {
       borderRadius: BorderRadius.circular(raio),
       child: Container(
         height: altura,
-        color: fundo,
+        color: fundo ?? context.cores.linha,
         alignment: Alignment.centerLeft,
         child: TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: v),

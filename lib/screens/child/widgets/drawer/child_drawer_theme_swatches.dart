@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/lummy_icon.dart';
 import 'package:lummy/screens/child/widgets/v1/v1_text.dart';
 
@@ -19,16 +20,18 @@ import 'package:lummy/screens/child/widgets/v1/v1_text.dart';
 class ChildThemeColorSwatches extends StatelessWidget {
   const ChildThemeColorSwatches({
     super.key,
-    this.corRotuloEscolhido = LummyColors.ink900,
-    this.corRotulo = LummyColors.ink600,
+    this.corRotuloEscolhido,
+    this.corRotulo,
     this.corDoVao,
   });
 
   /// Cor do rótulo da opção escolhida (mockup: tinta).
-  final Color corRotuloEscolhido;
+  /// Padrão: `context.cores.tinta`.
+  final Color? corRotuloEscolhido;
 
   /// Cor do rótulo das outras opções (mockup: texto de apoio).
-  final Color corRotulo;
+  /// Padrão: `context.cores.tintaApoio`.
+  final Color? corRotulo;
 
   /// Cor do vão de 3 px entre a bolinha e o anel. Nulo = branco do mockup
   /// (`LummyShadows.swatchRing`). No Perfil é a cor do cartão.
@@ -52,9 +55,9 @@ class ChildThemeColorSwatches extends StatelessWidget {
               child: _Swatch(
                 opcao: opcoes[i],
                 escolhida: opcoes[i] == cores.opcao,
-                corRotuloEscolhido: corRotuloEscolhido,
-                corRotulo: corRotulo,
-                corDoVao: corDoVao,
+                corRotuloEscolhido: corRotuloEscolhido ?? context.cores.tinta,
+                corRotulo: corRotulo ?? context.cores.tintaApoio,
+                corDoVao: corDoVao ?? context.cores.superficie,
                 onTap: () => context
                     .read<ChildThemeColorController>()
                     .selecionar(opcoes[i]),
@@ -135,6 +138,7 @@ class _Swatch extends StatelessWidget {
             AnimatedDefaultTextStyle(
               duration: _duracao,
               style: LummyText.poppins(
+                context,
                 size: 12,
                 weight: escolhida ? FontWeight.w600 : FontWeight.w500,
                 color: escolhida ? corRotuloEscolhido : corRotulo,

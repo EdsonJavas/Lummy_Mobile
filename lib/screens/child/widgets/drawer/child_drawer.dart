@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:lummy/core/providers/child_data_changes.dart';
 import 'package:lummy/core/providers/child_profile_controller.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/data/child/child_achievements_repository.dart';
 import 'package:lummy/data/child/child_missions_repository.dart';
@@ -31,7 +32,7 @@ import 'child_drawer_theme_swatches.dart';
 /// quando chegam. Sem dado (erro, sem rede, lista vazia) o valor fica
 /// escondido: nada de número inventado (D7).
 ///
-/// Sempre claro: a casca força o tema claro (D12) e as cores vêm dos tokens.
+/// Segue o modo claro/escuro do app: as cores vêm de `context.cores`.
 class ChildDrawer extends StatefulWidget {
   const ChildDrawer({super.key});
 
@@ -146,9 +147,9 @@ class _ChildDrawerState extends State<ChildDrawer> {
       child: ConstrainedBox(
         constraints: BoxConstraints.expand(width: largura),
         child: DecoratedBox(
-          decoration: const BoxDecoration(
-            color: LummyColors.white,
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: context.cores.superficie,
+            borderRadius: const BorderRadius.only(
               topRight: Radius.circular(28),
               bottomRight: Radius.circular(28),
             ),
@@ -199,8 +200,8 @@ class _ChildDrawerState extends State<ChildDrawer> {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.only(top: 8),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: LummyColors.line100)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: context.cores.linha)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -268,14 +269,14 @@ class _Topo extends StatelessWidget {
             child: InkWell(
               onTap: onFechar,
               customBorder: const CircleBorder(),
-              child: const SizedBox(
+              child: SizedBox(
                 width: 44,
                 height: 44,
                 child: Center(
                   child: LummyIcon(
                     LummyGlyphs.x,
                     size: 22,
-                    color: LummyColors.ink600,
+                    color: context.cores.tintaApoio,
                     strokeWidth: 2.2,
                   ),
                 ),
@@ -307,7 +308,7 @@ class _Identidade extends StatelessWidget {
           perfil.nome,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: LummyText.nomeMenu(),
+          style: LummyText.nomeMenu(context),
         ),
         const SizedBox(height: 6),
         // O "Exploradora" do mockup não aparece: não existe no banco (D7).
@@ -336,15 +337,15 @@ class _CorDoApp extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 18),
       padding: const EdgeInsets.only(top: 16),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: LummyColors.line100)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: context.cores.linha)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Semantics(
             header: true,
-            child: Text('Cor do app', style: LummyText.pergunta()),
+            child: Text('Cor do app', style: LummyText.pergunta(context)),
           ),
           const SizedBox(height: 12),
           const ChildThemeColorSwatches(),
@@ -366,8 +367,8 @@ class _Rodape extends StatelessWidget {
       // Respiro mínimo quando o conteúdo ocupa a tela toda e o menu rola.
       margin: const EdgeInsets.only(top: 18),
       padding: const EdgeInsets.only(top: 12),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: LummyColors.line100)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: context.cores.linha)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -382,20 +383,20 @@ class _Rodape extends StatelessWidget {
                   constraints: const BoxConstraints(minHeight: 52),
                   child: Row(
                     children: [
-                      const SizedBox(
+                      SizedBox(
                         width: 40,
                         height: 40,
                         child: Center(
                           child: LummyIcon(
                             LummyGlyphs.logOut,
                             size: 20,
-                            color: LummyColors.ink600,
+                            color: context.cores.tintaApoio,
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text('Sair da conta', style: LummyText.corpo()),
+                        child: Text('Sair da conta', style: LummyText.corpo(context)),
                       ),
                     ],
                   ),
@@ -406,7 +407,7 @@ class _Rodape extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             ChildDrawer.versaoDoApp,
-            style: LummyText.poppins(size: 12, color: LummyColors.ink600),
+            style: LummyText.poppins(context, size: 12, color: context.cores.tintaApoio),
           ),
         ],
       ),

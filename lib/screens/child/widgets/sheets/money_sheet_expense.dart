@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:lummy/core/providers/child_data_changes.dart';
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/core/utils/network_errors.dart';
 import 'package:lummy/data/child/child_transactions_repository.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
@@ -157,10 +157,10 @@ class _MoneySheetExpenseState extends State<MoneySheetExpense> {
         MoneySheetAmountDisplay(
           valor: _entrada.texto,
           linha: _linhaDoValor,
-          corLinha: _saldoInsuficiente ? LummyColors.danger700 : LummyColors.ink600,
+          corLinha: _saldoInsuficiente ? context.cores.perigo : context.cores.tintaApoio,
         ),
         const SizedBox(height: 16),
-        Text('Com o quê?', style: LummyText.pergunta()),
+        Text('Com o quê?', style: LummyText.pergunta(context)),
         const SizedBox(height: 10),
         if (_erroContexto)
           _ErroCategorias(onTentarDeNovo: _carregarContexto)
@@ -174,7 +174,7 @@ class _MoneySheetExpenseState extends State<MoneySheetExpense> {
             onEscolher: (c) => setState(() => _categoria = c),
           ),
         const SizedBox(height: 16),
-        Text('Você precisava ou só queria?', style: LummyText.pergunta()),
+        Text('Você precisava ou só queria?', style: LummyText.pergunta(context)),
         const SizedBox(height: 10),
         IgnorePointer(
           ignoring: _salvando,
@@ -220,14 +220,14 @@ class _ErroCategorias extends StatelessWidget {
         Text(
           'Não foi possível carregar suas categorias.',
           textAlign: TextAlign.center,
-          style: LummyText.apoio(),
+          style: LummyText.apoio(context),
         ),
         TextButton(
           onPressed: onTentarDeNovo,
           style: TextButton.styleFrom(
-            foregroundColor: tema,
+            foregroundColor: context.cores.realce(tema),
             minimumSize: const Size(48, 44),
-            textStyle: LummyText.link(tema),
+            textStyle: LummyText.link(context, tema),
           ),
           child: const Text('Tentar de novo'),
         ),

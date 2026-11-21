@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 /// Estado de erro da aba Metas (sem mockup): texto + "Tentar de novo".
@@ -21,8 +21,9 @@ class GoalsV1Error extends StatelessWidget {
         Text(
           'Não foi possível carregar suas metas. Verifique a internet e tente de novo.',
           style: LummyText.poppins(
+            context,
             size: 14,
-            color: LummyColors.ink600,
+            color: context.cores.tintaApoio,
             height: 1.45,
           ),
         ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 /// O que a criança digitou no teclado do painel, como texto cru.
@@ -95,7 +95,7 @@ class MoneySheetAmountDisplay extends StatelessWidget {
     super.key,
     required this.valor,
     required this.linha,
-    this.corLinha = LummyColors.ink600,
+    this.corLinha,
   });
 
   /// Texto do valor, já formatado ([MoneySheetAmountInput.texto]).
@@ -103,7 +103,8 @@ class MoneySheetAmountDisplay extends StatelessWidget {
 
   /// "Depois disso, sobram R$ 82,00" e variações.
   final String? linha;
-  final Color corLinha;
+  /// Padrão: `context.cores.tintaApoio`.
+  final Color? corLinha;
 
   @override
   Widget build(BuildContext context) {
@@ -122,13 +123,13 @@ class MoneySheetAmountDisplay extends StatelessWidget {
                 valor,
                 maxLines: 1,
                 softWrap: false,
-                style: LummyText.valorPainel(),
+                style: LummyText.valorPainel(context),
               ),
             ),
             const SizedBox(height: 2),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 160),
-              style: LummyText.poppins(size: 13, color: corLinha),
+              style: LummyText.poppins(context, size: 13, color: corLinha ?? context.cores.tintaApoio),
               child: Text(
                 // Espaço que não quebra: segura a altura da linha sem texto.
                 linha ?? ' ',

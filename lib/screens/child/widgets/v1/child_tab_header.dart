@@ -28,7 +28,7 @@ class ChildTabHeader extends StatelessWidget {
             header: true,
             child: Text(
               title,
-              style: LummyText.h1(),
+              style: LummyText.h1(context),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

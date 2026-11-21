@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:lummy/core/providers/child_data_changes.dart';
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/data/child/child_goals_repository.dart';
 import 'package:lummy/models/goal.dart';
@@ -32,7 +32,7 @@ import 'package:lummy/shared/widgets/lummy_feedback.dart';
 ///   feita por `ChildGoalsRepository.carregarMetaSincronizada`);
 /// - criar meta passa sempre por `abrirCriacaoDeMeta`.
 ///
-/// Sempre clara (o `Theme` claro vem da casca, `MainNavigation`).
+/// Segue o modo claro/escuro do app (cores de `context.cores`).
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
 
@@ -218,7 +218,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     } else {
       corpo = BrandedRefreshIndicator(
         color: tema,
-        backgroundColor: LummyColors.white,
+        backgroundColor: context.cores.superficie,
         onRefresh: _aoPuxar,
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
@@ -253,7 +253,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     }
 
     return ColoredBox(
-      color: LummyColors.white,
+      color: context.cores.fundo,
       child: SafeArea(bottom: false, child: corpo),
     );
   }

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:lummy/core/providers/child_data_changes.dart';
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/core/utils/network_errors.dart';
 import 'package:lummy/data/child/child_transactions_repository.dart';
 import 'package:lummy/screens/child/widgets/expenses/expenses_load_error.dart';
@@ -30,7 +30,7 @@ import 'package:lummy/shared/widgets/lummy_feedback.dart';
 ///
 /// Dados: uma consulta por carga (`listarGastos`) e o saldo (só como dica para
 /// o painel de anotar gasto). Todas as contas são locais, em `ExpensesCalc`.
-/// Sempre clara (DECISOES 12): não lê o tema do app.
+/// Segue o modo claro/escuro do app (cores de `context.cores`).
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
 
@@ -203,7 +203,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     }
 
     return ColoredBox(
-      color: LummyColors.white,
+      color: context.cores.fundo,
       child: SafeArea(bottom: false, child: corpo),
     );
   }
@@ -231,7 +231,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     return BrandedRefreshIndicator(
       onRefresh: _aoPuxar,
       color: tema,
-      backgroundColor: LummyColors.white,
+      backgroundColor: context.cores.superficie,
       // Coluna inteira montada (e não lista preguiçosa): as seções guardam o
       // estado e a animação de entrada não repete ao rolar de volta.
       child: SingleChildScrollView(

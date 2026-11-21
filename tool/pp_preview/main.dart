@@ -5,6 +5,7 @@
 //   ?tela=Main | Home-rolagem | Anotar-gasto | Drawer-crianca | Gastos-mes |
 //         Gastos-lista | Metas-atual | Metas-rolagem
 //   &tema=lummy | indigo | petroleo   (opcional; padrão lummy)
+//   &escuro=1                         (opcional; modo escuro)
 //
 // Compilar (caminho sem acento, ver MISSAO\pp\fotos-app.mjs):
 //   flutter build web -t tool/pp_preview/main.dart --no-pub -o build/pp_web
@@ -27,6 +28,7 @@ import 'package:lummy/core/providers/child_profile_controller.dart';
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
 import 'package:lummy/core/theme/app_theme.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/drawer/child_drawer.dart';
 import 'package:lummy/screens/child/widgets/home/home_b_mission_row.dart';
 import 'package:lummy/screens/child/widgets/sheets/money_sheet_frame.dart';
@@ -46,7 +48,12 @@ Future<void> main() async {
     orElse: () => ChildThemeColor.lummy,
   );
   await _carregarFontes();
-  runApp(PpApp(tela: tela, cor: cor, corrigido: params['corrigido'] == '1'));
+  runApp(PpApp(
+    tela: tela,
+    cor: cor,
+    corrigido: params['corrigido'] == '1',
+    escuro: params['escuro'] == '1',
+  ));
 }
 
 /// Baixa Poppins e Fredoka antes da primeira pintura (google_fonts em runtime).
@@ -77,7 +84,13 @@ ThemeData _temaCorrigido() {
 }
 
 class PpApp extends StatelessWidget {
-  const PpApp({super.key, required this.tela, required this.cor, this.corrigido = false});
+  const PpApp({
+    super.key,
+    required this.tela,
+    required this.cor,
+    this.corrigido = false,
+    this.escuro = false,
+  });
 
   final String tela;
 
@@ -85,6 +98,9 @@ class PpApp extends StatelessWidget {
   /// herdado e altura "normal" 1.5 do Poppins).
   final bool corrigido;
   final ChildThemeColor cor;
+
+  /// Modo escuro do app (tema escuro do MaterialApp).
+  final bool escuro;
 
   @override
   Widget build(BuildContext context) {
@@ -97,15 +113,15 @@ class PpApp extends StatelessWidget {
       child: MaterialApp(
         title: 'PP $tela',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
+        theme: escuro ? AppTheme.darkTheme : AppTheme.lightTheme,
         home: PpCasca(tela: tela, corrigido: corrigido),
       ),
     );
   }
 }
 
-/// Cópia da casca `main_navigation.dart` (build): Theme claro, ChildShellScope,
-/// Scaffold branco com o menu lateral e o véu, degradê e cápsula por cima.
+/// Cópia da casca `main_navigation.dart` (build): tema do app, ChildShellScope,
+/// Scaffold no fundo do tema com o menu lateral e o véu, degradê e cápsula por cima.
 class PpCasca extends StatefulWidget {
   const PpCasca({super.key, required this.tela, this.corrigido = false});
 
@@ -213,9 +229,9 @@ class _PpCascaState extends State<PpCasca> {
     final inset = MediaQuery.viewPaddingOf(context).bottom;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
+      value: context.cores.escuro ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Theme(
-        data: widget.corrigido ? _temaCorrigido() : AppTheme.lightTheme,
+        data: widget.corrigido ? _temaCorrigido() : Theme.of(context),
         child: ChildShellScope(
           currentTab: _aba,
           openDrawer: () => _scaffoldKey.currentState?.openDrawer(),
@@ -224,10 +240,10 @@ class _PpCascaState extends State<PpCasca> {
           afterDrawerClosed: (_) {},
           child: Scaffold(
             key: _scaffoldKey,
-            backgroundColor: LummyColors.white,
+            backgroundColor: context.cores.fundo,
             resizeToAvoidBottomInset: false,
             drawer: const ChildDrawer(),
-            drawerScrimColor: LummyColors.scrimInk,
+            drawerScrimColor: context.cores.veu,
             drawerEnableOpenDragGesture: false,
             body: Stack(
               children: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 import 'expenses_v1_calc.dart';
@@ -29,7 +30,7 @@ class ExpensesV1Summary extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(_rotulo, style: LummyText.poppins(size: 14, color: LummyColors.ink600)),
+        Text(_rotulo, style: LummyText.poppins(context, size: 14, color: context.cores.tintaApoio)),
         const SizedBox(height: 2),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
@@ -43,7 +44,7 @@ class ExpensesV1Summary extends StatelessWidget {
             key: ValueKey(total),
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(total, maxLines: 1, style: LummyText.valorResumo()),
+            child: Text(total, maxLines: 1, style: LummyText.valorResumo(context)),
           ),
         ),
         AnimatedSize(
@@ -80,12 +81,12 @@ class _Comparacao extends StatelessWidget {
         LummyIcon(
           menos ? LummyGlyphs.trendingDown : LummyGlyphs.trendingUp,
           size: 18,
-          color: menos ? LummyColors.brandGreen : LummyColors.chartInk,
+          color: menos ? LummyColors.brandGreen : context.cores.grafico,
           strokeWidth: 2.4,
         ),
         const SizedBox(width: 6),
         Expanded(
-          child: Text(texto, style: LummyText.poppins(size: 13)),
+          child: Text(texto, style: LummyText.poppins(context, size: 13)),
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/data/child/child_missions_repository.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
@@ -55,7 +56,7 @@ class HomeBMissions extends StatelessWidget {
         // Com todas feitas o mockup não desenhou texto: a legenda some.
         if (feitas < total) ...[
           const SizedBox(height: 8),
-          Text('Complete as $total e abra o baú do dia.', style: LummyText.apoio()),
+          Text('Complete as $total e abra o baú do dia.', style: LummyText.apoio(context)),
         ],
         const SizedBox(height: 4),
         for (final m in ordenadas)
@@ -91,7 +92,7 @@ class _Segmentos extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 height: 6,
                 decoration: BoxDecoration(
-                  color: i < feitas ? LummyColors.brandGreen : LummyColors.line100,
+                  color: i < feitas ? LummyColors.brandGreen : context.cores.linha,
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),

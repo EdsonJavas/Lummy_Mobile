@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:lummy/core/providers/child_data_changes.dart';
-import 'package:lummy/core/theme/app_theme.dart';
 import 'package:lummy/core/utils/app_log.dart';
 import 'package:lummy/data/child/child_goals_repository.dart';
 import 'package:lummy/screens/child/new_goal_screen.dart';
@@ -54,11 +53,7 @@ Future<bool> _abrirCriacaoDeMeta(BuildContext context) async {
 
   if (!context.mounted) return false;
   final result = await Navigator.of(context).push<Object?>(
-    // Área da criança sempre clara (D12), também nesta tela empurrada.
-    MaterialPageRoute(
-      builder: (_) =>
-          Theme(data: AppTheme.lightTheme, child: const NewGoalScreen()),
-    ),
+    MaterialPageRoute(builder: (_) => const NewGoalScreen()),
   );
   if (result is! Map || !context.mounted) return false;
 

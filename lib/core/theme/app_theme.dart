@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 
 class AppTheme {
   AppTheme._();
@@ -8,6 +9,8 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      // Cores da área da criança que seguem o modo claro/escuro.
+      extensions: const <ThemeExtension<dynamic>>[LummyCores.claro],
       materialTapTargetSize: MaterialTapTargetSize.padded,
       visualDensity: VisualDensity.standard,
       scaffoldBackgroundColor: LummyColors.slate100,
@@ -231,6 +234,8 @@ class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
+      // Cores da área da criança que seguem o modo claro/escuro.
+      extensions: const <ThemeExtension<dynamic>>[LummyCores.escuroPadrao],
       materialTapTargetSize: MaterialTapTargetSize.padded,
       visualDensity: VisualDensity.standard,
       brightness: Brightness.dark,

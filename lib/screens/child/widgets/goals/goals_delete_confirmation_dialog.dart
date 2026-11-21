@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/models/goal.dart';
 
 /// Conteúdo do diálogo de confirmação para excluir uma meta.
@@ -17,18 +18,27 @@ class GoalsDeleteConfirmationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // No claro, as cores de sempre; no escuro, a paleta da área da criança.
+    final cores = context.cores;
+    final titulo = cores.escuro ? cores.tinta : LummyColors.slate800;
+    final apoio = cores.escuro ? cores.tintaApoio : LummyColors.slate500;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.white, LummyColors.slate50],
+            colors: cores.escuro
+                ? [cores.superficie, cores.superficie]
+                : const [Colors.white, LummyColors.slate50],
           ),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: LummyColors.slate200, width: 1),
+          border: Border.all(
+            color: cores.escuro ? cores.linha : LummyColors.slate200,
+            width: 1,
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -63,7 +73,7 @@ class GoalsDeleteConfirmationDialog extends StatelessWidget {
               style: LummyFonts.body(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: LummyColors.slate800,
+                color: titulo,
               ),
             ),
             const SizedBox(height: 12),
@@ -85,7 +95,7 @@ class GoalsDeleteConfirmationDialog extends StatelessWidget {
                     style: LummyFonts.body(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: LummyColors.slate500,
+                      color: apoio,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -95,7 +105,7 @@ class GoalsDeleteConfirmationDialog extends StatelessWidget {
                     style: LummyFonts.body(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: LummyColors.slate800,
+                      color: titulo,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -128,7 +138,7 @@ class GoalsDeleteConfirmationDialog extends StatelessWidget {
                       style: LummyFonts.body(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: LummyColors.slate500,
+                        color: apoio,
                       ),
                     ),
                   ),

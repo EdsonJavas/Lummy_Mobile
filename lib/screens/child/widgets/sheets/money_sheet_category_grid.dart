@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 /// Uma opção da grade do painel: categoria de gasto ou origem de ganho.
@@ -102,12 +103,12 @@ class MoneySheetOptionGridPlaceholder extends StatelessWidget {
         itemBuilder: (_) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const _Quadrado(cor: LummyColors.surface100),
+            _Quadrado(cor: context.cores.superficieNeutra),
             const SizedBox(height: 6),
             // Mesmo estilo do rótulo: reserva a altura exata da linha.
             Text(
               ' ',
-              style: LummyText.poppins(size: 12, weight: FontWeight.w500),
+              style: LummyText.poppins(context, size: 12, weight: FontWeight.w500),
             ),
           ],
         ),
@@ -198,11 +199,11 @@ class _BotaoOpcao extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _Quadrado(
-              cor: escolhida ? LummyColors.orange600 : LummyColors.surface100,
+              cor: escolhida ? LummyColors.orange600 : context.cores.superficieNeutra,
               child: LummyIcon(
                 opcao.glyph,
                 size: 22,
-                color: escolhida ? LummyColors.white : LummyColors.ink900,
+                color: escolhida ? LummyColors.white : context.cores.tinta,
                 strokeWidth: escolhida ? opcao.tracoEscolhida : opcao.tracoNormal,
               ),
             ),
@@ -210,9 +211,10 @@ class _BotaoOpcao extends StatelessWidget {
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 160),
               style: LummyText.poppins(
+                context,
                 size: 12,
                 weight: escolhida ? FontWeight.w600 : FontWeight.w500,
-                color: escolhida ? LummyColors.ink900 : LummyColors.ink600,
+                color: escolhida ? context.cores.tinta : context.cores.tintaApoio,
               ),
               child: Text(
                 opcao.nome,

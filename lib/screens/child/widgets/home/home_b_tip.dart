@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 import 'home_educational_tips.dart';
@@ -61,9 +61,9 @@ class _HomeBTipState extends State<HomeBTip> {
               onTap: _proxima,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: const BoxDecoration(
-                  color: LummyColors.surface100,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: context.cores.superficieNeutra,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(18),
                     topRight: Radius.circular(18),
                     bottomRight: Radius.circular(18),
@@ -77,9 +77,10 @@ class _HomeBTipState extends State<HomeBTip> {
                     Text(
                       'Dica do Lummy',
                       style: LummyText.poppins(
+                        context,
                         size: 12,
                         weight: FontWeight.w600,
-                        color: tema,
+                        color: context.cores.realce(tema),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -98,7 +99,7 @@ class _HomeBTipState extends State<HomeBTip> {
                           width: double.infinity,
                           child: Text(
                             texto,
-                            style: LummyText.poppins(size: 14, height: 1.45),
+                            style: LummyText.poppins(context, size: 14, height: 1.45),
                           ),
                         ),
                       ),

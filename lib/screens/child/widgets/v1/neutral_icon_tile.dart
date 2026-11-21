@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 
 import 'lummy_icon.dart';
 
@@ -17,8 +17,8 @@ class NeutralIconTile extends StatelessWidget {
     this.size = 40,
     this.radius = 14,
     this.iconSize = 20,
-    this.background = LummyColors.surface100,
-    this.iconColor = LummyColors.ink900,
+    this.background,
+    this.iconColor,
     this.strokeWidth = 2,
   });
 
@@ -26,8 +26,11 @@ class NeutralIconTile extends StatelessWidget {
   final double size;
   final double radius;
   final double iconSize;
-  final Color background;
-  final Color iconColor;
+  /// Padrão: `context.cores.superficieNeutra`.
+  final Color? background;
+
+  /// Padrão: `context.cores.tinta`.
+  final Color? iconColor;
   final double strokeWidth;
 
   @override
@@ -38,10 +41,10 @@ class NeutralIconTile extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: background,
+        color: background ?? context.cores.superficieNeutra,
         borderRadius: BorderRadius.circular(radius),
       ),
-      child: LummyIcon(glyph, size: iconSize, color: iconColor, strokeWidth: strokeWidth),
+      child: LummyIcon(glyph, size: iconSize, color: iconColor ?? context.cores.tinta, strokeWidth: strokeWidth),
     );
   }
 }

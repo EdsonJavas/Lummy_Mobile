@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lummy/core/providers/child_profile_controller.dart';
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/data/child/child_transactions_repository.dart';
 import 'package:lummy/screens/child/widgets/expenses/expenses_v1_calc.dart';
 import 'package:lummy/screens/child/widgets/expenses/expenses_v1_categories.dart';
@@ -48,13 +48,13 @@ Future<void> _nadaAsync() async {}
 Widget _raizDaAba(BuildContext context, Widget rolagem) {
   final tema = ChildThemeColorController.of(context).tema;
   return ColoredBox(
-    color: LummyColors.white,
+    color: context.cores.fundo,
     child: SafeArea(
       bottom: false,
       child: BrandedRefreshIndicator(
         onRefresh: _nadaAsync,
         color: tema,
-        backgroundColor: LummyColors.white,
+        backgroundColor: context.cores.superficie,
         child: rolagem,
       ),
     ),
@@ -310,10 +310,10 @@ class PpPainelGasto extends StatelessWidget {
         MoneySheetAmountDisplay(
           valor: entrada.texto,
           linha: 'Depois disso, sobram ${V1Format.brl(ppSaldo - entrada.valor)}',
-          corLinha: LummyColors.ink600,
+          corLinha: context.cores.tintaApoio,
         ),
         const SizedBox(height: 16),
-        Text('Com o quê?', style: LummyText.pergunta()),
+        Text('Com o quê?', style: LummyText.pergunta(context)),
         const SizedBox(height: 10),
         MoneySheetOptionGrid(
           opcoes: categorias,
@@ -321,7 +321,7 @@ class PpPainelGasto extends StatelessWidget {
           onEscolher: (_) {},
         ),
         const SizedBox(height: 16),
-        Text('Você precisava ou só queria?', style: LummyText.pergunta()),
+        Text('Você precisava ou só queria?', style: LummyText.pergunta(context)),
         const SizedBox(height: 10),
         LummySegmented<NeedOrWant>(
           opcoes: _segmentos,
@@ -360,13 +360,13 @@ class PpTexto extends StatelessWidget {
         linhas.add(
           Text(
             'T${s.toInt()} ${v.key} Hg',
-            style: LummyText.poppins(size: s, height: v.value),
+            style: LummyText.poppins(context, size: s, height: v.value),
           ),
         );
       }
     }
     return ColoredBox(
-      color: LummyColors.white,
+      color: context.cores.fundo,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: linhas),

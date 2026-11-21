@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import 'package:lummy/core/providers/child_profile_controller.dart';
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
-import 'package:lummy/core/theme/app_theme.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/drawer/child_drawer.dart';
 import 'package:lummy/screens/child/widgets/v1/child_bottom_nav.dart';
 import 'package:lummy/screens/child/widgets/v1/child_shell_scope.dart';
@@ -23,9 +23,8 @@ import 'lessons_screen.dart';
 /// - Menu de baixo em cápsula + degradê branco (C-1), por cima do conteúdo.
 /// - Menu lateral novo (`ChildDrawer`), aberto pelo avatar de qualquer aba via
 ///   `ChildShellScope.read(context)?.openDrawer()`.
-/// - Tema SEMPRE claro aqui dentro, inclusive no menu lateral e nos painéis de
-///   baixo abertos daqui (D12). Telas empurradas por `Navigator.push` (Perfil,
-///   Missões etc.) seguem o tema do app (pendência registrada no PLANO).
+/// - Segue o modo claro/escuro do app: as cores vêm de `context.cores`
+///   (`LummyCores`), registradas nos dois temas.
 /// - Carrega a cor do tema e o perfil da criança ao abrir.
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -35,10 +34,6 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  /// Tema claro calculado uma vez (o getter cria um ThemeData novo a cada
-  /// chamada, o que reconstruiria a casca inteira a cada troca de aba).
-  static final ThemeData _temaClaro = AppTheme.lightTheme;
-
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = ChildTabs.inicio;
   DateTime? _lastBackPress;
@@ -76,7 +71,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   void _depoisDeFecharMenu(void Function(BuildContext shellContext) acao) {
     _fecharMenu();
-    // O contexto do Scaffold fica abaixo do Theme claro e continua montado.
+    // O contexto do Scaffold continua montado depois de fechar o menu.
     final ctx = _scaffoldKey.currentContext ?? context;
     acao(ctx);
   }
@@ -103,7 +98,7 @@ class _MainNavigationState extends State<MainNavigation> {
         SnackBar(
           content: Text(
             'Pressione voltar novamente para sair',
-            style: LummyFonts.body(color: LummyColors.white),
+            style: LummyFonts.body(color: context.cores.fundo),
           ),
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
@@ -119,7 +114,7 @@ class _MainNavigationState extends State<MainNavigation> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          backgroundColor: LummyColors.ink900,
+          backgroundColor: context.cores.tinta,
         ),
       );
       return false;
@@ -133,18 +128,19 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     final inset = MediaQuery.viewPaddingOf(context).bottom;
+    final cores = context.cores;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      // Fundo branco: ícones escuros nas barras do sistema, mesmo no modo
-      // escuro (o .dark puro deixaria a barra de navegação preta).
-      value: SystemUiOverlayStyle.dark.copyWith(
-        systemNavigationBarColor: LummyColors.white,
-        systemNavigationBarIconBrightness: Brightness.dark,
+      // Barras do sistema na cor do fundo, com ícones que contrastam.
+      value: (cores.escuro
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark)
+          .copyWith(
+        systemNavigationBarColor: cores.fundo,
+        systemNavigationBarIconBrightness: cores.brilhoDosIcones,
       ),
-      child: Theme(
-        data: _temaClaro,
-        // Avisos flutuantes aparecem acima da cápsula, não por cima dela.
-        child: LummyFeedbackInset(
+      // Avisos flutuantes aparecem acima da cápsula, não por cima dela.
+      child: LummyFeedbackInset(
           bottom: ChildBottomNavMetrics.capsuleBottom +
               ChildBottomNavMetrics.capsuleHeight,
           child: ChildShellScope(
@@ -164,10 +160,10 @@ class _MainNavigationState extends State<MainNavigation> {
             },
             child: Scaffold(
               key: _scaffoldKey,
-              backgroundColor: LummyColors.white,
+              backgroundColor: cores.fundo,
               resizeToAvoidBottomInset: false,
               drawer: const ChildDrawer(),
-              drawerScrimColor: LummyColors.scrimInk,
+              drawerScrimColor: context.cores.veu,
               // O menu abre pelo avatar (mockup), não arrastando da borda.
               drawerEnableOpenDragGesture: false,
               body: Stack(
@@ -196,7 +192,6 @@ class _MainNavigationState extends State<MainNavigation> {
               ),
             ),
           ),
-        ),
         ),
       ),
     );

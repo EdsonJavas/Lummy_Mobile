@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lummy/core/providers/child_profile_controller.dart';
 import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/v1.dart';
 
 /// Barra de nível da Home (`Main.dc.html`, bloco logo abaixo do `<header>`):
@@ -43,14 +44,14 @@ class HomeV1Level extends StatelessWidget {
                 'Nível $level',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: LummyText.poppins(size: 13, weight: FontWeight.w600),
+                style: LummyText.poppins(context, size: 13, weight: FontWeight.w600),
               ),
             ),
             const SizedBox(width: 8),
             Text(
               '$xpNoNivel de $total XP',
               maxLines: 1,
-              style: LummyText.poppins(size: 12, color: LummyColors.ink600),
+              style: LummyText.poppins(context, size: 12, color: context.cores.tintaApoio),
             ),
           ],
         ),

@@ -10,8 +10,7 @@ import 'skeleton_loader.dart';
 /// barra de nível, cofrinho de 236 com raio 24, 3 ações de 56 com raio 18 e
 /// 3 linhas de missão. Mesmo padding da tela (`16 20 0`).
 ///
-/// As cores vêm do `SkeletonLoader`; a área da criança é sempre clara
-/// (`Theme` claro forçado em `MainNavigation`).
+/// As cores vêm do `SkeletonLoader`, que segue o modo claro/escuro do app.
 class ChildHomeSkeleton extends StatelessWidget {
   const ChildHomeSkeleton({super.key});
 

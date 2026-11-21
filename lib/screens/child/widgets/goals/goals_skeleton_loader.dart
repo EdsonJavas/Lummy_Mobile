@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import 'package:lummy/core/theme/design_tokens.dart';
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/screens/child/widgets/v1/child_bottom_nav.dart';
 
 /// Skeleton da primeira carga da aba Metas (redesenho V1).
 ///
 /// Imita o layout novo: cabeçalho (avatar 40 + título), cartão da meta
 /// (~214 de altura, raio 24), título e segmentado do simulador (44) e 4 linhas
-/// de parada. Sempre claro (a área da criança não segue o modo escuro, D12).
+/// de parada. Segue o modo claro/escuro do app (`context.cores`).
 class GoalsSkeletonLoader extends StatelessWidget {
   const GoalsSkeletonLoader({super.key});
 
@@ -96,7 +96,7 @@ class _Bloco extends StatelessWidget {
       width: largura ?? double.infinity,
       height: altura,
       decoration: BoxDecoration(
-        color: LummyColors.surface100,
+        color: context.cores.superficieNeutra,
         borderRadius: BorderRadius.circular(raio),
       ),
     );

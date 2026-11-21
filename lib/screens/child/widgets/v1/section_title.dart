@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:lummy/core/theme/lummy_cores.dart';
 import 'package:lummy/core/providers/child_theme_color_controller.dart';
 
 import 'lummy_icon.dart';
@@ -21,7 +22,7 @@ class SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final tituloW = Semantics(
       header: true,
-      child: Text(titulo, style: LummyText.h2()),
+      child: Text(titulo, style: LummyText.h2(context)),
     );
     final linha = contagem == null
         ? tituloW
@@ -31,7 +32,7 @@ class SectionTitle extends StatelessWidget {
             children: [
               Expanded(child: tituloW),
               const SizedBox(width: 8),
-              Text(contagem!, style: LummyText.contagem()),
+              Text(contagem!, style: LummyText.contagem(context)),
             ],
           );
     if (apoio == null) return linha;
@@ -41,7 +42,7 @@ class SectionTitle extends StatelessWidget {
       children: [
         linha,
         const SizedBox(height: 4),
-        Text(apoio!, style: LummyText.apoio()),
+        Text(apoio!, style: LummyText.apoio(context)),
       ],
     );
   }
@@ -84,9 +85,14 @@ class ThemeLink extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(rotulo, style: LummyText.link(tema)),
+              Text(rotulo, style: LummyText.link(context, tema)),
               SizedBox(width: gap),
-              LummyIcon(LummyGlyphs.chevronRight, size: 18, color: tema, strokeWidth: 2.2),
+              LummyIcon(
+                LummyGlyphs.chevronRight,
+                size: 18,
+                color: context.cores.realce(tema),
+                strokeWidth: 2.2,
+              ),
             ],
           ),
         ),
