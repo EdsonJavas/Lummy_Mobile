@@ -220,10 +220,15 @@ exception when others then
 end;
 $$;
 
-drop trigger if exists trg_transactions_aviso on public.transactions;
-create trigger trg_transactions_aviso
-  after insert or update of status on public.transactions
-  for each row execute function public.lummy_aviso_transacao();
+-- Só cria o gatilho se a tabela existir (em produção ela pode ainda não ter sido criada).
+do $do$
+begin
+  if to_regclass('public.transactions') is not null then
+    execute 'drop trigger if exists trg_transactions_aviso on public.transactions';
+    execute 'create trigger trg_transactions_aviso after insert or update of status on public.transactions for each row execute function public.lummy_aviso_transacao()';
+  end if;
+end
+$do$;
 
 -- Mesada separada para resgate → cada filho do responsável.
 create or replace function public.lummy_aviso_distribuicao()
@@ -254,10 +259,15 @@ exception when others then
 end;
 $$;
 
-drop trigger if exists trg_allowance_distributions_aviso on public.allowance_distributions;
-create trigger trg_allowance_distributions_aviso
-  after insert on public.allowance_distributions
-  for each row execute function public.lummy_aviso_distribuicao();
+-- Só cria o gatilho se a tabela existir (em produção ela pode ainda não ter sido criada).
+do $do$
+begin
+  if to_regclass('public.allowance_distributions') is not null then
+    execute 'drop trigger if exists trg_allowance_distributions_aviso on public.allowance_distributions';
+    execute 'create trigger trg_allowance_distributions_aviso after insert on public.allowance_distributions for each row execute function public.lummy_aviso_distribuicao()';
+  end if;
+end
+$do$;
 
 -- Missão nova criada pelo responsável → criança.
 create or replace function public.lummy_aviso_missao()
@@ -280,10 +290,15 @@ exception when others then
 end;
 $$;
 
-drop trigger if exists trg_custom_missions_aviso on public.custom_missions;
-create trigger trg_custom_missions_aviso
-  after insert on public.custom_missions
-  for each row execute function public.lummy_aviso_missao();
+-- Só cria o gatilho se a tabela existir (em produção ela pode ainda não ter sido criada).
+do $do$
+begin
+  if to_regclass('public.custom_missions') is not null then
+    execute 'drop trigger if exists trg_custom_missions_aviso on public.custom_missions';
+    execute 'create trigger trg_custom_missions_aviso after insert on public.custom_missions for each row execute function public.lummy_aviso_missao()';
+  end if;
+end
+$do$;
 
 -- Meta conquistada → responsável.
 create or replace function public.lummy_aviso_meta()
@@ -316,7 +331,12 @@ exception when others then
 end;
 $$;
 
-drop trigger if exists trg_goals_aviso on public.goals;
-create trigger trg_goals_aviso
-  after update of status on public.goals
-  for each row execute function public.lummy_aviso_meta();
+-- Só cria o gatilho se a tabela existir (em produção ela pode ainda não ter sido criada).
+do $do$
+begin
+  if to_regclass('public.goals') is not null then
+    execute 'drop trigger if exists trg_goals_aviso on public.goals';
+    execute 'create trigger trg_goals_aviso after update of status on public.goals for each row execute function public.lummy_aviso_meta()';
+  end if;
+end
+$do$;
