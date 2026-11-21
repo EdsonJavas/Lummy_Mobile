@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lummy/core/providers/theme_provider.dart';
 import 'package:lummy/application/app_facade.dart';
 import 'package:lummy/core/config/supabase_config.dart';
+import 'package:lummy/core/services/push_notifications.dart';
 import 'package:lummy/di/locator.dart';
 import 'package:lummy/screens/auth/login_screen.dart';
 import 'package:lummy/screens/child/main_navigation.dart';
@@ -136,6 +137,8 @@ class _SplashScreenState extends State<SplashScreen>
         url: SupabaseConfig.url,
         anonKey: SupabaseConfig.anonKey,
       );
+      // Notificações remotas: em paralelo, nunca travam a abertura.
+      unawaited(PushNotifications.iniciar());
       setState(() => _loadingText = 'Configurando');
       setupLocator();
 
